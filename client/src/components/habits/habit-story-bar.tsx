@@ -95,19 +95,19 @@ export function HabitStoryBar({ habits, onUpdate, onAddHabit }: HabitStoryBarPro
   };
 
   return (
-    <div className="w-full bg-background border-b border-border">
-      <div className="flex items-center space-x-4 p-4 overflow-x-auto">
+    <div className="w-full bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-b border-border/50 shadow-sm">
+      <div className="flex items-center space-x-6 p-6 overflow-x-auto max-w-6xl mx-auto">
         {/* Add New Habit Story */}
         <div className="flex-shrink-0">
           <Button
             variant="outline"
             size="lg"
             onClick={onAddHabit}
-            className="w-16 h-16 rounded-full border-2 border-dashed border-muted-foreground/50 hover:border-accent transition-all duration-200 flex items-center justify-center"
+            className="w-20 h-20 rounded-full border-3 border-dashed border-muted-foreground/30 hover:border-accent hover:bg-accent/5 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
           >
-            <Plus className="w-6 h-6 text-muted-foreground" />
+            <Plus className="w-8 h-8 text-muted-foreground" />
           </Button>
-          <p className="text-xs text-center mt-2 text-muted-foreground max-w-16 truncate">Add Habit</p>
+          <p className="text-sm text-center mt-3 text-muted-foreground max-w-20 truncate font-medium">Add Habit</p>
         </div>
 
         {/* Habit Stories */}
@@ -120,10 +120,10 @@ export function HabitStoryBar({ habits, onUpdate, onAddHabit }: HabitStoryBarPro
             <div key={habit.id} className="flex-shrink-0 flex flex-col items-center">
               <div className="relative">
                 {/* Completion Ring */}
-                <div className={`w-16 h-16 rounded-full p-0.5 transition-all duration-300 ${
+                <div className={`w-20 h-20 rounded-full p-1 transition-all duration-300 ${
                   isCompleted 
-                    ? `bg-gradient-to-r ${habitColor} shadow-lg shadow-${habitColor.split('-')[1]}-500/25` 
-                    : "bg-gradient-to-r from-muted-foreground/30 to-muted-foreground/30"
+                    ? `bg-gradient-to-r ${habitColor} shadow-xl` 
+                    : "bg-gradient-to-r from-slate-200/60 to-slate-300/60 dark:from-slate-700/60 dark:to-slate-600/60"
                 }`}>
                   {/* Inner Circle */}
                   <Button
@@ -131,16 +131,21 @@ export function HabitStoryBar({ habits, onUpdate, onAddHabit }: HabitStoryBarPro
                     size="lg"
                     onClick={(e) => handleToggleHabit(habit.id, e)}
                     disabled={isLoading}
-                    className={`w-full h-full rounded-full border-2 transition-all duration-200 ${
+                    className={`w-full h-full rounded-full transition-all duration-300 hover:scale-105 ${
                       isCompleted
-                        ? "bg-green-500 border-green-400 hover:bg-green-600"
-                        : "bg-background border-muted hover:border-accent hover:bg-accent/10"
+                        ? `bg-gradient-to-r ${habitColor} border-0 shadow-lg hover:shadow-xl`
+                        : "bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 hover:bg-white dark:hover:bg-slate-700"
                     }`}
                   >
                     {isCompleted ? (
-                      <Check className="w-6 h-6 text-white" />
+                      <Check className="w-8 h-8 text-white drop-shadow-lg" />
                     ) : (
-                      <div className="w-6 h-6 rounded-full border-2 border-muted-foreground/50" />
+                      <div className={`w-8 h-8 rounded-full border-3 transition-all duration-300 ${
+                        habit.category === 'mind' ? 'border-purple-400/50' :
+                        habit.category === 'body' ? 'border-orange-400/50' :
+                        habit.category === 'soul' ? 'border-emerald-400/50' :
+                        'border-slate-400/50'
+                      }`} />
                     )}
                   </Button>
                 </div>
