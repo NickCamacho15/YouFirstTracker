@@ -285,17 +285,6 @@ export default function HabitsPage() {
                               )}
                             </div>
                           </div>
-
-                            {/* Quick Stats */}
-                            <div className="text-right">
-                              <div className={`text-2xl font-bold ${habit.completedToday ? 'text-green-600' : colors.text}`}>
-                                {habit.streak}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                day{habit.streak !== 1 ? 's' : ''}
-                              </div>
-                            </div>
-                          </div>
                         </CardContent>
                       </Card>
                     );
@@ -311,6 +300,14 @@ export default function HabitsPage() {
           open={showNewHabitModal}
           onOpenChange={setShowNewHabitModal}
           onSuccess={refreshHabits}
+        />
+
+        {/* Edit Habit Modal */}
+        <EditHabitModal
+          open={showEditHabitModal}
+          onOpenChange={setShowEditHabitModal}
+          onSuccess={refreshHabits}
+          habit={selectedHabit}
         />
       </div>
     </div>
