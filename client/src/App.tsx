@@ -14,20 +14,24 @@ import ReadPage from "@/pages/read";
 import VisionPage from "@/pages/vision";
 import ProfilePage from "@/pages/profile";
 import NotFound from "@/pages/not-found";
+import { Navigation } from "@/components/layout/navigation";
 
 function AuthenticatedApp() {
   return (
-    <Switch>
-      <Route path="/" component={DashboardPage} />
-      <Route path="/dashboard" component={DashboardPage} />
-      <Route path="/you" component={YouPage} />
-      <Route path="/goals" component={GoalsPage} />
-      <Route path="/habits" component={HabitsPage} />
-      <Route path="/read" component={ReadPage} />
-      <Route path="/vision" component={VisionPage} />
-      <Route path="/profile" component={ProfilePage} />
-      <Route component={NotFound} />
-    </Switch>
+    <>
+      <Navigation />
+      <Switch>
+        <Route path="/" component={DashboardPage} />
+        <Route path="/dashboard" component={DashboardPage} />
+        <Route path="/you" component={YouPage} />
+        <Route path="/goals" component={GoalsPage} />
+        <Route path="/habits" component={HabitsPage} />
+        <Route path="/read" component={ReadPage} />
+        <Route path="/vision" component={VisionPage} />
+        <Route path="/profile" component={ProfilePage} />
+        <Route component={NotFound} />
+      </Switch>
+    </>
   );
 }
 

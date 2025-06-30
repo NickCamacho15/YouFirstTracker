@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Navigation } from "@/components/layout/navigation";
 import { GoalCard } from "@/components/goals/goal-card";
 import { NewGoalModal } from "@/components/goals/new-goal-modal";
 import { HabitCard } from "@/components/habits/habit-card";
@@ -42,8 +41,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      
       {/* Habit Story Bar */}
       <HabitStoryBar 
         habits={habits}
