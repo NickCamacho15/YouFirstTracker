@@ -1,8 +1,8 @@
-# You. First. - A Premium Self-Leadership Platform
+# .uoY - A Premium Self-Leadership Platform
 
 ## Overview
 
-You. First. is a focused personal executive productivity platform built around goal setting, habit tracking, and personal reflection. The application provides users with clean, distraction-free tools to set goals, track habits, log reading sessions, and create vision boards - designed as a premium productivity companion without social features.
+.uoY is a focused personal executive productivity platform built around goal setting, habit tracking, and personal reflection. The application provides users with clean, distraction-free tools to set goals, track habits, log reading sessions, and create vision boards - designed as a premium productivity companion with a sleek dark aesthetic inspired by the .uoY brand.
 
 ## System Architecture
 
@@ -123,6 +123,15 @@ Build scripts include:
 
 ## Changelog
 
+- June 30, 2025: Rebranded to .uoY with sleek dark theme and vertical habit cards
+  - Updated branding from "You. First." to ".uoY" to match logo aesthetic
+  - Implemented dark theme inspired by .uoY logo with black background and white text
+  - Redesigned habit cards to be vertical and stacked in a responsive grid
+  - Added visual progress bars showing habit formation progress (0-66 days)
+  - Enhanced completion buttons with better visual feedback and animations
+  - Added edit functionality with settings button on each habit card
+  - Improved habit toggle API calls and error handling
+  - Updated navigation and dashboard headers to reflect .uoY branding
 - June 30, 2025: Enhanced visual design and scientific habit tracking
   - Added beautiful Calm-inspired hero header with nature imagery and gradients
   - Enhanced habit story bar with larger, more prominent colorful bubbles
