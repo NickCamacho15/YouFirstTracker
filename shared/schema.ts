@@ -36,6 +36,7 @@ export const habits = pgTable("habits", {
   frequency: text("frequency").default("daily").notNull(),
   streak: integer("streak").default(0).notNull(),
   reasons: text("reasons").array(),
+  category: text("category", { enum: ["mind", "body", "soul"] }).default("mind").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
