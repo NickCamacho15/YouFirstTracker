@@ -123,7 +123,14 @@ Build scripts include:
 
 ## Changelog
 
-- June 30, 2025. Initial setup
+- June 30, 2025: Navigation redesign with Instagram-inspired timeline
+  - Restructured navigation: Dashboard, You (timeline), Goals, Habits, Read, Vision
+  - Created "You" page as Instagram-style timeline with record button
+  - Added dedicated pages for each section (Goals, Habits, Read)
+  - Implemented auto-posting for goal and micro-goal completions
+  - Enhanced habit stories with Mind/Body/Soul category colors
+  - Updated profile page to aggregate all user data and stats
+- June 30, 2025: Initial setup
 
 ## User Preferences
 

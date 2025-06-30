@@ -37,6 +37,17 @@ export function Navigation() {
             </div>
             <div className="hidden md:block">
               <div className="flex items-baseline space-x-8">
+                <Link href="/">
+                  <a
+                    className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                      isActive("/") && location === "/"
+                        ? "text-accent border-accent"
+                        : "text-muted-foreground hover:text-primary border-transparent"
+                    }`}
+                  >
+                    Dashboard
+                  </a>
+                </Link>
                 <Link href="/you">
                   <a
                     className={`px-3 py-2 text-sm font-medium border-b-2 ${

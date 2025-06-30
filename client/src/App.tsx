@@ -18,14 +18,14 @@ import NotFound from "@/pages/not-found";
 function AuthenticatedApp() {
   return (
     <Switch>
-      <Route path="/" component={YouPage} />
+      <Route path="/" component={DashboardPage} />
+      <Route path="/dashboard" component={DashboardPage} />
       <Route path="/you" component={YouPage} />
       <Route path="/goals" component={GoalsPage} />
       <Route path="/habits" component={HabitsPage} />
       <Route path="/read" component={ReadPage} />
       <Route path="/vision" component={VisionPage} />
       <Route path="/profile" component={ProfilePage} />
-      <Route path="/dashboard" component={DashboardPage} />
       <Route component={NotFound} />
     </Switch>
   );
