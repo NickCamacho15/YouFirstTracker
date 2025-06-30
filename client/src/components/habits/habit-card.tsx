@@ -22,6 +22,7 @@ interface Habit {
   streak: number;
   completedToday: boolean;
   reasons?: string[];
+  category?: string;
 }
 
 interface HabitCardProps {
