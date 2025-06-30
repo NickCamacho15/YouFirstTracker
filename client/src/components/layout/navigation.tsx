@@ -40,70 +40,70 @@ export function Navigation() {
             <div className="hidden sm:block">
               <div className="flex items-baseline space-x-6">
                 <Link href="/">
-                  <a
-                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors ${
-                      isActive("/") && location === "/"
+                  <span
+                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+                      location === "/"
                         ? "text-accent border-accent"
                         : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                   >
                     Dashboard
-                  </a>
+                  </span>
                 </Link>
                 <Link href="/you">
-                  <a
-                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors ${
+                  <span
+                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                       isActive("/you")
                         ? "text-accent border-accent"
                         : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                   >
                     You
-                  </a>
+                  </span>
                 </Link>
                 <Link href="/goals">
-                  <a
-                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors ${
+                  <span
+                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                       isActive("/goals")
                         ? "text-accent border-accent"
                         : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                   >
                     Goals
-                  </a>
+                  </span>
                 </Link>
                 <Link href="/habits">
-                  <a
-                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors ${
+                  <span
+                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                       isActive("/habits")
                         ? "text-accent border-accent"
                         : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                   >
                     Habits
-                  </a>
+                  </span>
                 </Link>
                 <Link href="/read">
-                  <a
-                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors ${
+                  <span
+                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                       isActive("/read")
                         ? "text-accent border-accent"
                         : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                   >
                     Read
-                  </a>
+                  </span>
                 </Link>
                 <Link href="/vision">
-                  <a
-                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors ${
+                  <span
+                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                       isActive("/vision")
                         ? "text-accent border-accent"
                         : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                   >
                     Vision
-                  </a>
+                  </span>
                 </Link>
               </div>
             </div>
@@ -146,88 +146,88 @@ export function Navigation() {
           <div className="sm:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 bg-card border-t border-border">
               <Link href="/">
-                <a
+                <span
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
-                    isActive("/") && location === "/"
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
+                    location === "/"
                       ? "text-accent bg-accent/10"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
                   }`}
                 >
                   Dashboard
-                </a>
+                </span>
               </Link>
               <Link href="/you">
-                <a
+                <span
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
                     isActive("/you")
                       ? "text-accent bg-accent/10"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
                   }`}
                 >
                   You
-                </a>
+                </span>
               </Link>
               <Link href="/goals">
-                <a
+                <span
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
                     isActive("/goals")
                       ? "text-accent bg-accent/10"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
                   }`}
                 >
                   Goals
-                </a>
+                </span>
               </Link>
               <Link href="/habits">
-                <a
+                <span
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
                     isActive("/habits")
                       ? "text-accent bg-accent/10"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
                   }`}
                 >
                   Habits
-                </a>
+                </span>
               </Link>
               <Link href="/read">
-                <a
+                <span
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
                     isActive("/read")
                       ? "text-accent bg-accent/10"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
                   }`}
                 >
                   Read
-                </a>
+                </span>
               </Link>
               <Link href="/vision">
-                <a
+                <span
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
                     isActive("/vision")
                       ? "text-accent bg-accent/10"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
                   }`}
                 >
                   Vision
-                </a>
+                </span>
               </Link>
               <Link href="/profile">
-                <a
+                <span
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
                     isActive("/profile")
                       ? "text-accent bg-accent/10"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
                   }`}
                 >
                   Profile
-                </a>
+                </span>
               </Link>
             </div>
           </div>
