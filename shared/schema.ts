@@ -35,6 +35,7 @@ export const habits = pgTable("habits", {
   description: text("description"),
   frequency: text("frequency").default("daily").notNull(),
   streak: integer("streak").default(0).notNull(),
+  reasons: text("reasons").array(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -97,6 +98,8 @@ export const insertHabitSchema = createInsertSchema(habits).omit({
   id: true,
   createdAt: true,
   streak: true,
+}).extend({
+  reasons: z.array(z.string().min(1, "Reason cannot be empty")).min(3, "Please provide exactly 3 reasons").max(3, "Please provide exactly 3 reasons"),
 });
 
 export const insertHabitLogSchema = createInsertSchema(habitLogs).omit({

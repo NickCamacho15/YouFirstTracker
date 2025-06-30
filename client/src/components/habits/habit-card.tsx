@@ -96,7 +96,7 @@ export function HabitCard({ habit, onUpdate }: HabitCardProps) {
                 ? "bg-green-400"
                 : "bg-green-300"
               : isToday
-              ? "bg-accent border border-accent-foreground/20 animate-pulse"
+              ? "bg-accent border border-accent-foreground/20"
               : dayOfWeek === 0 || dayOfWeek === 6
               ? "bg-muted/60"
               : "bg-muted/40"
@@ -129,19 +129,22 @@ export function HabitCard({ habit, onUpdate }: HabitCardProps) {
   const stats = getStreakStats();
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer border-2 hover:border-accent/50 bg-gradient-to-br from-card to-card/95">
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-6">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 flex-1">
             <Button
               size="lg"
-              className={`w-12 h-12 rounded-xl relative ${
+              className={`w-14 h-14 rounded-xl relative shadow-sm ${
                 habit.completedToday
-                  ? "bg-green-100 hover:bg-green-200 text-green-600"
-                  : "bg-gray-100 hover:bg-gray-200 text-gray-600"
+                  ? "bg-green-100 hover:bg-green-200 text-green-600 border-2 border-green-300"
+                  : "bg-white hover:bg-gray-50 text-gray-600 border-2 border-gray-200"
               }`}
               variant="ghost"
-              onClick={() => toggleHabitMutation.mutate()}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleHabitMutation.mutate();
+              }}
               disabled={toggleHabitMutation.isPending}
             >
               {habit.completedToday ? (
