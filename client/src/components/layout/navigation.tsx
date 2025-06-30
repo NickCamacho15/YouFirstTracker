@@ -2,18 +2,16 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Bell, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { Bell, Home, User, Target, Repeat, BookOpen, ImageIcon } from "lucide-react";
 
 export function Navigation() {
   const [location] = useLocation();
   const { user } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const getInitials = (name: string) => {
     return name
       .split(" ")
-      .map((n) => n[0])
+      .map((part) => part.charAt(0))
       .join("")
       .toUpperCase()
       .slice(0, 2);
@@ -26,107 +24,21 @@ export function Navigation() {
   };
 
   return (
-    <nav className="bg-card shadow-sm border-b border-border sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-8">
-            <div className="flex-shrink-0">
-              <Link href="/">
-                <h1 className="text-xl font-bold text-primary cursor-pointer">
-                  You. <span className="text-accent">First.</span>
-                </h1>
-              </Link>
-            </div>
-            <div className="hidden sm:block">
-              <div className="flex items-baseline space-x-6">
+    <>
+      {/* Top Header */}
+      <nav className="bg-card border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
                 <Link href="/">
-                  <span
-                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-                      location === "/"
-                        ? "text-accent border-accent"
-                        : "text-foreground hover:text-accent border-transparent"
-                    }`}
-                  >
-                    Dashboard
-                  </span>
-                </Link>
-                <Link href="/you">
-                  <span
-                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-                      isActive("/you")
-                        ? "text-accent border-accent"
-                        : "text-foreground hover:text-accent border-transparent"
-                    }`}
-                  >
-                    You
-                  </span>
-                </Link>
-                <Link href="/goals">
-                  <span
-                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-                      isActive("/goals")
-                        ? "text-accent border-accent"
-                        : "text-foreground hover:text-accent border-transparent"
-                    }`}
-                  >
-                    Goals
-                  </span>
-                </Link>
-                <Link href="/habits">
-                  <span
-                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-                      isActive("/habits")
-                        ? "text-accent border-accent"
-                        : "text-foreground hover:text-accent border-transparent"
-                    }`}
-                  >
-                    Habits
-                  </span>
-                </Link>
-                <Link href="/read">
-                  <span
-                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-                      isActive("/read")
-                        ? "text-accent border-accent"
-                        : "text-foreground hover:text-accent border-transparent"
-                    }`}
-                  >
-                    Read
-                  </span>
-                </Link>
-                <Link href="/vision">
-                  <span
-                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-                      isActive("/vision")
-                        ? "text-accent border-accent"
-                        : "text-foreground hover:text-accent border-transparent"
-                    }`}
-                  >
-                    Vision
-                  </span>
+                  <h1 className="text-xl font-bold text-foreground cursor-pointer">
+                    You. <span className="text-accent">First.</span>
+                  </h1>
                 </Link>
               </div>
             </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            {/* Mobile menu button */}
-            <div className="sm:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2"
-              >
-                {mobileMenuOpen ? (
-                  <X className="w-5 h-5" />
-                ) : (
-                  <Menu className="w-5 h-5" />
-                )}
-              </Button>
-            </div>
-            
-            {/* Desktop notifications and profile */}
-            <div className="hidden sm:flex items-center space-x-4">
+            <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm" className="p-2">
                 <Bell className="w-5 h-5 text-muted-foreground" />
               </Button>
@@ -140,99 +52,78 @@ export function Navigation() {
             </div>
           </div>
         </div>
-        
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="sm:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-card border-t border-border">
-              <Link href="/">
-                <span
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
-                    location === "/"
-                      ? "text-accent bg-accent/10"
-                      : "text-foreground hover:text-accent hover:bg-accent/5"
-                  }`}
-                >
-                  Dashboard
-                </span>
-              </Link>
-              <Link href="/you">
-                <span
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
-                    isActive("/you")
-                      ? "text-accent bg-accent/10"
-                      : "text-foreground hover:text-accent hover:bg-accent/5"
-                  }`}
-                >
-                  You
-                </span>
-              </Link>
-              <Link href="/goals">
-                <span
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
-                    isActive("/goals")
-                      ? "text-accent bg-accent/10"
-                      : "text-foreground hover:text-accent hover:bg-accent/5"
-                  }`}
-                >
-                  Goals
-                </span>
-              </Link>
-              <Link href="/habits">
-                <span
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
-                    isActive("/habits")
-                      ? "text-accent bg-accent/10"
-                      : "text-foreground hover:text-accent hover:bg-accent/5"
-                  }`}
-                >
-                  Habits
-                </span>
-              </Link>
-              <Link href="/read">
-                <span
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
-                    isActive("/read")
-                      ? "text-accent bg-accent/10"
-                      : "text-foreground hover:text-accent hover:bg-accent/5"
-                  }`}
-                >
-                  Read
-                </span>
-              </Link>
-              <Link href="/vision">
-                <span
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
-                    isActive("/vision")
-                      ? "text-accent bg-accent/10"
-                      : "text-foreground hover:text-accent hover:bg-accent/5"
-                  }`}
-                >
-                  Vision
-                </span>
-              </Link>
-              <Link href="/profile">
-                <span
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
-                    isActive("/profile")
-                      ? "text-accent bg-accent/10"
-                      : "text-foreground hover:text-accent hover:bg-accent/5"
-                  }`}
-                >
-                  Profile
-                </span>
-              </Link>
+      </nav>
+
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
+        <div className="flex justify-around items-center h-16 px-4">
+          <Link href="/">
+            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
+              location === "/"
+                ? "text-accent bg-accent/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <Home className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">Dashboard</span>
             </div>
-          </div>
-        )}
+          </Link>
+          
+          <Link href="/you">
+            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
+              isActive("/you")
+                ? "text-accent bg-accent/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <User className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">You</span>
+            </div>
+          </Link>
+          
+          <Link href="/goals">
+            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
+              isActive("/goals")
+                ? "text-accent bg-accent/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <Target className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">Goals</span>
+            </div>
+          </Link>
+          
+          <Link href="/habits">
+            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
+              isActive("/habits")
+                ? "text-accent bg-accent/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <Repeat className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">Habits</span>
+            </div>
+          </Link>
+          
+          <Link href="/read">
+            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
+              isActive("/read")
+                ? "text-accent bg-accent/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <BookOpen className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">Read</span>
+            </div>
+          </Link>
+          
+          <Link href="/vision">
+            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
+              isActive("/vision")
+                ? "text-accent bg-accent/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <ImageIcon className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">Vision</span>
+            </div>
+          </Link>
+        </div>
       </div>
-    </nav>
+    </>
   );
 }
