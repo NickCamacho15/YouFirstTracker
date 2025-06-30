@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 
 import LoginPage from "@/pages/login";
 import DashboardPage from "@/pages/dashboard";
-import YouPage from "@/pages/you";
+
 import GoalsPage from "@/pages/goals";
 import HabitsPage from "@/pages/habits";
 import ReadPage from "@/pages/read";
@@ -23,7 +23,7 @@ function AuthenticatedApp() {
       <Switch>
         <Route path="/" component={DashboardPage} />
         <Route path="/dashboard" component={DashboardPage} />
-        <Route path="/you" component={YouPage} />
+
         <Route path="/goals" component={GoalsPage} />
         <Route path="/habits" component={HabitsPage} />
         <Route path="/read" component={ReadPage} />

@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Bell, Home, User, Target, Repeat, BookOpen, ImageIcon } from "lucide-react";
+import { Bell, Home, Target, Repeat, BookOpen, ImageIcon } from "lucide-react";
 
 export function Navigation() {
   const [location] = useLocation();
@@ -68,17 +68,7 @@ export function Navigation() {
             </div>
           </Link>
           
-          <Link href="/you">
-            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
-              isActive("/you")
-                ? "text-accent bg-accent/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <User className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">You</span>
-            </div>
-          </Link>
-          
+
           <Link href="/goals">
             <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
               isActive("/goals")

@@ -2,7 +2,7 @@
 
 ## Overview
 
-You. First. is a comprehensive self-leadership and productivity platform built around identity-based goal setting, habit tracking, and personal reflection. The application is designed as a digital companion for the You.™ apparel brand, providing users with tools to set goals, track habits, log reading sessions with reflections, and engage with a community feed.
+You. First. is a focused personal executive productivity platform built around goal setting, habit tracking, and personal reflection. The application provides users with clean, distraction-free tools to set goals, track habits, log reading sessions, and create vision boards - designed as a premium productivity companion without social features.
 
 ## System Architecture
 
@@ -55,11 +55,11 @@ You. First. is a comprehensive self-leadership and productivity platform built a
 - Reflection sharing to community feed
 - Reading session history
 
-### Community Feed
-- Social feed for sharing achievements
-- Post filtering by type (goals, habits, reflections)
-- User avatars and display names
-- Achievement celebration and motivation
+### Personal Focus
+- Clean, distraction-free interface
+- Individual productivity tracking
+- Personal achievement monitoring
+- No social features to maintain focus
 
 ### UI/UX Design
 - Modern, clean interface with consistent styling
@@ -123,13 +123,13 @@ Build scripts include:
 
 ## Changelog
 
-- June 30, 2025: Navigation redesign with Instagram-inspired timeline
-  - Restructured navigation: Dashboard, You (timeline), Goals, Habits, Read, Vision
-  - Created "You" page as Instagram-style timeline with record button
-  - Added dedicated pages for each section (Goals, Habits, Read)
-  - Implemented auto-posting for goal and micro-goal completions
+- June 30, 2025: Simplified to focused personal productivity platform
+  - Removed social "You" timeline section for distraction-free experience
+  - Fixed navigation disappearing issue by moving to app-level rendering
+  - Bottom navigation bar that persists across all routes
+  - Clean navigation structure: Dashboard, Goals, Habits, Read, Vision
   - Enhanced habit stories with Mind/Body/Soul category colors
-  - Updated profile page to aggregate all user data and stats
+  - Focused on individual productivity without social features
 - June 30, 2025: Initial setup
 
 ## User Preferences
