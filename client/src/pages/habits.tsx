@@ -47,7 +47,7 @@ export default function HabitsPage() {
   // Habit toggle mutation
   const toggleHabitMutation = useMutation({
     mutationFn: async (habitId: number) => {
-      const result = await apiRequest(`/api/habits/${habitId}/toggle`, "POST", {});
+      const result = await apiRequest("POST", `/api/habits/${habitId}/toggle`, {});
       return result;
     },
     onSuccess: () => {
@@ -179,7 +179,7 @@ export default function HabitsPage() {
                   <h2 className="text-2xl font-bold mb-2">Scientific Habit Formation</h2>
                   <p className="text-muted-foreground max-w-2xl mx-auto">
                     Track your habits through the three scientifically-backed stages of formation. 
-                    Research shows it takes an average of 66 days to form a new habit automatically.
+                    Research shows it takes an average of 66 days to form a new habit automatically, plus one bonus day for .uoY to celebrate mastery.
                   </p>
                 </div>
                 <div className="space-y-8">
@@ -194,7 +194,7 @@ export default function HabitsPage() {
                   {sortedHabits.map((habit) => {
                     const colors = getCategoryColor(habit.category);
                     const isLoading = toggleHabitMutation.isPending;
-                    const progressPercentage = Math.min((habit.streak / 66) * 100, 100);
+                    const progressPercentage = Math.min((habit.streak / 67) * 100, 100);
                     
                     return (
                       <Card key={habit.id} className={`border-0 shadow-md hover:shadow-xl transition-all duration-300 ${
@@ -240,7 +240,7 @@ export default function HabitsPage() {
                               />
                             </div>
                             <div className="text-xs text-muted-foreground text-center">
-                              {habit.streak < 66 ? `${66 - habit.streak} days to go` : "Habit formed! 🎉"}
+                              {habit.streak < 67 ? `${67 - habit.streak} days to go` : "Habit mastered - Bonus day for .uoY! 🎉"}
                             </div>
                           </div>
 

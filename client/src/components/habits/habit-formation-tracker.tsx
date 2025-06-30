@@ -27,16 +27,16 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
     queryKey: ["/api/habit-logs"],
   });
 
-  // Generate last 66 days (based on habit formation science)
-  const getLast66Days = () => {
+  // Generate last 67 days (based on habit formation science + bonus day for .uoY)
+  const getLast67Days = () => {
     const days = [];
-    for (let i = 65; i >= 0; i--) {
+    for (let i = 66; i >= 0; i--) {
       days.push(subDays(new Date(), i));
     }
     return days;
   };
 
-  const days = getLast66Days();
+  const days = getLast67Days();
 
   const isCompletedOnDay = (date: Date) => {
     return (habitLogs as HabitLog[]).some((log: HabitLog) => 
@@ -59,10 +59,11 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
 
   const colors = getHabitColor(habit);
 
-  // Split into three stages based on habit formation science
+  // Split into three stages based on habit formation science (plus bonus day)
   const stage1Days = days.slice(0, 18); // Days 1-18: Initial formation
   const stage2Days = days.slice(18, 45); // Days 19-45: Strengthening 
   const stage3Days = days.slice(45, 66); // Days 46-66: Automaticity
+  const bonusDay = days.slice(66, 67); // Day 67: Bonus day for .uoY
 
   const getStageCompletion = (stageDays: Date[]) => {
     const completed = stageDays.filter(day => isCompletedOnDay(day)).length;
