@@ -2,11 +2,13 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Bell } from "lucide-react";
+import { Bell, Menu, X } from "lucide-react";
+import { useState } from "react";
 
 export function Navigation() {
   const [location] = useLocation();
   const { user } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const getInitials = (name: string) => {
     return name
@@ -35,14 +37,14 @@ export function Navigation() {
                 </h1>
               </Link>
             </div>
-            <div className="hidden md:block">
-              <div className="flex items-baseline space-x-8">
+            <div className="hidden sm:block">
+              <div className="flex items-baseline space-x-6">
                 <Link href="/">
                   <a
-                    className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors ${
                       isActive("/") && location === "/"
                         ? "text-accent border-accent"
-                        : "text-muted-foreground hover:text-primary border-transparent"
+                        : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                   >
                     Dashboard
@@ -50,10 +52,10 @@ export function Navigation() {
                 </Link>
                 <Link href="/you">
                   <a
-                    className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors ${
                       isActive("/you")
                         ? "text-accent border-accent"
-                        : "text-muted-foreground hover:text-primary border-transparent"
+                        : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                   >
                     You
@@ -61,10 +63,10 @@ export function Navigation() {
                 </Link>
                 <Link href="/goals">
                   <a
-                    className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors ${
                       isActive("/goals")
                         ? "text-accent border-accent"
-                        : "text-muted-foreground hover:text-primary border-transparent"
+                        : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                   >
                     Goals
@@ -72,10 +74,10 @@ export function Navigation() {
                 </Link>
                 <Link href="/habits">
                   <a
-                    className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors ${
                       isActive("/habits")
                         ? "text-accent border-accent"
-                        : "text-muted-foreground hover:text-primary border-transparent"
+                        : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                   >
                     Habits
@@ -83,10 +85,10 @@ export function Navigation() {
                 </Link>
                 <Link href="/read">
                   <a
-                    className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors ${
                       isActive("/read")
                         ? "text-accent border-accent"
-                        : "text-muted-foreground hover:text-primary border-transparent"
+                        : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                   >
                     Read
@@ -94,10 +96,10 @@ export function Navigation() {
                 </Link>
                 <Link href="/vision">
                   <a
-                    className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                    className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors ${
                       isActive("/vision")
                         ? "text-accent border-accent"
-                        : "text-muted-foreground hover:text-primary border-transparent"
+                        : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                   >
                     Vision
@@ -107,18 +109,129 @@ export function Navigation() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="p-2">
-              <Bell className="w-5 h-5 text-muted-foreground" />
-            </Button>
-            <Link href="/profile">
-              <Avatar className="w-8 h-8 bg-accent cursor-pointer">
-                <AvatarFallback className="text-white text-sm font-medium">
-                  {user?.displayName ? getInitials(user.displayName) : "U"}
-                </AvatarFallback>
-              </Avatar>
-            </Link>
+            {/* Mobile menu button */}
+            <div className="sm:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2"
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
+              </Button>
+            </div>
+            
+            {/* Desktop notifications and profile */}
+            <div className="hidden sm:flex items-center space-x-4">
+              <Button variant="ghost" size="sm" className="p-2">
+                <Bell className="w-5 h-5 text-muted-foreground" />
+              </Button>
+              <Link href="/profile">
+                <Avatar className="w-8 h-8 bg-accent cursor-pointer">
+                  <AvatarFallback className="text-white text-sm font-medium">
+                    {user?.displayName ? getInitials(user.displayName) : "U"}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+            </div>
           </div>
         </div>
+        
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="sm:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-card border-t border-border">
+              <Link href="/">
+                <a
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                    isActive("/") && location === "/"
+                      ? "text-accent bg-accent/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                  }`}
+                >
+                  Dashboard
+                </a>
+              </Link>
+              <Link href="/you">
+                <a
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                    isActive("/you")
+                      ? "text-accent bg-accent/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                  }`}
+                >
+                  You
+                </a>
+              </Link>
+              <Link href="/goals">
+                <a
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                    isActive("/goals")
+                      ? "text-accent bg-accent/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                  }`}
+                >
+                  Goals
+                </a>
+              </Link>
+              <Link href="/habits">
+                <a
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                    isActive("/habits")
+                      ? "text-accent bg-accent/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                  }`}
+                >
+                  Habits
+                </a>
+              </Link>
+              <Link href="/read">
+                <a
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                    isActive("/read")
+                      ? "text-accent bg-accent/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                  }`}
+                >
+                  Read
+                </a>
+              </Link>
+              <Link href="/vision">
+                <a
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                    isActive("/vision")
+                      ? "text-accent bg-accent/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                  }`}
+                >
+                  Vision
+                </a>
+              </Link>
+              <Link href="/profile">
+                <a
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                    isActive("/profile")
+                      ? "text-accent bg-accent/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                  }`}
+                >
+                  Profile
+                </a>
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
