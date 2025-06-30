@@ -1,16 +1,27 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { GoalCard } from "@/components/goals/goal-card";
+import { Link } from "wouter";
 import { NewGoalModal } from "@/components/goals/new-goal-modal";
-import { HabitCard } from "@/components/habits/habit-card";
 import { NewHabitModal } from "@/components/habits/new-habit-modal";
 import { HabitStoryBar } from "@/components/habits/habit-story-bar";
-import { ReadingTimer } from "@/components/reading/reading-timer";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { 
+  Plus, 
+  Target, 
+  Repeat, 
+  BookOpen, 
+  ImageIcon, 
+  CheckCircle2,
+  Clock,
+  ArrowRight,
+  Flame,
+  Trophy,
+  Star
+} from "lucide-react";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -39,8 +50,24 @@ export default function DashboardPage() {
     return "Good evening";
   };
 
+  // Calculate statistics
+  const totalGoals = goals?.length || 0;
+  const completedGoals = goals?.filter((goal: any) => goal.completed).length || 0;
+  const goalProgress = totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
+  
+  const totalHabits = habits?.length || 0;
+  const completedHabitsToday = habits?.filter((habit: any) => habit.completedToday).length || 0;
+  const habitProgress = totalHabits > 0 ? (completedHabitsToday / totalHabits) * 100 : 0;
+  
+  const totalReadingSessions = readingSessions?.length || 0;
+  const totalReadingMinutes = readingSessions?.reduce((total: number, session: any) => {
+    const start = new Date(session.startTime);
+    const end = new Date(session.endTime);
+    return total + Math.floor((end.getTime() - start.getTime()) / (1000 * 60));
+  }, 0) || 0;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-blue-950 dark:to-purple-950">
       {/* Habit Story Bar */}
       <HabitStoryBar 
         habits={habits}
@@ -48,154 +75,297 @@ export default function DashboardPage() {
         onAddHabit={() => setShowNewHabitModal(true)}
       />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-primary mb-2">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
+        {/* Hero Welcome Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 bg-clip-text text-transparent mb-4">
             {getGreeting()}, {user?.displayName}
-          </h2>
-          <p className="text-muted-foreground">
-            Let's make today count. Focus on who you want to become.
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Your personal command center for growth, focus, and achievement
           </p>
         </div>
 
-        {/* Dashboard Tabs */}
-        <Tabs defaultValue="goals" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
-            <TabsTrigger value="goals">Goals</TabsTrigger>
-            <TabsTrigger value="habits">Habits</TabsTrigger>
-            <TabsTrigger value="reading">Read & Reflect</TabsTrigger>
-          </TabsList>
+        {/* Quick Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+          {/* Goals Quick Stat */}
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-100 text-sm font-medium">Goals</p>
+                  <p className="text-2xl font-bold">{completedGoals}/{totalGoals}</p>
+                </div>
+                <div className="p-3 bg-white/20 rounded-full">
+                  <Target className="w-6 h-6" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <Progress value={goalProgress} className="h-2 bg-white/20" />
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Goals Tab */}
-          <TabsContent value="goals">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-semibold text-primary">My Goals</h3>
-                  <Button
-                    onClick={() => setShowNewGoalModal(true)}
-                    className="flex items-center space-x-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>New Goal</span>
+          {/* Habits Quick Stat */}
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-orange-500 to-red-500 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-orange-100 text-sm font-medium">Today's Habits</p>
+                  <p className="text-2xl font-bold">{completedHabitsToday}/{totalHabits}</p>
+                </div>
+                <div className="p-3 bg-white/20 rounded-full">
+                  <Flame className="w-6 h-6" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <Progress value={habitProgress} className="h-2 bg-white/20" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Reading Quick Stat */}
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-emerald-100 text-sm font-medium">Reading Time</p>
+                  <p className="text-2xl font-bold">{totalReadingMinutes}m</p>
+                </div>
+                <div className="p-3 bg-white/20 rounded-full">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <p className="text-emerald-100 text-sm">{totalReadingSessions} sessions</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Streak Quick Stat */}
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-500 to-indigo-600 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-100 text-sm font-medium">Best Streak</p>
+                  <p className="text-2xl font-bold">{Math.max(...(habits?.map((habit: any) => habit.streak) || [0]), 0)}</p>
+                </div>
+                <div className="p-3 bg-white/20 rounded-full">
+                  <Trophy className="w-6 h-6" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <p className="text-purple-100 text-sm">days strong</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Sections Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          {/* Goals Section */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                    <Target className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <CardTitle className="text-xl">Goals</CardTitle>
+                </div>
+                <Link href="/goals">
+                  <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
+                    View All <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {totalGoals === 0 ? (
+                <div className="text-center py-8">
+                  <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                    <Target className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <p className="text-muted-foreground mb-4">Set your first goal and start achieving</p>
+                  <Button onClick={() => setShowNewGoalModal(true)} className="bg-blue-600 hover:bg-blue-700">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Goal
                   </Button>
                 </div>
-
+              ) : (
                 <div className="space-y-4">
-                  {goals.length === 0 ? (
-                    <Card>
-                      <CardContent className="p-8 text-center">
-                        <p className="text-muted-foreground mb-4">No goals yet. Create your first goal to get started!</p>
-                        <Button onClick={() => setShowNewGoalModal(true)}>
-                          <Plus className="w-4 h-4 mr-2" />
-                          Create Goal
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    goals.map((goal: any) => (
-                      <GoalCard key={goal.id} goal={goal} onUpdate={refetchGoals} />
-                    ))
+                  {goals?.slice(0, 3).map((goal: any) => (
+                    <div key={goal.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-3 h-3 rounded-full ${goal.completed ? 'bg-green-500' : 'bg-blue-500'}`} />
+                        <div>
+                          <p className="font-medium">{goal.title}</p>
+                          {goal.dueDate && (
+                            <p className="text-sm text-muted-foreground">
+                              Due {new Date(goal.dueDate).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      {goal.completed && <CheckCircle2 className="w-5 h-5 text-green-500" />}
+                    </div>
+                  ))}
+                  {totalGoals > 3 && (
+                    <p className="text-sm text-muted-foreground text-center pt-2">
+                      +{totalGoals - 3} more goals
+                    </p>
                   )}
                 </div>
-              </div>
+              )}
+            </CardContent>
+          </Card>
 
-              {/* Goals Stats Sidebar */}
-              <div>
-                <Card className="p-6 mb-6">
-                  <h4 className="font-semibold text-primary mb-4">This Week</h4>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground text-sm">Goals Completed</span>
-                      <span className="font-semibold text-accent">
-                        {goals.filter((g: any) => g.completed).length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground text-sm">Micro-Goals Done</span>
-                      <span className="font-semibold text-accent">
-                        {goals.reduce((acc: number, g: any) => acc + g.microGoals.filter((mg: any) => mg.completed).length, 0)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground text-sm">Success Rate</span>
-                      <span className="font-semibold text-green-600">
-                        {goals.length > 0 ? Math.round((goals.filter((g: any) => g.completed).length / goals.length) * 100) : 0}%
-                      </span>
-                    </div>
+          {/* Habits Section */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
+                    <Repeat className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                   </div>
-                </Card>
+                  <CardTitle className="text-xl">Habits</CardTitle>
+                </div>
+                <Link href="/habits">
+                  <Button variant="ghost" size="sm" className="text-orange-600 hover:text-orange-700">
+                    View All <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
               </div>
-            </div>
-          </TabsContent>
-
-          {/* Habits Tab */}
-          <TabsContent value="habits">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-semibold text-primary">Daily Habits</h3>
-                  <Button
-                    onClick={() => setShowNewHabitModal(true)}
-                    className="flex items-center space-x-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>New Habit</span>
+            </CardHeader>
+            <CardContent>
+              {totalHabits === 0 ? (
+                <div className="text-center py-8">
+                  <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                    <Repeat className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <p className="text-muted-foreground mb-4">Build your first habit and create momentum</p>
+                  <Button onClick={() => setShowNewHabitModal(true)} className="bg-orange-600 hover:bg-orange-700">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Habit
                   </Button>
                 </div>
-
+              ) : (
                 <div className="space-y-4">
-                  {habits.length === 0 ? (
-                    <Card>
-                      <CardContent className="p-8 text-center">
-                        <p className="text-muted-foreground mb-4">No habits yet. Create your first habit to get started!</p>
-                        <Button onClick={() => setShowNewHabitModal(true)}>
-                          <Plus className="w-4 h-4 mr-2" />
-                          Create Habit
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    habits.map((habit: any) => (
-                      <HabitCard key={habit.id} habit={habit} onUpdate={refetchHabits} />
-                    ))
+                  {habits?.slice(0, 3).map((habit: any) => (
+                    <div key={habit.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-3 h-3 rounded-full ${habit.completedToday ? 'bg-green-500' : 'bg-orange-500'}`} />
+                        <div>
+                          <p className="font-medium">{habit.title}</p>
+                          <div className="flex items-center space-x-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {habit.streak} day streak
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                      {habit.completedToday && <CheckCircle2 className="w-5 h-5 text-green-500" />}
+                    </div>
+                  ))}
+                  {totalHabits > 3 && (
+                    <p className="text-sm text-muted-foreground text-center pt-2">
+                      +{totalHabits - 3} more habits
+                    </p>
                   )}
                 </div>
-              </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
-              {/* Habits Stats Sidebar */}
-              <div>
-                <Card className="p-6 mb-6">
-                  <h4 className="font-semibold text-primary mb-4">This Week</h4>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground text-sm">Completion Rate</span>
-                      <span className="font-semibold text-green-600">
-                        {habits.length > 0 ? Math.round((habits.filter((h: any) => h.completedToday).length / habits.length) * 100) : 0}%
-                      </span>
+        {/* Additional Sections Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Reading Section */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-emerald-100 dark:bg-emerald-900 rounded-lg">
+                    <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <CardTitle className="text-xl">Reading</CardTitle>
+                </div>
+                <Link href="/read">
+                  <Button variant="ghost" size="sm" className="text-emerald-600 hover:text-emerald-700">
+                    View All <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {totalReadingSessions === 0 ? (
+                <div className="text-center py-8">
+                  <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                    <BookOpen className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <p className="text-muted-foreground mb-4">Start your reading journey</p>
+                  <Link href="/read">
+                    <Button className="bg-emerald-600 hover:bg-emerald-700">
+                      <Clock className="w-4 h-4 mr-2" />
+                      Start Reading
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                      <p className="text-2xl font-bold text-emerald-600">{totalReadingMinutes}</p>
+                      <p className="text-sm text-muted-foreground">minutes read</p>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground text-sm">Best Streak</span>
-                      <span className="font-semibold text-accent">
-                        {habits.length > 0 ? Math.max(...habits.map((h: any) => h.streak)) : 0} days
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground text-sm">Total Habits</span>
-                      <span className="font-semibold text-primary">{habits.length}</span>
+                    <div className="text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                      <p className="text-2xl font-bold text-emerald-600">{totalReadingSessions}</p>
+                      <p className="text-sm text-muted-foreground">sessions</p>
                     </div>
                   </div>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
+                  <Link href="/read">
+                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
+                      Continue Reading
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-          {/* Reading Tab */}
-          <TabsContent value="reading">
-            <ReadingTimer readingSessions={readingSessions} />
-          </TabsContent>
-        </Tabs>
+          {/* Vision Board Section */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                    <ImageIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <CardTitle className="text-xl">Vision Board</CardTitle>
+                </div>
+                <Link href="/vision">
+                  <Button variant="ghost" size="sm" className="text-purple-600 hover:text-purple-700">
+                    View All <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <ImageIcon className="w-8 h-8 text-slate-400" />
+                </div>
+                <p className="text-muted-foreground mb-4">Visualize your dreams and aspirations</p>
+                <Link href="/vision">
+                  <Button className="bg-purple-600 hover:bg-purple-700">
+                    <Star className="w-4 h-4 mr-2" />
+                    Create Vision
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </main>
 
       <NewGoalModal
