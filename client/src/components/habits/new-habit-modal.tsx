@@ -16,6 +16,7 @@ const habitSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   frequency: z.string().default("daily"),
+  reasons: z.array(z.string().min(1, "Reason cannot be empty")).min(3, "Please provide exactly 3 reasons").max(3, "Please provide exactly 3 reasons"),
 });
 
 type HabitFormData = z.infer<typeof habitSchema>;
@@ -35,6 +36,7 @@ export function NewHabitModal({ open, onOpenChange, onSuccess }: NewHabitModalPr
       title: "",
       description: "",
       frequency: "daily",
+      reasons: ["", "", ""],
     },
   });
 
@@ -46,7 +48,12 @@ export function NewHabitModal({ open, onOpenChange, onSuccess }: NewHabitModalPr
     onSuccess: () => {
       onSuccess();
       onOpenChange(false);
-      form.reset();
+      form.reset({
+        title: "",
+        description: "",
+        frequency: "daily",
+        reasons: ["", "", ""],
+      });
       toast({ title: "Habit created!", description: "Your new habit has been added to your dashboard." });
     },
     onError: (error: any) => {
@@ -64,7 +71,7 @@ export function NewHabitModal({ open, onOpenChange, onSuccess }: NewHabitModalPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md w-full mx-4 animate-slide-up">
+      <DialogContent className="max-w-2xl w-full mx-4 animate-slide-up max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Habit</DialogTitle>
         </DialogHeader>
@@ -125,6 +132,44 @@ export function NewHabitModal({ open, onOpenChange, onSuccess }: NewHabitModalPr
                 </FormItem>
               )}
             />
+
+            {/* Three Reasons Section */}
+            <div className="space-y-4">
+              <div className="text-sm font-medium text-foreground">
+                Why is this habit important to you? <span className="text-destructive">*</span>
+              </div>
+              <div className="text-xs text-muted-foreground mb-3">
+                Research shows that having clear reasons increases habit success by 60%. 
+                Please provide exactly 3 specific reasons.
+              </div>
+              
+              {[0, 1, 2].map((index) => (
+                <FormField
+                  key={index}
+                  control={form.control}
+                  name={`reasons.${index}` as const}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm">Reason {index + 1}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={
+                            index === 0 
+                              ? "e.g., It improves my mental health and reduces stress"
+                              : index === 1
+                              ? "e.g., It helps me be more productive throughout the day"
+                              : "e.g., It builds discipline that transfers to other areas of life"
+                          }
+                          rows={2}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+            </div>
 
             <div className="flex space-x-3 mt-8">
               <Button

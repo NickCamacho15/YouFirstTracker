@@ -21,14 +21,16 @@ interface Habit {
   frequency: string;
   streak: number;
   completedToday: boolean;
+  reasons?: string[];
 }
 
 interface HabitCardProps {
   habit: Habit;
   onUpdate: () => void;
+  onClick?: () => void;
 }
 
-export function HabitCard({ habit, onUpdate }: HabitCardProps) {
+export function HabitCard({ habit, onUpdate, onClick }: HabitCardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
