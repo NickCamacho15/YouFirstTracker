@@ -17,6 +17,7 @@ const habitSchema = z.object({
   description: z.string().optional(),
   frequency: z.string().default("daily"),
   category: z.enum(["mind", "body", "soul"]).default("mind"),
+  timeOfDay: z.enum(["morning", "afternoon", "evening", "anytime"]).default("anytime"),
   reasons: z.array(z.string().min(1, "Reason cannot be empty")).min(3, "Please provide exactly 3 reasons").max(3, "Please provide exactly 3 reasons"),
 });
 
@@ -38,6 +39,7 @@ export function NewHabitModal({ open, onOpenChange, onSuccess }: NewHabitModalPr
       description: "",
       frequency: "daily",
       category: "mind" as const,
+      timeOfDay: "anytime" as const,
       reasons: ["", "", ""],
     },
   });
@@ -136,28 +138,54 @@ export function NewHabitModal({ open, onOpenChange, onSuccess }: NewHabitModalPr
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="mind">🧠 Mind</SelectItem>
-                      <SelectItem value="body">💪 Body</SelectItem>
-                      <SelectItem value="soul">✨ Soul</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="mind">🧠 Mind</SelectItem>
+                        <SelectItem value="body">💪 Body</SelectItem>
+                        <SelectItem value="soul">✨ Soul</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="timeOfDay"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Time of Day</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select time" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="morning">🌅 Morning</SelectItem>
+                        <SelectItem value="afternoon">☀️ Afternoon</SelectItem>
+                        <SelectItem value="evening">🌙 Evening</SelectItem>
+                        <SelectItem value="anytime">⏰ Anytime</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Three Reasons Section */}
             <div className="space-y-4">

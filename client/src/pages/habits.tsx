@@ -18,6 +18,7 @@ interface Habit {
   completedToday: boolean;
   reasons?: string[];
   category?: string;
+  timeOfDay?: string;
 }
 
 export default function HabitsPage() {
