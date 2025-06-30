@@ -44,7 +44,7 @@ export function Navigation() {
                     className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                       location === "/"
                         ? "text-accent border-accent"
-                        : "text-muted-foreground hover:text-foreground border-transparent"
+                        : "text-foreground hover:text-accent border-transparent"
                     }`}
                   >
                     Dashboard
@@ -55,7 +55,7 @@ export function Navigation() {
                     className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                       isActive("/you")
                         ? "text-accent border-accent"
-                        : "text-muted-foreground hover:text-foreground border-transparent"
+                        : "text-foreground hover:text-accent border-transparent"
                     }`}
                   >
                     You
@@ -66,7 +66,7 @@ export function Navigation() {
                     className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                       isActive("/goals")
                         ? "text-accent border-accent"
-                        : "text-muted-foreground hover:text-foreground border-transparent"
+                        : "text-foreground hover:text-accent border-transparent"
                     }`}
                   >
                     Goals
@@ -77,7 +77,7 @@ export function Navigation() {
                     className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                       isActive("/habits")
                         ? "text-accent border-accent"
-                        : "text-muted-foreground hover:text-foreground border-transparent"
+                        : "text-foreground hover:text-accent border-transparent"
                     }`}
                   >
                     Habits
@@ -88,7 +88,7 @@ export function Navigation() {
                     className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                       isActive("/read")
                         ? "text-accent border-accent"
-                        : "text-muted-foreground hover:text-foreground border-transparent"
+                        : "text-foreground hover:text-accent border-transparent"
                     }`}
                   >
                     Read
@@ -99,7 +99,7 @@ export function Navigation() {
                     className={`px-2 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                       isActive("/vision")
                         ? "text-accent border-accent"
-                        : "text-muted-foreground hover:text-foreground border-transparent"
+                        : "text-foreground hover:text-accent border-transparent"
                     }`}
                   >
                     Vision
@@ -151,7 +151,7 @@ export function Navigation() {
                   className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
                     location === "/"
                       ? "text-accent bg-accent/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                      : "text-foreground hover:text-accent hover:bg-accent/5"
                   }`}
                 >
                   Dashboard
@@ -163,7 +163,7 @@ export function Navigation() {
                   className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
                     isActive("/you")
                       ? "text-accent bg-accent/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                      : "text-foreground hover:text-accent hover:bg-accent/5"
                   }`}
                 >
                   You
@@ -175,7 +175,7 @@ export function Navigation() {
                   className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
                     isActive("/goals")
                       ? "text-accent bg-accent/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                      : "text-foreground hover:text-accent hover:bg-accent/5"
                   }`}
                 >
                   Goals
@@ -187,7 +187,7 @@ export function Navigation() {
                   className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
                     isActive("/habits")
                       ? "text-accent bg-accent/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                      : "text-foreground hover:text-accent hover:bg-accent/5"
                   }`}
                 >
                   Habits
@@ -199,7 +199,7 @@ export function Navigation() {
                   className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
                     isActive("/read")
                       ? "text-accent bg-accent/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                      : "text-foreground hover:text-accent hover:bg-accent/5"
                   }`}
                 >
                   Read
@@ -211,7 +211,7 @@ export function Navigation() {
                   className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
                     isActive("/vision")
                       ? "text-accent bg-accent/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                      : "text-foreground hover:text-accent hover:bg-accent/5"
                   }`}
                 >
                   Vision
@@ -223,7 +223,7 @@ export function Navigation() {
                   className={`block px-3 py-2 text-base font-medium rounded-md transition-colors cursor-pointer ${
                     isActive("/profile")
                       ? "text-accent bg-accent/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/5"
+                      : "text-foreground hover:text-accent hover:bg-accent/5"
                   }`}
                 >
                   Profile
