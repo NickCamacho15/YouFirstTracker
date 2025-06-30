@@ -131,7 +131,10 @@ export function HabitCard({ habit, onUpdate, onClick }: HabitCardProps) {
   const stats = getStreakStats();
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer border-2 hover:border-accent/50 bg-gradient-to-br from-card to-card/95">
+    <Card 
+      className="hover:shadow-lg transition-all duration-200 cursor-pointer border-2 hover:border-accent/50 bg-gradient-to-br from-card to-card/95"
+      onClick={onClick}
+    >
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-center space-x-4 flex-1">
