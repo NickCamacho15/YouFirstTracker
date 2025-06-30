@@ -260,6 +260,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/habits/:id/logs", requireAuth, async (req, res) => {
+    try {
+      const habitId = parseInt(req.params.id);
+      const logs = await storage.getHabitLogsByHabitId(habitId);
+      res.json(logs);
+    } catch (error) {
+      console.error("Get habit logs error:", error);
+      res.status(500).json({ message: "Failed to get habit logs" });
+    }
+  });
+
   // Reading routes
   app.get("/api/reading-sessions", requireAuth, async (req, res) => {
     try {

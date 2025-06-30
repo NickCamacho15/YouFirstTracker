@@ -84,7 +84,7 @@ export const insertGoalSchema = createInsertSchema(goals).omit({
   createdAt: true,
   completed: true,
 }).extend({
-  dueDate: z.string().datetime().optional().or(z.literal("")).transform((val) => val === "" ? undefined : new Date(val)),
+  dueDate: z.string().optional().transform((val) => val && val !== "" ? new Date(val) : undefined),
 });
 
 export const insertMicroGoalSchema = createInsertSchema(microGoals).omit({
