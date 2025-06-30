@@ -34,9 +34,7 @@ export function HabitStoryBar({ habits, onUpdate, onAddHabit }: HabitStoryBarPro
 
   const toggleHabitMutation = useMutation({
     mutationFn: async (habitId: number) => {
-      return apiRequest(`/api/habits/${habitId}/toggle`, {
-        method: "POST",
-      });
+      return apiRequest(`/api/habits/${habitId}/toggle`, "POST");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/habits"] });
@@ -64,7 +62,7 @@ export function HabitStoryBar({ habits, onUpdate, onAddHabit }: HabitStoryBarPro
 
   const isHabitCompletedToday = (habitId: number) => {
     const today = startOfDay(new Date());
-    return habitLogs.some((log: HabitLog) => 
+    return (habitLogs as HabitLog[]).some((log: HabitLog) => 
       log.habitId === habitId && 
       log.completed && 
       isSameDay(new Date(log.date), today)

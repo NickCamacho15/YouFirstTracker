@@ -196,7 +196,7 @@ export function HabitCard({ habit, onUpdate, onClick }: HabitCardProps) {
         {/* 40-Day Visual Tracker */}
         <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <h5 className="text-sm font-medium text-muted-foreground">Last 40 Days</h5>
+            <h5 className="text-sm font-medium text-muted-foreground">Next 40 Days</h5>
             <div className="flex items-center space-x-2 text-xs text-muted-foreground">
               <div className="flex items-center space-x-1">
                 <div className="w-2 h-2 bg-green-500 rounded-sm"></div>
