@@ -97,7 +97,7 @@ export default function YouPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-background relative pb-20">
       <div className="max-w-2xl mx-auto px-4 pt-8 pb-24">
         {/* Header */}
         <div className="mb-8">
