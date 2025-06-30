@@ -1,0 +1,136 @@
+“You. First.” — a premium goal-setting, habit-tracking, and self-leadership platform built around the identity and mission of your You.™ apparel brand.
+
+🛠️ REPLIT BUILD PROMPT FOR “You. First.”
+
+Project Name: YouFirst
+
+Tech Stack:
+	•	Frontend: React (or Next.js for routing), TailwindCSS for modern design
+	•	Backend: Supabase (for user auth, real-time database, and file storage)
+	•	Hosting: Replit.                                      🧠 Brand Context:
+
+“You. First.” is a digital platform that comes free with any You.™ apparel purchase. It is a self-leadership and identity-based productivity platform designed to help users set goals, track habits, reflect on learning, and stay accountable through a minimal social feed — all rooted in the belief: “Who you see is what matters.”    
+
+✅ PLATFORM FEATURES
+🔐 1. User Authentication
+	•	Email + password login using Supabase
+	•	Option for OAuth in future (Google/Apple)
+	•	Dashboard access only after login
+	•	Onboarding walkthrough (3-step intro modal)
+
+🎯 2. Goal Setting + Step Breakdown
+	•	Create a Main Goal
+	•	Chunk into Micro-Goals (checkbox list)
+	•	Set due dates and optional reminders
+	•	Display progress bar (based on micro-goals completed)
+UI Sections:
+	•	“My Goals” tab
+	•	“Add New Goal” form (modal)
+	•	Timeline View (horizontal scroll or list with dates)
+
+📊 3. Habit Tracker
+	•	Create custom habits (e.g. “Cold shower,” “Pray,” “Read 10 min”)
+	•	Daily checkbox or toggle per habit
+	•	Weekly streak chart
+	•	“Wins this week” summary
+UI Sections:
+	•	“Habits” tab
+	•	Calendar view with colored dots or checkmarks
+	•	“Streaks” section with visual feedback
+
+📖 4. Reading Tracker + Reflection Posting
+	•	“Start Reading” button = starts timer
+	•	“End Reading” = opens modal to enter reflection
+	•	Reflections post to the Social Feed
+	•	Reflections stored in user profile (Book Title, Duration, Note)
+UI Sections:
+	•	“Read & Reflect” tab with timer + past entries
+	•	Reading leaderboard (optional)
+
+📸 5. Vision Board (Simple V1)
+	•	Upload or select images (from Unsplash API or upload)
+	•	Arrange in grid layout
+	•	Add titles or quotes to each image
+	•	Saved to user profile
+
+📢 6. Social Feed (Strava-style)
+	•	Posts show up only when actions are completed
+	•	Micro-goal complete → post auto-generated
+	•	Habit streak hit → optional share
+	•	Reading reflection → post to timeline
+	•	Feed is clean, minimal — no scrolling for hours
+	•	Buttons: ❤️ (Encourage), ✨ (Celebrate)
+UI Sections:
+	•	“Community” tab
+	•	Feed: real-time posts, names, timestamps, action type, message
+	•	Simple filter (Goals | Habits | Reflections)
+
+🖼️ UI / STYLE GUIDE
+Overall Feel:
+Clean. Premium. Minimalist. A calm, focused aesthetic.
+Fonts: Sans-serif (e.g., Inter, Poppins)
+Colors:
+	•	Primary: Deep black / charcoal
+	•	Accent: Electric blue or muted gold (used sparingly)
+	•	Background: Soft white or light gray
+Component Guidelines:
+	•	Use Card layouts for goals and habits
+	•	Modals for form entry
+	•	Hover/click animations (subtle)
+	•	Dashboard = 3-tab layout: Goals | Habits | Read & Reflect
+	•	Top Nav = “Dashboard | Community | Vision | Profile”
+
+🧩 Database Schema (Supabase)
+Tables:
+Users
+	•	id (UUID)
+	•	email
+	•	display_name
+	•	created_at
+Goals
+	•	id
+	•	user_id
+	•	title
+	•	description
+	•	due_date
+	•	completed (boolean)
+MicroGoals
+	•	id
+	•	goal_id
+	•	title
+	•	completed (boolean)
+	•	created_at
+Habits
+	•	id
+	•	user_id
+	•	title
+	•	frequency (daily/weekly)
+	•	streak (int)
+	•	current_status (boolean)
+	•	updated_at
+HabitLogs
+	•	id
+	•	habit_id
+	•	date
+	•	status
+ReadingSessions
+	•	id
+	•	user_id
+	•	start_time
+	•	end_time
+	•	reflection (text)
+	•	book_title
+Posts (Feed)
+	•	id
+	•	user_id
+	•	type (goal/micro-goal/habit/reflection)
+	•	message
+	•	timestamp
+VisionBoard
+	•	id
+	•	user_id
+	•	image_url
+	•	caption
+
+	“Start building this as a full-stack React + Supabase project with the name ‘YouFirst’. Begin with user login, dashboard layout, and Goal/MicroGoal module. Use TailwindCSS and keep the UI premium and clean. Continue building the other modules step by step using the feature guide above. Comment code clearly.”
+
