@@ -7,19 +7,25 @@ import { useAuth } from "@/hooks/use-auth";
 
 import LoginPage from "@/pages/login";
 import DashboardPage from "@/pages/dashboard";
-import CommunityPage from "@/pages/community";
-import ProfilePage from "@/pages/profile";
+import YouPage from "@/pages/you";
+import GoalsPage from "@/pages/goals";
+import HabitsPage from "@/pages/habits";
+import ReadPage from "@/pages/read";
 import VisionPage from "@/pages/vision";
+import ProfilePage from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 
 function AuthenticatedApp() {
   return (
     <Switch>
-      <Route path="/" component={DashboardPage} />
-      <Route path="/dashboard" component={DashboardPage} />
-      <Route path="/community" component={CommunityPage} />
+      <Route path="/" component={YouPage} />
+      <Route path="/you" component={YouPage} />
+      <Route path="/goals" component={GoalsPage} />
+      <Route path="/habits" component={HabitsPage} />
+      <Route path="/read" component={ReadPage} />
       <Route path="/vision" component={VisionPage} />
       <Route path="/profile" component={ProfilePage} />
+      <Route path="/dashboard" component={DashboardPage} />
       <Route component={NotFound} />
     </Switch>
   );

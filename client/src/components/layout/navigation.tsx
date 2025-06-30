@@ -37,26 +37,48 @@ export function Navigation() {
             </div>
             <div className="hidden md:block">
               <div className="flex items-baseline space-x-8">
-                <Link href="/">
+                <Link href="/you">
                   <a
                     className={`px-3 py-2 text-sm font-medium border-b-2 ${
-                      isActive("/")
+                      isActive("/you")
                         ? "text-accent border-accent"
                         : "text-muted-foreground hover:text-primary border-transparent"
                     }`}
                   >
-                    Dashboard
+                    You
                   </a>
                 </Link>
-                <Link href="/community">
+                <Link href="/goals">
                   <a
                     className={`px-3 py-2 text-sm font-medium border-b-2 ${
-                      isActive("/community")
+                      isActive("/goals")
                         ? "text-accent border-accent"
                         : "text-muted-foreground hover:text-primary border-transparent"
                     }`}
                   >
-                    Community
+                    Goals
+                  </a>
+                </Link>
+                <Link href="/habits">
+                  <a
+                    className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                      isActive("/habits")
+                        ? "text-accent border-accent"
+                        : "text-muted-foreground hover:text-primary border-transparent"
+                    }`}
+                  >
+                    Habits
+                  </a>
+                </Link>
+                <Link href="/read">
+                  <a
+                    className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                      isActive("/read")
+                        ? "text-accent border-accent"
+                        : "text-muted-foreground hover:text-primary border-transparent"
+                    }`}
+                  >
+                    Read
                   </a>
                 </Link>
                 <Link href="/vision">
@@ -68,17 +90,6 @@ export function Navigation() {
                     }`}
                   >
                     Vision
-                  </a>
-                </Link>
-                <Link href="/profile">
-                  <a
-                    className={`px-3 py-2 text-sm font-medium border-b-2 ${
-                      isActive("/profile")
-                        ? "text-accent border-accent"
-                        : "text-muted-foreground hover:text-primary border-transparent"
-                    }`}
-                  >
-                    Profile
                   </a>
                 </Link>
               </div>

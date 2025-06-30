@@ -120,10 +120,10 @@ export function HabitStoryBar({ habits, onUpdate, onAddHabit }: HabitStoryBarPro
             <div key={habit.id} className="flex-shrink-0 flex flex-col items-center">
               <div className="relative">
                 {/* Completion Ring */}
-                <div className={`w-16 h-16 rounded-full p-0.5 transition-all duration-300 bg-gradient-to-r ${
+                <div className={`w-16 h-16 rounded-full p-0.5 transition-all duration-300 ${
                   isCompleted 
-                    ? `${habitColor} shadow-lg` 
-                    : "from-muted-foreground/30 to-muted-foreground/30"
+                    ? `bg-gradient-to-r ${habitColor} shadow-lg shadow-${habitColor.split('-')[1]}-500/25` 
+                    : "bg-gradient-to-r from-muted-foreground/30 to-muted-foreground/30"
                 }`}>
                   {/* Inner Circle */}
                   <Button
