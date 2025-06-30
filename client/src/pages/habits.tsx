@@ -103,10 +103,10 @@ export default function HabitsPage() {
 
   const getCategoryColor = (category?: string) => {
     switch (category) {
-      case 'mind': return { bg: 'bg-purple-500', light: 'bg-purple-100 dark:bg-purple-900', text: 'text-purple-700 dark:text-purple-300' };
-      case 'body': return { bg: 'bg-orange-500', light: 'bg-orange-100 dark:bg-orange-900', text: 'text-orange-700 dark:text-orange-300' };
-      case 'soul': return { bg: 'bg-emerald-500', light: 'bg-emerald-100 dark:bg-emerald-900', text: 'text-emerald-700 dark:text-emerald-300' };
-      default: return { bg: 'bg-blue-500', light: 'bg-blue-100 dark:bg-blue-900', text: 'text-blue-700 dark:text-blue-300' };
+      case 'mind': return { bg: 'bg-blue-600', light: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' };
+      case 'body': return { bg: 'bg-amber-500', light: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' };
+      case 'soul': return { bg: 'bg-indigo-600', light: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' };
+      default: return { bg: 'bg-blue-600', light: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' };
     }
   };
 
@@ -197,8 +197,8 @@ export default function HabitsPage() {
                     const progressPercentage = Math.min((habit.streak / 66) * 100, 100);
                     
                     return (
-                      <Card key={habit.id} className={`border-0 shadow-md hover:shadow-lg transition-all duration-300 ${
-                        habit.completedToday ? `${colors.light} ring-2 ring-green-400` : 'hover:scale-[1.02]'
+                      <Card key={habit.id} className={`border-0 shadow-md hover:shadow-xl transition-all duration-300 ${
+                        habit.completedToday ? `${colors.light} ring-2 ring-green-500` : 'hover:scale-[1.02]'
                       }`}>
                         <CardContent className="p-6">
                           {/* Top section with edit button */}
@@ -233,7 +233,7 @@ export default function HabitsPage() {
                               <span>Progress to automaticity</span>
                               <span>{Math.round(progressPercentage)}%</span>
                             </div>
-                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+                            <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
                               <div 
                                 className={`h-2 rounded-full transition-all duration-500 ${colors.bg}`}
                                 style={{ width: `${progressPercentage}%` }}
@@ -252,8 +252,8 @@ export default function HabitsPage() {
                               disabled={isLoading}
                               className={`w-full h-12 rounded-lg border-2 transition-all duration-300 hover:scale-105 ${
                                 habit.completedToday
-                                  ? `${colors.bg} border-green-400 text-white hover:opacity-90 shadow-lg`
-                                  : `bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20`
+                                  ? `${colors.bg} border-green-500 text-white hover:opacity-90 shadow-lg`
+                                  : `bg-white border-gray-300 hover:border-blue-400 hover:bg-blue-50`
                               }`}
                             >
                               <div className="flex items-center justify-center gap-2">
@@ -273,12 +273,12 @@ export default function HabitsPage() {
 
                             {/* Streak info */}
                             <div className="flex items-center justify-center gap-4 text-sm">
-                              <div className="flex items-center gap-1 text-orange-600">
+                              <div className="flex items-center gap-1 text-amber-600">
                                 <Flame className="w-4 h-4" />
                                 <span className="font-medium">{habit.streak} day streak</span>
                               </div>
                               {habit.completedToday && (
-                                <div className="flex items-center gap-1 text-green-600">
+                                <div className="flex items-center gap-1 text-emerald-600">
                                   <Star className="w-4 h-4" />
                                   <span className="font-medium">Today!</span>
                                 </div>

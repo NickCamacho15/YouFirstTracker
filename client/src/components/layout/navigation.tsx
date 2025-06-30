@@ -32,8 +32,8 @@ export function Navigation() {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <Link href="/">
-                  <h1 className="text-2xl font-bold text-white cursor-pointer tracking-wider">
-                    .<span className="text-accent">uoY</span>
+                  <h1 className="text-2xl font-bold text-slate-900 cursor-pointer tracking-wider">
+                    .<span className="text-blue-600">uoY</span>
                   </h1>
                 </Link>
               </div>
