@@ -13,6 +13,7 @@ interface Habit {
   streak: number;
   completedToday: boolean;
   reasons?: string[];
+  category?: string;
 }
 
 interface HabitLog {
@@ -34,7 +35,8 @@ export function HabitStoryBar({ habits, onUpdate, onAddHabit }: HabitStoryBarPro
 
   const toggleHabitMutation = useMutation({
     mutationFn: async (habitId: number) => {
-      return apiRequest(`/api/habits/${habitId}/toggle`, "POST");
+      const result = await apiRequest(`/api/habits/${habitId}/toggle`, "POST");
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/habits"] });
@@ -51,7 +53,30 @@ export function HabitStoryBar({ habits, onUpdate, onAddHabit }: HabitStoryBarPro
 
   const handleToggleHabit = (habitId: number, e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('Toggling habit:', habitId);
     toggleHabitMutation.mutate(habitId);
+  };
+
+  // Get color for habit based on category and index
+  const getHabitColor = (habit: Habit, index: number) => {
+    if (habit.category === 'mind') {
+      return 'from-purple-500 to-indigo-500';
+    } else if (habit.category === 'body') {
+      return 'from-orange-500 to-red-500';
+    } else if (habit.category === 'soul') {
+      return 'from-emerald-500 to-teal-500';
+    }
+    
+    // Fallback colors if no category
+    const colors = [
+      'from-blue-500 to-cyan-500',
+      'from-green-500 to-emerald-500',
+      'from-purple-500 to-pink-500',
+      'from-orange-500 to-yellow-500',
+      'from-red-500 to-rose-500',
+      'from-indigo-500 to-purple-500',
+    ];
+    return colors[index % colors.length];
   };
 
   // Get habit log for today to check completion status
@@ -86,18 +111,19 @@ export function HabitStoryBar({ habits, onUpdate, onAddHabit }: HabitStoryBarPro
         </div>
 
         {/* Habit Stories */}
-        {habits.map((habit) => {
+        {habits.map((habit, index) => {
           const isCompleted = isHabitCompletedToday(habit.id);
           const isLoading = toggleHabitMutation.isPending;
+          const habitColor = getHabitColor(habit, index);
           
           return (
             <div key={habit.id} className="flex-shrink-0 flex flex-col items-center">
               <div className="relative">
                 {/* Completion Ring */}
-                <div className={`w-16 h-16 rounded-full p-0.5 transition-all duration-300 ${
+                <div className={`w-16 h-16 rounded-full p-0.5 transition-all duration-300 bg-gradient-to-r ${
                   isCompleted 
-                    ? "bg-gradient-to-r from-green-500 to-emerald-500 shadow-lg" 
-                    : "bg-gradient-to-r from-muted-foreground/30 to-muted-foreground/30"
+                    ? `${habitColor} shadow-lg` 
+                    : "from-muted-foreground/30 to-muted-foreground/30"
                 }`}>
                   {/* Inner Circle */}
                   <Button

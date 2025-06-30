@@ -16,6 +16,7 @@ const habitSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   frequency: z.string().default("daily"),
+  category: z.enum(["mind", "body", "soul"]).default("mind"),
   reasons: z.array(z.string().min(1, "Reason cannot be empty")).min(3, "Please provide exactly 3 reasons").max(3, "Please provide exactly 3 reasons"),
 });
 
@@ -36,6 +37,7 @@ export function NewHabitModal({ open, onOpenChange, onSuccess }: NewHabitModalPr
       title: "",
       description: "",
       frequency: "daily",
+      category: "mind" as const,
       reasons: ["", "", ""],
     },
   });
@@ -52,6 +54,7 @@ export function NewHabitModal({ open, onOpenChange, onSuccess }: NewHabitModalPr
         title: "",
         description: "",
         frequency: "daily",
+        category: "mind" as const,
         reasons: ["", "", ""],
       });
       toast({ title: "Habit created!", description: "Your new habit has been added to your dashboard." });
@@ -126,6 +129,29 @@ export function NewHabitModal({ open, onOpenChange, onSuccess }: NewHabitModalPr
                       <SelectItem value="daily">Daily</SelectItem>
                       <SelectItem value="weekly">Weekly</SelectItem>
                       <SelectItem value="custom">Custom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="mind">🧠 Mind</SelectItem>
+                      <SelectItem value="body">💪 Body</SelectItem>
+                      <SelectItem value="soul">✨ Soul</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
