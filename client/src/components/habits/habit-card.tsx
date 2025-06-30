@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, Flame, Target, Zap } from "lucide-react";
-import { format, subDays, startOfDay, isSameDay } from "date-fns";
+import { format, subDays, addDays, startOfDay, isSameDay } from "date-fns";
 
 interface HabitLog {
   id: number;
@@ -76,36 +76,40 @@ export function HabitCard({ habit, onUpdate, onClick }: HabitCardProps) {
       }
     });
 
-    // Generate last 40 days
-    for (let i = 39; i >= 0; i--) {
-      const currentDate = subDays(today, i);
+    // Generate next 40 days starting from today
+    for (let i = 0; i < 40; i++) {
+      const currentDate = addDays(today, i);
       const dateKey = format(currentDate, 'yyyy-MM-dd');
       const isToday = i === 0;
       const isCompleted = completedDates.has(dateKey);
       const dayOfWeek = currentDate.getDay();
       
-      // Calculate intensity based on streak position
-      const intensity = isCompleted ? (i < 7 ? 'high' : i < 20 ? 'medium' : 'low') : 'none';
-      
       days.push(
         <div
           key={i}
           className={`w-3 h-8 rounded-sm transition-all duration-200 hover:scale-110 ${
-            isCompleted
-              ? intensity === 'high'
-                ? "bg-green-500 shadow-sm"
-                : intensity === 'medium'
-                ? "bg-green-400"
-                : "bg-green-300"
-              : isToday
-              ? "bg-accent border border-accent-foreground/20"
+            isToday
+              ? "bg-blue-500 border-2 border-blue-600 shadow-md"
+              : isCompleted
+              ? "bg-green-500 shadow-sm"
               : dayOfWeek === 0 || dayOfWeek === 6
-              ? "bg-muted/60"
-              : "bg-muted/40"
+              ? "bg-muted/80 border border-muted-foreground/20"
+              : "bg-muted/60 border border-muted-foreground/10"
           }`}
-          title={`${format(currentDate, 'MMM d')} - ${isCompleted ? 'Completed' : 'Not completed'}`}
+          title={`${format(currentDate, 'MMM d')} - ${
+            isToday 
+              ? 'Today' 
+              : isCompleted 
+              ? 'Completed' 
+              : 'Upcoming'
+          }`}
         >
-          {isCompleted && i < 7 && (
+          {isToday && (
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+            </div>
+          )}
+          {isCompleted && !isToday && (
             <div className="w-full h-full flex items-center justify-center">
               <div className="w-1 h-1 bg-white rounded-full"></div>
             </div>

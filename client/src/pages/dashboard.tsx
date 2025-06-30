@@ -5,6 +5,7 @@ import { GoalCard } from "@/components/goals/goal-card";
 import { NewGoalModal } from "@/components/goals/new-goal-modal";
 import { HabitCard } from "@/components/habits/habit-card";
 import { NewHabitModal } from "@/components/habits/new-habit-modal";
+import { HabitStoryBar } from "@/components/habits/habit-story-bar";
 import { ReadingTimer } from "@/components/reading/reading-timer";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,13 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      
+      {/* Habit Story Bar */}
+      <HabitStoryBar 
+        habits={habits}
+        onUpdate={refetchHabits}
+        onAddHabit={() => setShowNewHabitModal(true)}
+      />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
