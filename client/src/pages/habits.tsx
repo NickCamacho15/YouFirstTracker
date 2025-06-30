@@ -1,13 +1,16 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { HabitCard } from "@/components/habits/habit-card";
 import { HabitStoryBar } from "@/components/habits/habit-story-bar";
 import { HabitFormationTracker } from "@/components/habits/habit-formation-tracker";
 import { NewHabitModal } from "@/components/habits/new-habit-modal";
-import { Plus, Zap, BarChart3, Grid3X3 } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { Plus, Zap, BarChart3, Grid3X3, CheckCircle2, Circle, Clock, Flame, Star } from "lucide-react";
 
 interface Habit {
   id: number;
@@ -24,6 +27,7 @@ interface Habit {
 export default function HabitsPage() {
   const [showNewHabitModal, setShowNewHabitModal] = useState(false);
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: habits = [], isLoading } = useQuery({
     queryKey: ["/api/habits"],
@@ -37,6 +41,29 @@ export default function HabitsPage() {
     setShowNewHabitModal(true);
   };
 
+  // Habit toggle mutation
+  const toggleHabitMutation = useMutation({
+    mutationFn: async (habitId: number) => {
+      const result = await apiRequest(`/api/habits/${habitId}/toggle`, "POST");
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/habits"] });
+      refreshHabits();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update habit",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleToggleHabit = (habitId: number) => {
+    toggleHabitMutation.mutate(habitId);
+  };
+
   // Sort habits by time of day (morning -> afternoon -> evening -> anytime)
   const sortedHabits = (habits as Habit[]).sort((a, b) => {
     const timeOrder = { morning: 0, afternoon: 1, evening: 2, anytime: 3 };
@@ -44,6 +71,33 @@ export default function HabitsPage() {
     const timeB = timeOrder[b.timeOfDay as keyof typeof timeOrder] ?? 3;
     return timeA - timeB;
   });
+
+  const getTimeOfDayEmoji = (timeOfDay?: string) => {
+    switch (timeOfDay) {
+      case 'morning': return '🌅';
+      case 'afternoon': return '☀️';
+      case 'evening': return '🌙';
+      default: return '⏰';
+    }
+  };
+
+  const getTimeOfDayLabel = (timeOfDay?: string) => {
+    switch (timeOfDay) {
+      case 'morning': return 'Morning';
+      case 'afternoon': return 'Afternoon';
+      case 'evening': return 'Evening';
+      default: return 'Anytime';
+    }
+  };
+
+  const getCategoryColor = (category?: string) => {
+    switch (category) {
+      case 'mind': return { bg: 'bg-purple-500', light: 'bg-purple-100 dark:bg-purple-900', text: 'text-purple-700 dark:text-purple-300' };
+      case 'body': return { bg: 'bg-orange-500', light: 'bg-orange-100 dark:bg-orange-900', text: 'text-orange-700 dark:text-orange-300' };
+      case 'soul': return { bg: 'bg-emerald-500', light: 'bg-emerald-100 dark:bg-emerald-900', text: 'text-emerald-700 dark:text-emerald-300' };
+      default: return { bg: 'bg-blue-500', light: 'bg-blue-100 dark:bg-blue-900', text: 'text-blue-700 dark:text-blue-300' };
+    }
+  };
 
   if (isLoading) {
     return (
@@ -75,16 +129,8 @@ export default function HabitsPage() {
           </Button>
         </div>
 
-        {/* Habit Stories */}
-        {habits.length > 0 && (
-          <div className="mb-8">
-            <HabitStoryBar 
-              habits={habits as Habit[]} 
-              onUpdate={refreshHabits} 
-              onAddHabit={handleAddHabit}
-            />
-          </div>
-        )}
+        {/* Habit Stories - only show on Formation Science tab */}
+        <div id="habit-stories-container" className="mb-8 hidden"></div>
 
         {/* Habits Content */}
         <div className="space-y-6">
@@ -105,15 +151,15 @@ export default function HabitsPage() {
               </CardContent>
             </Card>
           ) : (
-            <Tabs defaultValue="formation" className="w-full">
+            <Tabs defaultValue="simple" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="formation" className="flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4" />
-                  Formation Tracker
-                </TabsTrigger>
                 <TabsTrigger value="simple" className="flex items-center gap-2">
                   <Grid3X3 className="w-4 h-4" />
-                  Simple View
+                  Daily Tracker
+                </TabsTrigger>
+                <TabsTrigger value="formation" className="flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4" />
+                  Formation Science
                 </TabsTrigger>
               </TabsList>
 
@@ -133,40 +179,78 @@ export default function HabitsPage() {
               </TabsContent>
 
               <TabsContent value="simple" className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {(habits as Habit[]).map((habit) => (
-                    <Card key={habit.id} className="border-0 shadow-md hover:shadow-lg transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="font-semibold text-lg">{habit.title}</h3>
-                          <div className={`w-3 h-3 rounded-full ${
-                            habit.category === 'mind' ? 'bg-purple-500' :
-                            habit.category === 'body' ? 'bg-orange-500' :
-                            habit.category === 'soul' ? 'bg-emerald-500' :
-                            'bg-blue-500'
-                          }`} />
-                        </div>
-                        
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Current Streak</span>
-                            <span className="font-bold text-lg">{habit.streak} days</span>
+                <div className="space-y-4">
+                  {sortedHabits.map((habit) => {
+                    const colors = getCategoryColor(habit.category);
+                    const isLoading = toggleHabitMutation.isPending;
+                    
+                    return (
+                      <Card key={habit.id} className={`border-0 shadow-md hover:shadow-lg transition-all duration-300 ${
+                        habit.completedToday ? `${colors.light} border-l-4 border-l-green-500` : 'hover:scale-[1.02]'
+                      }`}>
+                        <CardContent className="p-0">
+                          <div className="flex items-center gap-4 p-6">
+                            {/* Gamified Completion Button */}
+                            <Button
+                              variant="ghost"
+                              size="lg"
+                              onClick={() => handleToggleHabit(habit.id)}
+                              disabled={isLoading}
+                              className={`w-16 h-16 rounded-full border-2 transition-all duration-300 hover:scale-105 ${
+                                habit.completedToday
+                                  ? `${colors.bg} border-green-400 text-white hover:bg-green-600 shadow-lg`
+                                  : `bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20`
+                              }`}
+                            >
+                              {habit.completedToday ? (
+                                <CheckCircle2 className="w-8 h-8 drop-shadow-lg" />
+                              ) : (
+                                <Circle className="w-8 h-8 text-gray-400" />
+                              )}
+                            </Button>
+
+                            {/* Habit Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="font-semibold text-lg truncate">{habit.title}</h3>
+                                <Badge variant="outline" className="text-xs">
+                                  {getTimeOfDayEmoji(habit.timeOfDay)} {getTimeOfDayLabel(habit.timeOfDay)}
+                                </Badge>
+                                <div className={`w-3 h-3 rounded-full ${colors.bg}`} />
+                              </div>
+                              
+                              {habit.description && (
+                                <p className="text-sm text-muted-foreground mb-2 truncate">{habit.description}</p>
+                              )}
+                              
+                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                <div className="flex items-center gap-1">
+                                  <Flame className="w-4 h-4 text-orange-500" />
+                                  <span className="font-medium">{habit.streak} day streak</span>
+                                </div>
+                                {habit.completedToday && (
+                                  <div className="flex items-center gap-1 text-green-600">
+                                    <Star className="w-4 h-4" />
+                                    <span className="font-medium">Completed today!</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Quick Stats */}
+                            <div className="text-right">
+                              <div className={`text-2xl font-bold ${habit.completedToday ? 'text-green-600' : colors.text}`}>
+                                {habit.streak}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                day{habit.streak !== 1 ? 's' : ''}
+                              </div>
+                            </div>
                           </div>
-                          
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Today</span>
-                            <span className={`font-medium ${habit.completedToday ? 'text-green-600' : 'text-muted-foreground'}`}>
-                              {habit.completedToday ? 'Completed ✓' : 'Pending'}
-                            </span>
-                          </div>
-                          
-                          {habit.description && (
-                            <p className="text-sm text-muted-foreground mt-2">{habit.description}</p>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               </TabsContent>
             </Tabs>
