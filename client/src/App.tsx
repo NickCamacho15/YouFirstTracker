@@ -9,6 +9,7 @@ import LoginPage from "@/pages/login";
 import DashboardPage from "@/pages/dashboard";
 import CommunityPage from "@/pages/community";
 import ProfilePage from "@/pages/profile";
+import VisionPage from "@/pages/vision";
 import NotFound from "@/pages/not-found";
 
 function AuthenticatedApp() {
@@ -17,6 +18,7 @@ function AuthenticatedApp() {
       <Route path="/" component={DashboardPage} />
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/community" component={CommunityPage} />
+      <Route path="/vision" component={VisionPage} />
       <Route path="/profile" component={ProfilePage} />
       <Route component={NotFound} />
     </Switch>

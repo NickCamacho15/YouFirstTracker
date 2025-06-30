@@ -296,6 +296,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Vision Board routes
+  app.get("/api/vision-board", requireAuth, async (req, res) => {
+    try {
+      const visionItems = await storage.getVisionBoardByUserId(req.session.userId);
+      res.json(visionItems);
+    } catch (error) {
+      console.error("Get vision board error:", error);
+      res.status(500).json({ message: "Failed to get vision board items" });
+    }
+  });
+
+  app.post("/api/vision-board", requireAuth, async (req, res) => {
+    try {
+      const { imageUrl, caption } = req.body;
+      const visionItem = await storage.createVisionBoardItem({
+        userId: req.session.userId,
+        imageUrl,
+        caption,
+        position: 0, // You can implement position management later
+      });
+      res.json(visionItem);
+    } catch (error) {
+      console.error("Create vision board item error:", error);
+      res.status(400).json({ message: "Failed to create vision board item" });
+    }
+  });
+
+  app.delete("/api/vision-board/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteVisionBoardItem(id);
+      if (success) {
+        res.json({ message: "Vision board item deleted" });
+      } else {
+        res.status(404).json({ message: "Vision board item not found" });
+      }
+    } catch (error) {
+      console.error("Delete vision board item error:", error);
+      res.status(500).json({ message: "Failed to delete vision board item" });
+    }
+  });
+
   // Community routes
   app.get("/api/posts", async (req, res) => {
     try {
