@@ -37,6 +37,14 @@ export default function HabitsPage() {
     setShowNewHabitModal(true);
   };
 
+  // Sort habits by time of day (morning -> afternoon -> evening -> anytime)
+  const sortedHabits = (habits as Habit[]).sort((a, b) => {
+    const timeOrder = { morning: 0, afternoon: 1, evening: 2, anytime: 3 };
+    const timeA = timeOrder[a.timeOfDay as keyof typeof timeOrder] ?? 3;
+    const timeB = timeOrder[b.timeOfDay as keyof typeof timeOrder] ?? 3;
+    return timeA - timeB;
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
