@@ -68,12 +68,39 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-blue-950 dark:to-purple-950">
+      {/* Vision Board Header */}
+      <div className="relative h-64 bg-gradient-to-br from-blue-400 via-blue-500 to-purple-600 overflow-hidden">
+        {/* Nature Background Image Placeholder */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-400/90 via-indigo-500/90 to-purple-600/90"></div>
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-80"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40c20-10 40 0 60-10s40 0 60-10v70H0V40z' fill='%23ffffff' fill-opacity='0.1'/%3E%3Cpath d='M0 60c15-8 30 2 45-6s30 2 45-6v46H0V60z' fill='%23ffffff' fill-opacity='0.05'/%3E%3C/svg%3E")`
+          }}
+        ></div>
+        
+        {/* Header Content */}
+        <div className="relative z-10 flex flex-col justify-center items-center h-full text-white px-6">
+          <h1 className="text-4xl font-bold text-center mb-2 drop-shadow-lg">
+            {getGreeting()}, {user?.displayName}
+          </h1>
+          <p className="text-xl text-center text-white/90 drop-shadow-md">
+            Your personal command center for growth and achievement
+          </p>
+        </div>
+        
+        {/* Gradient Overlay at Bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-slate-50 dark:from-slate-950 to-transparent"></div>
+      </div>
+
       {/* Habit Story Bar */}
-      <HabitStoryBar 
-        habits={habits}
-        onUpdate={refetchHabits}
-        onAddHabit={() => setShowNewHabitModal(true)}
-      />
+      <div className="relative -mt-8 z-20">
+        <HabitStoryBar 
+          habits={habits}
+          onUpdate={refetchHabits}
+          onAddHabit={() => setShowNewHabitModal(true)}
+        />
+      </div>
       
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
         {/* Hero Welcome Section */}

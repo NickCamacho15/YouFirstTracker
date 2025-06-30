@@ -123,6 +123,16 @@ Build scripts include:
 
 ## Changelog
 
+- June 30, 2025: Enhanced visual design and scientific habit tracking
+  - Added beautiful Calm-inspired hero header with nature imagery and gradients
+  - Enhanced habit story bar with larger, more prominent colorful bubbles
+  - Implemented scientific habit formation tracker with three research-backed stages:
+    - Stage 1: Initial Formation (Days 1-18) - Building awareness and momentum
+    - Stage 2: Strengthening (Days 19-45) - Neural pathway development
+    - Stage 3: Automaticity (Days 46-66) - Habit becomes automatic
+  - Added tabbed interface on habits page for Overview and Formation Science views
+  - Color-coded habit categories: Mind (purple), Body (orange/red), Soul (emerald/teal)
+  - Moved habit bar lower with elevated positioning over hero header
 - June 30, 2025: Simplified to focused personal productivity platform
   - Removed social "You" timeline section for distraction-free experience
   - Fixed navigation disappearing issue by moving to app-level rendering

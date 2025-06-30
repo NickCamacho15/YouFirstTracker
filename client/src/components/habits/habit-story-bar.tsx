@@ -123,7 +123,7 @@ export function HabitStoryBar({ habits, onUpdate, onAddHabit }: HabitStoryBarPro
                 <div className={`w-20 h-20 rounded-full p-1 transition-all duration-300 ${
                   isCompleted 
                     ? `bg-gradient-to-r ${habitColor} shadow-xl` 
-                    : "bg-gradient-to-r from-slate-200/60 to-slate-300/60 dark:from-slate-700/60 dark:to-slate-600/60"
+                    : `bg-gradient-to-r ${habitColor} opacity-40 shadow-lg`
                 }`}>
                   {/* Inner Circle */}
                   <Button
@@ -134,18 +134,13 @@ export function HabitStoryBar({ habits, onUpdate, onAddHabit }: HabitStoryBarPro
                     className={`w-full h-full rounded-full transition-all duration-300 hover:scale-105 ${
                       isCompleted
                         ? `bg-gradient-to-r ${habitColor} border-0 shadow-lg hover:shadow-xl`
-                        : "bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 hover:bg-white dark:hover:bg-slate-700"
+                        : `bg-gradient-to-r ${habitColor} opacity-30 border-0 hover:opacity-50 shadow-md`
                     }`}
                   >
                     {isCompleted ? (
                       <Check className="w-8 h-8 text-white drop-shadow-lg" />
                     ) : (
-                      <div className={`w-8 h-8 rounded-full border-3 transition-all duration-300 ${
-                        habit.category === 'mind' ? 'border-purple-400/50' :
-                        habit.category === 'body' ? 'border-orange-400/50' :
-                        habit.category === 'soul' ? 'border-emerald-400/50' :
-                        'border-slate-400/50'
-                      }`} />
+                      <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40" />
                     )}
                   </Button>
                 </div>
