@@ -8,9 +8,10 @@ import { HabitCard } from "@/components/habits/habit-card";
 import { HabitStoryBar } from "@/components/habits/habit-story-bar";
 import { HabitFormationTracker } from "@/components/habits/habit-formation-tracker";
 import { NewHabitModal } from "@/components/habits/new-habit-modal";
+import { EditHabitModal } from "@/components/habits/edit-habit-modal";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Zap, BarChart3, Grid3X3, CheckCircle2, Circle, Clock, Flame, Star } from "lucide-react";
+import { Plus, Zap, BarChart3, Grid3X3, CheckCircle2, Circle, Clock, Flame, Star, Settings } from "lucide-react";
 
 interface Habit {
   id: number;
@@ -26,6 +27,8 @@ interface Habit {
 
 export default function HabitsPage() {
   const [showNewHabitModal, setShowNewHabitModal] = useState(false);
+  const [showEditHabitModal, setShowEditHabitModal] = useState(false);
+  const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -44,12 +47,15 @@ export default function HabitsPage() {
   // Habit toggle mutation
   const toggleHabitMutation = useMutation({
     mutationFn: async (habitId: number) => {
-      const result = await apiRequest(`/api/habits/${habitId}/toggle`, "POST");
+      const result = await apiRequest(`/api/habits/${habitId}/toggle`, "POST", {});
       return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/habits"] });
-      refreshHabits();
+      toast({
+        title: "Success",
+        description: "Habit updated!",
+      });
     },
     onError: (error: any) => {
       toast({
@@ -62,6 +68,11 @@ export default function HabitsPage() {
 
   const handleToggleHabit = (habitId: number) => {
     toggleHabitMutation.mutate(habitId);
+  };
+
+  const handleEditHabit = (habit: Habit) => {
+    setSelectedHabit(habit);
+    setShowEditHabitModal(true);
   };
 
   // Sort habits by time of day (morning -> afternoon -> evening -> anytime)
@@ -179,63 +190,101 @@ export default function HabitsPage() {
               </TabsContent>
 
               <TabsContent value="simple" className="space-y-6">
-                <div className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {sortedHabits.map((habit) => {
                     const colors = getCategoryColor(habit.category);
                     const isLoading = toggleHabitMutation.isPending;
+                    const progressPercentage = Math.min((habit.streak / 66) * 100, 100);
                     
                     return (
                       <Card key={habit.id} className={`border-0 shadow-md hover:shadow-lg transition-all duration-300 ${
-                        habit.completedToday ? `${colors.light} border-l-4 border-l-green-500` : 'hover:scale-[1.02]'
+                        habit.completedToday ? `${colors.light} ring-2 ring-green-400` : 'hover:scale-[1.02]'
                       }`}>
-                        <CardContent className="p-0">
-                          <div className="flex items-center gap-4 p-6">
-                            {/* Gamified Completion Button */}
+                        <CardContent className="p-6">
+                          {/* Top section with edit button */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-xs">
+                                {getTimeOfDayEmoji(habit.timeOfDay)} {getTimeOfDayLabel(habit.timeOfDay)}
+                              </Badge>
+                              <div className={`w-3 h-3 rounded-full ${colors.bg}`} />
+                            </div>
                             <Button
                               variant="ghost"
-                              size="lg"
+                              size="sm"
+                              onClick={() => handleEditHabit(habit)}
+                              className="h-8 w-8 p-0 opacity-60 hover:opacity-100"
+                            >
+                              <Settings className="w-4 h-4" />
+                            </Button>
+                          </div>
+
+                          {/* Habit title and description */}
+                          <div className="mb-4">
+                            <h3 className="font-semibold text-lg mb-1 line-clamp-2">{habit.title}</h3>
+                            {habit.description && (
+                              <p className="text-sm text-muted-foreground line-clamp-2">{habit.description}</p>
+                            )}
+                          </div>
+
+                          {/* Progress visualization */}
+                          <div className="mb-4">
+                            <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                              <span>Progress to automaticity</span>
+                              <span>{Math.round(progressPercentage)}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+                              <div 
+                                className={`h-2 rounded-full transition-all duration-500 ${colors.bg}`}
+                                style={{ width: `${progressPercentage}%` }}
+                              />
+                            </div>
+                            <div className="text-xs text-muted-foreground text-center">
+                              {habit.streak < 66 ? `${66 - habit.streak} days to go` : "Habit formed! 🎉"}
+                            </div>
+                          </div>
+
+                          {/* Completion button and stats */}
+                          <div className="space-y-3">
+                            <Button
+                              variant="ghost"
                               onClick={() => handleToggleHabit(habit.id)}
                               disabled={isLoading}
-                              className={`w-16 h-16 rounded-full border-2 transition-all duration-300 hover:scale-105 ${
+                              className={`w-full h-12 rounded-lg border-2 transition-all duration-300 hover:scale-105 ${
                                 habit.completedToday
-                                  ? `${colors.bg} border-green-400 text-white hover:bg-green-600 shadow-lg`
+                                  ? `${colors.bg} border-green-400 text-white hover:opacity-90 shadow-lg`
                                   : `bg-white dark:bg-slate-800 border-gray-300 dark:border-gray-600 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20`
                               }`}
                             >
-                              {habit.completedToday ? (
-                                <CheckCircle2 className="w-8 h-8 drop-shadow-lg" />
-                              ) : (
-                                <Circle className="w-8 h-8 text-gray-400" />
-                              )}
-                            </Button>
-
-                            {/* Habit Info */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-3 mb-2">
-                                <h3 className="font-semibold text-lg truncate">{habit.title}</h3>
-                                <Badge variant="outline" className="text-xs">
-                                  {getTimeOfDayEmoji(habit.timeOfDay)} {getTimeOfDayLabel(habit.timeOfDay)}
-                                </Badge>
-                                <div className={`w-3 h-3 rounded-full ${colors.bg}`} />
-                              </div>
-                              
-                              {habit.description && (
-                                <p className="text-sm text-muted-foreground mb-2 truncate">{habit.description}</p>
-                              )}
-                              
-                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                <div className="flex items-center gap-1">
-                                  <Flame className="w-4 h-4 text-orange-500" />
-                                  <span className="font-medium">{habit.streak} day streak</span>
-                                </div>
-                                {habit.completedToday && (
-                                  <div className="flex items-center gap-1 text-green-600">
-                                    <Star className="w-4 h-4" />
-                                    <span className="font-medium">Completed today!</span>
-                                  </div>
+                              <div className="flex items-center justify-center gap-2">
+                                {habit.completedToday ? (
+                                  <>
+                                    <CheckCircle2 className="w-5 h-5 drop-shadow-lg" />
+                                    <span className="font-medium">Completed!</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Circle className="w-5 h-5 text-gray-400" />
+                                    <span className="font-medium">Mark Complete</span>
+                                  </>
                                 )}
                               </div>
+                            </Button>
+
+                            {/* Streak info */}
+                            <div className="flex items-center justify-center gap-4 text-sm">
+                              <div className="flex items-center gap-1 text-orange-600">
+                                <Flame className="w-4 h-4" />
+                                <span className="font-medium">{habit.streak} day streak</span>
+                              </div>
+                              {habit.completedToday && (
+                                <div className="flex items-center gap-1 text-green-600">
+                                  <Star className="w-4 h-4" />
+                                  <span className="font-medium">Today!</span>
+                                </div>
+                              )}
                             </div>
+                          </div>
 
                             {/* Quick Stats */}
                             <div className="text-right">
