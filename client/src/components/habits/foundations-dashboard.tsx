@@ -39,42 +39,42 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
     switch (category) {
       case 'mind':
         return {
-          bg: 'bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600',
-          light: 'from-blue-50 via-indigo-50 to-purple-50',
-          dark: 'from-blue-950/30 via-indigo-950/30 to-purple-950/30',
-          glow: 'shadow-blue-500/25',
-          border: 'border-blue-200',
-          text: 'text-blue-600',
+          bg: 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700',
+          light: 'from-blue-100 via-indigo-100 to-purple-100',
+          dark: 'from-blue-900/80 via-indigo-900/80 to-purple-900/80',
+          glow: 'shadow-blue-500/40',
+          border: 'border-blue-300',
+          text: 'text-blue-700',
           icon: '🧠'
         };
       case 'body':
         return {
-          bg: 'bg-gradient-to-r from-orange-500 via-red-500 to-pink-600',
-          light: 'from-orange-50 via-red-50 to-pink-50',
-          dark: 'from-orange-950/30 via-red-950/30 to-pink-950/30',
-          glow: 'shadow-orange-500/25',
-          border: 'border-orange-200',
-          text: 'text-orange-600',
+          bg: 'bg-gradient-to-br from-orange-500 via-red-600 to-rose-700',
+          light: 'from-orange-100 via-red-100 to-rose-100',
+          dark: 'from-orange-900/80 via-red-900/80 to-rose-900/80',
+          glow: 'shadow-orange-500/40',
+          border: 'border-orange-300',
+          text: 'text-orange-700',
           icon: '💪'
         };
       case 'soul':
         return {
-          bg: 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600',
-          light: 'from-emerald-50 via-teal-50 to-cyan-50',
-          dark: 'from-emerald-950/30 via-teal-950/30 to-cyan-950/30',
-          glow: 'shadow-emerald-500/25',
-          border: 'border-emerald-200',
-          text: 'text-emerald-600',
+          bg: 'bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700',
+          light: 'from-emerald-100 via-teal-100 to-cyan-100',
+          dark: 'from-emerald-900/80 via-teal-900/80 to-cyan-900/80',
+          glow: 'shadow-emerald-500/40',
+          border: 'border-emerald-300',
+          text: 'text-emerald-700',
           icon: '✨'
         };
       default:
         return {
-          bg: 'bg-gradient-to-r from-gray-500 to-gray-600',
-          light: 'from-gray-50 to-gray-50',
-          dark: 'from-gray-950/30 to-gray-950/30',
-          glow: 'shadow-gray-500/25',
-          border: 'border-gray-200',
-          text: 'text-gray-600',
+          bg: 'bg-gradient-to-br from-gray-500 to-slate-600',
+          light: 'from-gray-100 to-slate-100',
+          dark: 'from-gray-900/80 to-slate-900/80',
+          glow: 'shadow-gray-500/40',
+          border: 'border-gray-300',
+          text: 'text-gray-700',
           icon: '⚡'
         };
     }
@@ -138,46 +138,54 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
       </div>
 
       {/* Interactive Habits Grid */}
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {habits.map((habit) => {
           const colors = getCategoryGradient(habit.category);
           const streakWidth = maxStreak > 0 ? (habit.streak / maxStreak) * 100 : 0;
           
           return (
-            <div key={habit.id} className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${colors.light} dark:bg-gradient-to-br dark:${colors.dark} border ${colors.border} dark:border-opacity-50 hover:shadow-xl hover:${colors.glow} transition-all duration-300 hover:scale-[1.02]`}>
+            <div key={habit.id} className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${colors.light} dark:bg-gradient-to-br dark:${colors.dark} border ${colors.border} dark:border-opacity-50 hover:shadow-xl hover:${colors.glow} transition-all duration-300 hover:scale-[1.02] min-h-[280px] flex flex-col`}>
               {/* Animated background gradient */}
               <div className={`absolute inset-0 ${colors.bg} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
               
-              <div className="relative z-10 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">{colors.icon}</div>
-                    <div>
-                      <h3 className="font-bold text-lg text-gray-800 dark:text-gray-200">{habit.title}</h3>
-                      {habit.description && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{habit.description}</p>
-                      )}
+              <div className="relative z-10 p-6 flex flex-col h-full">
+                {/* Header with icon and settings */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="text-3xl">{colors.icon}</div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEditHabit(habit)}
+                    className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                {/* Title and description */}
+                <div className="mb-6">
+                  <h3 className="font-bold text-xl text-gray-800 dark:text-gray-200 mb-2">{habit.title}</h3>
+                  {habit.description && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{habit.description}</p>
+                  )}
+                </div>
+                
+                {/* Streak visualization */}
+                <div className="mb-6 flex-grow flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Flame className="w-5 h-5 text-amber-500" />
+                      <span className="text-3xl font-black text-gray-800 dark:text-gray-200">{habit.streak}</span>
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">day streak</div>
+                    <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-3 mx-auto">
+                      <div 
+                        className={`h-2 rounded-full ${colors.bg} transition-all duration-500`}
+                        style={{ width: `${streakWidth}%` }}
+                      />
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-3">
-                    {/* Enhanced streak visualization */}
-                    <div className="flex items-center gap-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl px-3 py-2">
-                      <Flame className="w-4 h-4 text-amber-500" />
-                      <div className="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div 
-                          className={`h-2 rounded-full ${colors.bg} transition-all duration-500`}
-                          style={{ width: `${streakWidth}%` }}
-                        />
-                      </div>
-                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{habit.streak}</span>
-                    </div>
-                    
-                    {/* Interactive edit button */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onEditHabit(habit)}
+                </div>
                       className="h-10 w-10 p-0 rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-gray-700/80 transition-all duration-200 hover:scale-110"
                     >
                       <Settings className="h-4 w-4 text-gray-600 dark:text-gray-400" />
