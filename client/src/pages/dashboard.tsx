@@ -113,8 +113,8 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           {/* Habits Progress */}
           <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-3">
-              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+            <div className="relative w-28 h-28 mx-auto mb-3">
+              <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 36 36">
                 <path
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
