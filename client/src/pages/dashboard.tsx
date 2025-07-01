@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { NewGoalModal } from "@/components/goals/new-goal-modal";
@@ -27,6 +27,68 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [showNewGoalModal, setShowNewGoalModal] = useState(false);
   const [showNewHabitModal, setShowNewHabitModal] = useState(false);
+  const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set(['task-1']));
+  const [dragProgress, setDragProgress] = useState<{ [key: string]: number }>({});
+  
+  // Haptic feedback function
+  const triggerHapticFeedback = () => {
+    if ('vibrate' in navigator) {
+      // Rhythmic completion vibration: quick burst, pause, double burst
+      navigator.vibrate([100, 50, 100, 50, 200]);
+    }
+  };
+  
+  // Handle task completion
+  const handleTaskComplete = (taskId: string) => {
+    setCompletedTasks(prev => new Set([...prev, taskId]));
+    triggerHapticFeedback();
+    
+    // Show completion celebration
+    const celebrationElement = document.querySelector(`#celebration-${taskId}`);
+    if (celebrationElement) {
+      celebrationElement.classList.add('animate-bounce');
+      setTimeout(() => {
+        celebrationElement.classList.remove('animate-bounce');
+      }, 1000);
+    }
+  };
+  
+  // Handle drag progress for slide-to-complete
+  const handleDragStart = (taskId: string, event: React.MouseEvent | React.TouchEvent) => {
+    const startX = 'touches' in event ? event.touches[0].clientX : event.clientX;
+    const slider = event.currentTarget as HTMLElement;
+    const sliderRect = slider.getBoundingClientRect();
+    const maxWidth = sliderRect.width - 48; // Account for slider button width
+    
+    const handleMove = (moveEvent: MouseEvent | TouchEvent) => {
+      const currentX = 'touches' in moveEvent ? moveEvent.touches[0].clientX : moveEvent.clientX;
+      const progress = Math.min(Math.max((currentX - startX) / maxWidth, 0), 1);
+      setDragProgress(prev => ({ ...prev, [taskId]: progress }));
+      
+      // Haptic feedback at milestones
+      if (progress > 0.5 && progress < 0.6 && 'vibrate' in navigator) {
+        navigator.vibrate(50); // Light feedback at halfway
+      }
+    };
+    
+    const handleEnd = () => {
+      const currentProgress = dragProgress[taskId] || 0;
+      if (currentProgress > 0.8) {
+        handleTaskComplete(taskId);
+      }
+      setDragProgress(prev => ({ ...prev, [taskId]: 0 }));
+      
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleMove);
+      document.removeEventListener('touchend', handleEnd);
+    };
+    
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchmove', handleMove);
+    document.addEventListener('touchend', handleEnd);
+  };
 
   const { data: goals = [], refetch: refetchGoals } = useQuery({
     queryKey: ["/api/goals"],
@@ -89,6 +151,18 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-blue-950 dark:to-purple-950">
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
+        {/* Premium Welcome Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-600 bg-clip-text text-transparent mb-4">
+            {getGreeting()}, {user?.displayName}
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-2">
+            Your Premium Personal Excellence Dashboard
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+            "Action is the touchstone of reality" - Transform your life into a masterpiece
+          </p>
+        </div>
 
         {/* Large Whoop-style Rings Dashboard */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
@@ -289,42 +363,90 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                    <div>
-                      <p className="font-medium">Review quarterly metrics</p>
-                      <p className="text-sm text-muted-foreground">High priority</p>
+                {/* Completed Task */}
+                <div className="relative overflow-hidden bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                  <div className="flex items-center justify-between p-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 rounded-full bg-emerald-500 animate-pulse" />
+                      <div>
+                        <p className="font-semibold text-emerald-800 dark:text-emerald-200">Review quarterly metrics</p>
+                        <p className="text-sm text-emerald-600 dark:text-emerald-400">Completed - Action taken!</p>
+                      </div>
                     </div>
-                  </div>
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                </div>
-                
-                <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 rounded-full bg-orange-500" />
-                    <div>
-                      <p className="font-medium">Prepare presentation slides</p>
-                      <p className="text-sm text-muted-foreground">Due 2 PM</p>
-                    </div>
+                    <CheckCircle2 className="w-6 h-6 text-emerald-500 animate-bounce" />
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 rounded-full bg-blue-500" />
-                    <div>
-                      <p className="font-medium">Team standup meeting</p>
-                      <p className="text-sm text-muted-foreground">10 AM today</p>
+                {/* Active Task with Slide to Complete */}
+                <div className="relative overflow-hidden bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30 rounded-xl border-2 border-orange-200 dark:border-orange-800">
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-4 h-4 rounded-full bg-orange-500 animate-pulse" />
+                        <div>
+                          <p className="font-semibold text-gray-900 dark:text-white">Prepare presentation slides</p>
+                          <p className="text-sm text-orange-600 dark:text-orange-400">Critical - Due 2 PM</p>
+                        </div>
+                      </div>
+                      <Badge variant="destructive" className="animate-pulse">URGENT</Badge>
                     </div>
+                    
+                    {/* Slide to Complete Interface */}
+                    <div className="relative bg-gray-200 dark:bg-gray-700 rounded-full h-12 overflow-hidden">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-sm font-bold text-gray-600 dark:text-gray-400 animate-pulse">
+                          ← Slide to Take Action & Complete →
+                        </span>
+                      </div>
+                      <div className="absolute left-1 top-1 w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center cursor-pointer transform transition-transform duration-300 hover:scale-110 shadow-lg">
+                        <ArrowRight className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                    
+                    <p className="text-xs text-center text-gray-600 dark:text-gray-400 mt-2 italic">
+                      "Action is the touchstone of reality" - Complete to transform intention into achievement
+                    </p>
                   </div>
                 </div>
                 
-                <div className="text-center pt-2">
-                  <Button variant="outline" size="sm" className="text-emerald-600 hover:text-emerald-700">
+                {/* Another Active Task */}
+                <div className="relative overflow-hidden bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl border-2 border-blue-200 dark:border-blue-800">
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-4 h-4 rounded-full bg-blue-500 animate-pulse" />
+                        <div>
+                          <p className="font-semibold text-gray-900 dark:text-white">Team standup meeting</p>
+                          <p className="text-sm text-blue-600 dark:text-blue-400">Important - 10 AM today</p>
+                        </div>
+                      </div>
+                      <Badge variant="secondary" className="bg-blue-100 text-blue-700">HIGH</Badge>
+                    </div>
+                    
+                    {/* Slide to Complete Interface */}
+                    <div className="relative bg-gray-200 dark:bg-gray-700 rounded-full h-12 overflow-hidden">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-sm font-bold text-gray-600 dark:text-gray-400 animate-pulse">
+                          ← Slide to Execute & Mark Done →
+                        </span>
+                      </div>
+                      <div className="absolute left-1 top-1 w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center cursor-pointer transform transition-transform duration-300 hover:scale-110 shadow-lg">
+                        <ArrowRight className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                    
+                    <p className="text-xs text-center text-gray-600 dark:text-gray-400 mt-2 italic">
+                      Make it happen - Every completed task builds momentum
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="text-center pt-4">
+                  <Button variant="outline" size="sm" className="text-emerald-600 hover:text-emerald-700 border-2 border-emerald-200 hover:border-emerald-400">
                     <Plus className="w-4 h-4 mr-2" />
-                    Add Task
+                    Add Critical Task
                   </Button>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Focus on what moves the needle</p>
                 </div>
               </div>
             </CardContent>
