@@ -75,36 +75,73 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
   const stage3Stats = getStageCompletion(stage3Days);
 
   const renderStageProgress = (days: Date[], stageNumber: number, stageStats: any) => {
-    const isCompleted = isCompletedOnDay(days[days.length - 1]);
     const completedDays = days.filter(day => isCompletedOnDay(day)).length;
     const progressPercent = (completedDays / days.length) * 100;
     
+    // Get gradient colors based on stage
+    const getStageGradient = (stage: number) => {
+      switch (stage) {
+        case 1: return 'from-orange-400/20 via-red-300/15 to-pink-400/20';
+        case 2: return 'from-blue-400/20 via-cyan-300/15 to-indigo-400/20';
+        case 3: return 'from-green-400/20 via-emerald-300/15 to-teal-400/20';
+        default: return 'from-gray-400/20 via-gray-300/15 to-gray-400/20';
+      }
+    };
+
+    // Render mini progress bubbles (show last 7 days)
+    const recentDays = days.slice(-7);
+    
     return (
-      <div className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+      <div className={`relative p-5 rounded-xl border-2 transition-all duration-300 hover:scale-[1.02] ${
         progressPercent === 100 
-          ? `${colors.bg} ${colors.text} border-current shadow-lg` 
-          : `bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600`
+          ? `${colors.bg} ${colors.text} border-current shadow-xl shadow-current/25` 
+          : `bg-gradient-to-br ${getStageGradient(stageNumber)} border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 backdrop-blur-sm`
       }`}>
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-lg font-bold">
-            {completedDays}/{days.length}
-          </div>
-          <div className="text-sm opacity-75">
-            {Math.round(progressPercent)}%
-          </div>
-        </div>
+        {/* Glowing background effect */}
+        <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${getStageGradient(stageNumber)} opacity-50 blur-sm`} />
         
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-3">
-          <div 
-            className={`h-2 rounded-full transition-all duration-500 ${
-              progressPercent > 0 ? colors.bg : 'bg-gray-300 dark:bg-gray-600'
-            }`}
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-        
-        <div className="text-xs opacity-75">
-          {progressPercent === 100 ? 'Stage Complete!' : `${days.length - completedDays} days remaining`}
+        <div className="relative z-10">
+          {/* Mini progress bubbles */}
+          <div className="flex justify-center gap-1 mb-4">
+            {recentDays.map((day, index) => {
+              const isCompleted = isCompletedOnDay(day);
+              const isToday = isSameDay(day, new Date());
+              
+              return (
+                <div
+                  key={index}
+                  className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                    isCompleted 
+                      ? `${colors.bg} shadow-sm` 
+                      : `bg-gray-300 dark:bg-gray-600 border border-gray-400 dark:border-gray-500`
+                  } ${isToday ? 'ring-2 ring-white ring-offset-1' : ''}`}
+                  title={`${format(day, 'MMM d')}: ${isCompleted ? 'Completed' : 'Not completed'}`}
+                />
+              );
+            })}
+          </div>
+
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-2xl font-bold">
+              {completedDays}/{days.length}
+            </div>
+            <div className="text-sm opacity-75 font-medium">
+              {Math.round(progressPercent)}%
+            </div>
+          </div>
+          
+          <div className="w-full bg-white/50 dark:bg-gray-800/50 rounded-full h-3 mb-3 overflow-hidden">
+            <div 
+              className={`h-3 rounded-full transition-all duration-700 ease-out ${
+                progressPercent > 0 ? colors.bg : 'bg-gray-300 dark:bg-gray-600'
+              } shadow-sm`}
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          
+          <div className="text-xs opacity-75 font-medium text-center">
+            {progressPercent === 100 ? '🎉 Stage Complete!' : `${days.length - completedDays} days remaining`}
+          </div>
         </div>
       </div>
     );
@@ -175,24 +212,31 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
         </div>
 
         {/* Overall Progress */}
-        <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-lg">
-          <div className="flex items-center justify-between mb-3">
-            <span className="font-semibold">Overall Formation Progress</span>
-            <span className="text-sm text-muted-foreground">
-              {stage1Stats.completed + stage2Stats.completed + stage3Stats.completed}/67 days
-            </span>
+        <div className="relative mt-8 p-6 bg-gradient-to-br from-violet-400/15 via-purple-300/10 to-fuchsia-400/15 rounded-2xl border border-violet-200 dark:border-violet-700/50 overflow-hidden">
+          {/* Glowing background effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-400/20 via-purple-300/15 to-fuchsia-400/20 opacity-60 blur-lg" />
+          
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <span className="font-bold text-lg">Overall Formation Progress</span>
+              <span className="text-sm font-medium px-3 py-1 bg-white/50 dark:bg-gray-800/50 rounded-full">
+                {stage1Stats.completed + stage2Stats.completed + stage3Stats.completed}/67 days
+              </span>
+            </div>
+            
+            <div className="w-full bg-white/60 dark:bg-gray-800/60 rounded-full h-4 mb-4 overflow-hidden shadow-inner">
+              <div
+                className={`${colors.bg} h-4 rounded-full transition-all duration-1000 ease-out shadow-lg`}
+                style={{
+                  width: `${Math.round(((stage1Stats.completed + stage2Stats.completed + stage3Stats.completed) / 67) * 100)}%`
+                }}
+              />
+            </div>
+            
+            <p className="text-sm text-center font-medium opacity-90">
+              Science shows 66 days for habit formation + your special .uoY bonus day for mastery ✨
+            </p>
           </div>
-          <div className="w-full bg-white dark:bg-gray-600 rounded-full h-3 mb-3">
-            <div
-              className={`${colors.bg} h-3 rounded-full transition-all duration-500 shadow-sm`}
-              style={{
-                width: `${Math.round(((stage1Stats.completed + stage2Stats.completed + stage3Stats.completed) / 67) * 100)}%`
-              }}
-            />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Science shows 66 days for habit formation + your special .uoY bonus day for mastery.
-          </p>
         </div>
       </CardContent>
     </Card>
