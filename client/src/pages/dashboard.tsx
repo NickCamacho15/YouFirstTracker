@@ -335,7 +335,7 @@ export default function DashboardPage() {
                     type="checkbox" 
                     checked={task.completed}
                     onChange={() => handleTaskToggle(task.id)}
-                    className="w-4 h-4 text-green-600 rounded cursor-pointer"
+                    className="w-5 h-5 text-green-600 rounded cursor-pointer"
                   />
 
                   {/* Task Content */}
