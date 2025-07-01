@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle, Circle, Settings, Flame } from 'lucide-react';
+import { CheckCircle2, Circle, Settings, Flame, Hash, Target, Sparkles } from 'lucide-react';
 
 interface Habit {
   id: number;
@@ -21,164 +20,205 @@ interface FoundationsDashboardProps {
 }
 
 export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoading }: FoundationsDashboardProps) {
-  const getCategoryColor = (category?: string) => {
+  if (habits.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <div className="relative inline-block">
+          <div className="text-8xl mb-6 animate-pulse">🌱</div>
+          <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-full blur-xl"></div>
+        </div>
+        <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+          No foundations yet
+        </h3>
+        <p className="text-muted-foreground text-lg">Create your first habit to begin building your foundations</p>
+      </div>
+    );
+  }
+
+  const getCategoryGradient = (category?: string) => {
     switch (category) {
-      case 'mind': return { bg: 'bg-purple-500', hover: 'hover:bg-purple-600', light: 'bg-purple-50' };
-      case 'body': return { bg: 'bg-orange-500', hover: 'hover:bg-orange-600', light: 'bg-orange-50' };
-      case 'soul': return { bg: 'bg-emerald-500', hover: 'hover:bg-emerald-600', light: 'bg-emerald-50' };
-      default: return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600', light: 'bg-blue-50' };
+      case 'mind':
+        return {
+          bg: 'bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600',
+          light: 'from-blue-50 via-indigo-50 to-purple-50',
+          dark: 'from-blue-950/30 via-indigo-950/30 to-purple-950/30',
+          glow: 'shadow-blue-500/25',
+          border: 'border-blue-200',
+          text: 'text-blue-600',
+          icon: '🧠'
+        };
+      case 'body':
+        return {
+          bg: 'bg-gradient-to-r from-orange-500 via-red-500 to-pink-600',
+          light: 'from-orange-50 via-red-50 to-pink-50',
+          dark: 'from-orange-950/30 via-red-950/30 to-pink-950/30',
+          glow: 'shadow-orange-500/25',
+          border: 'border-orange-200',
+          text: 'text-orange-600',
+          icon: '💪'
+        };
+      case 'soul':
+        return {
+          bg: 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600',
+          light: 'from-emerald-50 via-teal-50 to-cyan-50',
+          dark: 'from-emerald-950/30 via-teal-950/30 to-cyan-950/30',
+          glow: 'shadow-emerald-500/25',
+          border: 'border-emerald-200',
+          text: 'text-emerald-600',
+          icon: '✨'
+        };
+      default:
+        return {
+          bg: 'bg-gradient-to-r from-gray-500 to-gray-600',
+          light: 'from-gray-50 to-gray-50',
+          dark: 'from-gray-950/30 to-gray-950/30',
+          glow: 'shadow-gray-500/25',
+          border: 'border-gray-200',
+          text: 'text-gray-600',
+          icon: '⚡'
+        };
     }
   };
 
-  const getTimeOfDayEmoji = (timeOfDay?: string) => {
-    switch (timeOfDay) {
-      case 'morning': return '🌅';
-      case 'afternoon': return '☀️';
-      case 'evening': return '🌆';
-      case 'night': return '🌙';
-      default: return '⏰';
-    }
-  };
+  const maxStreak = Math.max(...habits.map(h => h.streak));
+  const completedToday = habits.filter(h => h.completedToday).length;
+  const completionRate = Math.round((completedToday / habits.length) * 100);
 
-  const getTimeOfDayLabel = (timeOfDay?: string) => {
-    switch (timeOfDay) {
-      case 'morning': return 'Morning';
-      case 'afternoon': return 'Afternoon';
-      case 'evening': return 'Evening';
-      case 'night': return 'Night';
-      default: return 'Anytime';
-    }
+  // Group habits by category
+  const habitsByCategory = {
+    mind: habits.filter(h => h.category === 'mind'),
+    body: habits.filter(h => h.category === 'body'),
+    soul: habits.filter(h => h.category === 'soul')
   };
-
-  const maxStreak = Math.max(...habits.map(h => h.streak), 1);
 
   return (
-    <Card className="border-0 shadow-xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <CardContent className="p-8">
-        {/* Header with overall stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-              {habits.reduce((sum, habit) => sum + habit.streak, 0)}
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Total Days</p>
+    <div className="space-y-8">
+      {/* Evolving Foundation Tree Visual */}
+      <div className="relative p-8 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-green-950/20 dark:via-emerald-950/20 dark:to-teal-950/20 rounded-3xl border border-emerald-200 dark:border-emerald-800/50 overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-4 right-4 w-20 h-20 bg-gradient-to-br from-emerald-400/20 to-teal-400/20 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute bottom-4 left-4 w-16 h-16 bg-gradient-to-br from-green-400/15 to-emerald-400/15 rounded-full blur-lg animate-pulse delay-1000"></div>
+        </div>
+        
+        <div className="relative z-10 text-center">
+          <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent">
+            🌳 Your Foundation Tree
+          </h2>
+          
+          <div className="grid grid-cols-3 gap-8 mb-6">
+            {Object.entries(habitsByCategory).map(([category, categoryHabits]) => {
+              const colors = getCategoryGradient(category);
+              const categoryStreak = categoryHabits.reduce((sum, h) => sum + h.streak, 0);
+              const categoryCompletion = categoryHabits.filter(h => h.completedToday).length;
+              
+              return (
+                <div key={category} className="text-center">
+                  <div className={`inline-block p-4 rounded-2xl bg-gradient-to-br ${colors.light} dark:bg-gradient-to-br dark:${colors.dark} border ${colors.border} dark:border-opacity-50 mb-3`}>
+                    <div className="text-3xl mb-2">{colors.icon}</div>
+                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                      {category}
+                    </div>
+                  </div>
+                  <div className={`text-2xl font-bold ${colors.text}`}>
+                    {categoryHabits.length}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {categoryCompletion}/{categoryHabits.length} today
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-              {habits.filter(habit => habit.completedToday).length}/{habits.length}
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Completed Today</p>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-              {Math.round((habits.filter(habit => habit.completedToday).length / habits.length) * 100) || 0}%
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Daily Success</p>
+          
+          <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-white/30">
+            <div className="text-4xl font-black text-emerald-600 mb-2">{completionRate}%</div>
+            <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Daily Foundation Strength</div>
           </div>
         </div>
+      </div>
 
-        {/* Habits List with Streak Visualization */}
-        <div className="space-y-4">
-          {habits.map((habit) => {
-            const colors = getCategoryColor(habit.category);
-            const streakWidth = maxStreak > 0 ? (habit.streak / maxStreak) * 100 : 0;
-            
-            return (
-              <div key={habit.id} className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200">
-                {/* Completion Checkbox */}
+      {/* Interactive Habits Grid */}
+      <div className="grid gap-4">
+        {habits.map((habit) => {
+          const colors = getCategoryGradient(habit.category);
+          const streakWidth = maxStreak > 0 ? (habit.streak / maxStreak) * 100 : 0;
+          
+          return (
+            <div key={habit.id} className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${colors.light} dark:bg-gradient-to-br dark:${colors.dark} border ${colors.border} dark:border-opacity-50 hover:shadow-xl hover:${colors.glow} transition-all duration-300 hover:scale-[1.02]`}>
+              {/* Animated background gradient */}
+              <div className={`absolute inset-0 ${colors.bg} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+              
+              <div className="relative z-10 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">{colors.icon}</div>
+                    <div>
+                      <h3 className="font-bold text-lg text-gray-800 dark:text-gray-200">{habit.title}</h3>
+                      {habit.description && (
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{habit.description}</p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    {/* Enhanced streak visualization */}
+                    <div className="flex items-center gap-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl px-3 py-2">
+                      <Flame className="w-4 h-4 text-amber-500" />
+                      <div className="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full ${colors.bg} transition-all duration-500`}
+                          style={{ width: `${streakWidth}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{habit.streak}</span>
+                    </div>
+                    
+                    {/* Interactive edit button */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEditHabit(habit)}
+                      className="h-10 w-10 p-0 rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-gray-700/80 transition-all duration-200 hover:scale-110"
+                    >
+                      <Settings className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    </Button>
+                  </div>
+                </div>
+                
+                {/* Large Interactive Completion Button */}
                 <Button
                   onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
                   disabled={isLoading}
-                  variant="ghost"
-                  size="sm"
-                  className={`w-12 h-12 rounded-full border-2 transition-all duration-200 ${
-                    habit.completedToday
-                      ? `${colors.bg} border-current text-white shadow-lg`
-                      : `border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500`
+                  className={`w-full h-14 rounded-xl text-lg font-bold transition-all duration-300 hover:scale-105 transform-gpu ${
+                    habit.completedToday 
+                      ? `${colors.bg} text-white hover:opacity-90 ${colors.glow} shadow-lg animate-pulse`
+                      : `bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 ${colors.border} dark:border-opacity-30 text-gray-700 dark:text-gray-300 hover:${colors.bg} hover:text-white hover:border-transparent`
                   }`}
                 >
-                  {habit.completedToday ? (
-                    <CheckCircle className="w-6 h-6" />
-                  ) : (
-                    <Circle className="w-6 h-6" />
-                  )}
-                </Button>
-
-                {/* Habit Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-semibold text-lg text-gray-900 dark:text-white truncate">
-                      {habit.title}
-                    </h3>
-                    <div className={`w-3 h-3 rounded-full ${colors.bg}`} />
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {getTimeOfDayEmoji(habit.timeOfDay)} {getTimeOfDayLabel(habit.timeOfDay)}
-                    </span>
+                  <div className="flex items-center justify-center gap-3">
+                    {habit.completedToday ? (
+                      <>
+                        <CheckCircle2 className="w-6 h-6 animate-bounce" />
+                        <span>Foundation Complete!</span>
+                        <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="relative">
+                          <Circle className="w-6 h-6" />
+                          <div className={`absolute inset-0 w-6 h-6 border-2 ${colors.border} rounded-full opacity-0 group-hover:opacity-100 transition-opacity animate-pulse`}></div>
+                        </div>
+                        <span>Build Foundation</span>
+                        <div className={`w-2 h-2 ${colors.bg} rounded-full animate-ping opacity-75`}></div>
+                      </>
+                    )}
                   </div>
-                  
-                  {/* Streak Visualization */}
-                  <div className="relative">
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                      <div
-                        className={`h-3 rounded-full transition-all duration-500 ${colors.bg} shadow-sm`}
-                        style={{ width: `${streakWidth}%` }}
-                      />
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      <span>0</span>
-                      <span className="font-medium">{habit.streak} days</span>
-                      <span>{maxStreak}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Streak Display */}
-                <div className="text-right">
-                  <div className="flex items-center gap-1 mb-1">
-                    <Flame className="w-4 h-4 text-orange-500" />
-                    <span className="text-xl font-bold text-gray-900 dark:text-white">{habit.streak}</span>
-                  </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">day streak</p>
-                </div>
-
-                {/* Settings */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onEditHabit(habit)}
-                  className="w-8 h-8 p-0 opacity-60 hover:opacity-100"
-                >
-                  <Settings className="w-4 h-4" />
                 </Button>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Quick Stats at Bottom */}
-        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex justify-center gap-8 text-sm text-gray-600 dark:text-gray-400">
-            <div className="text-center">
-              <span className="block font-medium text-gray-900 dark:text-white">
-                {Math.max(...habits.map(h => h.streak))}
-              </span>
-              <span>Longest Streak</span>
             </div>
-            <div className="text-center">
-              <span className="block font-medium text-gray-900 dark:text-white">
-                {Math.round(habits.reduce((sum, habit) => sum + habit.streak, 0) / habits.length) || 0}
-              </span>
-              <span>Avg Streak</span>
-            </div>
-            <div className="text-center">
-              <span className="block font-medium text-gray-900 dark:text-white">
-                {habits.length}
-              </span>
-              <span>Total Habits</span>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+          );
+        })}
+      </div>
+    </div>
   );
 }
