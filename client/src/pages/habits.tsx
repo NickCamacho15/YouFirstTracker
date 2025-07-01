@@ -162,15 +162,15 @@ export default function HabitsPage() {
               </CardContent>
             </Card>
           ) : (
-            <Tabs defaultValue="simple" className="w-full">
+            <Tabs defaultValue="formation" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="simple" className="flex items-center gap-2">
-                  <Grid3X3 className="w-4 h-4" />
-                  Daily Tracker
-                </TabsTrigger>
                 <TabsTrigger value="formation" className="flex items-center gap-2">
                   <BarChart3 className="w-4 h-4" />
                   Habit Formation & Foundations
+                </TabsTrigger>
+                <TabsTrigger value="simple" className="flex items-center gap-2">
+                  <Grid3X3 className="w-4 h-4" />
+                  Foundations
                 </TabsTrigger>
               </TabsList>
 
