@@ -421,25 +421,19 @@ export default function HabitsPage() {
                         <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent"></div>
                         <div className="relative z-10">
                           {/* Title and Settings Row */}
-                          <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-start justify-between mb-2">
                             <div className="flex-1">
-                              <h3 className="text-2xl font-bold mb-2">{habit.title}</h3>
-                              <p className="text-white/90">{habit.description || "Building consistency every day"}</p>
+                              <h3 className="text-lg font-semibold mb-1">{habit.title}</h3>
+                              <p className="text-white/80 text-sm">{habit.description || "Building consistency every day"}</p>
                             </div>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => handleEditHabit(habit)}
-                              className="h-10 w-10 p-0 text-white hover:bg-white/20 flex-shrink-0 ml-4"
+                              className="h-8 w-8 p-0 text-white hover:bg-white/20 flex-shrink-0 ml-4"
                             >
-                              <Settings className="w-5 h-5" />
+                              <Settings className="w-4 h-4" />
                             </Button>
-                          </div>
-                          
-                          {/* Streak Display - Centered */}
-                          <div className="text-center">
-                            <div className="text-4xl font-black mb-1">{habit.streak}</div>
-                            <div className="text-sm text-white/80">day streak</div>
                           </div>
                         </div>
                       </div>
