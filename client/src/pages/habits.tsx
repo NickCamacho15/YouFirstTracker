@@ -158,110 +158,110 @@ export default function HabitsPage() {
           </Button>
         </div>
 
-        {/* Compact Whoop-style Rings Dashboard */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        {/* Large Whoop-style Rings Dashboard */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           {/* Habits Ring */}
           <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-3">
-              <svg className="w-20 h-20 transform -rotate-90">
-                <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+            <div className="relative w-32 h-32 mx-auto mb-4">
+              <svg className="w-32 h-32 transform -rotate-90">
+                <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="8" fill="none" className="text-gray-200 dark:text-gray-700" />
                 <circle 
-                  cx="40" 
-                  cy="40" 
-                  r="32" 
+                  cx="64" 
+                  cy="64" 
+                  r="56" 
                   stroke="#3b82f6" 
-                  strokeWidth="6" 
+                  strokeWidth="8" 
                   fill="none" 
-                  strokeDasharray={`${2 * Math.PI * 32}`}
-                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - ((habits as Habit[]).filter(h => h.completedToday).length / Math.max((habits as Habit[]).length, 1)))}`}
+                  strokeDasharray={`${2 * Math.PI * 56}`}
+                  strokeDashoffset={`${2 * Math.PI * 56 * (1 - ((habits as Habit[]).filter(h => h.completedToday).length / Math.max((habits as Habit[]).length, 1)))}`}
                   strokeLinecap="round"
-                  className="transition-all duration-700"
+                  className="transition-all duration-700 drop-shadow-lg"
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-lg font-bold text-blue-600">
+                <span className="text-2xl font-black text-blue-600">
                   {Math.round(((habits as Habit[]).filter(h => h.completedToday).length / Math.max((habits as Habit[]).length, 1)) * 100)}%
                 </span>
               </div>
             </div>
-            <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">HABITS</div>
+            <div className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">HABITS</div>
           </div>
 
           {/* Foundations Ring */}
           <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-3">
-              <svg className="w-20 h-20 transform -rotate-90">
-                <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+            <div className="relative w-32 h-32 mx-auto mb-4">
+              <svg className="w-32 h-32 transform -rotate-90">
+                <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="8" fill="none" className="text-gray-200 dark:text-gray-700" />
                 <circle 
-                  cx="40" 
-                  cy="40" 
-                  r="32" 
+                  cx="64" 
+                  cy="64" 
+                  r="56" 
                   stroke="#f59e0b" 
-                  strokeWidth="6" 
+                  strokeWidth="8" 
                   fill="none" 
-                  strokeDasharray={`${2 * Math.PI * 32}`}
-                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - (Math.min(((habits as Habit[]).reduce((sum, h) => sum + h.streak, 0) / Math.max((habits as Habit[]).length, 1)) / 21, 1)))}`}
+                  strokeDasharray={`${2 * Math.PI * 56}`}
+                  strokeDashoffset={`${2 * Math.PI * 56 * (1 - (Math.min(((habits as Habit[]).reduce((sum, h) => sum + h.streak, 0) / Math.max((habits as Habit[]).length, 1)) / 21, 1)))}`}
                   strokeLinecap="round"
-                  className="transition-all duration-700"
+                  className="transition-all duration-700 drop-shadow-lg"
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-lg font-bold text-amber-600">
+                <span className="text-2xl font-black text-amber-600">
                   {Math.round(Math.min(((habits as Habit[]).reduce((sum, h) => sum + h.streak, 0) / Math.max((habits as Habit[]).length, 1)) / 21, 1) * 100)}%
                 </span>
               </div>
             </div>
-            <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">FOUNDATIONS</div>
+            <div className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">FOUNDATIONS</div>
           </div>
 
           {/* Critical Tasks Ring */}
           <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-3">
-              <svg className="w-20 h-20 transform -rotate-90">
-                <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+            <div className="relative w-32 h-32 mx-auto mb-4">
+              <svg className="w-32 h-32 transform -rotate-90">
+                <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="8" fill="none" className="text-gray-200 dark:text-gray-700" />
                 <circle 
-                  cx="40" 
-                  cy="40" 
-                  r="32" 
+                  cx="64" 
+                  cy="64" 
+                  r="56" 
                   stroke="#10b981" 
-                  strokeWidth="6" 
+                  strokeWidth="8" 
                   fill="none" 
-                  strokeDasharray={`${2 * Math.PI * 32}`}
-                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - 0.75)}`}
+                  strokeDasharray={`${2 * Math.PI * 56}`}
+                  strokeDashoffset={`${2 * Math.PI * 56 * (1 - 0.75)}`}
                   strokeLinecap="round"
-                  className="transition-all duration-700"
+                  className="transition-all duration-700 drop-shadow-lg"
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-lg font-bold text-emerald-600">75%</span>
+                <span className="text-2xl font-black text-emerald-600">75%</span>
               </div>
             </div>
-            <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">TASKS</div>
+            <div className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">TASKS</div>
           </div>
 
           {/* Reading Ring */}
           <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-3">
-              <svg className="w-20 h-20 transform -rotate-90">
-                <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+            <div className="relative w-32 h-32 mx-auto mb-4">
+              <svg className="w-32 h-32 transform -rotate-90">
+                <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="8" fill="none" className="text-gray-200 dark:text-gray-700" />
                 <circle 
-                  cx="40" 
-                  cy="40" 
-                  r="32" 
+                  cx="64" 
+                  cy="64" 
+                  r="56" 
                   stroke="#8b5cf6" 
-                  strokeWidth="6" 
+                  strokeWidth="8" 
                   fill="none" 
-                  strokeDasharray={`${2 * Math.PI * 32}`}
-                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - 0.60)}`}
+                  strokeDasharray={`${2 * Math.PI * 56}`}
+                  strokeDashoffset={`${2 * Math.PI * 56 * (1 - 0.60)}`}
                   strokeLinecap="round"
-                  className="transition-all duration-700"
+                  className="transition-all duration-700 drop-shadow-lg"
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-lg font-bold text-purple-600">60%</span>
+                <span className="text-2xl font-black text-purple-600">60%</span>
               </div>
             </div>
-            <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">READING</div>
+            <div className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">READING</div>
           </div>
         </div>
 
@@ -284,131 +284,150 @@ export default function HabitsPage() {
             </TabsList>
 
             <TabsContent value="formation" className="space-y-6">
-              <div className="grid gap-6">
+              <div className="space-y-8">
                 {(habits as Habit[]).map((habit) => {
                   const colors = getCategoryColors(habit.category);
                   const progressPercentage = Math.min((habit.streak / 67) * 100, 100);
 
+                  // Generate calendar view for last 30 days
+                  const generateCalendarDays = () => {
+                    const days = [];
+                    for (let i = 29; i >= 0; i--) {
+                      const date = new Date();
+                      date.setDate(date.getDate() - i);
+                      const dayNumber = date.getDate();
+                      const isToday = i === 0;
+                      const isCompleted = i < habit.streak; // Simplified - real implementation would check actual logs
+                      
+                      days.push({
+                        day: dayNumber,
+                        isToday,
+                        isCompleted,
+                        date
+                      });
+                    }
+                    return days;
+                  };
+
+                  const calendarDays = generateCalendarDays();
+
                   return (
-                    <Card key={habit.id} className={`border-0 shadow-md hover:shadow-xl transition-all duration-300 ${
-                      habit.completedToday ? `${colors.light} ring-2 ring-green-500` : 'hover:scale-[1.02]'
-                    }`}>
-                      <CardContent className="p-6">
-                        {/* Top section with edit button */}
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="text-xs">
-                              {getTimeOfDayEmoji(habit.timeOfDay)} {getTimeOfDayLabel(habit.timeOfDay)}
-                            </Badge>
-                            <div className={`w-3 h-3 rounded-full ${colors.bg}`} />
+                    <div key={habit.id} className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+                      {/* Header */}
+                      <div className={`${colors.bg} p-6 text-white relative overflow-hidden`}>
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent"></div>
+                        <div className="relative z-10 flex items-center justify-between">
+                          <div>
+                            <h3 className="text-2xl font-bold mb-1">{habit.title}</h3>
+                            <p className="text-white/90">{habit.description || "Building consistency every day"}</p>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditHabit(habit)}
-                            className="h-8 w-8 p-0 opacity-60 hover:opacity-100"
-                          >
-                            <Settings className="w-4 h-4" />
-                          </Button>
-                        </div>
-
-                        {/* Habit name and description */}
-                        <div className="mb-4">
-                          <h3 className="text-lg font-semibold text-foreground mb-1">{habit.title}</h3>
-                          {habit.description && (
-                            <p className="text-sm text-muted-foreground">{habit.description}</p>
-                          )}
-                        </div>
-
-                        {/* Progress section */}
-                        <div className="space-y-3">
-                          {/* Progress bar */}
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="font-medium text-foreground">Progress to Formation</span>
-                              <span className="text-muted-foreground">{habit.streak}/67 days</span>
+                          <div className="flex items-center gap-4">
+                            <div className="text-right">
+                              <div className="text-3xl font-black">{habit.streak}</div>
+                              <div className="text-sm text-white/80">day streak</div>
                             </div>
-                            <div className="h-3 bg-muted rounded-full overflow-hidden">
-                              <div 
-                                className={`h-2 rounded-full transition-all duration-500 ${colors.bg}`}
-                                style={{ width: `${progressPercentage}%` }}
-                              />
-                            </div>
-                            <div className="text-xs text-muted-foreground text-center">
-                              {habit.streak < 67 ? `${67 - habit.streak} days to go` : "Habit mastered - Bonus day for .uoY! 🎉"}
-                            </div>
-                          </div>
-
-                          {/* Large Prominent Completion Button */}
-                          <div className="space-y-4">
                             <Button
-                              onClick={() => handleToggleHabit(habit.id)}
-                              disabled={toggleHabitMutation.isPending}
-                              className={`w-full h-16 rounded-2xl text-lg font-bold border-3 transition-all duration-300 hover:scale-105 transform-gpu shadow-lg hover:shadow-2xl ${
-                                habit.completedToday
-                                  ? `${colors.bg} border-green-400 text-white hover:opacity-90 shadow-green-500/25 pulse-success`
-                                  : `bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-gray-300 hover:border-blue-400 hover:from-blue-50 hover:to-blue-100 dark:hover:from-blue-900 dark:hover:to-blue-800 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 shadow-xl`
-                              }`}
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditHabit(habit)}
+                              className="h-10 w-10 p-0 text-white hover:bg-white/20"
                             >
-                              <div className="flex items-center justify-center gap-3">
-                                {habit.completedToday ? (
-                                  <>
-                                    <CheckCircle2 className="w-7 h-7 drop-shadow-lg animate-bounce" />
-                                    <span className="font-bold text-xl">Completed!</span>
-                                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                                  </>
-                                ) : (
-                                  <>
-                                    <div className="relative">
-                                      <Circle className="w-7 h-7 text-gray-400" />
-                                      <div className="absolute inset-0 w-7 h-7 border-2 border-blue-400 rounded-full opacity-0 hover:opacity-100 transition-opacity animate-pulse"></div>
-                                    </div>
-                                    <span className="font-bold text-xl">Mark Complete</span>
-                                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-ping opacity-75"></div>
-                                  </>
-                                )}
-                              </div>
+                              <Settings className="w-5 h-5" />
                             </Button>
+                          </div>
+                        </div>
+                      </div>
 
-                            {/* Enhanced Progress Bar for Individual Habit */}
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between text-sm font-medium">
-                                <span className="text-foreground">Progress to Formation</span>
-                                <span className="text-muted-foreground">{habit.streak}/67 days</span>
-                              </div>
-                              <div className="relative w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden shadow-inner">
-                                <div 
-                                  className={`h-4 rounded-full transition-all duration-700 ease-out shadow-lg relative ${colors.bg}`}
-                                  style={{ width: `${progressPercentage}%` }}
-                                >
-                                  {/* Shimmer effect */}
-                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
-                                </div>
-                              </div>
-                              <div className="text-center">
-                                <span className="text-sm font-medium text-muted-foreground">
-                                  {habit.streak < 67 ? `${67 - habit.streak} days to go` : "🎉 Habit mastered - Bonus day for .uoY!"}
-                                </span>
-                              </div>
+                      {/* Interactive Calendar Grid */}
+                      <div className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Last 30 Days</h4>
+                          <Badge variant="outline" className={`${colors.text} border-current`}>
+                            {getTimeOfDayEmoji(habit.timeOfDay)} {getTimeOfDayLabel(habit.timeOfDay)}
+                          </Badge>
+                        </div>
+                        
+                        <div className="grid grid-cols-10 gap-2 mb-6">
+                          {calendarDays.map((day, index) => (
+                            <div
+                              key={index}
+                              className={`
+                                aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition-all duration-200 cursor-pointer
+                                ${day.isCompleted 
+                                  ? `${colors.bg} text-white shadow-lg hover:scale-110` 
+                                  : day.isToday 
+                                  ? 'bg-blue-100 text-blue-600 border-2 border-blue-400 hover:bg-blue-200' 
+                                  : 'bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                }
+                              `}
+                            >
+                              {day.day}
                             </div>
+                          ))}
+                        </div>
 
-                            {/* Streak info */}
-                            <div className="flex items-center justify-center gap-6 text-sm bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 p-3 rounded-xl">
-                              <div className="flex items-center gap-2 text-amber-600">
-                                <Flame className="w-5 h-5" />
-                                <span className="font-bold text-base">{habit.streak} day streak</span>
-                              </div>
-                              {habit.completedToday && (
-                                <div className="flex items-center gap-2 text-emerald-600">
-                                  <Star className="w-5 h-5 animate-pulse" />
-                                  <span className="font-bold text-base">Today!</span>
-                                </div>
+                        {/* Large Gamified Completion Button */}
+                        <div className="space-y-4">
+                          <Button
+                            onClick={() => handleToggleHabit(habit.id)}
+                            disabled={toggleHabitMutation.isPending}
+                            className={`
+                              w-full h-20 rounded-2xl text-xl font-black transition-all duration-300 hover:scale-105 transform-gpu shadow-xl hover:shadow-2xl
+                              ${habit.completedToday
+                                ? `${colors.bg} text-white animate-pulse border-4 border-green-400 shadow-green-500/50`
+                                : `bg-gradient-to-r from-white via-gray-50 to-white dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 border-4 border-gray-200 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400`
+                              }
+                            `}
+                          >
+                            <div className="flex items-center justify-center gap-4">
+                              {habit.completedToday ? (
+                                <>
+                                  <CheckCircle2 className="w-10 h-10 animate-bounce drop-shadow-lg" />
+                                  <span className="text-2xl">COMPLETED TODAY!</span>
+                                  <div className="flex gap-1">
+                                    <div className="w-3 h-3 bg-white rounded-full animate-ping"></div>
+                                    <div className="w-3 h-3 bg-white rounded-full animate-ping delay-100"></div>
+                                    <div className="w-3 h-3 bg-white rounded-full animate-ping delay-200"></div>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="relative">
+                                    <Circle className="w-10 h-10" />
+                                    <div className="absolute inset-0 w-10 h-10 border-4 border-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+                                  </div>
+                                  <span className="text-2xl">TAP TO COMPLETE</span>
+                                  <div className="w-4 h-4 bg-blue-400 rounded-full animate-ping"></div>
+                                </>
                               )}
                             </div>
+                          </Button>
+
+                          {/* Progress Visualization */}
+                          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="font-semibold text-gray-900 dark:text-white">Formation Progress</span>
+                              <span className="text-2xl font-bold" style={{ color: colors.bg.split(' ')[1] }}>
+                                {habit.streak}/67
+                              </span>
+                            </div>
+                            <div className="relative h-6 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-6 rounded-full transition-all duration-1000 ease-out ${colors.bg} shadow-lg relative`}
+                                style={{ width: `${progressPercentage}%` }}
+                              >
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                              </div>
+                            </div>
+                            <div className="text-center mt-3">
+                              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                {habit.streak < 67 ? `${67 - habit.streak} days until habit mastery` : "🎉 Habit mastered - Bonus day for .uoY!"}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
