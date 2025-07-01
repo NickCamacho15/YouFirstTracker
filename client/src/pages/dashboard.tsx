@@ -30,6 +30,21 @@ export default function DashboardPage() {
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set(['task-1']));
   const [dragProgress, setDragProgress] = useState<{ [key: string]: number }>({});
   
+  // Sample tasks data - in real app this would come from API
+  const [tasks, setTasks] = useState([
+    { id: 'task-1', text: 'Review quarterly metrics', completed: true, goalId: 1 },
+    { id: 'task-2', text: 'Prepare presentation slides', completed: false, time: 'Due 2 PM', goalId: 1 },
+    { id: 'task-3', text: 'Team standup meeting', completed: false, time: '10 AM', goalId: 2 },
+    { id: 'task-4', text: 'Update project timeline', completed: false, goalId: 2 },
+    { id: 'task-5', text: 'Call insurance provider', completed: false, goalId: null },
+  ]);
+
+  const handleTaskToggle = (taskId: string) => {
+    setTasks(prev => prev.map(task => 
+      task.id === taskId ? { ...task, completed: !task.completed } : task
+    ));
+  };
+  
   // Haptic feedback function
   const triggerHapticFeedback = () => {
     if ('vibrate' in navigator) {
@@ -148,6 +163,20 @@ export default function DashboardPage() {
     return total + Math.floor((end.getTime() - start.getTime()) / (1000 * 60));
   }, 0) || 0;
 
+  // Task completion statistics
+  const totalTasks = tasks.length;
+  const completedTasksCount = tasks.filter(task => task.completed).length;
+  const taskProgress = totalTasks > 0 ? (completedTasksCount / totalTasks) * 100 : 0;
+  
+  // Tasks toward goals
+  const tasksForGoal1 = tasks.filter(task => task.goalId === 1);
+  const completedTasksForGoal1 = tasksForGoal1.filter(task => task.completed).length;
+  const goal1Progress = tasksForGoal1.length > 0 ? (completedTasksForGoal1 / tasksForGoal1.length) * 100 : 0;
+  
+  const tasksForGoal2 = tasks.filter(task => task.goalId === 2);
+  const completedTasksForGoal2 = tasksForGoal2.filter(task => task.completed).length;
+  const goal2Progress = tasksForGoal2.length > 0 ? (completedTasksForGoal2 / tasksForGoal2.length) * 100 : 0;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-blue-950 dark:to-purple-950">
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
@@ -220,13 +249,15 @@ export default function DashboardPage() {
                   strokeWidth="8" 
                   fill="none" 
                   strokeDasharray={352}
-                  strokeDashoffset={352 * (1 - 0.75)}
+                  strokeDashoffset={352 * (1 - (taskProgress / 100))}
                   strokeLinecap="round"
                   className="transition-all duration-700 drop-shadow-lg"
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-black text-emerald-600">75%</span>
+                <span className="text-2xl font-black text-emerald-600">
+                  {Math.round(taskProgress)}%
+                </span>
               </div>
             </div>
             <div className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">TASKS</div>
@@ -345,53 +376,68 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {/* Simple Checklist Items */}
-                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
-                  <input 
-                    type="checkbox" 
-                    checked 
-                    className="w-4 h-4 text-green-600 rounded"
-                    readOnly
-                  />
-                  <span className="line-through text-gray-500">Review quarterly metrics</span>
-                </div>
+                {tasks.map(task => (
+                  <div 
+                    key={task.id}
+                    className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={task.completed}
+                      onChange={() => handleTaskToggle(task.id)}
+                      className="w-4 h-4 text-green-600 rounded cursor-pointer"
+                    />
+                    <span className={`flex-1 transition-all duration-300 ${
+                      task.completed 
+                        ? 'line-through text-gray-500 opacity-60' 
+                        : 'text-gray-900 dark:text-gray-100'
+                    }`}>
+                      {task.text}
+                    </span>
+                    {task.time && (
+                      <span className={`text-xs px-2 py-1 rounded transition-opacity ${
+                        task.completed 
+                          ? 'opacity-40'
+                          : task.time.includes('Due') 
+                            ? 'text-orange-600 bg-orange-100' 
+                            : 'text-blue-600 bg-blue-100'
+                      }`}>
+                        {task.time}
+                      </span>
+                    )}
+                  </div>
+                ))}
                 
-                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
-                  <input 
-                    type="checkbox" 
-                    className="w-4 h-4 text-blue-600 rounded"
-                  />
-                  <span className="text-gray-900 dark:text-gray-100">Prepare presentation slides</span>
-                  <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">Due 2 PM</span>
-                </div>
-                
-                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
-                  <input 
-                    type="checkbox" 
-                    className="w-4 h-4 text-blue-600 rounded"
-                  />
-                  <span className="text-gray-900 dark:text-gray-100">Team standup meeting</span>
-                  <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">10 AM</span>
-                </div>
-                
-                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
-                  <input 
-                    type="checkbox" 
-                    className="w-4 h-4 text-blue-600 rounded"
-                  />
-                  <span className="text-gray-900 dark:text-gray-100">Update project timeline</span>
-                </div>
-                
-                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
-                  <input 
-                    type="checkbox" 
-                    className="w-4 h-4 text-blue-600 rounded"
-                  />
-                  <span className="text-gray-900 dark:text-gray-100">Call insurance provider</span>
-                </div>
-                
-                <div className="pt-3 border-t">
-                  <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800">
+                <div className="pt-4 border-t space-y-3">
+                  {/* Goal Progress Tracker */}
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <div className="font-medium mb-2">Progress toward Goals:</div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs">Goal 1 (Work Project)</span>
+                        <span className="text-xs font-medium">{completedTasksForGoal1}/{tasksForGoal1.length} tasks</span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div 
+                          className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                          style={{ width: `${goal1Progress}%` }}
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs">Goal 2 (Team Leadership)</span>
+                        <span className="text-xs font-medium">{completedTasksForGoal2}/{tasksForGoal2.length} tasks</span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div 
+                          className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
+                          style={{ width: `${goal2Progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800 w-full">
                     <Plus className="w-4 h-4 mr-2" />
                     Add task
                   </Button>
