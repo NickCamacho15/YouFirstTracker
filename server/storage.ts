@@ -3,11 +3,11 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { eq, desc, and, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { 
-  users, goals, microGoals, habits, habitLogs, readingSessions, posts, visionBoard,
+  users, goals, microGoals, habits, habitLogs, readingSessions, posts, visionBoard, tasks,
   type User, type InsertUser, type Goal, type InsertGoal, type MicroGoal, type InsertMicroGoal,
   type Habit, type InsertHabit, type HabitLog, type InsertHabitLog,
   type ReadingSession, type InsertReadingSession, type Post, type InsertPost,
-  type VisionBoardItem, type InsertVisionBoardItem
+  type VisionBoardItem, type InsertVisionBoardItem, type Task, type InsertTask
 } from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -247,6 +247,31 @@ export class DatabaseStorage implements IStorage {
 
   async deleteVisionBoardItem(id: number): Promise<boolean> {
     const result = await db.delete(visionBoard).where(eq(visionBoard.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Tasks
+  async getTasksByUserId(userId: number): Promise<Task[]> {
+    return await db.select().from(tasks).where(eq(tasks.userId, userId)).orderBy(desc(tasks.createdAt));
+  }
+
+  async getTaskById(id: number): Promise<Task | undefined> {
+    const result = await db.select().from(tasks).where(eq(tasks.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createTask(task: InsertTask): Promise<Task> {
+    const result = await db.insert(tasks).values(task).returning();
+    return result[0];
+  }
+
+  async updateTask(id: number, updates: Partial<Task>): Promise<Task | undefined> {
+    const result = await db.update(tasks).set(updates).where(eq(tasks.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteTask(id: number): Promise<boolean> {
+    const result = await db.delete(tasks).where(eq(tasks.id, id));
     return result.rowCount > 0;
   }
 }

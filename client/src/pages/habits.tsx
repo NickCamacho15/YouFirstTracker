@@ -170,16 +170,16 @@ export default function HabitsPage() {
                 </TabsTrigger>
                 <TabsTrigger value="formation" className="flex items-center gap-2">
                   <BarChart3 className="w-4 h-4" />
-                  Formation Science
+                  Habit Formation & Foundations
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="formation" className="space-y-8">
                 <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold mb-2">Scientific Habit Formation</h2>
+                  <h2 className="text-2xl font-bold mb-2">Habit Formation & Foundations</h2>
                   <p className="text-muted-foreground max-w-2xl mx-auto">
-                    Track your habits through the three scientifically-backed stages of formation. 
-                    Research shows it takes an average of 66 days to form a new habit automatically, plus one bonus day for .uoY to celebrate mastery.
+                    This is a foundational habit that you have made a part of your lifestyle. You have completed it as a formed habit, 
+                    and is now something you can keep tracking your consistency of for as long as you use the platform.
                   </p>
                 </div>
                 <div className="space-y-8">
