@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { HabitFormationTracker } from "@/components/habits/habit-formation-tracker";
 import { FoundationsDashboard } from "@/components/habits/foundations-dashboard";
 import { EditHabitModal } from "@/components/habits/edit-habit-modal";
+import { HabitHealthScore } from "@/components/habits/habit-health-score";
 
 interface Habit {
   id: number;
@@ -88,11 +89,7 @@ export default function HabitsPage() {
 
   const toggleHabitMutation = useMutation({
     mutationFn: async ({ habitId, completed }: { habitId: number; completed: boolean }) => {
-      const response = await apiRequest(`/api/habits/${habitId}/toggle`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ completed }),
-      });
+      const response = await apiRequest(`/api/habits/${habitId}/toggle`, 'POST', { completed });
       return response;
     },
     onSuccess: () => {

@@ -19,10 +19,24 @@ interface Habit {
 }
 
 interface HabitFormationTrackerProps {
-  habit: Habit;
+  habits: Habit[];
 }
 
-export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
+export function HabitFormationTracker({ habits }: HabitFormationTrackerProps) {
+  // Use the first habit as the primary focus, or show overall stats
+  const primaryHabit = habits[0];
+  
+  if (!primaryHabit) {
+    return (
+      <Card className="w-full">
+        <CardContent className="p-8 text-center">
+          <p className="text-muted-foreground">No habits yet. Create your first habit to see formation tracking!</p>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  const habit = primaryHabit;
   const { data: habitLogs = [] } = useQuery({
     queryKey: ["/api/habit-logs"],
   });
