@@ -102,16 +102,7 @@ export function Navigation() {
             </div>
           </Link>
           
-          <Link href="/vision">
-            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
-              isActive("/vision")
-                ? "text-accent bg-accent/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <ImageIcon className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">Vision</span>
-            </div>
-          </Link>
+
         </div>
       </div>
     </>

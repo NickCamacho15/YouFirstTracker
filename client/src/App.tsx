@@ -27,7 +27,6 @@ function AuthenticatedApp() {
         <Route path="/goals" component={GoalsPage} />
         <Route path="/habits" component={HabitsPage} />
         <Route path="/read" component={ReadPage} />
-        <Route path="/vision" component={VisionPage} />
         <Route path="/profile" component={ProfilePage} />
         <Route component={NotFound} />
       </Switch>
