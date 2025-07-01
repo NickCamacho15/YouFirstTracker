@@ -75,7 +75,7 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
   const stage3Stats = getStageCompletion(stage3Days);
 
   const renderDaysGrid = (days: Date[], stageNumber: number) => (
-    <div className="grid grid-cols-9 gap-1">
+    <div className="grid grid-cols-12 gap-0.5">
       {days.map((day, index) => {
         const isCompleted = isCompletedOnDay(day);
         const isToday = isSameDay(day, new Date());
@@ -83,17 +83,15 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
         return (
           <div
             key={index}
-            className={`w-6 h-6 rounded-sm flex items-center justify-center text-xs font-medium transition-all duration-200 ${
+            className={`w-4 h-4 rounded-full flex items-center justify-center transition-all duration-200 ${
               isCompleted 
-                ? `${colors.bg} text-white shadow-sm` 
-                : `${colors.light} ${colors.text} border border-gray-200 dark:border-gray-700`
-            } ${isToday ? 'ring-2 ring-offset-1 ring-blue-400' : ''}`}
-            title={`${format(day, 'MMM d')}: ${isCompleted ? 'Completed' : 'Not completed'}`}
+                ? `${colors.bg} shadow-sm` 
+                : `${colors.light} border border-gray-300 dark:border-gray-600`
+            } ${isToday ? 'ring-1 ring-blue-400' : ''}`}
+            title={`Day ${index + 1 + (stageNumber - 1) * 18}: ${format(day, 'MMM d')} - ${isCompleted ? 'Completed' : 'Not completed'}`}
           >
-            {isCompleted ? (
-              <CheckCircle2 className="w-3 h-3" />
-            ) : (
-              <Circle className="w-3 h-3 opacity-50" />
+            {isCompleted && (
+              <div className="w-2 h-2 bg-white rounded-full" />
             )}
           </div>
         );
@@ -117,9 +115,9 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
           Track your habit through the three scientifically-backed stages of formation
         </p>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         {/* Stage 1: Initial Formation (Days 1-18) */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-orange-500" />
@@ -139,7 +137,7 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
         </div>
 
         {/* Stage 2: Strengthening (Days 19-45) */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Brain className="w-4 h-4 text-blue-500" />
@@ -158,14 +156,14 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
           </p>
         </div>
 
-        {/* Stage 3: Automaticity (Days 46-66) */}
-        <div className="space-y-3">
+        {/* Stage 3: Automaticity (Days 46-67) */}
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Trophy className="w-4 h-4 text-green-500" />
-              <h4 className="font-semibold text-sm">Stage 3: Automaticity</h4>
+              <h4 className="font-semibold text-sm">Stage 3: Automaticity + Bonus</h4>
               <Badge variant="outline" className="text-xs">
-                Days 46-66
+                Days 46-67
               </Badge>
             </div>
             <div className="text-sm text-muted-foreground">
@@ -174,7 +172,7 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
           </div>
           {renderDaysGrid(stage3Days, 3)}
           <p className="text-xs text-muted-foreground">
-            The habit becomes automatic. Neural pathways are well-established and require minimal effort.
+            Automaticity achieved + your special .uoY bonus day for extra mastery.
           </p>
         </div>
 
