@@ -151,18 +151,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-blue-950 dark:to-purple-950">
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
-        {/* Premium Welcome Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-600 bg-clip-text text-transparent mb-4">
-            {getGreeting()}, {user?.displayName}
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-2">
-            Your Premium Personal Excellence Dashboard
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-            "Action is the touchstone of reality" - Transform your life into a masterpiece
-          </p>
-        </div>
+
 
         {/* Large Whoop-style Rings Dashboard */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
@@ -349,104 +338,63 @@ export default function DashboardPage() {
           {/* Daily Tasks Section */}
           <Card className="border-0 shadow-lg">
             <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-emerald-100 dark:bg-emerald-900 rounded-lg">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                  </div>
-                  <CardTitle className="text-xl">Today's Tasks</CardTitle>
-                </div>
-                <Badge variant="outline" className="text-emerald-600 border-emerald-200">
-                  3 critical
-                </Badge>
-              </div>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-gray-600" />
+                Today's Tasks
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {/* Completed Task */}
-                <div className="relative overflow-hidden bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800">
-                  <div className="flex items-center justify-between p-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 rounded-full bg-emerald-500 animate-pulse" />
-                      <div>
-                        <p className="font-semibold text-emerald-800 dark:text-emerald-200">Review quarterly metrics</p>
-                        <p className="text-sm text-emerald-600 dark:text-emerald-400">Completed - Action taken!</p>
-                      </div>
-                    </div>
-                    <CheckCircle2 className="w-6 h-6 text-emerald-500 animate-bounce" />
-                  </div>
+              <div className="space-y-3">
+                {/* Simple Checklist Items */}
+                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
+                  <input 
+                    type="checkbox" 
+                    checked 
+                    className="w-4 h-4 text-green-600 rounded"
+                    readOnly
+                  />
+                  <span className="line-through text-gray-500">Review quarterly metrics</span>
                 </div>
                 
-                {/* Active Task with Slide to Complete */}
-                <div className="relative overflow-hidden bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30 rounded-xl border-2 border-orange-200 dark:border-orange-800">
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-4 h-4 rounded-full bg-orange-500 animate-pulse" />
-                        <div>
-                          <p className="font-semibold text-gray-900 dark:text-white">Prepare presentation slides</p>
-                          <p className="text-sm text-orange-600 dark:text-orange-400">Critical - Due 2 PM</p>
-                        </div>
-                      </div>
-                      <Badge variant="destructive" className="animate-pulse">URGENT</Badge>
-                    </div>
-                    
-                    {/* Slide to Complete Interface */}
-                    <div className="relative bg-gray-200 dark:bg-gray-700 rounded-full h-12 overflow-hidden">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-sm font-bold text-gray-600 dark:text-gray-400 animate-pulse">
-                          ← Slide to Take Action & Complete →
-                        </span>
-                      </div>
-                      <div className="absolute left-1 top-1 w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center cursor-pointer transform transition-transform duration-300 hover:scale-110 shadow-lg">
-                        <ArrowRight className="w-5 h-5 text-white" />
-                      </div>
-                    </div>
-                    
-                    <p className="text-xs text-center text-gray-600 dark:text-gray-400 mt-2 italic">
-                      "Action is the touchstone of reality" - Complete to transform intention into achievement
-                    </p>
-                  </div>
+                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
+                  <input 
+                    type="checkbox" 
+                    className="w-4 h-4 text-blue-600 rounded"
+                  />
+                  <span className="text-gray-900 dark:text-gray-100">Prepare presentation slides</span>
+                  <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">Due 2 PM</span>
                 </div>
                 
-                {/* Another Active Task */}
-                <div className="relative overflow-hidden bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl border-2 border-blue-200 dark:border-blue-800">
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-4 h-4 rounded-full bg-blue-500 animate-pulse" />
-                        <div>
-                          <p className="font-semibold text-gray-900 dark:text-white">Team standup meeting</p>
-                          <p className="text-sm text-blue-600 dark:text-blue-400">Important - 10 AM today</p>
-                        </div>
-                      </div>
-                      <Badge variant="secondary" className="bg-blue-100 text-blue-700">HIGH</Badge>
-                    </div>
-                    
-                    {/* Slide to Complete Interface */}
-                    <div className="relative bg-gray-200 dark:bg-gray-700 rounded-full h-12 overflow-hidden">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-sm font-bold text-gray-600 dark:text-gray-400 animate-pulse">
-                          ← Slide to Execute & Mark Done →
-                        </span>
-                      </div>
-                      <div className="absolute left-1 top-1 w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center cursor-pointer transform transition-transform duration-300 hover:scale-110 shadow-lg">
-                        <ArrowRight className="w-5 h-5 text-white" />
-                      </div>
-                    </div>
-                    
-                    <p className="text-xs text-center text-gray-600 dark:text-gray-400 mt-2 italic">
-                      Make it happen - Every completed task builds momentum
-                    </p>
-                  </div>
+                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
+                  <input 
+                    type="checkbox" 
+                    className="w-4 h-4 text-blue-600 rounded"
+                  />
+                  <span className="text-gray-900 dark:text-gray-100">Team standup meeting</span>
+                  <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">10 AM</span>
                 </div>
                 
-                <div className="text-center pt-4">
-                  <Button variant="outline" size="sm" className="text-emerald-600 hover:text-emerald-700 border-2 border-emerald-200 hover:border-emerald-400">
+                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
+                  <input 
+                    type="checkbox" 
+                    className="w-4 h-4 text-blue-600 rounded"
+                  />
+                  <span className="text-gray-900 dark:text-gray-100">Update project timeline</span>
+                </div>
+                
+                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
+                  <input 
+                    type="checkbox" 
+                    className="w-4 h-4 text-blue-600 rounded"
+                  />
+                  <span className="text-gray-900 dark:text-gray-100">Call insurance provider</span>
+                </div>
+                
+                <div className="pt-3 border-t">
+                  <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800">
                     <Plus className="w-4 h-4 mr-2" />
-                    Add Critical Task
+                    Add task
                   </Button>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Focus on what moves the needle</p>
                 </div>
               </div>
             </CardContent>

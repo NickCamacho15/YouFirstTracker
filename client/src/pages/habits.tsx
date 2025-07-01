@@ -469,63 +469,103 @@ export default function HabitsPage() {
                           ))}
                         </div>
 
-                        {/* Large Gamified Completion Button */}
+                        {/* Progress Visualization with Compact YES Button */}
                         <div className="space-y-4">
-                          <Button
-                            onClick={() => handleToggleHabit(habit.id)}
-                            disabled={toggleHabitMutation.isPending}
-                            className={`
-                              w-full h-20 rounded-2xl text-xl font-black transition-all duration-300 hover:scale-105 transform-gpu shadow-xl hover:shadow-2xl
-                              ${habit.completedToday
-                                ? `${colors.bg} text-white animate-pulse border-4 border-green-400 shadow-green-500/50`
-                                : `bg-gradient-to-r from-white via-gray-50 to-white dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 border-4 border-gray-200 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400`
-                              }
-                            `}
-                          >
-                            <div className="flex items-center justify-center gap-4">
-                              {habit.completedToday ? (
-                                <>
-                                  <CheckCircle2 className="w-10 h-10 animate-bounce drop-shadow-lg" />
-                                  <span className="text-2xl">COMPLETED TODAY!</span>
-                                  <div className="flex gap-1">
-                                    <div className="w-3 h-3 bg-white rounded-full animate-ping"></div>
-                                    <div className="w-3 h-3 bg-white rounded-full animate-ping delay-100"></div>
-                                    <div className="w-3 h-3 bg-white rounded-full animate-ping delay-200"></div>
+                          {/* Progress Ring and Completion Button */}
+                          <div className="flex items-center gap-6">
+                            {/* Large Progress Ring */}
+                            <div className="relative flex-shrink-0">
+                              <div className="relative w-24 h-24">
+                                <svg className="w-24 h-24 transform -rotate-90">
+                                  <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+                                  <circle 
+                                    cx="48" 
+                                    cy="48" 
+                                    r="40" 
+                                    stroke={colors.bg.includes('indigo') ? '#6366f1' : colors.bg.includes('amber') ? '#f59e0b' : '#10b981'} 
+                                    strokeWidth="6" 
+                                    fill="none" 
+                                    strokeDasharray={`${2 * Math.PI * 40}`}
+                                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - (progressPercentage / 100))}`}
+                                    strokeLinecap="round"
+                                    className="transition-all duration-1000 drop-shadow-lg"
+                                  />
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <div className="text-center">
+                                    <div className="text-lg font-black text-gray-900 dark:text-white">{habit.streak}</div>
+                                    <div className="text-xs text-gray-500">days</div>
                                   </div>
-                                </>
-                              ) : (
-                                <>
-                                  <div className="relative">
-                                    <Circle className="w-10 h-10" />
-                                    <div className="absolute inset-0 w-10 h-10 border-4 border-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
-                                  </div>
-                                  <span className="text-2xl">TAP TO COMPLETE</span>
-                                  <div className="w-4 h-4 bg-blue-400 rounded-full animate-ping"></div>
-                                </>
-                              )}
-                            </div>
-                          </Button>
-
-                          {/* Progress Visualization */}
-                          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="font-semibold text-gray-900 dark:text-white">Formation Progress</span>
-                              <span className="text-2xl font-bold" style={{ color: colors.bg.split(' ')[1] }}>
-                                {habit.streak}/67
-                              </span>
-                            </div>
-                            <div className="relative h-6 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                              <div 
-                                className={`h-6 rounded-full transition-all duration-1000 ease-out ${colors.bg} shadow-lg relative`}
-                                style={{ width: `${progressPercentage}%` }}
-                              >
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                                </div>
                               </div>
                             </div>
-                            <div className="text-center mt-3">
-                              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                                {habit.streak < 67 ? `${67 - habit.streak} days until habit mastery` : "🎉 Habit mastered - Bonus day for .uoY!"}
-                              </span>
+
+                            {/* Progress Info and Button */}
+                            <div className="flex-grow">
+                              <div className="flex items-center justify-between mb-2">
+                                <div>
+                                  <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    {habit.streak}/67 Days
+                                  </div>
+                                  <div className="text-sm text-gray-500">
+                                    {habit.streak < 67 ? `${67 - habit.streak} days to mastery` : "Habit mastered!"}
+                                  </div>
+                                </div>
+                                
+                                {/* Compact YES Button */}
+                                <Button
+                                  onClick={() => handleToggleHabit(habit.id)}
+                                  disabled={toggleHabitMutation.isPending}
+                                  size="lg"
+                                  className={`
+                                    h-12 px-8 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 transform-gpu shadow-lg hover:shadow-xl
+                                    ${habit.completedToday
+                                      ? `${colors.bg} text-white border-2 border-green-400 shadow-green-500/30`
+                                      : `bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400`
+                                    }
+                                  `}
+                                >
+                                  {habit.completedToday ? (
+                                    <div className="flex items-center gap-2">
+                                      <CheckCircle2 className="w-5 h-5" />
+                                      <span>DONE</span>
+                                    </div>
+                                  ) : (
+                                    <span>YES</span>
+                                  )}
+                                </Button>
+                              </div>
+                              
+                              {/* Linear Progress Bar */}
+                              <div className="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-3 rounded-full transition-all duration-1000 ease-out ${colors.bg} shadow-sm relative`}
+                                  style={{ width: `${progressPercentage}%` }}
+                                >
+                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pulse"></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Formation Stage Indicator */}
+                          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="font-medium text-gray-900 dark:text-white">
+                                  {habit.streak <= 18 ? "🌱 Initial Formation" :
+                                   habit.streak <= 45 ? "💪 Strengthening" :
+                                   habit.streak < 67 ? "🧠 Automaticity" : "🎉 Mastery + Bonus"}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {habit.streak <= 18 ? "Building awareness & momentum" :
+                                   habit.streak <= 45 ? "Developing neural pathways" :
+                                   habit.streak < 67 ? "Becoming automatic" : "Habit mastered with .uoY bonus!"}
+                                </div>
+                              </div>
+                              <div className="text-2xl">
+                                {Math.round(progressPercentage)}%
+                              </div>
                             </div>
                           </div>
                         </div>

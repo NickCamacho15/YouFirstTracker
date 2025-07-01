@@ -90,10 +90,15 @@ export default function LoginPage() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">
-            You. <span className="text-accent">First.</span>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-600 bg-clip-text text-transparent mb-4">
+            .uoY
           </h1>
-          <p className="text-muted-foreground">Your premium self-leadership platform</p>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-2">
+            The Premium Personal Excellence Platform
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+            "Action is the touchstone of reality" - Transform your life into a masterpiece
+          </p>
         </div>
 
         <Card className="shadow-lg">
