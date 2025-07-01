@@ -1,18 +1,15 @@
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Plus, Settings, CheckCircle2, Circle, Flame, Star, Zap, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { HabitCard } from "@/components/habits/habit-card";
-import { HabitStoryBar } from "@/components/habits/habit-story-bar";
-import { HabitFormationTracker } from "@/components/habits/habit-formation-tracker";
-import { FoundationsDashboard } from "@/components/habits/foundations-dashboard";
-import { NewHabitModal } from "@/components/habits/new-habit-modal";
-import { EditHabitModal } from "@/components/habits/edit-habit-modal";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Zap, BarChart3, Grid3X3, CheckCircle2, Circle, Clock, Flame, Star, Settings } from "lucide-react";
+import { HabitFormationTracker } from "@/components/habits/habit-formation-tracker";
+import { FoundationsDashboard } from "@/components/habits/foundations-dashboard";
+import { EditHabitModal } from "@/components/habits/edit-habit-modal";
 
 interface Habit {
   id: number;
@@ -26,96 +23,118 @@ interface Habit {
   timeOfDay?: string;
 }
 
-export default function HabitsPage() {
-  const [showNewHabitModal, setShowNewHabitModal] = useState(false);
-  const [showEditHabitModal, setShowEditHabitModal] = useState(false);
-  const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
+const getCategoryColors = (category?: string) => {
+  switch (category) {
+    case 'mind':
+      return {
+        bg: 'bg-gradient-to-r from-blue-500 to-indigo-600',
+        light: 'bg-blue-50 dark:bg-blue-950/20',
+        text: 'text-blue-600 dark:text-blue-400',
+        border: 'border-blue-200 dark:border-blue-800'
+      };
+    case 'body':
+      return {
+        bg: 'bg-gradient-to-r from-orange-500 to-red-600',
+        light: 'bg-orange-50 dark:bg-orange-950/20',
+        text: 'text-orange-600 dark:text-orange-400',
+        border: 'border-orange-200 dark:border-orange-800'
+      };
+    case 'soul':
+      return {
+        bg: 'bg-gradient-to-r from-emerald-500 to-teal-600',
+        light: 'bg-emerald-50 dark:bg-emerald-950/20',
+        text: 'text-emerald-600 dark:text-emerald-400',
+        border: 'border-emerald-200 dark:border-emerald-800'
+      };
+    default:
+      return {
+        bg: 'bg-gradient-to-r from-gray-500 to-gray-600',
+        light: 'bg-gray-50 dark:bg-gray-950/20',
+        text: 'text-gray-600 dark:text-gray-400',
+        border: 'border-gray-200 dark:border-gray-800'
+      };
+  }
+};
 
-  const { data: habits = [], isLoading } = useQuery({
-    queryKey: ["/api/habits"],
+const getTimeOfDayEmoji = (timeOfDay?: string) => {
+  switch (timeOfDay) {
+    case 'morning': return '🌅';
+    case 'afternoon': return '☀️';
+    case 'evening': return '🌆';
+    case 'night': return '🌙';
+    default: return '📅';
+  }
+};
+
+const getTimeOfDayLabel = (timeOfDay?: string) => {
+  switch (timeOfDay) {
+    case 'morning': return 'Morning';
+    case 'afternoon': return 'Afternoon';
+    case 'evening': return 'Evening';
+    case 'night': return 'Night';
+    default: return 'Any time';
+  }
+};
+
+export default function HabitsPage() {
+  const [editHabitModalOpen, setEditHabitModalOpen] = useState(false);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: habits = [], isLoading, error } = useQuery({
+    queryKey: ['/api/habits'],
   });
 
-  const refreshHabits = () => {
-    queryClient.invalidateQueries({ queryKey: ["/api/habits"] });
-  };
-
-  const handleAddHabit = () => {
-    setShowNewHabitModal(true);
-  };
-
-  // Habit toggle mutation
   const toggleHabitMutation = useMutation({
-    mutationFn: async (habitId: number) => {
-      const result = await apiRequest("POST", `/api/habits/${habitId}/toggle`, {});
-      return result;
+    mutationFn: async ({ habitId, completed }: { habitId: number; completed: boolean }) => {
+      const response = await apiRequest(`/api/habits/${habitId}/toggle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ completed }),
+      });
+      return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/habits"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/habits'] });
       toast({
         title: "Success",
-        description: "Habit updated!",
+        description: "Habit updated successfully",
       });
     },
-    onError: (error: any) => {
+    onError: (error) => {
+      console.error('Toggle habit error:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to update habit",
+        description: "Failed to update habit",
         variant: "destructive",
       });
     },
   });
 
   const handleToggleHabit = (habitId: number) => {
-    toggleHabitMutation.mutate(habitId);
+    const habit = (habits as Habit[]).find(h => h.id === habitId);
+    if (habit) {
+      toggleHabitMutation.mutate({ habitId, completed: !habit.completedToday });
+    }
   };
 
   const handleEditHabit = (habit: Habit) => {
-    setSelectedHabit(habit);
-    setShowEditHabitModal(true);
+    setEditingHabit(habit);
+    setEditHabitModalOpen(true);
   };
 
-  // Sort habits by time of day (morning -> afternoon -> evening -> anytime)
-  const sortedHabits = (habits as Habit[]).sort((a, b) => {
-    const timeOrder = { morning: 0, afternoon: 1, evening: 2, anytime: 3 };
-    const timeA = timeOrder[a.timeOfDay as keyof typeof timeOrder] ?? 3;
-    const timeB = timeOrder[b.timeOfDay as keyof typeof timeOrder] ?? 3;
-    return timeA - timeB;
-  });
-
-  const getTimeOfDayEmoji = (timeOfDay?: string) => {
-    switch (timeOfDay) {
-      case 'morning': return '🌅';
-      case 'afternoon': return '☀️';
-      case 'evening': return '🌙';
-      default: return '⏰';
-    }
+  const handleAddHabit = () => {
+    setEditingHabit(null);
+    setEditHabitModalOpen(true);
   };
 
-  const getTimeOfDayLabel = (timeOfDay?: string) => {
-    switch (timeOfDay) {
-      case 'morning': return 'Morning';
-      case 'afternoon': return 'Afternoon';
-      case 'evening': return 'Evening';
-      default: return 'Anytime';
-    }
-  };
-
-  const getCategoryColor = (category?: string) => {
-    switch (category) {
-      case 'mind': return { bg: 'bg-blue-600', light: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' };
-      case 'body': return { bg: 'bg-amber-500', light: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' };
-      case 'soul': return { bg: 'bg-indigo-600', light: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' };
-      default: return { bg: 'bg-blue-600', light: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' };
-    }
-  };
-
-  if (isLoading) {
+  if (error) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="max-w-4xl mx-auto px-4 pt-8">
-          <div className="text-center py-8">Loading your habits...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-destructive mb-2">Error loading habits</h2>
+          <p className="text-muted-foreground">Please try refreshing the page</p>
         </div>
       </div>
     );
@@ -141,138 +160,80 @@ export default function HabitsPage() {
           </Button>
         </div>
 
-        {/* Habit Stories - only show on Formation Science tab */}
-        <div id="habit-stories-container" className="mb-8 hidden"></div>
+        {/* Habit Formation Progress */}
+        <HabitFormationTracker habits={habits as Habit[]} />
 
-        {/* Habits Content */}
-        <div className="space-y-6">
-          {habits.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-12">
-                  <Zap className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">No Habits Yet</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Start building powerful habits that will transform your life.
-                  </p>
-                  <Button onClick={handleAddHabit} className="flex items-center gap-2">
-                    <Plus className="w-4 h-4" />
-                    Create Your First Habit
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Tabs defaultValue="formation" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="formation" className="flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4" />
-                  Habit Formation & Foundations
-                </TabsTrigger>
-                <TabsTrigger value="simple" className="flex items-center gap-2">
-                  <Grid3X3 className="w-4 h-4" />
-                  Foundations
-                </TabsTrigger>
-              </TabsList>
+        {/* Tabs */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+          </div>
+        ) : (
+          <Tabs defaultValue="formation" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsTrigger value="formation" className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" />
+                Habit Formation & Foundations
+              </TabsTrigger>
+              <TabsTrigger value="foundations" className="flex items-center gap-2">
+                <Flame className="w-4 h-4" />
+                Foundations
+              </TabsTrigger>
+            </TabsList>
 
-              <TabsContent value="formation" className="space-y-8">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold mb-2">Habit Formation & Foundations</h2>
-                  <p className="text-muted-foreground max-w-2xl mx-auto">
-                    This is a foundational habit that you have made a part of your lifestyle. You have completed it as a formed habit, 
-                    and is now something you can keep tracking your consistency of for as long as you use the platform.
-                  </p>
-                </div>
-                <div className="space-y-8">
-                  {(habits as Habit[]).map((habit) => (
-                    <HabitFormationTracker key={habit.id} habit={habit} />
-                  ))}
-                </div>
-              </TabsContent>
+            <TabsContent value="formation" className="space-y-6">
+              <div className="grid gap-6">
+                {(habits as Habit[]).map((habit) => {
+                  const colors = getCategoryColors(habit.category);
+                  const progressPercentage = Math.min((habit.streak / 67) * 100, 100);
 
-              <TabsContent value="simple" className="space-y-6">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold mb-2">Foundational Habits</h2>
-                  <p className="text-muted-foreground max-w-2xl mx-auto">
-                    Track long-term consistency and streaks for your established lifestyle habits.
-                  </p>
-                </div>
-                
-                {/* Unified Dashboard View */}
-                <Card className="border-0 shadow-xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-                  <CardContent className="p-8">
-                    {/* Header with overall stats */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                          {sortedHabits.reduce((sum, habit) => sum + habit.streak, 0)}
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Total Days</p>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                          {sortedHabits.filter(habit => habit.completedToday).length}/{sortedHabits.length}
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Completed Today</p>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                          {Math.round((sortedHabits.filter(habit => habit.completedToday).length / sortedHabits.length) * 100) || 0}%
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Daily Success</p>
-                      </div>
-                    </div>
-
-                    {/* Habits List with Streak Visualization */}
-                    <div className="space-y-4">
-                      {sortedHabits.map((habit) => {
-                        const colors = getCategoryColor(habit.category);
-                        const isLoading = toggleHabitMutation.isPending;
-                        const maxStreak = Math.max(...sortedHabits.map(h => h.streak));
-                        const streakWidth = maxStreak > 0 ? (habit.streak / maxStreak) * 100 : 0;
-                    
-                        return (
-                          <div key={habit.id} className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200">
-                          {/* Top section with edit button */}
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-xs">
-                                {getTimeOfDayEmoji(habit.timeOfDay)} {getTimeOfDayLabel(habit.timeOfDay)}
-                              </Badge>
-                              <div className={`w-3 h-3 rounded-full ${colors.bg}`} />
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditHabit(habit)}
-                              className="h-8 w-8 p-0 opacity-60 hover:opacity-100"
-                            >
-                              <Settings className="w-4 h-4" />
-                            </Button>
+                  return (
+                    <Card key={habit.id} className={`border-0 shadow-md hover:shadow-xl transition-all duration-300 ${
+                      habit.completedToday ? `${colors.light} ring-2 ring-green-500` : 'hover:scale-[1.02]'
+                    }`}>
+                      <CardContent className="p-6">
+                        {/* Top section with edit button */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">
+                              {getTimeOfDayEmoji(habit.timeOfDay)} {getTimeOfDayLabel(habit.timeOfDay)}
+                            </Badge>
+                            <div className={`w-3 h-3 rounded-full ${colors.bg}`} />
                           </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditHabit(habit)}
+                            className="h-8 w-8 p-0 opacity-60 hover:opacity-100"
+                          >
+                            <Settings className="w-4 h-4" />
+                          </Button>
+                        </div>
 
-                          {/* Habit title and description */}
-                          <div className="mb-4">
-                            <h3 className="font-semibold text-lg mb-1 line-clamp-2">{habit.title}</h3>
-                            {habit.description && (
-                              <p className="text-sm text-muted-foreground line-clamp-2">{habit.description}</p>
-                            )}
-                          </div>
+                        {/* Habit name and description */}
+                        <div className="mb-4">
+                          <h3 className="text-lg font-semibold text-foreground mb-1">{habit.title}</h3>
+                          {habit.description && (
+                            <p className="text-sm text-muted-foreground">{habit.description}</p>
+                          )}
+                        </div>
 
-                          {/* Progress visualization */}
-                          <div className="mb-4">
-                            <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                              <span>Progress to automaticity</span>
-                              <span>{Math.round(progressPercentage)}%</span>
+                        {/* Progress section */}
+                        <div className="space-y-3">
+                          {/* Progress bar */}
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="font-medium text-foreground">Progress to Formation</span>
+                              <span className="text-muted-foreground">{habit.streak}/67 days</span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                            <div className="h-3 bg-muted rounded-full overflow-hidden">
                               <div 
                                 className={`h-2 rounded-full transition-all duration-500 ${colors.bg}`}
                                 style={{ width: `${progressPercentage}%` }}
                               />
                             </div>
                             <div className="text-xs text-muted-foreground text-center">
-                              {habit.streak < 67 ? `${67 - habit.streak} days to go` : "Habit mastered - Bonus day for You! 🎉"}
+                              {habit.streak < 67 ? `${67 - habit.streak} days to go` : "Habit mastered - Bonus day for .uoY! 🎉"}
                             </div>
                           </div>
 
@@ -281,7 +242,7 @@ export default function HabitsPage() {
                             <Button
                               variant="ghost"
                               onClick={() => handleToggleHabit(habit.id)}
-                              disabled={isLoading}
+                              disabled={toggleHabitMutation.isPending}
                               className={`w-full h-12 rounded-lg border-2 transition-all duration-300 hover:scale-105 ${
                                 habit.completedToday
                                   ? `${colors.bg} border-green-500 text-white hover:opacity-90 shadow-lg`
@@ -317,29 +278,35 @@ export default function HabitsPage() {
                               )}
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </TabsContent>
-            </Tabs>
-          )}
-        </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </TabsContent>
 
-        {/* New Habit Modal */}
-        <NewHabitModal
-          open={showNewHabitModal}
-          onOpenChange={setShowNewHabitModal}
-          onSuccess={refreshHabits}
-        />
+            <TabsContent value="foundations">
+              <FoundationsDashboard 
+                habits={habits as Habit[]} 
+                onToggleHabit={handleToggleHabit}
+                onEditHabit={handleEditHabit}
+                isLoading={toggleHabitMutation.isPending}
+              />
+            </TabsContent>
+          </Tabs>
+        )}
 
         {/* Edit Habit Modal */}
         <EditHabitModal
-          open={showEditHabitModal}
-          onOpenChange={setShowEditHabitModal}
-          onSuccess={refreshHabits}
-          habit={selectedHabit}
+          open={editHabitModalOpen}
+          onOpenChange={setEditHabitModalOpen}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ['/api/habits'] });
+            setEditHabitModalOpen(false);
+            setEditingHabit(null);
+          }}
+          habit={editingHabit}
         />
       </div>
     </div>
