@@ -30,13 +30,18 @@ export default function DashboardPage() {
   const [showNewGoalModal, setShowNewGoalModal] = useState(false);
   const [showNewHabitModal, setShowNewHabitModal] = useState(false);
   
-  // Sample tasks data - in real app this would come from API
+  // Combined tasks, routines, and critical items - in real app this would come from API
   const [tasks, setTasks] = useState([
-    { id: 'task-1', text: 'Review quarterly metrics', completed: true, goalId: 1, priority: 1 },
-    { id: 'task-2', text: 'Prepare presentation slides', completed: false, time: 'Due 2 PM', goalId: 1, priority: 2 },
-    { id: 'task-3', text: 'Team standup meeting', completed: false, time: '10 AM', goalId: 2, priority: 3 },
-    { id: 'task-4', text: 'Update project timeline', completed: false, goalId: 2, priority: 4 },
-    { id: 'task-5', text: 'Call insurance provider', completed: false, goalId: null, priority: 5 },
+    { id: 'routine-1', text: 'Meditation (10 min)', completed: true, type: 'routine', category: 'Morning', priority: 1 },
+    { id: 'critical-1', text: 'Review quarterly metrics', completed: false, type: 'critical', time: 'Due 2 PM', goalId: 1, priority: 2 },
+    { id: 'routine-2', text: 'Exercise', completed: false, type: 'routine', category: 'Morning', priority: 3 },
+    { id: 'task-1', text: 'Prepare presentation slides', completed: false, type: 'task', goalId: 1, priority: 4 },
+    { id: 'routine-3', text: 'Healthy breakfast', completed: false, type: 'routine', category: 'Morning', priority: 5 },
+    { id: 'critical-2', text: 'Team standup meeting', completed: false, type: 'critical', time: '10 AM', goalId: 2, priority: 6 },
+    { id: 'task-2', text: 'Update project timeline', completed: false, type: 'task', goalId: 2, priority: 7 },
+    { id: 'routine-4', text: 'Daily reflection', completed: false, type: 'routine', category: 'Evening', priority: 8 },
+    { id: 'task-3', text: 'Call insurance provider', completed: false, type: 'task', goalId: null, priority: 9 },
+    { id: 'routine-5', text: 'Reading (30 min)', completed: false, type: 'routine', category: 'Evening', priority: 10 },
   ]);
 
   const [draggedTask, setDraggedTask] = useState<string | null>(null);
@@ -99,32 +104,7 @@ export default function DashboardPage() {
     });
   };
 
-  // Sample routine data
-  const [morningRoutine, setMorningRoutine] = useState([
-    { id: 'morning-1', text: 'Meditation (10 min)', completed: true },
-    { id: 'morning-2', text: 'Exercise', completed: false },
-    { id: 'morning-3', text: 'Healthy breakfast', completed: false },
-    { id: 'morning-4', text: 'Review daily goals', completed: false },
-  ]);
 
-  const [eveningRoutine, setEveningRoutine] = useState([
-    { id: 'evening-1', text: 'Daily reflection', completed: false },
-    { id: 'evening-2', text: 'Reading (30 min)', completed: false },
-    { id: 'evening-3', text: 'Plan tomorrow', completed: false },
-    { id: 'evening-4', text: 'Gratitude practice', completed: false },
-  ]);
-
-  const handleRoutineToggle = (routineType: 'morning' | 'evening', itemId: string) => {
-    if (routineType === 'morning') {
-      setMorningRoutine(prev => prev.map(item => 
-        item.id === itemId ? { ...item, completed: !item.completed } : item
-      ));
-    } else {
-      setEveningRoutine(prev => prev.map(item => 
-        item.id === itemId ? { ...item, completed: !item.completed } : item
-      ));
-    }
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -137,6 +117,117 @@ export default function DashboardPage() {
           <p className="text-gray-600">
             Ready to craft your life into a masterpiece today?
           </p>
+        </div>
+
+        {/* Progress Circles Overview - Free Floating */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          {/* Habits Progress */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#f3f4f6"
+                  strokeWidth="3"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#10b981"
+                  strokeWidth="3"
+                  strokeDasharray={`${75}, 100`}
+                  className="drop-shadow-sm"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xl font-bold text-gray-900">75%</span>
+              </div>
+            </div>
+            <h3 className="font-semibold text-gray-900">Habits</h3>
+            <p className="text-xs text-gray-500">Daily completion</p>
+          </div>
+
+          {/* Tasks Progress */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#f3f4f6"
+                  strokeWidth="3"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#3b82f6"
+                  strokeWidth="3"
+                  strokeDasharray={`${40}, 100`}
+                  className="drop-shadow-sm"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xl font-bold text-gray-900">40%</span>
+              </div>
+            </div>
+            <h3 className="font-semibold text-gray-900">Tasks</h3>
+            <p className="text-xs text-gray-500">Today's progress</p>
+          </div>
+
+          {/* Goals Progress */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#f3f4f6"
+                  strokeWidth="3"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#8b5cf6"
+                  strokeWidth="3"
+                  strokeDasharray={`${65}, 100`}
+                  className="drop-shadow-sm"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xl font-bold text-gray-900">65%</span>
+              </div>
+            </div>
+            <h3 className="font-semibold text-gray-900">Goals</h3>
+            <p className="text-xs text-gray-500">Weekly targets</p>
+          </div>
+
+          {/* Reading Progress */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#f3f4f6"
+                  strokeWidth="3"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#f59e0b"
+                  strokeWidth="3"
+                  strokeDasharray={`${85}, 100`}
+                  className="drop-shadow-sm"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xl font-bold text-gray-900">85%</span>
+              </div>
+            </div>
+            <h3 className="font-semibold text-gray-900">Reading</h3>
+            <p className="text-xs text-gray-500">Monthly goal</p>
+          </div>
         </div>
 
         {/* Quick Actions */}
@@ -190,199 +281,19 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        {/* Progress Circles Overview */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          {/* Habits Progress */}
-          <Card className="border-0 shadow-lg text-center">
-            <CardContent className="p-6">
-              <div className="relative w-20 h-20 mx-auto mb-4">
-                <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#f3f4f6"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#10b981"
-                    strokeWidth="2"
-                    strokeDasharray={`${75}, 100`}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xl font-bold text-gray-900">75%</span>
-                </div>
-              </div>
-              <h3 className="font-semibold text-gray-900">Habits</h3>
-              <p className="text-xs text-gray-500">Daily completion</p>
-            </CardContent>
-          </Card>
 
-          {/* Tasks Progress */}
-          <Card className="border-0 shadow-lg text-center">
-            <CardContent className="p-6">
-              <div className="relative w-20 h-20 mx-auto mb-4">
-                <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#f3f4f6"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#3b82f6"
-                    strokeWidth="2"
-                    strokeDasharray={`${40}, 100`}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xl font-bold text-gray-900">40%</span>
-                </div>
-              </div>
-              <h3 className="font-semibold text-gray-900">Tasks</h3>
-              <p className="text-xs text-gray-500">Today's progress</p>
-            </CardContent>
-          </Card>
 
-          {/* Goals Progress */}
-          <Card className="border-0 shadow-lg text-center">
-            <CardContent className="p-6">
-              <div className="relative w-20 h-20 mx-auto mb-4">
-                <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#f3f4f6"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#8b5cf6"
-                    strokeWidth="2"
-                    strokeDasharray={`${65}, 100`}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xl font-bold text-gray-900">65%</span>
-                </div>
-              </div>
-              <h3 className="font-semibold text-gray-900">Goals</h3>
-              <p className="text-xs text-gray-500">Weekly targets</p>
-            </CardContent>
-          </Card>
 
-          {/* Reading Progress */}
-          <Card className="border-0 shadow-lg text-center">
-            <CardContent className="p-6">
-              <div className="relative w-20 h-20 mx-auto mb-4">
-                <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#f3f4f6"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#f59e0b"
-                    strokeWidth="2"
-                    strokeDasharray={`${85}, 100`}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xl font-bold text-gray-900">85%</span>
-                </div>
-              </div>
-              <h3 className="font-semibold text-gray-900">Reading</h3>
-              <p className="text-xs text-gray-500">Monthly goal</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Daily Routine Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Morning Routine */}
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">🌅</span>
-                </div>
-                Morning Routine
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {morningRoutine.map(item => (
-                  <div key={item.id} className="flex items-center gap-3">
-                    <input 
-                      type="checkbox" 
-                      checked={item.completed}
-                      onChange={() => handleRoutineToggle('morning', item.id)}
-                      className="w-4 h-4 text-orange-500 rounded cursor-pointer"
-                    />
-                    <span className={`flex-1 transition-all duration-300 ${
-                      item.completed 
-                        ? 'line-through text-gray-500 opacity-60' 
-                        : 'text-gray-900'
-                    }`}>
-                      {item.text}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Evening Routine */}
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">🌙</span>
-                </div>
-                Evening Routine
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {eveningRoutine.map(item => (
-                  <div key={item.id} className="flex items-center gap-3">
-                    <input 
-                      type="checkbox" 
-                      checked={item.completed}
-                      onChange={() => handleRoutineToggle('evening', item.id)}
-                      className="w-4 h-4 text-indigo-500 rounded cursor-pointer"
-                    />
-                    <span className={`flex-1 transition-all duration-300 ${
-                      item.completed 
-                        ? 'line-through text-gray-500 opacity-60' 
-                        : 'text-gray-900'
-                    }`}>
-                      {item.text}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Today's Tasks - To-Do List */}
         <Card className="border-0 shadow-lg mb-6">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-gray-600" />
-              Today's Tasks
+              Today's Tasks & Routines
             </CardTitle>
             <p className="text-sm text-gray-600 mt-1">
-              Drag to reorder or use arrows to adjust priorities
+              Critical tasks, routines, and regular tasks - drag to reorder priorities
             </p>
           </CardHeader>
           <CardContent>
@@ -439,15 +350,30 @@ export default function DashboardPage() {
 
                   {/* Task Content */}
                   <div className="flex-1 min-w-0">
-                    <span className={`block transition-all duration-300 ${
-                      task.completed 
-                        ? 'line-through text-gray-500 opacity-60' 
-                        : 'text-gray-900'
-                    }`}>
-                      {task.text}
-                    </span>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`block transition-all duration-300 ${
+                        task.completed 
+                          ? 'line-through text-gray-500 opacity-60' 
+                          : 'text-gray-900'
+                      }`}>
+                        {task.text}
+                      </span>
+                      
+                      {/* Type Badge */}
+                      {task.type === 'critical' && (
+                        <Badge className="text-xs bg-red-100 text-red-700 hover:bg-red-100">
+                          Critical
+                        </Badge>
+                      )}
+                      {task.type === 'routine' && (
+                        <Badge className="text-xs bg-blue-100 text-blue-700 hover:bg-blue-100">
+                          {task.category}
+                        </Badge>
+                      )}
+                    </div>
+                    
                     {task.time && (
-                      <span className={`text-xs px-2 py-1 rounded mt-1 inline-block transition-opacity ${
+                      <span className={`text-xs px-2 py-1 rounded inline-block transition-opacity ${
                         task.completed 
                           ? 'opacity-40'
                           : task.time.includes('Due') 
