@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { HabitCard } from "@/components/habits/habit-card";
 import { HabitStoryBar } from "@/components/habits/habit-story-bar";
 import { HabitFormationTracker } from "@/components/habits/habit-formation-tracker";
+import { FoundationsDashboard } from "@/components/habits/foundations-dashboard";
 import { NewHabitModal } from "@/components/habits/new-habit-modal";
 import { EditHabitModal } from "@/components/habits/edit-habit-modal";
 import { apiRequest } from "@/lib/queryClient";
@@ -197,17 +198,41 @@ export default function HabitsPage() {
                   </p>
                 </div>
                 
-                <div className="space-y-6">
-                  {sortedHabits.map((habit) => {
-                    const colors = getCategoryColor(habit.category);
-                    const isLoading = toggleHabitMutation.isPending;
-                    const progressPercentage = Math.min((habit.streak / 67) * 100, 100);
+                {/* Unified Dashboard View */}
+                <Card className="border-0 shadow-xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                  <CardContent className="p-8">
+                    {/* Header with overall stats */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                          {sortedHabits.reduce((sum, habit) => sum + habit.streak, 0)}
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Total Days</p>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                          {sortedHabits.filter(habit => habit.completedToday).length}/{sortedHabits.length}
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Completed Today</p>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                          {Math.round((sortedHabits.filter(habit => habit.completedToday).length / sortedHabits.length) * 100) || 0}%
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Daily Success</p>
+                      </div>
+                    </div>
+
+                    {/* Habits List with Streak Visualization */}
+                    <div className="space-y-4">
+                      {sortedHabits.map((habit) => {
+                        const colors = getCategoryColor(habit.category);
+                        const isLoading = toggleHabitMutation.isPending;
+                        const maxStreak = Math.max(...sortedHabits.map(h => h.streak));
+                        const streakWidth = maxStreak > 0 ? (habit.streak / maxStreak) * 100 : 0;
                     
-                    return (
-                      <Card key={habit.id} className={`border-0 shadow-md hover:shadow-xl transition-all duration-300 ${
-                        habit.completedToday ? `${colors.light} ring-2 ring-green-500` : 'hover:scale-[1.02]'
-                      }`}>
-                        <CardContent className="p-6">
+                        return (
+                          <div key={habit.id} className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200">
                           {/* Top section with edit button */}
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-2">
