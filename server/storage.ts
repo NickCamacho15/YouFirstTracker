@@ -62,6 +62,13 @@ export interface IStorage {
   getVisionBoardByUserId(userId: number): Promise<VisionBoardItem[]>;
   createVisionBoardItem(item: InsertVisionBoardItem): Promise<VisionBoardItem>;
   deleteVisionBoardItem(id: number): Promise<boolean>;
+
+  // Tasks
+  getTasksByUserId(userId: number): Promise<Task[]>;
+  getTaskById(id: number): Promise<Task | undefined>;
+  createTask(task: InsertTask): Promise<Task>;
+  updateTask(id: number, updates: Partial<Task>): Promise<Task | undefined>;
+  deleteTask(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {

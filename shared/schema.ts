@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, date, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -76,6 +76,19 @@ export const visionBoard = pgTable("vision_board", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const tasks = pgTable("tasks", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  priority: text("priority").notNull().default("medium"), // low, medium, high, critical
+  completed: boolean("completed").notNull().default(false),
+  dueDate: timestamp("due_date"),
+  timeframe: text("timeframe").notNull().default("today"), // today, week, month
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -123,6 +136,14 @@ export const insertVisionBoardSchema = createInsertSchema(visionBoard).omit({
   createdAt: true,
 });
 
+export const insertTaskSchema = createInsertSchema(tasks).omit({
+  id: true,
+  createdAt: true,
+  completedAt: true,
+}).extend({
+  dueDate: z.string().optional().transform((val) => val && val !== "" ? new Date(val) : undefined),
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -140,3 +161,5 @@ export type Post = typeof posts.$inferSelect;
 export type InsertPost = z.infer<typeof insertPostSchema>;
 export type VisionBoardItem = typeof visionBoard.$inferSelect;
 export type InsertVisionBoardItem = z.infer<typeof insertVisionBoardSchema>;
+export type Task = typeof tasks.$inferSelect;
+export type InsertTask = z.infer<typeof insertTaskSchema>;
