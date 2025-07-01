@@ -88,8 +88,7 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
       }
     };
 
-    // Render mini progress bubbles (show last 7 days)
-    const recentDays = days.slice(-7);
+    // Render all progress bubbles for this stage
     
     return (
       <div className={`relative p-5 rounded-xl border-2 transition-all duration-300 hover:scale-[1.02] ${
@@ -101,9 +100,9 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
         <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${getStageGradient(stageNumber)} opacity-50 blur-sm`} />
         
         <div className="relative z-10">
-          {/* Mini progress bubbles */}
-          <div className="flex justify-center gap-1 mb-4">
-            {recentDays.map((day, index) => {
+          {/* Stage progress bubbles */}
+          <div className="grid grid-cols-9 gap-1 mb-4 justify-items-center">
+            {days.map((day, index) => {
               const isCompleted = isCompletedOnDay(day);
               const isToday = isSameDay(day, new Date());
               
@@ -115,7 +114,7 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
                       ? `${colors.bg} shadow-sm` 
                       : `bg-gray-300 dark:bg-gray-600 border border-gray-400 dark:border-gray-500`
                   } ${isToday ? 'ring-2 ring-white ring-offset-1' : ''}`}
-                  title={`${format(day, 'MMM d')}: ${isCompleted ? 'Completed' : 'Not completed'}`}
+                  title={`Day ${index + 1 + (stageNumber - 1) * (stageNumber === 3 ? 27 : 18)}: ${format(day, 'MMM d')} - ${isCompleted ? 'Completed' : 'Not completed'}`}
                 />
               );
             })}
@@ -234,7 +233,7 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
             </div>
             
             <p className="text-sm text-center font-medium opacity-90">
-              Science shows 66 days for habit formation + your special .uoY bonus day for mastery ✨
+              Foundational habit consistency tracking - maintain your lifestyle habit ✨
             </p>
           </div>
         </div>
