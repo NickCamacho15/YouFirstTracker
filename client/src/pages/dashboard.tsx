@@ -109,16 +109,6 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white">
       <main className="p-4 pb-20">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Welcome back, {user?.displayName || 'there'}
-          </h1>
-          <p className="text-gray-600">
-            Ready to craft your life into a masterpiece today?
-          </p>
-        </div>
-
         {/* Progress Circles Overview - Free Floating */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           {/* Habits Progress */}
