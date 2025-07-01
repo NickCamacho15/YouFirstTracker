@@ -32,17 +32,71 @@ export default function DashboardPage() {
   
   // Sample tasks data - in real app this would come from API
   const [tasks, setTasks] = useState([
-    { id: 'task-1', text: 'Review quarterly metrics', completed: true, goalId: 1 },
-    { id: 'task-2', text: 'Prepare presentation slides', completed: false, time: 'Due 2 PM', goalId: 1 },
-    { id: 'task-3', text: 'Team standup meeting', completed: false, time: '10 AM', goalId: 2 },
-    { id: 'task-4', text: 'Update project timeline', completed: false, goalId: 2 },
-    { id: 'task-5', text: 'Call insurance provider', completed: false, goalId: null },
+    { id: 'task-1', text: 'Review quarterly metrics', completed: true, goalId: 1, priority: 1 },
+    { id: 'task-2', text: 'Prepare presentation slides', completed: false, time: 'Due 2 PM', goalId: 1, priority: 2 },
+    { id: 'task-3', text: 'Team standup meeting', completed: false, time: '10 AM', goalId: 2, priority: 3 },
+    { id: 'task-4', text: 'Update project timeline', completed: false, goalId: 2, priority: 4 },
+    { id: 'task-5', text: 'Call insurance provider', completed: false, goalId: null, priority: 5 },
   ]);
+
+  const [draggedTask, setDraggedTask] = useState<string | null>(null);
 
   const handleTaskToggle = (taskId: string) => {
     setTasks(prev => prev.map(task => 
       task.id === taskId ? { ...task, completed: !task.completed } : task
     ));
+  };
+
+  const handleDragStart = (e: React.DragEvent, taskId: string) => {
+    setDraggedTask(taskId);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, targetTaskId: string) => {
+    e.preventDefault();
+    
+    if (!draggedTask || draggedTask === targetTaskId) return;
+
+    setTasks(prev => {
+      const draggedIndex = prev.findIndex(task => task.id === draggedTask);
+      const targetIndex = prev.findIndex(task => task.id === targetTaskId);
+      
+      const newTasks = [...prev];
+      const [draggedItem] = newTasks.splice(draggedIndex, 1);
+      newTasks.splice(targetIndex, 0, draggedItem);
+      
+      // Update priorities based on new order
+      return newTasks.map((task, index) => ({
+        ...task,
+        priority: index + 1
+      }));
+    });
+    
+    setDraggedTask(null);
+  };
+
+  const movePriority = (taskId: string, direction: 'up' | 'down') => {
+    setTasks(prev => {
+      const sortedTasks = [...prev].sort((a, b) => a.priority - b.priority);
+      const taskIndex = sortedTasks.findIndex(task => task.id === taskId);
+      
+      if (direction === 'up' && taskIndex > 0) {
+        [sortedTasks[taskIndex], sortedTasks[taskIndex - 1]] = [sortedTasks[taskIndex - 1], sortedTasks[taskIndex]];
+      } else if (direction === 'down' && taskIndex < sortedTasks.length - 1) {
+        [sortedTasks[taskIndex], sortedTasks[taskIndex + 1]] = [sortedTasks[taskIndex + 1], sortedTasks[taskIndex]];
+      }
+      
+      // Update priorities
+      return sortedTasks.map((task, index) => ({
+        ...task,
+        priority: index + 1
+      }));
+    });
   };
   
   // Haptic feedback function
