@@ -157,6 +157,9 @@ export default function HabitsPage() {
           </Button>
         </div>
 
+        {/* One-Click Habit Health Score */}
+        <HabitHealthScore habits={habits as Habit[]} />
+
         {/* Habit Formation Progress */}
         <HabitFormationTracker habits={habits as Habit[]} />
 
