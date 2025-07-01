@@ -79,6 +79,7 @@ export const visionBoard = pgTable("vision_board", {
 export const tasks = pgTable("tasks", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
+  goalId: integer("goal_id").references(() => goals.id).notNull(),
   title: text("title").notNull(),
   description: text("description"),
   priority: text("priority").notNull().default("medium"), // low, medium, high, critical
