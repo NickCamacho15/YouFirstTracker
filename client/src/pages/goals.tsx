@@ -157,14 +157,98 @@ export default function GoalsPage() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {(goals as Goal[]).map((goal: Goal) => (
-                  <GoalCard
-                    key={goal.id}
-                    goal={goal}
-                    onUpdate={refreshGoals}
-                  />
-                ))}
+              <div className="space-y-8">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {(goals as Goal[]).map((goal: Goal) => (
+                    <GoalCard
+                      key={goal.id}
+                      goal={goal}
+                      onUpdate={refreshGoals}
+                    />
+                  ))}
+                </div>
+
+                {/* Goal Progress Charts */}
+                <Card className="border-0 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-xl">Goal Progress Analytics</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Track task completion trends toward your goals over time
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-6 md:grid-cols-2">
+                      {/* Sample Goal 1 Progress Chart */}
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-lg">Work Project Progress</h4>
+                        <div className="h-40 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 flex items-end justify-between gap-2">
+                          {/* Simple dot chart representation */}
+                          {Array.from({ length: 7 }, (_, i) => {
+                            const progress = [20, 40, 60, 55, 75, 85, 90][i]; // Mock data
+                            return (
+                              <div key={i} className="flex flex-col items-center gap-2">
+                                <div 
+                                  className="w-8 bg-blue-500 rounded-t-sm transition-all duration-500"
+                                  style={{ height: `${progress}%` }}
+                                />
+                                <span className="text-xs text-gray-500">
+                                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">7 tasks completed this week</span>
+                          <span className="text-green-600 font-medium">+15% vs last week</span>
+                        </div>
+                      </div>
+
+                      {/* Sample Goal 2 Progress Chart */}
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-lg">Team Leadership Progress</h4>
+                        <div className="h-40 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 flex items-end justify-between gap-2">
+                          {Array.from({ length: 7 }, (_, i) => {
+                            const progress = [10, 25, 30, 45, 50, 65, 70][i]; // Mock data
+                            return (
+                              <div key={i} className="flex flex-col items-center gap-2">
+                                <div 
+                                  className="w-8 bg-emerald-500 rounded-t-sm transition-all duration-500"
+                                  style={{ height: `${progress}%` }}
+                                />
+                                <span className="text-xs text-gray-500">
+                                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">4 tasks completed this week</span>
+                          <span className="text-green-600 font-medium">+8% vs last week</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Overall Progress Summary */}
+                    <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h5 className="font-semibold text-gray-900 dark:text-white">
+                            Total Task Completion Rate
+                          </h5>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Across all active goals this month
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-3xl font-bold text-blue-600">78%</div>
+                          <div className="text-sm text-green-600 font-medium">↑ 12% from last month</div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </TabsContent>

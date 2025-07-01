@@ -441,32 +441,21 @@ export default function HabitsPage() {
                         </div>
                       </div>
 
-                      {/* Interactive Calendar Grid */}
+                      {/* Habit Details */}
                       <div className="p-6">
-                        <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Last 30 Days</h4>
-                          <Badge variant="outline" className={`${colors.text} border-current`}>
-                            {getTimeOfDayEmoji(habit.timeOfDay)} {getTimeOfDayLabel(habit.timeOfDay)}
-                          </Badge>
-                        </div>
-                        
-                        <div className="grid grid-cols-10 gap-2 mb-6">
-                          {calendarDays.map((day, index) => (
-                            <div
-                              key={index}
-                              className={`
-                                aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition-all duration-200 cursor-pointer
-                                ${day.isCompleted 
-                                  ? `${colors.bg} text-white shadow-lg hover:scale-110` 
-                                  : day.isToday 
-                                  ? 'bg-blue-100 text-blue-600 border-2 border-blue-400 hover:bg-blue-200' 
-                                  : 'bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                                }
-                              `}
-                            >
-                              {day.day}
-                            </div>
-                          ))}
+                        <div className="flex items-center justify-between mb-6">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="outline" className={`${colors.text} border-current`}>
+                              {getTimeOfDayEmoji(habit.timeOfDay)} {getTimeOfDayLabel(habit.timeOfDay)}
+                            </Badge>
+                            <Badge variant="outline" className="text-gray-600">
+                              {habit.frequency}
+                            </Badge>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm text-gray-500">Current Streak</div>
+                            <div className="text-2xl font-bold text-gray-900 dark:text-white">{habit.streak} days</div>
+                          </div>
                         </div>
 
                         {/* Progress Visualization with Compact YES Button */}

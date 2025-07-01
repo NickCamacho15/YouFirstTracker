@@ -93,11 +93,8 @@ export default function LoginPage() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-600 bg-clip-text text-transparent mb-4">
             .uoY
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-2">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             The Premium Personal Excellence Platform
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-            "Action is the touchstone of reality" - Transform your life into a masterpiece
           </p>
         </div>
 
