@@ -144,7 +144,7 @@ export default function DashboardPage() {
             <div className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">FOUNDATIONS</div>
           </div>
 
-          {/* Goals Ring */}
+          {/* Tasks Ring */}
           <div className="text-center">
             <div className="relative w-32 h-32 mx-auto mb-4">
               <svg className="w-32 h-32 transform -rotate-90">
@@ -157,16 +157,16 @@ export default function DashboardPage() {
                   strokeWidth="8" 
                   fill="none" 
                   strokeDasharray={352}
-                  strokeDashoffset={352 * (1 - (goalProgress / 100))}
+                  strokeDashoffset={352 * (1 - 0.75)}
                   strokeLinecap="round"
                   className="transition-all duration-700 drop-shadow-lg"
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-black text-emerald-600">{Math.round(goalProgress)}%</span>
+                <span className="text-2xl font-black text-emerald-600">75%</span>
               </div>
             </div>
-            <div className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">GOALS</div>
+            <div className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">TASKS</div>
           </div>
 
           {/* Reading Ring */}
@@ -272,60 +272,61 @@ export default function DashboardPage() {
 
         {/* Main Sections Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Goals Section */}
+          {/* Daily Tasks Section */}
           <Card className="border-0 shadow-lg">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                    <Target className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <div className="p-2 bg-emerald-100 dark:bg-emerald-900 rounded-lg">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <CardTitle className="text-xl">Goals</CardTitle>
+                  <CardTitle className="text-xl">Today's Tasks</CardTitle>
                 </div>
-                <Link href="/goals">
-                  <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
-                    View All <ArrowRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </Link>
+                <Badge variant="outline" className="text-emerald-600 border-emerald-200">
+                  3 critical
+                </Badge>
               </div>
             </CardHeader>
             <CardContent>
-              {totalGoals === 0 ? (
-                <div className="text-center py-8">
-                  <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                    <Target className="w-8 h-8 text-slate-400" />
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                    <div>
+                      <p className="font-medium">Review quarterly metrics</p>
+                      <p className="text-sm text-muted-foreground">High priority</p>
+                    </div>
                   </div>
-                  <p className="text-muted-foreground mb-4">Set your first goal and start achieving</p>
-                  <Button onClick={() => setShowNewGoalModal(true)} className="bg-blue-600 hover:bg-blue-700">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 rounded-full bg-orange-500" />
+                    <div>
+                      <p className="font-medium">Prepare presentation slides</p>
+                      <p className="text-sm text-muted-foreground">Due 2 PM</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 rounded-full bg-blue-500" />
+                    <div>
+                      <p className="font-medium">Team standup meeting</p>
+                      <p className="text-sm text-muted-foreground">10 AM today</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="text-center pt-2">
+                  <Button variant="outline" size="sm" className="text-emerald-600 hover:text-emerald-700">
                     <Plus className="w-4 h-4 mr-2" />
-                    Create Goal
+                    Add Task
                   </Button>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {goals?.slice(0, 3).map((goal: any) => (
-                    <div key={goal.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-3 h-3 rounded-full ${goal.completed ? 'bg-green-500' : 'bg-blue-500'}`} />
-                        <div>
-                          <p className="font-medium">{goal.title}</p>
-                          {goal.dueDate && (
-                            <p className="text-sm text-muted-foreground">
-                              Due {new Date(goal.dueDate).toLocaleDateString()}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      {goal.completed && <CheckCircle2 className="w-5 h-5 text-green-500" />}
-                    </div>
-                  ))}
-                  {totalGoals > 3 && (
-                    <p className="text-sm text-muted-foreground text-center pt-2">
-                      +{totalGoals - 3} more goals
-                    </p>
-                  )}
-                </div>
-              )}
+              </div>
             </CardContent>
           </Card>
 
@@ -387,6 +388,146 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+        {/* Goal Progression Section */}
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Goal Progression</h2>
+            <Link href="/goals">
+              <Button variant="outline" className="text-blue-600 hover:text-blue-700">
+                <Target className="w-4 h-4 mr-2" />
+                Manage Goals
+              </Button>
+            </Link>
+          </div>
+          
+          {totalGoals === 0 ? (
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50">
+              <CardContent className="p-8 text-center">
+                <div className="p-4 bg-blue-100 dark:bg-blue-900 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <Target className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Set Your First Goal</h3>
+                <p className="text-muted-foreground mb-4">Transform your aspirations into actionable goals with micro-steps</p>
+                <Button onClick={() => setShowNewGoalModal(true)} className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Goal
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-6">
+              {/* Active Goals Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(goals as any[])?.slice(0, 6).map((goal: any) => (
+                  <Card key={goal.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className={`w-4 h-4 rounded-full ${goal.completed ? 'bg-green-500' : 'bg-blue-500'} flex-shrink-0 mt-1`} />
+                        {goal.completed && <CheckCircle2 className="w-5 h-5 text-green-500" />}
+                      </div>
+                      
+                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{goal.title}</h3>
+                      {goal.description && (
+                        <p className="text-sm text-muted-foreground mb-3">{goal.description}</p>
+                      )}
+                      
+                      {/* Micro Goals Progress */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium">Progress</span>
+                          <span className="text-muted-foreground">
+                            {goal.microGoals?.filter((mg: any) => mg.completed).length || 0}/
+                            {goal.microGoals?.length || 0} steps
+                          </span>
+                        </div>
+                        
+                        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-2 rounded-full transition-all duration-500 ${
+                              goal.completed ? 'bg-green-500' : 'bg-blue-500'
+                            }`}
+                            style={{ 
+                              width: `${goal.microGoals?.length > 0 
+                                ? (goal.microGoals.filter((mg: any) => mg.completed).length / goal.microGoals.length) * 100 
+                                : 0}%` 
+                            }}
+                          />
+                        </div>
+                        
+                        {goal.dueDate && (
+                          <p className="text-xs text-muted-foreground">
+                            Due {new Date(goal.dueDate).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Future Folder - Vision Board Integration */}
+              <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/50 dark:to-indigo-950/50">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                        <Star className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl">Future Folder</CardTitle>
+                        <p className="text-sm text-muted-foreground">Visualize your aspirations and future goals</p>
+                      </div>
+                    </div>
+                    <Link href="/vision">
+                      <Button variant="outline" className="text-purple-600 hover:text-purple-700">
+                        <ImageIcon className="w-4 h-4 mr-2" />
+                        View Vision Board
+                      </Button>
+                    </Link>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {/* Vision placeholder tiles */}
+                    <div className="aspect-square bg-purple-100 dark:bg-purple-900/20 rounded-xl flex items-center justify-center border-2 border-dashed border-purple-300 dark:border-purple-700">
+                      <div className="text-center">
+                        <Star className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+                        <p className="text-xs text-purple-600 dark:text-purple-400">Add Vision</p>
+                      </div>
+                    </div>
+                    <div className="aspect-square bg-blue-100 dark:bg-blue-900/20 rounded-xl flex items-center justify-center border-2 border-dashed border-blue-300 dark:border-blue-700">
+                      <div className="text-center">
+                        <Target className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+                        <p className="text-xs text-blue-600 dark:text-blue-400">Future Goal</p>
+                      </div>
+                    </div>
+                    <div className="aspect-square bg-emerald-100 dark:bg-emerald-900/20 rounded-xl flex items-center justify-center border-2 border-dashed border-emerald-300 dark:border-emerald-700">
+                      <div className="text-center">
+                        <Trophy className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
+                        <p className="text-xs text-emerald-600 dark:text-emerald-400">Dream Big</p>
+                      </div>
+                    </div>
+                    <div className="aspect-square bg-orange-100 dark:bg-orange-900/20 rounded-xl flex items-center justify-center border-2 border-dashed border-orange-300 dark:border-orange-700">
+                      <div className="text-center">
+                        <Plus className="w-8 h-8 text-orange-400 mx-auto mb-2" />
+                        <p className="text-xs text-orange-600 dark:text-orange-400">Inspiration</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-center mt-6">
+                    <Link href="/vision">
+                      <Button className="bg-purple-600 hover:bg-purple-700">
+                        <Star className="w-4 h-4 mr-2" />
+                        Create Your Future Vision
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
+
         {/* Additional Sections Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Reading Section */}
@@ -442,38 +583,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Vision Board Section */}
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                    <ImageIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <CardTitle className="text-xl">Vision Board</CardTitle>
-                </div>
-                <Link href="/vision">
-                  <Button variant="ghost" size="sm" className="text-purple-600 hover:text-purple-700">
-                    View All <ArrowRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <ImageIcon className="w-8 h-8 text-slate-400" />
-                </div>
-                <p className="text-muted-foreground mb-4">Visualize your dreams and aspirations</p>
-                <Link href="/vision">
-                  <Button className="bg-purple-600 hover:bg-purple-700">
-                    <Star className="w-4 h-4 mr-2" />
-                    Create Vision
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+
         </div>
       </main>
 
