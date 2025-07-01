@@ -177,7 +177,7 @@ export default function HabitsPage() {
               </TabsTrigger>
               <TabsTrigger value="foundations" className="flex items-center gap-2">
                 <Flame className="w-4 h-4" />
-                Foundations
+                Foundations Dashboard
               </TabsTrigger>
             </TabsList>
 

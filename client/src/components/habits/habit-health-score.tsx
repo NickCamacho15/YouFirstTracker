@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
@@ -8,14 +8,11 @@ import {
   TrendingUp, 
   Calendar, 
   Target, 
-  Flame, 
-  Brain, 
-  Activity,
   Zap,
   Award,
-  BarChart3
+  Sparkles
 } from "lucide-react";
-import { format, subDays, isAfter, startOfDay } from "date-fns";
+import { format, subDays } from "date-fns";
 
 interface Habit {
   id: number;
@@ -44,7 +41,6 @@ interface HealthMetrics {
   balance: number;
   engagement: number;
   grade: string;
-  insights: string[];
   recommendations: string[];
 }
 
@@ -61,9 +57,8 @@ export function HabitHealthScore({ habits }: HabitHealthScoreProps) {
         momentum: 0,
         balance: 0,
         engagement: 0,
-        grade: "F",
-        insights: ["No habits tracked yet"],
-        recommendations: ["Create your first habit to get started!"]
+        grade: "Start",
+        recommendations: ["Create your first habit to begin your journey!"]
       };
     }
 
@@ -84,7 +79,7 @@ export function HabitHealthScore({ habits }: HabitHealthScoreProps) {
 
     // Calculate momentum (average streak across all habits)
     const avgStreak = habits.reduce((sum, habit) => sum + habit.streak, 0) / habits.length;
-    const momentum = Math.min((avgStreak / 21) * 100, 100); // 21 days = 100% momentum
+    const momentum = Math.min((avgStreak / 21) * 100, 100);
 
     // Calculate balance (diversity across Mind, Body, Soul categories)
     const categoryCount = {
@@ -120,28 +115,13 @@ export function HabitHealthScore({ habits }: HabitHealthScoreProps) {
     else if (overallScore >= 50) grade = "C-";
     else if (overallScore >= 40) grade = "D";
 
-    // Generate insights
-    const insights = [];
-    if (consistency >= 80) insights.push("Excellent consistency this week!");
-    else if (consistency >= 60) insights.push("Good consistency, with room for improvement");
-    else if (consistency < 40) insights.push("Consistency needs attention");
-
-    if (momentum >= 70) insights.push("Strong habit momentum building");
-    else if (momentum < 30) insights.push("Focus on building longer streaks");
-
-    if (balance >= 67) insights.push("Well-balanced habit categories");
-    else insights.push("Consider diversifying across Mind, Body, and Soul");
-
-    if (engagement >= 80) insights.push("Great daily engagement today!");
-    else if (engagement < 50) insights.push("Complete more habits today");
-
     // Generate recommendations
     const recommendations = [];
-    if (consistency < 70) recommendations.push("Set daily reminders for habit completion");
-    if (momentum < 50) recommendations.push("Focus on completing one habit consistently for 21 days");
-    if (balance < 50) recommendations.push("Add habits in underrepresented categories");
-    if (engagement < 60) recommendations.push("Start with your highest-priority habit today");
-    if (habits.length < 3) recommendations.push("Consider adding 1-2 more foundational habits");
+    if (consistency < 70) recommendations.push("Set daily reminders");
+    if (momentum < 50) recommendations.push("Focus on streak building");
+    if (balance < 50) recommendations.push("Balance Mind, Body, Soul");
+    if (engagement < 60) recommendations.push("Complete more habits today");
+    if (habits.length < 3) recommendations.push("Add foundational habits");
 
     return {
       overallScore,
@@ -150,175 +130,176 @@ export function HabitHealthScore({ habits }: HabitHealthScoreProps) {
       balance: Math.round(balance),
       engagement: Math.round(engagement),
       grade,
-      insights,
       recommendations
     };
   }, [habits, habitLogs]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600 dark:text-green-400";
-    if (score >= 60) return "text-yellow-600 dark:text-yellow-400";
-    return "text-red-600 dark:text-red-400";
+    if (score >= 80) return "from-emerald-500 to-green-400";
+    if (score >= 60) return "from-yellow-500 to-amber-400";
+    return "from-red-500 to-pink-400";
   };
 
-  const getGradeColor = (grade: string) => {
-    if (grade.startsWith('A')) return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-    if (grade.startsWith('B')) return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-    if (grade.startsWith('C')) return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
-    return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
+  const getGradeGlow = (grade: string) => {
+    if (grade.startsWith('A')) return "shadow-green-500/50";
+    if (grade.startsWith('B')) return "shadow-blue-500/50";
+    if (grade.startsWith('C')) return "shadow-yellow-500/50";
+    return "shadow-red-500/50";
   };
 
   return (
-    <Card className="w-full mb-8">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl flex items-center gap-2">
-            <Heart className="w-6 h-6 text-red-500" />
-            Habit Health Score
-          </CardTitle>
-          <div className="flex items-center gap-3">
-            <Badge 
-              variant="secondary" 
-              className={`text-lg font-bold px-4 py-2 ${getGradeColor(healthMetrics.grade)}`}
-            >
-              {healthMetrics.grade}
-            </Badge>
-            <div className={`text-3xl font-bold ${getScoreColor(healthMetrics.overallScore)}`}>
-              {healthMetrics.overallScore}
-            </div>
-          </div>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          Your comprehensive habit wellness assessment
-        </p>
-      </CardHeader>
-      
-      <CardContent className="space-y-6">
-        {/* Metric Breakdown */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Consistency */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-blue-500" />
-              <span className="text-sm font-medium">Consistency</span>
-              <span className={`text-sm font-bold ${getScoreColor(healthMetrics.consistency)}`}>
-                {healthMetrics.consistency}%
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div 
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
-                style={{ width: `${healthMetrics.consistency}%` }}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">Last 7 days completion rate</p>
-          </div>
-
-          {/* Momentum */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-orange-500" />
-              <span className="text-sm font-medium">Momentum</span>
-              <span className={`text-sm font-bold ${getScoreColor(healthMetrics.momentum)}`}>
-                {healthMetrics.momentum}%
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div 
-                className="bg-orange-500 h-2 rounded-full transition-all duration-300" 
-                style={{ width: `${healthMetrics.momentum}%` }}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">Average streak strength</p>
-          </div>
-
-          {/* Balance */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Target className="w-4 h-4 text-purple-500" />
-              <span className="text-sm font-medium">Balance</span>
-              <span className={`text-sm font-bold ${getScoreColor(healthMetrics.balance)}`}>
-                {healthMetrics.balance}%
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div 
-                className="bg-purple-500 h-2 rounded-full transition-all duration-300" 
-                style={{ width: `${healthMetrics.balance}%` }}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">Mind, Body, Soul diversity</p>
-          </div>
-
-          {/* Today's Engagement */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-green-500" />
-              <span className="text-sm font-medium">Today</span>
-              <span className={`text-sm font-bold ${getScoreColor(healthMetrics.engagement)}`}>
-                {healthMetrics.engagement}%
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div 
-                className="bg-green-500 h-2 rounded-full transition-all duration-300" 
-                style={{ width: `${healthMetrics.engagement}%` }}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">Habits completed today</p>
-          </div>
+    <div className="relative mb-8">
+      {/* Glassmorphism container with gradient background */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900 border border-white/20 backdrop-blur-xl shadow-2xl">
+        
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-blue-400/30 to-purple-400/30 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute top-1/2 -left-8 w-32 h-32 bg-gradient-to-br from-emerald-400/20 to-cyan-400/20 rounded-full blur-2xl animate-pulse delay-1000"></div>
+          <div className="absolute bottom-4 right-1/3 w-16 h-16 bg-gradient-to-br from-pink-400/25 to-rose-400/25 rounded-full blur-lg animate-pulse delay-500"></div>
         </div>
 
-        {/* Insights Section */}
-        {healthMetrics.insights.length > 0 && (
-          <div className="space-y-3">
-            <h4 className="font-semibold flex items-center gap-2">
-              <Brain className="w-4 h-4 text-indigo-500" />
-              Key Insights
-            </h4>
-            <div className="grid gap-2">
-              {healthMetrics.insights.map((insight, index) => (
-                <div key={index} className="flex items-center gap-2 text-sm bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg">
-                  <Activity className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                  <span>{insight}</span>
+        <div className="relative z-10 p-8">
+          {/* Header Section */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Heart className="w-8 h-8 text-red-500 drop-shadow-lg" />
+                <Sparkles className="w-4 h-4 text-yellow-400 absolute -top-1 -right-1 animate-pulse" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                  Habit Health Score
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Your wellness at a glance</p>
+              </div>
+            </div>
+            
+            {/* Score Display */}
+            <div className="flex items-center gap-6">
+              <div className={`relative p-6 rounded-2xl bg-gradient-to-br ${getScoreColor(healthMetrics.overallScore)} shadow-xl ${getGradeGlow(healthMetrics.grade)}`}>
+                <div className="text-center">
+                  <div className="text-4xl font-black text-white drop-shadow-lg">
+                    {healthMetrics.overallScore}
+                  </div>
+                  <div className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+                    Health Score
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Recommendations Section */}
-        {healthMetrics.recommendations.length > 0 && (
-          <div className="space-y-3">
-            <h4 className="font-semibold flex items-center gap-2">
-              <Award className="w-4 h-4 text-amber-500" />
-              Recommendations
-            </h4>
-            <div className="grid gap-2">
-              {healthMetrics.recommendations.map((rec, index) => (
-                <div key={index} className="flex items-center gap-2 text-sm bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg">
-                  <BarChart3 className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                  <span>{rec}</span>
+                
+                {/* Floating grade badge */}
+                <div className="absolute -top-3 -right-3 bg-white text-gray-900 text-xl font-black px-3 py-1 rounded-full shadow-lg border-2 border-gray-100">
+                  {healthMetrics.grade}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
-        )}
 
-        {/* Action Button */}
-        <div className="pt-4 border-t">
-          <Button 
-            className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-            onClick={() => {
-              // This could trigger a detailed breakdown or sync action
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-          >
-            <Heart className="w-5 h-5 mr-2" />
-            View Detailed Breakdown
-          </Button>
+          {/* Metrics Grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Consistency */}
+            <div className="group cursor-pointer">
+              <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-5 border border-white/30 hover:border-blue-300/50 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                <div className="flex items-center gap-3 mb-3">
+                  <Calendar className="w-6 h-6 text-blue-500" />
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">Consistency</span>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-2xl font-bold text-blue-600">{healthMetrics.consistency}%</div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-blue-500 to-cyan-400 h-2 rounded-full transition-all duration-700 ease-out shadow-sm" 
+                      style={{ width: `${healthMetrics.consistency}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">7-day rate</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Momentum */}
+            <div className="group cursor-pointer">
+              <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-5 border border-white/30 hover:border-orange-300/50 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                <div className="flex items-center gap-3 mb-3">
+                  <TrendingUp className="w-6 h-6 text-orange-500" />
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">Momentum</span>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-2xl font-bold text-orange-600">{healthMetrics.momentum}%</div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-orange-500 to-red-400 h-2 rounded-full transition-all duration-700 ease-out shadow-sm" 
+                      style={{ width: `${healthMetrics.momentum}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Streak power</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Balance */}
+            <div className="group cursor-pointer">
+              <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-5 border border-white/30 hover:border-purple-300/50 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                <div className="flex items-center gap-3 mb-3">
+                  <Target className="w-6 h-6 text-purple-500" />
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">Balance</span>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-2xl font-bold text-purple-600">{healthMetrics.balance}%</div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-purple-500 to-indigo-400 h-2 rounded-full transition-all duration-700 ease-out shadow-sm" 
+                      style={{ width: `${healthMetrics.balance}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Mind•Body•Soul</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Today's Energy */}
+            <div className="group cursor-pointer">
+              <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-5 border border-white/30 hover:border-green-300/50 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                <div className="flex items-center gap-3 mb-3">
+                  <Zap className="w-6 h-6 text-green-500" />
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">Today</span>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-2xl font-bold text-green-600">{healthMetrics.engagement}%</div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-green-500 to-emerald-400 h-2 rounded-full transition-all duration-700 ease-out shadow-sm" 
+                      style={{ width: `${healthMetrics.engagement}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Completion</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recommendations */}
+          {healthMetrics.recommendations.length > 0 && (
+            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 backdrop-blur-sm rounded-2xl p-6 border border-amber-200/50 dark:border-amber-800/50">
+              <div className="flex items-center gap-3 mb-4">
+                <Award className="w-6 h-6 text-amber-500" />
+                <h4 className="font-bold text-amber-800 dark:text-amber-300">Quick Wins</h4>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {healthMetrics.recommendations.map((rec, index) => (
+                  <Badge 
+                    key={index} 
+                    variant="secondary" 
+                    className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 border border-amber-300/50 px-3 py-1 text-sm font-medium hover:scale-105 transition-transform cursor-pointer"
+                  >
+                    {rec}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

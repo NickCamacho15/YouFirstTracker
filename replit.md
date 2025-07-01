@@ -123,6 +123,15 @@ Build scripts include:
 
 ## Changelog
 
+- July 1, 2025: Implemented One-Click Habit Health Score feature
+  - Created comprehensive health scoring system with weighted algorithms  
+  - Added glassmorphism design with animated gradients and floating elements
+  - Real-time calculation of Consistency, Momentum, Balance, and Engagement metrics
+  - Letter grade scoring (A+ to F) with color-coded visual feedback
+  - Smart recommendations based on performance patterns
+  - Removed AI insights section (pending AI integration)
+  - Beautiful visual design with backdrop blur effects and hover animations
+  - Positioned prominently at top of habits page for instant wellness assessment
 - June 30, 2025: Rebranded to .uoY with white theme, electric blue/gold accents, and 67-day habit tracking
   - Updated branding from "You. First." to ".uoY" to match logo aesthetic
   - Implemented clean white background with electric blue and gold accent colors
