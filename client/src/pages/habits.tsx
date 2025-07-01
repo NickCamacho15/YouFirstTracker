@@ -284,6 +284,109 @@ export default function HabitsPage() {
             </TabsList>
 
             <TabsContent value="formation" className="space-y-6">
+              {/* Scientific Habit Formation Overview */}
+              <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
+                      <BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">67-Day Formation Science</CardTitle>
+                      <p className="text-sm text-muted-foreground">Research-backed habit formation with bonus day for .uoY</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Stage 1: Initial Formation */}
+                    <div className="text-center">
+                      <div className="relative w-20 h-20 mx-auto mb-4">
+                        <svg className="w-20 h-20 transform -rotate-90">
+                          <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-blue-200 dark:text-blue-800" />
+                          <circle 
+                            cx="40" 
+                            cy="40" 
+                            r="32" 
+                            stroke="#3b82f6" 
+                            strokeWidth="6" 
+                            fill="none" 
+                            strokeDasharray={`${2 * Math.PI * 32}`}
+                            strokeDashoffset={`${2 * Math.PI * 32 * (1 - 0.3)}`}
+                            strokeLinecap="round"
+                            className="transition-all duration-700"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-lg font-bold text-blue-600">1-18</span>
+                        </div>
+                      </div>
+                      <h3 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">Initial Formation</h3>
+                      <p className="text-sm text-muted-foreground">Building awareness and momentum. Focus on consistency over perfection.</p>
+                    </div>
+
+                    {/* Stage 2: Strengthening */}
+                    <div className="text-center">
+                      <div className="relative w-20 h-20 mx-auto mb-4">
+                        <svg className="w-20 h-20 transform -rotate-90">
+                          <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-orange-200 dark:text-orange-800" />
+                          <circle 
+                            cx="40" 
+                            cy="40" 
+                            r="32" 
+                            stroke="#f59e0b" 
+                            strokeWidth="6" 
+                            fill="none" 
+                            strokeDasharray={`${2 * Math.PI * 32}`}
+                            strokeDashoffset={`${2 * Math.PI * 32 * (1 - 0.6)}`}
+                            strokeLinecap="round"
+                            className="transition-all duration-700"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-lg font-bold text-orange-600">19-45</span>
+                        </div>
+                      </div>
+                      <h3 className="font-semibold text-orange-700 dark:text-orange-300 mb-2">Strengthening</h3>
+                      <p className="text-sm text-muted-foreground">Neural pathway development. The habit becomes more automatic.</p>
+                    </div>
+
+                    {/* Stage 3: Automaticity */}
+                    <div className="text-center">
+                      <div className="relative w-20 h-20 mx-auto mb-4">
+                        <svg className="w-20 h-20 transform -rotate-90">
+                          <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-emerald-200 dark:text-emerald-800" />
+                          <circle 
+                            cx="40" 
+                            cy="40" 
+                            r="32" 
+                            stroke="#10b981" 
+                            strokeWidth="6" 
+                            fill="none" 
+                            strokeDasharray={`${2 * Math.PI * 32}`}
+                            strokeDashoffset={`${2 * Math.PI * 32 * (1 - 0.9)}`}
+                            strokeLinecap="round"
+                            className="transition-all duration-700"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-lg font-bold text-emerald-600">46-67</span>
+                        </div>
+                      </div>
+                      <h3 className="font-semibold text-emerald-700 dark:text-emerald-300 mb-2">Automaticity + .uoY</h3>
+                      <p className="text-sm text-muted-foreground">Habit becomes automatic. Day 67 is your bonus day for .uoY mastery!</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6 p-4 bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-lg">
+                    <p className="text-sm text-center text-gray-700 dark:text-gray-300">
+                      <strong>Science-backed approach:</strong> Based on research from University College London and behavioral psychology studies. 
+                      Each stage represents critical neural pathway development for lasting habit formation.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
               <div className="space-y-8">
                 {(habits as Habit[]).map((habit) => {
                   const colors = getCategoryColors(habit.category);
