@@ -11,6 +11,7 @@ import { HabitFormationTracker } from "@/components/habits/habit-formation-track
 import { FoundationsDashboard } from "@/components/habits/foundations-dashboard";
 import { EditHabitModal } from "@/components/habits/edit-habit-modal";
 import { HabitHealthScore } from "@/components/habits/habit-health-score";
+import { CompactDashboard } from "@/components/habits/compact-dashboard";
 
 interface Habit {
   id: number;
@@ -157,11 +158,112 @@ export default function HabitsPage() {
           </Button>
         </div>
 
-        {/* One-Click Habit Health Score */}
-        <HabitHealthScore habits={habits as Habit[]} />
+        {/* Compact Whoop-style Rings Dashboard */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          {/* Habits Ring */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90">
+                <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+                <circle 
+                  cx="40" 
+                  cy="40" 
+                  r="32" 
+                  stroke="#3b82f6" 
+                  strokeWidth="6" 
+                  fill="none" 
+                  strokeDasharray={`${2 * Math.PI * 32}`}
+                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - ((habits as Habit[]).filter(h => h.completedToday).length / Math.max((habits as Habit[]).length, 1)))}`}
+                  strokeLinecap="round"
+                  className="transition-all duration-700"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-bold text-blue-600">
+                  {Math.round(((habits as Habit[]).filter(h => h.completedToday).length / Math.max((habits as Habit[]).length, 1)) * 100)}%
+                </span>
+              </div>
+            </div>
+            <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">HABITS</div>
+          </div>
 
-        {/* Habit Formation Progress */}
-        <HabitFormationTracker habits={habits as Habit[]} />
+          {/* Foundations Ring */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90">
+                <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+                <circle 
+                  cx="40" 
+                  cy="40" 
+                  r="32" 
+                  stroke="#f59e0b" 
+                  strokeWidth="6" 
+                  fill="none" 
+                  strokeDasharray={`${2 * Math.PI * 32}`}
+                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - (Math.min(((habits as Habit[]).reduce((sum, h) => sum + h.streak, 0) / Math.max((habits as Habit[]).length, 1)) / 21, 1)))}`}
+                  strokeLinecap="round"
+                  className="transition-all duration-700"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-bold text-amber-600">
+                  {Math.round(Math.min(((habits as Habit[]).reduce((sum, h) => sum + h.streak, 0) / Math.max((habits as Habit[]).length, 1)) / 21, 1) * 100)}%
+                </span>
+              </div>
+            </div>
+            <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">FOUNDATIONS</div>
+          </div>
+
+          {/* Critical Tasks Ring */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90">
+                <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+                <circle 
+                  cx="40" 
+                  cy="40" 
+                  r="32" 
+                  stroke="#10b981" 
+                  strokeWidth="6" 
+                  fill="none" 
+                  strokeDasharray={`${2 * Math.PI * 32}`}
+                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - 0.75)}`}
+                  strokeLinecap="round"
+                  className="transition-all duration-700"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-bold text-emerald-600">75%</span>
+              </div>
+            </div>
+            <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">TASKS</div>
+          </div>
+
+          {/* Reading Ring */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90">
+                <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+                <circle 
+                  cx="40" 
+                  cy="40" 
+                  r="32" 
+                  stroke="#8b5cf6" 
+                  strokeWidth="6" 
+                  fill="none" 
+                  strokeDasharray={`${2 * Math.PI * 32}`}
+                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - 0.60)}`}
+                  strokeLinecap="round"
+                  className="transition-all duration-700"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-bold text-purple-600">60%</span>
+              </div>
+            </div>
+            <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">READING</div>
+          </div>
+        </div>
 
         {/* Tabs */}
         {isLoading ? (
