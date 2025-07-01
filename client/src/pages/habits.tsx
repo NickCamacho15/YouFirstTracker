@@ -190,7 +190,14 @@ export default function HabitsPage() {
               </TabsContent>
 
               <TabsContent value="simple" className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold mb-2">Foundational Habits</h2>
+                  <p className="text-muted-foreground max-w-2xl mx-auto">
+                    Track long-term consistency and streaks for your established lifestyle habits.
+                  </p>
+                </div>
+                
+                <div className="space-y-6">
                   {sortedHabits.map((habit) => {
                     const colors = getCategoryColor(habit.category);
                     const isLoading = toggleHabitMutation.isPending;
