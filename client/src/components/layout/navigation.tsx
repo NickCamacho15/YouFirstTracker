@@ -57,6 +57,17 @@ export function Navigation() {
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
         <div className="flex justify-around items-center h-16 px-4">
+          <Link href="/">
+            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
+              location === "/"
+                ? "text-accent bg-accent/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <Clipboard className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">You</span>
+            </div>
+          </Link>
+
           <Link href="/goals">
             <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
               isActive("/goals")
@@ -87,17 +98,6 @@ export function Navigation() {
             }`}>
               <BookOpen className="w-5 h-5 mb-1" />
               <span className="text-xs font-medium">Read</span>
-            </div>
-          </Link>
-
-          <Link href="/">
-            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
-              location === "/"
-                ? "text-accent bg-accent/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <Clipboard className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">You</span>
             </div>
           </Link>
 
