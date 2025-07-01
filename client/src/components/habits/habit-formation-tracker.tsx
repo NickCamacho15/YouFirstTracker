@@ -74,30 +74,41 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
   const stage2Stats = getStageCompletion(stage2Days);
   const stage3Stats = getStageCompletion(stage3Days);
 
-  const renderDaysGrid = (days: Date[], stageNumber: number) => (
-    <div className="grid grid-cols-12 gap-0.5">
-      {days.map((day, index) => {
-        const isCompleted = isCompletedOnDay(day);
-        const isToday = isSameDay(day, new Date());
-        
-        return (
-          <div
-            key={index}
-            className={`w-4 h-4 rounded-full flex items-center justify-center transition-all duration-200 ${
-              isCompleted 
-                ? `${colors.bg} shadow-sm` 
-                : `${colors.light} border border-gray-300 dark:border-gray-600`
-            } ${isToday ? 'ring-1 ring-blue-400' : ''}`}
-            title={`Day ${index + 1 + (stageNumber - 1) * 18}: ${format(day, 'MMM d')} - ${isCompleted ? 'Completed' : 'Not completed'}`}
-          >
-            {isCompleted && (
-              <div className="w-2 h-2 bg-white rounded-full" />
-            )}
+  const renderStageProgress = (days: Date[], stageNumber: number, stageStats: any) => {
+    const isCompleted = isCompletedOnDay(days[days.length - 1]);
+    const completedDays = days.filter(day => isCompletedOnDay(day)).length;
+    const progressPercent = (completedDays / days.length) * 100;
+    
+    return (
+      <div className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+        progressPercent === 100 
+          ? `${colors.bg} ${colors.text} border-current shadow-lg` 
+          : `bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600`
+      }`}>
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-lg font-bold">
+            {completedDays}/{days.length}
           </div>
-        );
-      })}
-    </div>
-  );
+          <div className="text-sm opacity-75">
+            {Math.round(progressPercent)}%
+          </div>
+        </div>
+        
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-3">
+          <div 
+            className={`h-2 rounded-full transition-all duration-500 ${
+              progressPercent > 0 ? colors.bg : 'bg-gray-300 dark:bg-gray-600'
+            }`}
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+        
+        <div className="text-xs opacity-75">
+          {progressPercent === 100 ? 'Stage Complete!' : `${days.length - completedDays} days remaining`}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <Card className="w-full">
@@ -115,85 +126,72 @@ export function HabitFormationTracker({ habit }: HabitFormationTrackerProps) {
           Track your habit through the three scientifically-backed stages of formation
         </p>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Stage 1: Initial Formation (Days 1-18) */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Stage 1: Initial Formation (Days 1-18) */}
+          <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-orange-500" />
-              <h4 className="font-semibold text-sm">Stage 1: Initial Formation</h4>
-              <Badge variant="outline" className="text-xs">
-                Days 1-18
-              </Badge>
+              <Zap className="w-5 h-5 text-orange-500" />
+              <div>
+                <h4 className="font-semibold text-sm">Stage 1: Initial Formation</h4>
+                <p className="text-xs text-muted-foreground">Days 1-18</p>
+              </div>
             </div>
-            <div className="text-sm text-muted-foreground">
-              {stage1Stats.completed}/{stage1Stats.total} days ({stage1Stats.percentage}%)
-            </div>
+            {renderStageProgress(stage1Days, 1, stage1Stats)}
+            <p className="text-xs text-muted-foreground">
+              Building awareness and initial momentum. Requires high motivation and conscious effort.
+            </p>
           </div>
-          {renderDaysGrid(stage1Days, 1)}
-          <p className="text-xs text-muted-foreground">
-            Building awareness and initial momentum. Requires high motivation and conscious effort.
-          </p>
-        </div>
 
-        {/* Stage 2: Strengthening (Days 19-45) */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          {/* Stage 2: Strengthening (Days 19-45) */}
+          <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Brain className="w-4 h-4 text-blue-500" />
-              <h4 className="font-semibold text-sm">Stage 2: Strengthening</h4>
-              <Badge variant="outline" className="text-xs">
-                Days 19-45
-              </Badge>
+              <Brain className="w-5 h-5 text-blue-500" />
+              <div>
+                <h4 className="font-semibold text-sm">Stage 2: Strengthening</h4>
+                <p className="text-xs text-muted-foreground">Days 19-45</p>
+              </div>
             </div>
-            <div className="text-sm text-muted-foreground">
-              {stage2Stats.completed}/{stage2Stats.total} days ({stage2Stats.percentage}%)
-            </div>
+            {renderStageProgress(stage2Days, 2, stage2Stats)}
+            <p className="text-xs text-muted-foreground">
+              Neural pathways strengthen. The habit becomes easier but still requires conscious choice.
+            </p>
           </div>
-          {renderDaysGrid(stage2Days, 2)}
-          <p className="text-xs text-muted-foreground">
-            Neural pathways strengthen. The habit becomes easier but still requires conscious choice.
-          </p>
-        </div>
 
-        {/* Stage 3: Automaticity (Days 46-67) */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          {/* Stage 3: Automaticity (Days 46-67) */}
+          <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-green-500" />
-              <h4 className="font-semibold text-sm">Stage 3: Automaticity + Bonus</h4>
-              <Badge variant="outline" className="text-xs">
-                Days 46-67
-              </Badge>
+              <Trophy className="w-5 h-5 text-green-500" />
+              <div>
+                <h4 className="font-semibold text-sm">Stage 3: Automaticity + Bonus</h4>
+                <p className="text-xs text-muted-foreground">Days 46-67</p>
+              </div>
             </div>
-            <div className="text-sm text-muted-foreground">
-              {stage3Stats.completed}/{stage3Stats.total} days ({stage3Stats.percentage}%)
-            </div>
+            {renderStageProgress(stage3Days, 3, stage3Stats)}
+            <p className="text-xs text-muted-foreground">
+              Automaticity achieved + your special .uoY bonus day for extra mastery.
+            </p>
           </div>
-          {renderDaysGrid(stage3Days, 3)}
-          <p className="text-xs text-muted-foreground">
-            Automaticity achieved + your special .uoY bonus day for extra mastery.
-          </p>
         </div>
 
         {/* Overall Progress */}
-        <div className="pt-4 border-t border-border">
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-semibold text-sm">Overall Formation Progress</span>
+        <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-lg">
+          <div className="flex items-center justify-between mb-3">
+            <span className="font-semibold">Overall Formation Progress</span>
             <span className="text-sm text-muted-foreground">
-              {stage1Stats.completed + stage2Stats.completed + stage3Stats.completed}/66 days
+              {stage1Stats.completed + stage2Stats.completed + stage3Stats.completed}/67 days
             </span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-white dark:bg-gray-600 rounded-full h-3 mb-3">
             <div
-              className={`${colors.bg} h-2 rounded-full transition-all duration-300`}
+              className={`${colors.bg} h-3 rounded-full transition-all duration-500 shadow-sm`}
               style={{
-                width: `${Math.round(((stage1Stats.completed + stage2Stats.completed + stage3Stats.completed) / 66) * 100)}%`
+                width: `${Math.round(((stage1Stats.completed + stage2Stats.completed + stage3Stats.completed) / 67) * 100)}%`
               }}
             />
           </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            Research shows it takes an average of 66 days to form a new habit automatically.
+          <p className="text-xs text-muted-foreground">
+            Science shows 66 days for habit formation + your special .uoY bonus day for mastery.
           </p>
         </div>
       </CardContent>
