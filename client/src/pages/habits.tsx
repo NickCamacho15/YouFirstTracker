@@ -419,90 +419,87 @@ export default function HabitsPage() {
                       {/* Header */}
                       <div className={`${colors.bg} p-6 text-white relative overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent"></div>
-                        <div className="relative z-10 flex items-center justify-between">
-                          <div>
-                            <h3 className="text-2xl font-bold mb-1">{habit.title}</h3>
-                            <p className="text-white/90">{habit.description || "Building consistency every day"}</p>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <div className="text-right">
-                              <div className="text-3xl font-black">{habit.streak}</div>
-                              <div className="text-sm text-white/80">day streak</div>
+                        <div className="relative z-10">
+                          {/* Title and Settings Row */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                              <h3 className="text-2xl font-bold mb-2">{habit.title}</h3>
+                              <p className="text-white/90">{habit.description || "Building consistency every day"}</p>
                             </div>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => handleEditHabit(habit)}
-                              className="h-10 w-10 p-0 text-white hover:bg-white/20"
+                              className="h-10 w-10 p-0 text-white hover:bg-white/20 flex-shrink-0 ml-4"
                             >
                               <Settings className="w-5 h-5" />
                             </Button>
+                          </div>
+                          
+                          {/* Streak Display - Centered */}
+                          <div className="text-center">
+                            <div className="text-4xl font-black mb-1">{habit.streak}</div>
+                            <div className="text-sm text-white/80">day streak</div>
                           </div>
                         </div>
                       </div>
 
                       {/* Habit Details */}
                       <div className="p-6">
-                        <div className="flex items-center justify-between mb-6">
-                          <div className="flex items-center gap-3">
-                            <Badge variant="outline" className={`${colors.text} border-current`}>
-                              {getTimeOfDayEmoji(habit.timeOfDay)} {getTimeOfDayLabel(habit.timeOfDay)}
-                            </Badge>
-                            <Badge variant="outline" className="text-gray-600">
-                              {habit.frequency}
-                            </Badge>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-sm text-gray-500">Current Streak</div>
-                            <div className="text-2xl font-bold text-gray-900 dark:text-white">{habit.streak} days</div>
-                          </div>
+                        {/* Badges Row */}
+                        <div className="flex items-center justify-center gap-3 mb-6">
+                          <Badge variant="outline" className={`${colors.text} border-current`}>
+                            {getTimeOfDayEmoji(habit.timeOfDay)} {getTimeOfDayLabel(habit.timeOfDay)}
+                          </Badge>
+                          <Badge variant="outline" className="text-gray-600">
+                            {habit.frequency}
+                          </Badge>
                         </div>
 
-                        {/* Progress Visualization with Compact YES Button */}
-                        <div className="space-y-4">
-                          {/* Progress Ring and Completion Button */}
-                          <div className="flex items-center gap-6">
-                            {/* Large Progress Ring */}
-                            <div className="relative flex-shrink-0">
-                              <div className="relative w-24 h-24">
-                                <svg className="w-24 h-24 transform -rotate-90">
-                                  <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+                        {/* Progress Visualization - Vertical Layout */}
+                        <div className="space-y-6">
+                          {/* Large Progress Ring - Centered */}
+                          <div className="flex justify-center">
+                            <div className="relative">
+                              <div className="relative w-32 h-32">
+                                <svg className="w-32 h-32 transform -rotate-90">
+                                  <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="8" fill="none" className="text-gray-200 dark:text-gray-700" />
                                   <circle 
-                                    cx="48" 
-                                    cy="48" 
-                                    r="40" 
+                                    cx="64" 
+                                    cy="64" 
+                                    r="56" 
                                     stroke={colors.bg.includes('indigo') ? '#6366f1' : colors.bg.includes('amber') ? '#f59e0b' : '#10b981'} 
-                                    strokeWidth="6" 
+                                    strokeWidth="8" 
                                     fill="none" 
-                                    strokeDasharray={`${2 * Math.PI * 40}`}
-                                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - (progressPercentage / 100))}`}
+                                    strokeDasharray={`${2 * Math.PI * 56}`}
+                                    strokeDashoffset={`${2 * Math.PI * 56 * (1 - (progressPercentage / 100))}`}
                                     strokeLinecap="round"
                                     className="transition-all duration-1000 drop-shadow-lg"
                                   />
                                 </svg>
                                 <div className="absolute inset-0 flex items-center justify-center">
                                   <div className="text-center">
-                                    <div className="text-lg font-black text-gray-900 dark:text-white">{habit.streak}</div>
-                                    <div className="text-xs text-gray-500">days</div>
+                                    <div className="text-2xl font-black text-gray-900 dark:text-white">{Math.round(progressPercentage)}%</div>
+                                    <div className="text-sm text-gray-500">complete</div>
                                   </div>
                                 </div>
                               </div>
                             </div>
+                          </div>
 
-                            {/* Progress Info and Button */}
-                            <div className="flex-grow">
-                              <div className="flex items-center justify-between mb-2">
-                                <div>
-                                  <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    {habit.streak}/67 Days
-                                  </div>
-                                  <div className="text-sm text-gray-500">
-                                    {habit.streak < 67 ? `${67 - habit.streak} days to mastery` : "Habit mastered!"}
-                                  </div>
-                                </div>
-                                
-                                {/* Compact YES Button */}
-                                <Button
+                          {/* Progress Info - Centered */}
+                          <div className="text-center">
+                            <div className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                              {habit.streak}/67 Days
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {habit.streak < 67 ? `${67 - habit.streak} days to mastery` : "Habit mastered!"}
+                            </div>
+                          </div>
+                          
+                          {/* Compact YES Button - Centered */}
+                          <div className="flex justify-center">
+                            <Button
                                   onClick={() => handleToggleHabit(habit.id)}
                                   disabled={toggleHabitMutation.isPending}
                                   size="lg"
@@ -523,20 +520,8 @@ export default function HabitsPage() {
                                     <span>YES</span>
                                   )}
                                 </Button>
-                              </div>
-                              
-                              {/* Linear Progress Bar */}
-                              <div className="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                <div 
-                                  className={`h-3 rounded-full transition-all duration-1000 ease-out ${colors.bg} shadow-sm relative`}
-                                  style={{ width: `${progressPercentage}%` }}
-                                >
-                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pulse"></div>
-                                </div>
-                              </div>
-                            </div>
                           </div>
-
+                          
                           {/* Formation Stage Indicator */}
                           <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
                             <div className="flex items-center justify-between">
