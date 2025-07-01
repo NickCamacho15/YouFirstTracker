@@ -139,6 +139,172 @@ export default function DashboardPage() {
           </p>
         </div>
 
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Link href="/goals">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
+              <CardContent className="p-4 text-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                  <Target className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-semibold text-gray-900">Goals</h3>
+                <p className="text-xs text-gray-500 mt-1">Future Folder</p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/habits">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
+              <CardContent className="p-4 text-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                  <Repeat className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-semibold text-gray-900">Habits</h3>
+                <p className="text-xs text-gray-500 mt-1">67-day formation</p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/read">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
+              <CardContent className="p-4 text-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                  <BookOpen className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-semibold text-gray-900">Read</h3>
+                <p className="text-xs text-gray-500 mt-1">Daily sessions</p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/community">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
+              <CardContent className="p-4 text-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                  <Star className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-semibold text-gray-900">Community</h3>
+                <p className="text-xs text-gray-500 mt-1">Share progress</p>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+
+        {/* Progress Circles Overview */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          {/* Habits Progress */}
+          <Card className="border-0 shadow-lg text-center">
+            <CardContent className="p-6">
+              <div className="relative w-20 h-20 mx-auto mb-4">
+                <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#f3f4f6"
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#10b981"
+                    strokeWidth="2"
+                    strokeDasharray={`${75}, 100`}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xl font-bold text-gray-900">75%</span>
+                </div>
+              </div>
+              <h3 className="font-semibold text-gray-900">Habits</h3>
+              <p className="text-xs text-gray-500">Daily completion</p>
+            </CardContent>
+          </Card>
+
+          {/* Tasks Progress */}
+          <Card className="border-0 shadow-lg text-center">
+            <CardContent className="p-6">
+              <div className="relative w-20 h-20 mx-auto mb-4">
+                <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#f3f4f6"
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#3b82f6"
+                    strokeWidth="2"
+                    strokeDasharray={`${40}, 100`}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xl font-bold text-gray-900">40%</span>
+                </div>
+              </div>
+              <h3 className="font-semibold text-gray-900">Tasks</h3>
+              <p className="text-xs text-gray-500">Today's progress</p>
+            </CardContent>
+          </Card>
+
+          {/* Goals Progress */}
+          <Card className="border-0 shadow-lg text-center">
+            <CardContent className="p-6">
+              <div className="relative w-20 h-20 mx-auto mb-4">
+                <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#f3f4f6"
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#8b5cf6"
+                    strokeWidth="2"
+                    strokeDasharray={`${65}, 100`}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xl font-bold text-gray-900">65%</span>
+                </div>
+              </div>
+              <h3 className="font-semibold text-gray-900">Goals</h3>
+              <p className="text-xs text-gray-500">Weekly targets</p>
+            </CardContent>
+          </Card>
+
+          {/* Reading Progress */}
+          <Card className="border-0 shadow-lg text-center">
+            <CardContent className="p-6">
+              <div className="relative w-20 h-20 mx-auto mb-4">
+                <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#f3f4f6"
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#f59e0b"
+                    strokeWidth="2"
+                    strokeDasharray={`${85}, 100`}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xl font-bold text-gray-900">85%</span>
+                </div>
+              </div>
+              <h3 className="font-semibold text-gray-900">Reading</h3>
+              <p className="text-xs text-gray-500">Monthly goal</p>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Daily Routine Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Morning Routine */}
