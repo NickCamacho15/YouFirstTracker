@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { NewGoalModal } from "@/components/goals/new-goal-modal";
@@ -43,6 +43,26 @@ export default function DashboardPage() {
     enabled: !!user,
   });
 
+  const { data: visionItems = [] } = useQuery({
+    queryKey: ["/api/vision-board"],
+    enabled: !!user,
+  });
+
+  // Rotating vision board background
+  const [currentVisionIndex, setCurrentVisionIndex] = useState(0);
+  
+  useEffect(() => {
+    if (visionItems.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentVisionIndex((prev) => (prev + 1) % visionItems.length);
+      }, 5000); // Change every 5 seconds
+      
+      return () => clearInterval(interval);
+    }
+  }, [visionItems.length]);
+
+  const currentVisionImage = visionItems.length > 0 ? visionItems[currentVisionIndex]?.imageUrl : null;
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Good morning";
@@ -70,16 +90,39 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-blue-950 dark:to-purple-950">
       {/* Vision Board Header */}
       <div className="relative h-64 bg-gradient-to-br from-blue-400 via-blue-500 to-purple-600 overflow-hidden">
-        {/* Nature Background Image Placeholder */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-400/90 via-indigo-500/90 to-purple-600/90"></div>
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-80"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40c20-10 40 0 60-10s40 0 60-10v70H0V40z' fill='%23ffffff' fill-opacity='0.1'/%3E%3Cpath d='M0 60c15-8 30 2 45-6s30 2 45-6v46H0V60z' fill='%23ffffff' fill-opacity='0.05'/%3E%3C/svg%3E")`
-          }}
-        ></div>
+        {/* Vision Board Background Image */}
+        {currentVisionImage ? (
+          <div 
+            className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
+            style={{
+              backgroundImage: `url(${currentVisionImage})`
+            }}
+          ></div>
+        ) : (
+          <div 
+            className="absolute inset-0 bg-cover bg-center opacity-80"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40c20-10 40 0 60-10s40 0 60-10v70H0V40z' fill='%23ffffff' fill-opacity='0.1'/%3E%3Cpath d='M0 60c15-8 30 2 45-6s30 2 45-6v46H0V60z' fill='%23ffffff' fill-opacity='0.05'/%3E%3C/svg%3E")`
+            }}
+          ></div>
+        )}
         
-
+        {/* Color Overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-400/60 via-indigo-500/60 to-purple-600/60"></div>
+        
+        {/* Vision Board Indicator */}
+        {visionItems.length > 1 && (
+          <div className="absolute top-4 right-4 flex space-x-2">
+            {visionItems.map((_, index) => (
+              <div
+                key={index}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentVisionIndex ? 'bg-white' : 'bg-white/50'
+                }`}
+              />
+            ))}
+          </div>
+        )}
         
         {/* Gradient Overlay at Bottom */}
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-slate-50 dark:from-slate-950 to-transparent"></div>

@@ -12,7 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Move } from "lucide-react";
+import { Plus, Trash2, Move, Upload, Camera } from "lucide-react";
 
 interface VisionBoardItem {
   id: number;
@@ -23,8 +23,9 @@ interface VisionBoardItem {
 }
 
 const visionItemSchema = z.object({
-  imageUrl: z.string().url("Please enter a valid image URL"),
+  imageUrl: z.string().optional(),
   caption: z.string().optional(),
+  imageFile: z.any().optional(),
 });
 
 type VisionItemFormData = z.infer<typeof visionItemSchema>;
@@ -44,6 +45,17 @@ export default function VisionPage() {
       caption: "",
     },
   });
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+
+  // Quick add function for the uploaded tropical image
+  const addTropicalImage = () => {
+    createVisionItemMutation.mutate({
+      imageUrl: tropicalImage,
+      caption: "Tropical Paradise - My Dream Destination"
+    });
+  };
 
   const createVisionItemMutation = useMutation({
     mutationFn: async (data: VisionItemFormData) => {
