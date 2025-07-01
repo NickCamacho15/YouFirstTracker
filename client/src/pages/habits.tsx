@@ -237,43 +237,69 @@ export default function HabitsPage() {
                             </div>
                           </div>
 
-                          {/* Completion button and stats */}
-                          <div className="space-y-3">
+                          {/* Large Prominent Completion Button */}
+                          <div className="space-y-4">
                             <Button
-                              variant="ghost"
                               onClick={() => handleToggleHabit(habit.id)}
                               disabled={toggleHabitMutation.isPending}
-                              className={`w-full h-12 rounded-lg border-2 transition-all duration-300 hover:scale-105 ${
+                              className={`w-full h-16 rounded-2xl text-lg font-bold border-3 transition-all duration-300 hover:scale-105 transform-gpu shadow-lg hover:shadow-2xl ${
                                 habit.completedToday
-                                  ? `${colors.bg} border-green-500 text-white hover:opacity-90 shadow-lg`
-                                  : `bg-white border-gray-300 hover:border-blue-400 hover:bg-blue-50`
+                                  ? `${colors.bg} border-green-400 text-white hover:opacity-90 shadow-green-500/25 pulse-success`
+                                  : `bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-gray-300 hover:border-blue-400 hover:from-blue-50 hover:to-blue-100 dark:hover:from-blue-900 dark:hover:to-blue-800 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 shadow-xl`
                               }`}
                             >
-                              <div className="flex items-center justify-center gap-2">
+                              <div className="flex items-center justify-center gap-3">
                                 {habit.completedToday ? (
                                   <>
-                                    <CheckCircle2 className="w-5 h-5 drop-shadow-lg" />
-                                    <span className="font-medium">Completed!</span>
+                                    <CheckCircle2 className="w-7 h-7 drop-shadow-lg animate-bounce" />
+                                    <span className="font-bold text-xl">Completed!</span>
+                                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                                   </>
                                 ) : (
                                   <>
-                                    <Circle className="w-5 h-5 text-gray-400" />
-                                    <span className="font-medium">Mark Complete</span>
+                                    <div className="relative">
+                                      <Circle className="w-7 h-7 text-gray-400" />
+                                      <div className="absolute inset-0 w-7 h-7 border-2 border-blue-400 rounded-full opacity-0 hover:opacity-100 transition-opacity animate-pulse"></div>
+                                    </div>
+                                    <span className="font-bold text-xl">Mark Complete</span>
+                                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-ping opacity-75"></div>
                                   </>
                                 )}
                               </div>
                             </Button>
 
+                            {/* Enhanced Progress Bar for Individual Habit */}
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between text-sm font-medium">
+                                <span className="text-foreground">Progress to Formation</span>
+                                <span className="text-muted-foreground">{habit.streak}/67 days</span>
+                              </div>
+                              <div className="relative w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden shadow-inner">
+                                <div 
+                                  className={`h-4 rounded-full transition-all duration-700 ease-out shadow-lg relative ${colors.bg}`}
+                                  style={{ width: `${progressPercentage}%` }}
+                                >
+                                  {/* Shimmer effect */}
+                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                                </div>
+                              </div>
+                              <div className="text-center">
+                                <span className="text-sm font-medium text-muted-foreground">
+                                  {habit.streak < 67 ? `${67 - habit.streak} days to go` : "🎉 Habit mastered - Bonus day for .uoY!"}
+                                </span>
+                              </div>
+                            </div>
+
                             {/* Streak info */}
-                            <div className="flex items-center justify-center gap-4 text-sm">
-                              <div className="flex items-center gap-1 text-amber-600">
-                                <Flame className="w-4 h-4" />
-                                <span className="font-medium">{habit.streak} day streak</span>
+                            <div className="flex items-center justify-center gap-6 text-sm bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 p-3 rounded-xl">
+                              <div className="flex items-center gap-2 text-amber-600">
+                                <Flame className="w-5 h-5" />
+                                <span className="font-bold text-base">{habit.streak} day streak</span>
                               </div>
                               {habit.completedToday && (
-                                <div className="flex items-center gap-1 text-emerald-600">
-                                  <Star className="w-4 h-4" />
-                                  <span className="font-medium">Today!</span>
+                                <div className="flex items-center gap-2 text-emerald-600">
+                                  <Star className="w-5 h-5 animate-pulse" />
+                                  <span className="font-bold text-base">Today!</span>
                                 </div>
                               )}
                             </div>

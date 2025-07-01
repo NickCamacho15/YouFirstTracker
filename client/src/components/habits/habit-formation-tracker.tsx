@@ -161,94 +161,99 @@ export function HabitFormationTracker({ habits }: HabitFormationTrackerProps) {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Brain className="w-5 h-5 text-purple-600" />
-            {habit.title} - Formation Journey
-          </CardTitle>
-          <Badge variant="secondary" className="text-xs">
-            Current Streak: {habit.streak} days
+    <Card className="w-full mb-6">
+      <CardContent className="p-6">
+        {/* Compact Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Brain className="w-6 h-6 text-purple-600" />
+            <div>
+              <h3 className="text-lg font-bold">{habit.title} - Formation Journey</h3>
+              <p className="text-sm text-muted-foreground">67-day scientifically-backed formation</p>
+            </div>
+          </div>
+          <Badge variant="secondary" className="px-3 py-1">
+            Streak: {habit.streak} days
           </Badge>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Track your habit through the three scientifically-backed stages of formation
-        </p>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Stage 1: Initial Formation (Days 1-18) */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-orange-500" />
-              <div>
-                <h4 className="font-semibold text-sm">Stage 1: Initial Formation</h4>
-                <p className="text-xs text-muted-foreground">Days 1-18</p>
-              </div>
+
+        {/* Compact Horizontal Stage Layout */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          {/* Stage 1 */}
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Zap className="w-4 h-4 text-orange-500" />
+              <span className="text-sm font-semibold">Stage 1</span>
             </div>
-            {renderStageProgress(stage1Days, 1, stage1Stats)}
-            <p className="text-xs text-muted-foreground">
-              Building awareness and initial momentum. Requires high motivation and conscious effort.
-            </p>
+            <div className="text-xs text-muted-foreground mb-2">Days 1-18</div>
+            <div className="text-2xl font-bold text-orange-600">{stage1Stats.completed}/18</div>
+            <div className="w-full bg-orange-100 dark:bg-orange-900/20 rounded-full h-2 mt-2">
+              <div 
+                className="bg-gradient-to-r from-orange-500 to-red-400 h-2 rounded-full transition-all duration-500" 
+                style={{ width: `${stage1Stats.percentage}%` }}
+              />
+            </div>
           </div>
 
-          {/* Stage 2: Strengthening (Days 19-45) */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Brain className="w-5 h-5 text-blue-500" />
-              <div>
-                <h4 className="font-semibold text-sm">Stage 2: Strengthening</h4>
-                <p className="text-xs text-muted-foreground">Days 19-45</p>
-              </div>
+          {/* Stage 2 */}
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Brain className="w-4 h-4 text-blue-500" />
+              <span className="text-sm font-semibold">Stage 2</span>
             </div>
-            {renderStageProgress(stage2Days, 2, stage2Stats)}
-            <p className="text-xs text-muted-foreground">
-              Neural pathways strengthen. The habit becomes easier but still requires conscious choice.
-            </p>
+            <div className="text-xs text-muted-foreground mb-2">Days 19-45</div>
+            <div className="text-2xl font-bold text-blue-600">{stage2Stats.completed}/27</div>
+            <div className="w-full bg-blue-100 dark:bg-blue-900/20 rounded-full h-2 mt-2">
+              <div 
+                className="bg-gradient-to-r from-blue-500 to-cyan-400 h-2 rounded-full transition-all duration-500" 
+                style={{ width: `${stage2Stats.percentage}%` }}
+              />
+            </div>
           </div>
 
-          {/* Stage 3: Automaticity (Days 46-67) */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-green-500" />
-              <div>
-                <h4 className="font-semibold text-sm">Stage 3: Automaticity + Bonus</h4>
-                <p className="text-xs text-muted-foreground">Days 46-67</p>
-              </div>
+          {/* Stage 3 */}
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Trophy className="w-4 h-4 text-green-500" />
+              <span className="text-sm font-semibold">Stage 3</span>
             </div>
-            {renderStageProgress(stage3Days, 3, stage3Stats)}
-            <p className="text-xs text-muted-foreground">
-              Automaticity achieved + your special .uoY bonus day for extra mastery.
-            </p>
+            <div className="text-xs text-muted-foreground mb-2">Days 46-67</div>
+            <div className="text-2xl font-bold text-green-600">{stage3Stats.completed}/22</div>
+            <div className="w-full bg-green-100 dark:bg-green-900/20 rounded-full h-2 mt-2">
+              <div 
+                className="bg-gradient-to-r from-green-500 to-emerald-400 h-2 rounded-full transition-all duration-500" 
+                style={{ width: `${stage3Stats.percentage}%` }}
+              />
+            </div>
           </div>
         </div>
 
-        {/* Overall Progress */}
-        <div className="relative mt-8 p-6 bg-gradient-to-br from-violet-400/15 via-purple-300/10 to-fuchsia-400/15 rounded-2xl border border-violet-200 dark:border-violet-700/50 overflow-hidden">
-          {/* Glowing background effect */}
-          <div className="absolute inset-0 bg-gradient-to-br from-violet-400/20 via-purple-300/15 to-fuchsia-400/20 opacity-60 blur-lg" />
+        {/* Large Overall Progress Bar */}
+        <div className="relative p-6 bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-fuchsia-950/30 rounded-2xl border border-violet-200 dark:border-violet-700/50">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-lg font-bold text-gray-800 dark:text-gray-200">Overall Formation Progress</span>
+            <span className="text-lg font-bold text-purple-600">
+              {stage1Stats.completed + stage2Stats.completed + stage3Stats.completed}/67 days
+            </span>
+          </div>
           
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <span className="font-bold text-lg">Overall Formation Progress</span>
-              <span className="text-sm font-medium px-3 py-1 bg-white/50 dark:bg-gray-800/50 rounded-full">
-                {stage1Stats.completed + stage2Stats.completed + stage3Stats.completed}/67 days
-              </span>
+          {/* Large Visual Progress Bar */}
+          <div className="relative w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 mb-3 overflow-hidden shadow-inner">
+            <div
+              className={`${colors.bg} h-6 rounded-full transition-all duration-1000 ease-out shadow-lg relative`}
+              style={{
+                width: `${Math.round(((stage1Stats.completed + stage2Stats.completed + stage3Stats.completed) / 67) * 100)}%`
+              }}
+            >
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
             </div>
-            
-            <div className="w-full bg-white/60 dark:bg-gray-800/60 rounded-full h-4 mb-4 overflow-hidden shadow-inner">
-              <div
-                className={`${colors.bg} h-4 rounded-full transition-all duration-1000 ease-out shadow-lg`}
-                style={{
-                  width: `${Math.round(((stage1Stats.completed + stage2Stats.completed + stage3Stats.completed) / 67) * 100)}%`
-                }}
-              />
-            </div>
-            
-            <p className="text-sm text-center font-medium opacity-90">
-              Foundational habit consistency tracking - maintain your lifestyle habit ✨
-            </p>
+          </div>
+          
+          <div className="text-center">
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {habit.streak < 67 ? `${67 - habit.streak} days until habit mastery` : "🎉 Habit mastered - Bonus day for .uoY!"}
+            </span>
           </div>
         </div>
       </CardContent>
