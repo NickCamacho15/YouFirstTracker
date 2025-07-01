@@ -93,14 +93,7 @@ export default function DashboardPage() {
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-slate-50 dark:from-slate-950 to-transparent"></div>
       </div>
 
-      {/* Habit Story Bar */}
-      <div className="relative -mt-8 z-20">
-        <HabitStoryBar 
-          habits={habits}
-          onUpdate={refetchHabits}
-          onAddHabit={() => setShowNewHabitModal(true)}
-        />
-      </div>
+
       
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
         {/* Hero Welcome Section */}
