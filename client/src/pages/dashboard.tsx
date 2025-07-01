@@ -431,99 +431,29 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Central Performance Calendar */}
-        <Card className="border-0 shadow-lg mb-8">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-400 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold">📊</span>
-              </div>
-              Daily Performance Calendar
+        {/* Today's Tasks Section */}
+        <Card className="border-0 shadow-lg mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-gray-600" />
+              Today's Tasks
             </CardTitle>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Track your daily scores and identify patterns in your performance
-            </p>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-7 gap-2 mb-4">
-              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
-                  {day}
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7 gap-2">
-              {Array.from({ length: 35 }, (_, i) => {
-                const dayNumber = i + 1;
-                const score = Math.floor(Math.random() * 100) + 1; // Mock scores - replace with real data
-                const isToday = dayNumber === 15; // Mock today
-                const scoreColor = 
-                  score >= 90 ? 'bg-green-500' :
-                  score >= 80 ? 'bg-green-400' :
-                  score >= 70 ? 'bg-yellow-400' :
-                  score >= 60 ? 'bg-orange-400' :
-                  'bg-red-400';
-                
-                return (
-                  <div
-                    key={i}
-                    className={`
-                      aspect-square rounded-lg flex flex-col items-center justify-center text-xs font-medium cursor-pointer transition-all duration-200 hover:scale-105
-                      ${isToday ? 'ring-2 ring-blue-500' : ''}
-                      ${scoreColor} text-white shadow-sm
-                    `}
-                    title={`Day ${dayNumber}: ${score}% performance`}
-                  >
-                    <span className="text-[10px] opacity-80">{dayNumber > 30 ? dayNumber - 30 : dayNumber}</span>
-                    <span className="font-bold">{score}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-green-500 rounded"></div>
-                  <span>90-100%</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-yellow-400 rounded"></div>
-                  <span>70-89%</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-red-400 rounded"></div>
-                  <span>Below 70%</span>
-                </div>
-              </div>
-              <span>Today: 85% (Good day!)</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Main Sections Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Daily Tasks Section */}
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-gray-600" />
-                Today's Tasks
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {tasks.map(task => (
-                  <div 
-                    key={task.id}
-                    className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                  >
-                    <input 
-                      type="checkbox" 
-                      checked={task.completed}
-                      onChange={() => handleTaskToggle(task.id)}
-                      className="w-4 h-4 text-green-600 rounded cursor-pointer"
-                    />
-                    <span className={`flex-1 transition-all duration-300 ${
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              {tasks.map(task => (
+                <div 
+                  key={task.id}
+                  className="flex items-center gap-2 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors border border-gray-200 dark:border-gray-700"
+                >
+                  <input 
+                    type="checkbox" 
+                    checked={task.completed}
+                    onChange={() => handleTaskToggle(task.id)}
+                    className="w-4 h-4 text-green-600 rounded cursor-pointer"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <span className={`text-sm block transition-all duration-300 ${
                       task.completed 
                         ? 'line-through text-gray-500 opacity-60' 
                         : 'text-gray-900 dark:text-gray-100'
@@ -531,7 +461,7 @@ export default function DashboardPage() {
                       {task.text}
                     </span>
                     {task.time && (
-                      <span className={`text-xs px-2 py-1 rounded transition-opacity ${
+                      <span className={`text-xs px-2 py-1 rounded mt-1 inline-block transition-opacity ${
                         task.completed 
                           ? 'opacity-40'
                           : task.time.includes('Due') 
@@ -542,41 +472,131 @@ export default function DashboardPage() {
                       </span>
                     )}
                   </div>
-                ))}
+                </div>
+              ))}
+              
+              <div className="flex items-center justify-center p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800 text-xs">
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add task
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Compact Performance Calendar */}
+        <Card className="border-0 shadow-lg mb-8">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <div className="w-6 h-6 bg-gradient-to-r from-green-400 to-blue-400 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm">📊</span>
+              </div>
+              Daily Performance Calendar
+            </CardTitle>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Track your daily scores and identify patterns
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-7 gap-1 mb-2">
+              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+                <div key={`day-${index}`} className="text-center text-xs font-medium text-gray-500 py-1">
+                  {day}
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-7 gap-1">
+              {Array.from({ length: 28 }, (_, i) => {
+                const dayNumber = i + 1;
+                const score = Math.floor(Math.random() * 100) + 1;
+                const isToday = dayNumber === 15;
+                const gradientClass = 
+                  score >= 90 ? 'bg-gradient-to-br from-green-400 to-green-600' :
+                  score >= 80 ? 'bg-gradient-to-br from-green-300 to-green-500' :
+                  score >= 70 ? 'bg-gradient-to-br from-yellow-300 to-yellow-500' :
+                  score >= 60 ? 'bg-gradient-to-br from-orange-300 to-orange-500' :
+                  'bg-gradient-to-br from-red-300 to-red-500';
                 
-                <div className="pt-4 border-t space-y-3">
-                  {/* Goal Progress Tracker */}
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                    <div className="font-medium mb-2">Progress toward Goals:</div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs">Goal 1 (Work Project)</span>
-                        <span className="text-xs font-medium">{completedTasksForGoal1}/{tasksForGoal1.length} tasks</span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div 
-                          className="bg-blue-500 h-2 rounded-full transition-all duration-500"
-                          style={{ width: `${goal1Progress}%` }}
-                        />
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs">Goal 2 (Team Leadership)</span>
-                        <span className="text-xs font-medium">{completedTasksForGoal2}/{tasksForGoal2.length} tasks</span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div 
-                          className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
-                          style={{ width: `${goal2Progress}%` }}
-                        />
-                      </div>
+                return (
+                  <div
+                    key={`score-${i}`}
+                    className={`
+                      aspect-square rounded-md flex items-center justify-center text-white font-bold cursor-pointer transition-all duration-200 hover:scale-110 shadow-sm
+                      ${isToday ? 'ring-2 ring-blue-500 ring-offset-1' : ''}
+                      ${gradientClass}
+                    `}
+                    title={`Day ${dayNumber}: ${score}% performance`}
+                  >
+                    <span className="text-sm">{score}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-green-600 rounded"></div>
+                  <span>90+</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-gradient-to-r from-yellow-300 to-yellow-500 rounded"></div>
+                  <span>70+</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-gradient-to-r from-red-300 to-red-500 rounded"></div>
+                  <span>&lt;70</span>
+                </div>
+              </div>
+              <span>Today: 85%</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Main Sections Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          {/* Goal Progress Tracker */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl flex items-center gap-2">
+                <Target className="w-5 h-5 text-blue-600" />
+                Goal Progress
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="font-medium mb-3">Progress toward Goals:</div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Goal 1 (Work Project)</span>
+                      <span className="text-sm font-medium">{completedTasksForGoal1}/{tasksForGoal1.length} tasks</span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                      <div 
+                        className="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full transition-all duration-500"
+                        style={{ width: `${goal1Progress}%` }}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Goal 2 (Team Leadership)</span>
+                      <span className="text-sm font-medium">{completedTasksForGoal2}/{tasksForGoal2.length} tasks</span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                      <div 
+                        className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-3 rounded-full transition-all duration-500"
+                        style={{ width: `${goal2Progress}%` }}
+                      />
                     </div>
                   </div>
-                  
-                  <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800 w-full">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add task
-                  </Button>
+                </div>
+                
+                <div className="pt-3 border-t">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-gray-900 dark:text-white">{completedTasksCount}</div>
+                    <div className="text-sm text-gray-500">Tasks completed today</div>
+                  </div>
                 </div>
               </div>
             </CardContent>
