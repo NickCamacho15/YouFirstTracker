@@ -85,7 +85,7 @@ export default function DashboardPage() {
             {getGreeting()}, {user?.displayName}
           </h1>
           <p className="text-xl text-center text-white/90 drop-shadow-md">
-            Welcome to .<span className="text-yellow-300 font-semibold">uoY</span> - Your personal command center for growth and achievement
+            Your personal command center for growth and achievement
           </p>
         </div>
         

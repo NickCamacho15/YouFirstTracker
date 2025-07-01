@@ -123,15 +123,16 @@ Build scripts include:
 
 ## Changelog
 
-- June 30, 2025: Rebranded to .uoY with sleek dark theme and vertical habit cards
+- June 30, 2025: Rebranded to .uoY with white theme, electric blue/gold accents, and 67-day habit tracking
   - Updated branding from "You. First." to ".uoY" to match logo aesthetic
-  - Implemented dark theme inspired by .uoY logo with black background and white text
+  - Implemented clean white background with electric blue and gold accent colors
   - Redesigned habit cards to be vertical and stacked in a responsive grid
-  - Added visual progress bars showing habit formation progress (0-66 days)
-  - Enhanced completion buttons with better visual feedback and animations
+  - Updated habit formation tracking from 66 to 67 days with "Bonus day for .uoY" celebration
+  - Enhanced completion buttons with electric blue hover states and better visual feedback
   - Added edit functionality with settings button on each habit card
-  - Improved habit toggle API calls and error handling
-  - Updated navigation and dashboard headers to reflect .uoY branding
+  - Fixed habit toggle API calls with proper parameter ordering
+  - Updated both Daily Tracker and Formation Science views to use 67-day cycle
+  - Color-coded categories: Mind (electric blue), Body (gold/amber), Soul (indigo)
 - June 30, 2025: Enhanced visual design and scientific habit tracking
   - Added beautiful Calm-inspired hero header with nature imagery and gradients
   - Enhanced habit story bar with larger, more prominent colorful bubbles

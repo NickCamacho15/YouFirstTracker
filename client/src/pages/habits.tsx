@@ -240,7 +240,7 @@ export default function HabitsPage() {
                               />
                             </div>
                             <div className="text-xs text-muted-foreground text-center">
-                              {habit.streak < 67 ? `${67 - habit.streak} days to go` : "Habit mastered - Bonus day for .uoY! 🎉"}
+                              {habit.streak < 67 ? `${67 - habit.streak} days to go` : "Habit mastered - Bonus day for You! 🎉"}
                             </div>
                           </div>
 
