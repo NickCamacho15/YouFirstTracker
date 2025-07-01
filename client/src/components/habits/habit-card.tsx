@@ -145,10 +145,10 @@ export function HabitCard({ habit, onUpdate, onClick }: HabitCardProps) {
           <div className="flex items-center space-x-4 flex-1">
             <Button
               size="lg"
-              className={`w-14 h-14 rounded-xl relative shadow-sm ${
+              className={`w-16 h-16 rounded-full relative transition-all duration-300 transform active:scale-95 ${
                 habit.completedToday
-                  ? "bg-green-100 hover:bg-green-200 text-green-600 border-2 border-green-300"
-                  : "bg-white hover:bg-gray-50 text-gray-600 border-2 border-gray-200"
+                  ? "bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white shadow-lg hover:shadow-xl border-0"
+                  : "bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg hover:shadow-xl border-0 hover:scale-105"
               }`}
               variant="ghost"
               onClick={(e) => {
@@ -158,14 +158,25 @@ export function HabitCard({ habit, onUpdate, onClick }: HabitCardProps) {
               disabled={toggleHabitMutation.isPending}
             >
               {habit.completedToday ? (
-                <Check className="w-6 h-6" />
+                <div className="flex flex-col items-center">
+                  <Check className="w-7 h-7" />
+                  <span className="text-xs font-bold">DONE</span>
+                </div>
               ) : (
-                <div className="w-6 h-6 border-2 border-current rounded" />
+                <div className="flex flex-col items-center">
+                  <div className="w-7 h-7 border-3 border-white rounded-full flex items-center justify-center">
+                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                  </div>
+                  <span className="text-xs font-bold">TAP</span>
+                </div>
               )}
               {stats.currentStreak >= 7 && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
-                  <Flame className="w-3 h-3 text-white" />
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                  <Flame className="w-4 h-4 text-white" />
                 </div>
+              )}
+              {habit.completedToday && (
+                <div className="absolute inset-0 rounded-full bg-green-400 opacity-0 animate-ping"></div>
               )}
             </Button>
             <div>
