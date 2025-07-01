@@ -132,13 +132,122 @@ export default function DashboardPage() {
       
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
         {/* Hero Welcome Section */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 bg-clip-text text-transparent mb-4">
             {getGreeting()}, {user?.displayName}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Your personal command center for growth, focus, and achievement
           </p>
+        </div>
+
+        {/* Compact Whoop-style Rings Dashboard */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          {/* Habits Ring */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90">
+                <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+                <circle 
+                  cx="40" 
+                  cy="40" 
+                  r="32" 
+                  stroke="#3b82f6" 
+                  strokeWidth="6" 
+                  fill="none" 
+                  strokeDasharray={`${2 * Math.PI * 32}`}
+                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - (habitProgress / 100))}`}
+                  strokeLinecap="round"
+                  className="transition-all duration-700"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-bold text-blue-600">
+                  {Math.round(habitProgress)}%
+                </span>
+              </div>
+            </div>
+            <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">HABITS</div>
+          </div>
+
+          {/* Foundations Ring */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90">
+                <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+                <circle 
+                  cx="40" 
+                  cy="40" 
+                  r="32" 
+                  stroke="#f59e0b" 
+                  strokeWidth="6" 
+                  fill="none" 
+                  strokeDasharray={`${2 * Math.PI * 32}`}
+                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - (Math.min(((habits?.reduce((sum: number, h: any) => sum + h.streak, 0) || 0) / Math.max((habits?.length || 0), 1)) / 21, 1)))}`}
+                  strokeLinecap="round"
+                  className="transition-all duration-700"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-bold text-amber-600">
+                  {Math.round(Math.min(((habits?.reduce((sum: number, h: any) => sum + h.streak, 0) || 0) / Math.max((habits?.length || 0), 1)) / 21, 1) * 100)}%
+                </span>
+              </div>
+            </div>
+            <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">FOUNDATIONS</div>
+          </div>
+
+          {/* Goals Ring */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90">
+                <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+                <circle 
+                  cx="40" 
+                  cy="40" 
+                  r="32" 
+                  stroke="#10b981" 
+                  strokeWidth="6" 
+                  fill="none" 
+                  strokeDasharray={`${2 * Math.PI * 32}`}
+                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - (goalProgress / 100))}`}
+                  strokeLinecap="round"
+                  className="transition-all duration-700"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-bold text-emerald-600">{Math.round(goalProgress)}%</span>
+              </div>
+            </div>
+            <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">GOALS</div>
+          </div>
+
+          {/* Reading Ring */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90">
+                <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-gray-200 dark:text-gray-700" />
+                <circle 
+                  cx="40" 
+                  cy="40" 
+                  r="32" 
+                  stroke="#8b5cf6" 
+                  strokeWidth="6" 
+                  fill="none" 
+                  strokeDasharray={`${2 * Math.PI * 32}`}
+                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - (Math.min(totalReadingMinutes / 60, 1)))}`}
+                  strokeLinecap="round"
+                  className="transition-all duration-700"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-bold text-purple-600">
+                  {Math.round(Math.min(totalReadingMinutes / 60, 1) * 100)}%
+                </span>
+              </div>
+            </div>
+            <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">READING</div>
+          </div>
         </div>
 
         {/* Quick Stats Cards */}
