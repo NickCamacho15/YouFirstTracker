@@ -79,15 +79,7 @@ export default function DashboardPage() {
           }}
         ></div>
         
-        {/* Header Content */}
-        <div className="relative z-10 flex flex-col justify-center items-center h-full text-white px-6">
-          <h1 className="text-4xl font-bold text-center mb-2 drop-shadow-lg">
-            {getGreeting()}, {user?.displayName}
-          </h1>
-          <p className="text-xl text-center text-white/90 drop-shadow-md">
-            Your personal command center for growth and achievement
-          </p>
-        </div>
+
         
         {/* Gradient Overlay at Bottom */}
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-slate-50 dark:from-slate-950 to-transparent"></div>
