@@ -80,6 +80,7 @@ const getTimeOfDayLabel = (timeOfDay?: string) => {
 export default function HabitsPage() {
   const [editHabitModalOpen, setEditHabitModalOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [showFormationInfo, setShowFormationInfo] = useState(true);
   const [rules, setRules] = useState([
     { id: 1, text: "No social media before 10 AM", violated: false, streak: 12, category: "Digital Wellness" },
     { id: 2, text: "No processed food on weekdays", violated: false, streak: 8, category: "Nutrition" },
@@ -207,6 +208,36 @@ export default function HabitsPage() {
             </TabsList>
 
             <TabsContent value="formation" className="space-y-6">
+              {/* Dismissible 67-Day Formation Info */}
+              {showFormationInfo && (
+                <Card className="border-0 shadow-lg bg-blue-50 dark:bg-gray-700 border border-blue-200 dark:border-gray-600">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                          <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-blue-900 dark:text-blue-100">67-Day Formation Science</h3>
+                          <p className="text-sm text-blue-700 dark:text-blue-300">
+                            Research shows it takes 66 days on average to form a habit. We give you an extra day for .uoY excellence. 
+                            Track your progress through three key stages: Initial Formation (1-18), Strengthening (19-45), and Automaticity (46-67).
+                          </p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setShowFormationInfo(false)}
+                        className="text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Scientific Habit Formation Overview */}
               <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50">
                 <CardHeader className="pb-4">
@@ -393,12 +424,12 @@ export default function HabitsPage() {
 
             <TabsContent value="rules" className="space-y-6">
               {/* Rules Commitment Dashboard */}
-              <Card className="border-0 shadow-lg bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/50 dark:to-orange-950/50">
+              <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
-                        <Shield className="w-5 h-5 text-red-600 dark:text-red-400" />
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                        <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div>
                         <CardTitle className="text-xl">Rules of Negation</CardTitle>
@@ -406,15 +437,15 @@ export default function HabitsPage() {
                       </div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-red-600">{rules.filter(r => !r.violated).length}</div>
-                      <div className="text-xs text-red-600">Active Rules</div>
+                      <div className="text-2xl font-bold text-blue-600">{rules.filter(r => !r.violated).length}</div>
+                      <div className="text-xs text-blue-600">Active Rules</div>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   {/* Commitment Gamification Dashboard */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 p-4 rounded-lg">
+                    <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-4 rounded-lg shadow-sm">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-2xl">🎯</span>
                         <span className="text-sm font-medium">Commitment Score</span>
@@ -425,7 +456,7 @@ export default function HabitsPage() {
                       <div className="text-xs text-muted-foreground">Overall integrity</div>
                     </div>
                     
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 p-4 rounded-lg">
+                    <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-4 rounded-lg shadow-sm">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-2xl">🔥</span>
                         <span className="text-sm font-medium">Longest Streak</span>
@@ -436,7 +467,7 @@ export default function HabitsPage() {
                       <div className="text-xs text-muted-foreground">Personal record</div>
                     </div>
                     
-                    <div className="bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-950/30 dark:to-violet-950/30 p-4 rounded-lg">
+                    <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-4 rounded-lg shadow-sm">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-2xl">💪</span>
                         <span className="text-sm font-medium">Recovery Rate</span>
@@ -447,12 +478,12 @@ export default function HabitsPage() {
                       <div className="text-xs text-muted-foreground">Bounce back strength</div>
                     </div>
                     
-                    <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30 p-4 rounded-lg">
+                    <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-4 rounded-lg shadow-sm">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-2xl">🎖️</span>
                         <span className="text-sm font-medium">Mastery Level</span>
                       </div>
-                      <div className="text-2xl font-bold text-orange-600">
+                      <div className="text-2xl font-bold text-amber-600">
                         {rules.filter(r => r.streak >= 30).length > 2 ? 'Elite' : 
                          rules.filter(r => r.streak >= 14).length > 1 ? 'Advanced' : 
                          rules.filter(r => r.streak >= 7).length > 0 ? 'Developing' : 'Beginner'}
@@ -462,33 +493,33 @@ export default function HabitsPage() {
                   </div>
 
                   {/* 1000-Day Vision */}
-                  <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 rounded-lg">
+                  <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
                     <div className="flex items-center gap-3 mb-3">
                       <span className="text-2xl">🏆</span>
                       <div>
-                        <h3 className="font-semibold text-amber-800 dark:text-amber-200">1000-Day Transformation Vision</h3>
-                        <p className="text-xs text-amber-700 dark:text-amber-300">Who you become through consistent negation</p>
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">1000-Day Transformation Vision</h3>
+                        <p className="text-xs text-muted-foreground">Who you become through consistent negation</p>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                      <div className="bg-white/50 dark:bg-black/20 p-2 rounded">
-                        <div className="font-medium text-amber-800 dark:text-amber-200">Year 1 (365 days)</div>
-                        <div className="text-amber-700 dark:text-amber-300">New patterns established, old triggers identified</div>
+                      <div className="bg-white dark:bg-gray-600 p-2 rounded border border-gray-200 dark:border-gray-500">
+                        <div className="font-medium text-amber-600">Year 1 (365 days)</div>
+                        <div className="text-muted-foreground">New patterns established, old triggers identified</div>
                       </div>
-                      <div className="bg-white/50 dark:bg-black/20 p-2 rounded">
-                        <div className="font-medium text-amber-800 dark:text-amber-200">Year 2-3 (730 days)</div>
-                        <div className="text-amber-700 dark:text-amber-300">Deep rewiring, automatic resistance to old patterns</div>
+                      <div className="bg-white dark:bg-gray-600 p-2 rounded border border-gray-200 dark:border-gray-500">
+                        <div className="font-medium text-amber-600">Year 2-3 (730 days)</div>
+                        <div className="text-muted-foreground">Deep rewiring, automatic resistance to old patterns</div>
                       </div>
-                      <div className="bg-white/50 dark:bg-black/20 p-2 rounded">
-                        <div className="font-medium text-amber-800 dark:text-amber-200">1000 Days</div>
-                        <div className="text-amber-700 dark:text-amber-300">Complete identity shift, unshakeable self-mastery</div>
+                      <div className="bg-white dark:bg-gray-600 p-2 rounded border border-gray-200 dark:border-gray-500">
+                        <div className="font-medium text-amber-600">1000 Days</div>
+                        <div className="text-muted-foreground">Complete identity shift, unshakeable self-mastery</div>
                       </div>
                     </div>
                   </div>
 
                   {/* Philosophy */}
-                  <div className="bg-red-100 dark:bg-red-900/30 rounded-lg p-4 mb-6">
-                    <p className="text-sm text-red-800 dark:text-red-200 text-center">
+                  <div className="bg-blue-50 dark:bg-gray-700 border border-blue-200 dark:border-gray-600 rounded-lg p-4 mb-6">
+                    <p className="text-sm text-gray-800 dark:text-gray-200 text-center">
                       <strong>Commitment over Perfection:</strong> You will break these rules. That's human. 
                       What matters is your commitment to return to the path immediately. Recovery speed, not perfection, builds character.
                     </p>
