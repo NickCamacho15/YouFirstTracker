@@ -11,6 +11,8 @@ import { HabitFormationTracker } from "@/components/habits/habit-formation-track
 import { FoundationsDashboard } from "@/components/habits/foundations-dashboard";
 import { EditHabitModal } from "@/components/habits/edit-habit-modal";
 import { SlideToComplete } from "@/components/habits/slide-to-complete";
+import { HabitRadarChart } from "@/components/habits/habit-radar-chart";
+import { SlideToBreak } from "@/components/habits/slide-to-break";
 
 interface Habit {
   id: number;
@@ -82,11 +84,11 @@ export default function HabitsPage() {
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [showFormationInfo, setShowFormationInfo] = useState(true);
   const [rules, setRules] = useState([
-    { id: 1, text: "No social media before 10 AM", violated: false, streak: 12, category: "Digital Wellness" },
-    { id: 2, text: "No processed food on weekdays", violated: false, streak: 8, category: "Nutrition" },
-    { id: 3, text: "No screens 1 hour before bed", violated: true, streak: 0, category: "Sleep Hygiene" },
-    { id: 4, text: "No negative self-talk", violated: false, streak: 5, category: "Mental Health" },
-    { id: 5, text: "No skipping workouts without valid reason", violated: false, streak: 15, category: "Fitness" },
+    { id: 1, text: "No social media before 10 AM", violated: false, streak: 12, category: "Digital Wellness", completedToday: true },
+    { id: 2, text: "No processed food on weekdays", violated: false, streak: 8, category: "Nutrition", completedToday: true },
+    { id: 3, text: "No screens 1 hour before bed", violated: true, streak: 0, category: "Sleep Hygiene", completedToday: false },
+    { id: 4, text: "No negative self-talk", violated: false, streak: 5, category: "Mental Health", completedToday: true },
+    { id: 5, text: "No skipping workouts without valid reason", violated: false, streak: 15, category: "Fitness", completedToday: true },
   ]);
   const [newRule, setNewRule] = useState("");
   const [newRuleCategory, setNewRuleCategory] = useState("Personal");
@@ -129,22 +131,6 @@ export default function HabitsPage() {
   };
 
   // Rules functions
-  const handleRuleViolation = (ruleId: number) => {
-    setRules(prev => prev.map(rule => 
-      rule.id === ruleId 
-        ? { ...rule, violated: !rule.violated, streak: rule.violated ? 1 : 0 }
-        : rule
-    ));
-    
-    const rule = rules.find(r => r.id === ruleId);
-    if (rule && !rule.violated) {
-      toast({
-        title: "Rule Broken",
-        description: `You've marked "${rule.text}" as violated. Your streak has been reset.`,
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleAddRule = () => {
     if (newRule.trim()) {
@@ -153,7 +139,8 @@ export default function HabitsPage() {
         text: newRule.trim(),
         violated: false,
         streak: 0,
-        category: newRuleCategory
+        category: newRuleCategory,
+        completedToday: false
       };
       setRules(prev => [...prev, newRuleObj]);
       setNewRule("");
@@ -170,6 +157,48 @@ export default function HabitsPage() {
       title: "Success", 
       description: "Rule deleted successfully",
     });
+  };
+
+  const toggleRuleCompletion = (id: number) => {
+    setRules(rules.map(rule => 
+      rule.id === id 
+        ? { 
+            ...rule, 
+            completedToday: !rule.completedToday,
+            streak: !rule.completedToday ? rule.streak + 1 : Math.max(0, rule.streak - 1)
+          }
+        : rule
+    ));
+    
+    const rule = rules.find(r => r.id === id);
+    if (rule) {
+      toast({
+        title: rule.completedToday ? "Promise broken today" : "Promise kept!",
+        description: rule.completedToday ? "Reset your commitment tomorrow" : "Building integrity, one day at a time",
+      });
+    }
+  };
+
+  const breakRule = (id: number) => {
+    setRules(rules.map(rule => 
+      rule.id === id 
+        ? { 
+            ...rule, 
+            completedToday: false,
+            violated: true,
+            streak: 0
+          }
+        : rule
+    ));
+    
+    const rule = rules.find(r => r.id === id);
+    if (rule) {
+      toast({
+        title: "Promise broken",
+        description: `"${rule.text}" - Tomorrow is a fresh start to rebuild integrity`,
+        variant: "destructive",
+      });
+    }
   };
 
   if (error) {
@@ -560,42 +589,48 @@ export default function HabitsPage() {
                     {rules.map((rule) => (
                       <div
                         key={rule.id}
-                        className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-                          rule.violated 
-                            ? 'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800' 
-                            : 'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800'
+                        className={`p-4 rounded-lg border transition-all duration-200 ${
+                          rule.completedToday 
+                            ? 'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800' 
+                            : 'bg-white border-gray-200 dark:bg-gray-700 dark:border-gray-600'
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
-                              <span className={`font-semibold ${rule.violated ? 'line-through text-red-600' : 'text-gray-900 dark:text-gray-100'}`}>
-                                {rule.text}
-                              </span>
+                              <div 
+                                className="flex items-center gap-2 cursor-pointer"
+                                onClick={() => toggleRuleCompletion(rule.id)}
+                              >
+                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                                  rule.completedToday 
+                                    ? 'bg-green-500 border-green-500 text-white' 
+                                    : 'border-gray-300 hover:border-green-400'
+                                }`}>
+                                  {rule.completedToday && (
+                                    <CheckCircle2 className="w-3 h-3" />
+                                  )}
+                                </div>
+                                <span className={`font-semibold ${rule.completedToday ? 'text-green-700 dark:text-green-300' : 'text-gray-900 dark:text-gray-100'}`}>
+                                  {rule.text}
+                                </span>
+                              </div>
                               <Badge variant="outline" className="text-xs">
                                 {rule.category}
                               </Badge>
                             </div>
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                              <span className={rule.violated ? 'text-red-600' : 'text-green-600'}>
-                                {rule.violated ? '❌ Violated' : `✅ ${rule.streak} days clean`}
+                              <span className={rule.completedToday ? 'text-green-600' : 'text-gray-500'}>
+                                {rule.completedToday ? '✅ Promise kept today' : `🔄 ${rule.streak} day streak`}
                               </span>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
                             <Button
-                              variant={rule.violated ? "default" : "destructive"}
-                              size="sm"
-                              onClick={() => handleRuleViolation(rule.id)}
-                              className="text-xs"
-                            >
-                              {rule.violated ? 'Mark Fixed' : 'Mark Broken'}
-                            </Button>
-                            <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDeleteRule(rule.id)}
-                              className="text-red-600 hover:text-red-700"
+                              className="text-gray-400 hover:text-red-600"
                             >
                               <X className="w-4 h-4" />
                             </Button>

@@ -271,104 +271,38 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
         {habits.map((habit) => {
           const colors = getCategoryGradient(habit.category);
-          const [isDragging, setIsDragging] = useState(false);
-          const [dragOffset, setDragOffset] = useState(0);
-          const [startY, setStartY] = useState(0);
-          const cardRef = useRef<HTMLDivElement>(null);
-          
-          const handleTouchStart = (e: React.TouchEvent) => {
-            if (habit.completedToday) return;
-            setIsDragging(true);
-            setStartY(e.touches[0].clientY);
-          };
-
-          const handleTouchMove = (e: React.TouchEvent) => {
-            if (!isDragging || habit.completedToday) return;
-            const currentY = e.touches[0].clientY;
-            const diff = startY - currentY; // Positive when swiping up
-            
-            if (diff > 0) {
-              setDragOffset(Math.min(diff, 100)); // Limit to 100px
-            }
-          };
-
-          const handleTouchEnd = () => {
-            if (!isDragging || habit.completedToday) return;
-            
-            if (dragOffset > 50) { // Threshold for completion
-              onToggleHabit(habit.id, true);
-              // Add haptic feedback if available
-              if (navigator.vibrate) {
-                navigator.vibrate([50, 50, 50]);
-              }
-            }
-            
-            setIsDragging(false);
-            setDragOffset(0);
-          };
-
-          const handleMouseDown = (e: React.MouseEvent) => {
-            if (habit.completedToday) return;
-            setIsDragging(true);
-            setStartY(e.clientY);
-          };
-
-          const handleMouseMove = (e: React.MouseEvent) => {
-            if (!isDragging || habit.completedToday) return;
-            const diff = startY - e.clientY;
-            
-            if (diff > 0) {
-              setDragOffset(Math.min(diff, 100));
-            }
-          };
-
-          const handleMouseUp = () => {
-            if (!isDragging || habit.completedToday) return;
-            
-            if (dragOffset > 50) {
-              onToggleHabit(habit.id, true);
-            }
-            
-            setIsDragging(false);
-            setDragOffset(0);
-          };
           
           return (
             <div 
               key={habit.id} 
-              ref={cardRef}
-              className={`group relative overflow-hidden rounded-2xl bg-white border-2 ${colors.border} hover:shadow-xl transition-all duration-300 hover:scale-[1.05] aspect-square flex flex-col shadow-lg select-none cursor-pointer ${
-                isDragging ? 'scale-105' : ''
+              className={`group relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02] aspect-square flex flex-col shadow-lg ${
+                habit.completedToday 
+                  ? `${colors.light} border-2 ${colors.border} bg-opacity-80` 
+                  : 'bg-white border-2 border-gray-200 hover:border-gray-300'
               }`}
-              style={{
-                transform: `translateY(-${dragOffset}px)`,
-                transition: isDragging ? 'none' : 'transform 0.3s ease-out'
-              }}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
             >
-              {/* Light background tint */}
-              <div className={`absolute inset-0 ${colors.light} opacity-50 group-hover:opacity-70 transition-opacity duration-300`}></div>
-              
-              {/* Slide indicator */}
-              {!habit.completedToday && dragOffset > 10 && (
-                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-20">
-                  <div className={`w-8 h-1 ${colors.bg} rounded-full animate-pulse`}></div>
-                  <div className="text-xs text-center mt-1 font-semibold text-gray-600">
-                    {dragOffset > 50 ? 'Release!' : 'Slide up'}
-                  </div>
-                </div>
-              )}
               
               <div className="relative z-10 p-4 flex flex-col h-full">
-                {/* Header with icon and settings */}
+                {/* Header with checkbox and settings */}
                 <div className="flex items-center justify-between mb-2">
-                  <div className="text-2xl">{colors.icon}</div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-2xl">{colors.icon}</div>
+                    <button
+                      onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
+                      className="flex-shrink-0"
+                      disabled={isLoading}
+                    >
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                        habit.completedToday 
+                          ? `${colors.bg} ${colors.border} text-white` 
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}>
+                        {habit.completedToday && (
+                          <CheckCircle2 className="w-3 h-3" />
+                        )}
+                      </div>
+                    </button>
+                  </div>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -405,29 +339,16 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
                   <div className="text-xs font-semibold text-gray-600 dark:text-gray-400">day streak</div>
                 </div>
                 
-                {/* Completion Status with Grab Bar */}
-                <div className="relative">
-                  {/* Darker Grab Bar - Only show when not completed */}
-                  {!habit.completedToday && (
-                    <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gray-600 rounded-full shadow-sm"></div>
-                  )}
-                  
-                  <div className={`w-full h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                {/* Completion Status */}
+                <div className="mt-auto">
+                  <div className={`w-full py-2 px-3 rounded-lg text-center transition-all duration-300 ${
                     habit.completedToday 
-                      ? `${colors.bg} text-white shadow-lg`
-                      : `bg-gray-100 border-2 ${colors.border} text-gray-700 shadow-inner`
+                      ? `${colors.bg} text-white`
+                      : 'bg-gray-100 text-gray-600'
                   }`}>
-                    {habit.completedToday ? (
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-6 h-6 animate-bounce" />
-                        <span className="font-bold">Complete!</span>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center">
-                        <Circle className="w-6 h-6 mb-1" />
-                        <span className="text-xs font-medium">Slide up to complete</span>
-                      </div>
-                    )}
+                    <span className="text-sm font-medium">
+                      {habit.completedToday ? '✅ Complete!' : 'Pending'}
+                    </span>
                   </div>
                 </div>
               </div>

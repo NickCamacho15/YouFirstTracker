@@ -123,6 +123,15 @@ Build scripts include:
 
 ## Changelog
 
+- July 2, 2025: Enhanced Rules System + Improved Foundation Tiles
+  - **NEW**: Rules tab now uses positive completion language with "Promise kept today" instead of violation tracking
+  - **NEW**: Rules feature slide-to-break bars for intentional promise breaking with haptic feedback
+  - **IMPROVED**: Foundation tiles now use simple checkboxes instead of slide-to-complete
+  - **IMPROVED**: Whole foundation tile changes color when completed for better visual feedback
+  - **NEW**: Created comprehensive habit radar chart showing 6 performance metrics (Consistency, Momentum, Balance, Engagement, Foundation, Growth)
+  - Radar chart displays overall performance grade (A+ to F) with color-coded scoring
+  - Rules system emphasizes building integrity through commitment over perfection
+  - Removed complex slide interactions from foundation tiles for cleaner UX
 - July 2, 2025: Major Social Features Integration - Home Timeline + Follower Feed
   - **NEW**: Home page now serves as social timeline feed (Instagram Stories + habit-tracking community)
   - **RESTRUCTURED**: You page moved to `/you` route and remains as personal "You. Dashboard" 
