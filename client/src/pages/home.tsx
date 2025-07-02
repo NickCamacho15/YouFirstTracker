@@ -92,6 +92,140 @@ function PostCard({ post }: { post: Post }) {
     }
   };
 
+  const renderMetrics = () => {
+    try {
+      const metadata = JSON.parse(post.metadata || '{}');
+      
+      if (metadata.achievement === 'reading_session_completed') {
+        return (
+          <div className="mt-3 bg-purple-50 border border-purple-200 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <BookOpen className="w-4 h-4 text-purple-600" />
+              <span className="font-medium text-purple-800 text-sm">Reading Session Metrics</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-purple-700">Duration:</span>
+                <span className="font-semibold text-purple-900">{metadata.readingDuration}m</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-purple-700">Book:</span>
+                <span className="font-semibold text-purple-900 truncate">{metadata.bookTitle}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-purple-700">Date:</span>
+                <span className="font-semibold text-purple-900">{new Date(metadata.sessionDate).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-purple-700">Session:</span>
+                <span className="font-semibold text-purple-900">#{metadata.sessionId}</span>
+              </div>
+            </div>
+            {metadata.reflection && (
+              <div className="mt-2 pt-2 border-t border-purple-200">
+                <p className="text-sm text-purple-700 italic">"{metadata.reflection}"</p>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      if (metadata.achievement === 'goal_completed') {
+        const daysTaken = metadata.dueDate 
+          ? Math.floor((new Date(metadata.completionDate).getTime() - new Date(metadata.dueDate).getTime()) / (1000 * 60 * 60 * 24))
+          : null;
+        
+        return (
+          <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Target className="w-4 h-4 text-blue-600" />
+              <span className="font-medium text-blue-800 text-sm">Goal Achievement Metrics</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-blue-700">Completed:</span>
+                <span className="font-semibold text-blue-900">{new Date(metadata.completionDate).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-blue-700">Sub-tasks:</span>
+                <span className="font-semibold text-blue-900">{metadata.microGoalsCompleted}/{metadata.totalMicroGoals}</span>
+              </div>
+              {metadata.dueDate && (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-blue-700">Due Date:</span>
+                    <span className="font-semibold text-blue-900">{new Date(metadata.dueDate).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-blue-700">Timeline:</span>
+                    <span className={`font-semibold ${daysTaken <= 0 ? 'text-green-600' : 'text-orange-600'}`}>
+                      {daysTaken <= 0 ? `${Math.abs(daysTaken)}d early` : `${daysTaken}d late`}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      if (metadata.achievement === 'micro_goal_completed') {
+        return (
+          <div className="mt-3 bg-green-50 border border-green-200 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="w-4 h-4 text-green-600" />
+              <span className="font-medium text-green-800 text-sm">Micro-Goal Metrics</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-green-700">Task:</span>
+                <span className="font-semibold text-green-900 truncate">{metadata.microGoalTitle}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-green-700">Parent Goal:</span>
+                <span className="font-semibold text-green-900 truncate">{metadata.parentGoalTitle}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-green-700">Completed:</span>
+                <span className="font-semibold text-green-900">{new Date(metadata.completionDate).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-green-700">Progress:</span>
+                <span className="font-semibold text-green-900">Step completed ✓</span>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // Habit completion metrics (if we add those later)
+      if (metadata.achievement === 'habit_completed' || post.type === 'habit') {
+        return (
+          <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Zap className="w-4 h-4 text-yellow-600" />
+              <span className="font-medium text-yellow-800 text-sm">Habit Streak Metrics</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-yellow-700">Streak:</span>
+                <span className="font-semibold text-yellow-900">{metadata.streakDays || 'N/A'} days</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-yellow-700">Category:</span>
+                <span className="font-semibold text-yellow-900">{metadata.category || 'General'}</span>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      return null;
+    } catch (error) {
+      return null;
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardContent className="p-4">
@@ -118,6 +252,9 @@ function PostCard({ post }: { post: Post }) {
         {/* Post Content */}
         <div className="mb-4">
           <p className="text-gray-800 leading-relaxed">{post.message}</p>
+          
+          {/* Achievement Metrics */}
+          {post.metadata && renderMetrics()}
         </div>
 
         {/* Action Buttons */}
