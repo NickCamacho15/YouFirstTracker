@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { HabitFormationTracker } from "@/components/habits/habit-formation-tracker";
-import { FoundationsDashboard } from "@/components/habits/foundations-dashboard";
+import { FoundationsDashboard } from "@/components/habits/foundations-dashboard-new";
 import { EditHabitModal } from "@/components/habits/edit-habit-modal";
 import { SlideToComplete } from "@/components/habits/slide-to-complete";
 import { HabitRadarChart } from "@/components/habits/habit-radar-chart";

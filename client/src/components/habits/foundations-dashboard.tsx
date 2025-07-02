@@ -106,26 +106,26 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
   });
 
   return (
-    <div className="space-y-6">
-      {/* Central Completion Graph - Transparent and Floating */}
-      <div className="relative p-6 backdrop-blur-xl bg-white/15 border border-white/25 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-4 right-4 w-20 h-20 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-xl animate-pulse"></div>
-          <div className="absolute bottom-4 left-4 w-16 h-16 bg-gradient-to-br from-emerald-500/15 to-teal-500/15 rounded-full blur-lg animate-pulse delay-1000"></div>
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/10 via-purple-50/10 to-emerald-50/10 rounded-3xl"></div>
+    <div className="space-y-8">
+      {/* Foundation Monitor - Direct Page Integration */}
+      <div className="relative">
+        {/* Background Effects */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-4 right-4 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-4 left-4 w-24 h-24 bg-gradient-to-br from-emerald-500/15 to-teal-500/15 rounded-full blur-2xl animate-pulse delay-1000"></div>
         </div>
         
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-1">FOUNDATION MONITOR</h2>
-              <p className="text-gray-600 text-sm">Last updated {new Date().toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })}</p>
-            </div>
-            <div className="text-right">
-              <div className="text-emerald-600 text-sm font-semibold">HIGH</div>
-              <div className="text-gray-900 text-2xl font-bold">{completionRate}%</div>
-            </div>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">FOUNDATION MONITOR</h2>
+            <p className="text-gray-600">Real-time habit performance tracking</p>
           </div>
+          <div className="text-right">
+            <div className="text-emerald-600 text-sm font-semibold">PERFORMANCE</div>
+            <div className="text-gray-900 text-3xl font-bold">{completionRate}%</div>
+          </div>
+        </div>
 
           {/* Multi-Line Graph */}
           <div className="relative h-32 mb-4">
