@@ -12,6 +12,7 @@ import { FoundationsDashboard } from "@/components/habits/foundations-dashboard"
 import { EditHabitModal } from "@/components/habits/edit-habit-modal";
 import { HabitHealthScore } from "@/components/habits/habit-health-score";
 import { CompactDashboard } from "@/components/habits/compact-dashboard";
+import { SlideToComplete } from "@/components/habits/slide-to-complete";
 
 interface Habit {
   id: number;
@@ -423,7 +424,7 @@ export default function HabitsPage() {
                           {/* Title and Settings Row */}
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex-1">
-                              <h3 className="text-lg font-semibold mb-1">{habit.title}</h3>
+                              <h1 className="text-2xl font-bold mb-1">{habit.title}</h1>
                               <p className="text-white/80 text-sm">{habit.description || "Building consistency every day"}</p>
                             </div>
                             <Button
@@ -491,29 +492,37 @@ export default function HabitsPage() {
                             </div>
                           </div>
                           
-                          {/* Compact YES Button - Centered */}
-                          <div className="flex justify-center">
-                            <Button
-                                  onClick={() => handleToggleHabit(habit.id)}
-                                  disabled={toggleHabitMutation.isPending}
-                                  size="lg"
-                                  className={`
-                                    h-12 px-8 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 transform-gpu shadow-lg hover:shadow-xl
-                                    ${habit.completedToday
-                                      ? `${colors.bg} text-white border-2 border-green-400 shadow-green-500/30`
-                                      : `bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400`
-                                    }
-                                  `}
-                                >
-                                  {habit.completedToday ? (
-                                    <div className="flex items-center gap-2">
-                                      <CheckCircle2 className="w-5 h-5" />
-                                      <span>DONE</span>
-                                    </div>
-                                  ) : (
-                                    <span>YES</span>
-                                  )}
-                                </Button>
+                          {/* Slide to Complete Interface */}
+                          <div className="space-y-4">
+                            {!habit.completedToday ? (
+                              <SlideToComplete
+                                onComplete={() => handleToggleHabit(habit.id)}
+                                disabled={toggleHabitMutation.isPending}
+                                colors={{
+                                  bg: colors.bg,
+                                  stroke: colors.bg.includes('indigo') ? '#6366f1' : colors.bg.includes('amber') ? '#f59e0b' : '#10b981',
+                                  text: colors.text
+                                }}
+                              />
+                            ) : (
+                              <div className={`${colors.bg} rounded-xl py-4 px-6 flex items-center justify-center`}>
+                                <div className="flex items-center gap-3 text-white">
+                                  <CheckCircle2 className="w-6 h-6" />
+                                  <span className="font-bold text-lg">COMPLETED TODAY</span>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Progress Bar */}
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                              <div 
+                                className="h-2 rounded-full transition-all duration-700"
+                                style={{ 
+                                  width: `${progressPercentage}%`,
+                                  backgroundColor: colors.bg.includes('indigo') ? '#6366f1' : colors.bg.includes('amber') ? '#f59e0b' : '#10b981'
+                                }}
+                              />
+                            </div>
                           </div>
                           
                           {/* Formation Stage Indicator */}
