@@ -178,13 +178,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Micro-goal not found" });
       }
 
-      // If completed, create social post
+      // If completed, create earned social post with receipt details
       if (updates.completed) {
+        // Get the parent goal for context
+        const goal = await storage.getGoalById(microGoal.goalId);
+        const completionDate = new Date().toISOString();
+        
         await storage.createPost({
           userId: req.session.userId,
           type: "micro-goal",
           message: `completed micro-goal: "${microGoal.title}"`,
           relatedId: microGoal.id,
+          isPrivate: false,
+          metadata: JSON.stringify({
+            microGoalTitle: microGoal.title,
+            parentGoalTitle: goal?.title || "Unknown Goal",
+            completionDate: completionDate,
+            achievement: "micro_goal_completed"
+          })
         });
       }
 
@@ -192,6 +203,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Update micro-goal error:", error);
       res.status(400).json({ message: "Failed to update micro-goal" });
+    }
+  });
+
+  // Goal completion route
+  app.patch("/api/goals/:id/complete", requireAuth, async (req, res) => {
+    try {
+      const goalId = parseInt(req.params.id);
+      const goal = await storage.updateGoal(goalId, { completed: true });
+      
+      if (!goal) {
+        return res.status(404).json({ message: "Goal not found" });
+      }
+
+      // Create earned social post for goal completion with receipt details
+      const completionDate = new Date().toISOString();
+      const microGoals = await storage.getMicroGoalsByGoalId(goalId);
+      const completedMicroGoals = microGoals.filter(mg => mg.completed).length;
+      
+      await storage.createPost({
+        userId: req.session.userId,
+        type: "goal",
+        message: `achieved goal: "${goal.title}"`,
+        relatedId: goalId,
+        isPrivate: false,
+        metadata: JSON.stringify({
+          goalTitle: goal.title,
+          goalDescription: goal.description,
+          completionDate: completionDate,
+          microGoalsCompleted: completedMicroGoals,
+          totalMicroGoals: microGoals.length,
+          dueDate: goal.dueDate,
+          achievement: "goal_completed"
+        })
+      });
+
+      res.json(goal);
+    } catch (error) {
+      console.error("Complete goal error:", error);
+      res.status(400).json({ message: "Failed to complete goal" });
     }
   });
 
@@ -314,13 +364,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       const session = await storage.createReadingSession(sessionData);
       
-      // Create social post if reflection exists
-      if (session.reflection) {
+      // Auto-create earned social post for completed reading session with receipt details
+      if (session.reflection && session.endTime) {
+        const readingDuration = session.startTime && session.endTime 
+          ? Math.round((new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60))
+          : null;
+        
+        const postMessage = `completed ${readingDuration}min reading session: "${session.bookTitle}"`;
+        
         await storage.createPost({
           userId: req.session.userId,
           type: "reflection",
-          message: `shared a reading reflection: "${session.reflection.substring(0, 50)}${session.reflection.length > 50 ? '...' : ''}"`,
+          message: postMessage,
           relatedId: session.id,
+          isPrivate: false,
+          metadata: JSON.stringify({
+            bookTitle: session.bookTitle,
+            readingDuration: readingDuration,
+            reflection: session.reflection,
+            sessionDate: session.endTime,
+            achievement: "reading_session_completed"
+          })
         });
       }
       
