@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { HabitFormationTracker } from "@/components/habits/habit-formation-tracker";
-import { FoundationsDashboard } from "@/components/habits/foundations-dashboard-new";
+import { FoundationsDashboard } from "@/components/habits/foundations-dashboard-large";
 import { EditHabitModal } from "@/components/habits/edit-habit-modal";
 import { SlideToComplete } from "@/components/habits/slide-to-complete";
 import { HabitRadarChart } from "@/components/habits/habit-radar-chart";
@@ -83,6 +83,7 @@ export default function HabitsPage() {
   const [editHabitModalOpen, setEditHabitModalOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [showFormationInfo, setShowFormationInfo] = useState(true);
+  const [showFormationScience, setShowFormationScience] = useState(true);
   const [rules, setRules] = useState([
     { id: 1, text: "No social media before 10 AM", violated: false, streak: 12, category: "Digital Wellness", completedToday: true, failures: 2 },
     { id: 2, text: "No processed food on weekdays", violated: false, streak: 8, category: "Nutrition", completedToday: true, failures: 0 },
@@ -101,7 +102,7 @@ export default function HabitsPage() {
 
   const toggleHabitMutation = useMutation({
     mutationFn: async ({ habitId }: { habitId: number }) => {
-      const response = await apiRequest(`/api/habits/${habitId}/toggle`, 'POST');
+      const response = await apiRequest('POST', `/api/habits/${habitId}/toggle`);
       return response;
     },
     onSuccess: () => {
@@ -290,18 +291,29 @@ export default function HabitsPage() {
               )}
 
               {/* Scientific Habit Formation Overview */}
-              <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50">
-                <CardHeader className="pb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
-                      <BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              {showFormationScience && (
+                <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
+                          <BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-xl">67-Day Formation Science</CardTitle>
+                          <p className="text-sm text-muted-foreground">Research-backed habit formation with bonus day for .uoY</p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setShowFormationScience(false)}
+                        className="text-indigo-600 hover:text-indigo-800"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
                     </div>
-                    <div>
-                      <CardTitle className="text-xl">67-Day Formation Science</CardTitle>
-                      <p className="text-sm text-muted-foreground">Research-backed habit formation with bonus day for .uoY</p>
-                    </div>
-                  </div>
-                </CardHeader>
+                  </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Stage 1: Initial Formation */}
@@ -391,6 +403,7 @@ export default function HabitsPage() {
                   </div>
                 </CardContent>
               </Card>
+              )}
 
               {/* Compact Habit Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
