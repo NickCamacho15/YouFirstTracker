@@ -22,7 +22,9 @@ import {
   Trophy,
   Star,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Coffee,
+  Moon
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -31,35 +33,49 @@ export default function DashboardPage() {
   const [showNewHabitModal, setShowNewHabitModal] = useState(false);
   
   // Critical tasks completion counter - tracks lifetime achievements
-  const [criticalTasksCompleted, setCriticalTasksCompleted] = useState(147); // Starting with example number
+  const [criticalTasksCompleted, setCriticalTasksCompleted] = useState(147);
   
-  // Combined tasks, routines, and critical items - in real app this would come from API
-  const [tasks, setTasks] = useState([
-    { id: 'routine-1', text: 'Meditation (10 min)', completed: true, type: 'routine', category: 'Morning', priority: 1 },
-    { id: 'critical-1', text: 'Review quarterly metrics', completed: false, type: 'critical', time: 'Due 2 PM', goalId: 1, priority: 2 },
-    { id: 'routine-2', text: 'Exercise', completed: false, type: 'routine', category: 'Morning', priority: 3 },
-    { id: 'task-1', text: 'Prepare presentation slides', completed: false, type: 'task', goalId: 1, priority: 4 },
-    { id: 'routine-3', text: 'Healthy breakfast', completed: false, type: 'routine', category: 'Morning', priority: 5 },
-    { id: 'critical-2', text: 'Team standup meeting', completed: false, type: 'critical', time: '10 AM', goalId: 2, priority: 6 },
-    { id: 'task-2', text: 'Update project timeline', completed: false, type: 'task', goalId: 2, priority: 7 },
-    { id: 'routine-4', text: 'Daily reflection', completed: false, type: 'routine', category: 'Evening', priority: 8 },
-    { id: 'task-3', text: 'Call insurance provider', completed: false, type: 'task', goalId: null, priority: 9 },
-    { id: 'routine-5', text: 'Reading (30 min)', completed: false, type: 'routine', category: 'Evening', priority: 10 },
+  // Goals with task completion tracking
+  const [goals] = useState([
+    { id: 1, title: 'Q4 Business Review', description: 'Complete quarterly business analysis', tasksCompleted: 12, totalTasks: 18, color: 'bg-gradient-to-r from-blue-500 to-indigo-600' },
+    { id: 2, title: 'Team Leadership', description: 'Develop team processes and culture', tasksCompleted: 8, totalTasks: 15, color: 'bg-gradient-to-r from-purple-500 to-pink-600' },
+    { id: 3, title: 'Personal Development', description: 'Health and wellness improvements', tasksCompleted: 25, totalTasks: 30, color: 'bg-gradient-to-r from-emerald-500 to-teal-600' },
+    { id: 4, title: 'Home Organization', description: 'Organize and optimize living space', tasksCompleted: 6, totalTasks: 12, color: 'bg-gradient-to-r from-orange-500 to-red-600' }
   ]);
 
-  const [draggedTask, setDraggedTask] = useState<string | null>(null);
+  // Critical tasks tied to goals
+  const [criticalTasks, setCriticalTasks] = useState([
+    { id: 'critical-1', text: 'Review quarterly metrics', completed: false, goalId: 1, time: 'Due 2 PM', priority: 1 },
+    { id: 'critical-2', text: 'Team standup meeting', completed: false, goalId: 2, time: '10 AM', priority: 2 },
+    { id: 'critical-3', text: 'Prepare presentation slides', completed: false, goalId: 1, priority: 3 },
+    { id: 'critical-4', text: 'Update project timeline', completed: false, goalId: 2, priority: 4 },
+    { id: 'critical-5', text: 'Doctor appointment', completed: false, goalId: 3, time: '3 PM', priority: 5 }
+  ]);
 
-  const handleTaskToggle = (taskId: string) => {
-    setTasks(prev => prev.map(task => {
+  // Morning routines
+  const [morningRoutines, setMorningRoutines] = useState([
+    { id: 'morning-1', text: 'Meditation (10 min)', completed: true, priority: 1 },
+    { id: 'morning-2', text: 'Exercise', completed: false, priority: 2 },
+    { id: 'morning-3', text: 'Healthy breakfast', completed: false, priority: 3 },
+    { id: 'morning-4', text: 'Review daily priorities', completed: false, priority: 4 }
+  ]);
+
+  // Evening routines
+  const [eveningRoutines, setEveningRoutines] = useState([
+    { id: 'evening-1', text: 'Daily reflection', completed: false, priority: 1 },
+    { id: 'evening-2', text: 'Reading (30 min)', completed: false, priority: 2 },
+    { id: 'evening-3', text: 'Prepare tomorrow', completed: false, priority: 3 },
+    { id: 'evening-4', text: 'Gratitude practice', completed: false, priority: 4 }
+  ]);
+
+  const handleCriticalTaskToggle = (taskId: string) => {
+    setCriticalTasks(prev => prev.map(task => {
       if (task.id === taskId) {
         const updatedTask = { ...task, completed: !task.completed };
         
-        // Increment counter when a critical task is completed
-        if (updatedTask.completed && task.type === 'critical') {
+        if (updatedTask.completed && !task.completed) {
           setCriticalTasksCompleted(count => count + 1);
-        }
-        // Decrement counter when a critical task is unchecked
-        else if (!updatedTask.completed && task.type === 'critical' && task.completed) {
+        } else if (!updatedTask.completed && task.completed) {
           setCriticalTasksCompleted(count => Math.max(0, count - 1));
         }
         
@@ -69,59 +85,19 @@ export default function DashboardPage() {
     }));
   };
 
-  const handleDragStart = (e: React.DragEvent, taskId: string) => {
-    setDraggedTask(taskId);
-    e.dataTransfer.effectAllowed = 'move';
+  const handleMorningRoutineToggle = (taskId: string) => {
+    setMorningRoutines(prev => prev.map(task => 
+      task.id === taskId ? { ...task, completed: !task.completed } : task
+    ));
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
+  const handleEveningRoutineToggle = (taskId: string) => {
+    setEveningRoutines(prev => prev.map(task => 
+      task.id === taskId ? { ...task, completed: !task.completed } : task
+    ));
   };
 
-  const handleDrop = (e: React.DragEvent, targetTaskId: string) => {
-    e.preventDefault();
-    
-    if (!draggedTask || draggedTask === targetTaskId) return;
-
-    setTasks(prev => {
-      const draggedIndex = prev.findIndex(task => task.id === draggedTask);
-      const targetIndex = prev.findIndex(task => task.id === targetTaskId);
-      
-      const newTasks = [...prev];
-      const [draggedItem] = newTasks.splice(draggedIndex, 1);
-      newTasks.splice(targetIndex, 0, draggedItem);
-      
-      // Update priorities based on new order
-      return newTasks.map((task, index) => ({
-        ...task,
-        priority: index + 1
-      }));
-    });
-    
-    setDraggedTask(null);
-  };
-
-  const movePriority = (taskId: string, direction: 'up' | 'down') => {
-    setTasks(prev => {
-      const sortedTasks = [...prev].sort((a, b) => a.priority - b.priority);
-      const taskIndex = sortedTasks.findIndex(task => task.id === taskId);
-      
-      if (direction === 'up' && taskIndex > 0) {
-        [sortedTasks[taskIndex], sortedTasks[taskIndex - 1]] = [sortedTasks[taskIndex - 1], sortedTasks[taskIndex]];
-      } else if (direction === 'down' && taskIndex < sortedTasks.length - 1) {
-        [sortedTasks[taskIndex], sortedTasks[taskIndex + 1]] = [sortedTasks[taskIndex + 1], sortedTasks[taskIndex]];
-      }
-      
-      // Update priorities
-      return sortedTasks.map((task, index) => ({
-        ...task,
-        priority: index + 1
-      }));
-    });
-  };
-
-
+  const getGoalById = (goalId: number) => goals.find(g => g.id === goalId);
 
   return (
     <div className="min-h-screen bg-white">
@@ -224,20 +200,70 @@ export default function DashboardPage() {
                   fill="none"
                   stroke="#f59e0b"
                   strokeWidth="3"
-                  strokeDasharray={`${85}, 100`}
+                  strokeDasharray={`${80}, 100`}
                   className="drop-shadow-sm"
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl font-bold text-gray-900">85%</span>
+                <span className="text-xl font-bold text-gray-900">80%</span>
               </div>
             </div>
             <h3 className="font-semibold text-gray-900">Reading</h3>
-            <p className="text-xs text-gray-500">Monthly goal</p>
+            <p className="text-xs text-gray-500">Weekly goal</p>
           </div>
         </div>
 
-        {/* Quick Actions */}
+        {/* Goals Grid with Task Counters */}
+        <Card className="border-0 shadow-lg mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Target className="w-5 h-5 text-gray-600" />
+              Active Goals
+            </CardTitle>
+            <p className="text-sm text-gray-600 mt-1">
+              Track task completion progress for each goal
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {goals.map((goal) => {
+                const progressPercentage = Math.round((goal.tasksCompleted / goal.totalTasks) * 100);
+                
+                return (
+                  <div key={goal.id} className={`${goal.color} p-6 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold mb-2">{goal.title}</h3>
+                        <p className="text-white/90 text-sm">{goal.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-black">{goal.tasksCompleted}</div>
+                        <div className="text-sm text-white/80">of {goal.totalTasks}</div>
+                      </div>
+                    </div>
+                    
+                    {/* Progress Bar */}
+                    <div className="w-full bg-white/20 rounded-full h-3 mb-3">
+                      <div 
+                        className="h-3 bg-white rounded-full transition-all duration-500"
+                        style={{ width: `${progressPercentage}%` }}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-white/90">{progressPercentage}% Complete</span>
+                      <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                        {goal.totalTasks - goal.tasksCompleted} remaining
+                      </Badge>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <Link href="/goals">
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
@@ -246,7 +272,7 @@ export default function DashboardPage() {
                   <Target className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-semibold text-gray-900">Goals</h3>
-                <p className="text-xs text-gray-500 mt-1">Future Folder</p>
+                <p className="text-xs text-gray-500 mt-1">Set & track</p>
               </CardContent>
             </Card>
           </Link>
@@ -254,11 +280,11 @@ export default function DashboardPage() {
           <Link href="/habits">
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
               <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                   <Repeat className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-semibold text-gray-900">Habits</h3>
-                <p className="text-xs text-gray-500 mt-1">67-day formation</p>
+                <p className="text-xs text-gray-500 mt-1">Build consistency</p>
               </CardContent>
             </Card>
           </Link>
@@ -275,38 +301,33 @@ export default function DashboardPage() {
             </Card>
           </Link>
 
-          <Link href="/community">
+          <Link href="/vision">
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
               <CardContent className="p-4 text-center">
                 <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                   <Star className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-900">Community</h3>
-                <p className="text-xs text-gray-500 mt-1">Share progress</p>
+                <h3 className="font-semibold text-gray-900">Vision</h3>
+                <p className="text-xs text-gray-500 mt-1">Future Folder</p>
               </CardContent>
             </Card>
           </Link>
         </div>
 
-
-
-
-
-        {/* Today's Tasks - To-Do List */}
+        {/* Critical Tasks */}
         <Card className="border-0 shadow-lg mb-6">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-gray-600" />
-                  Today's Tasks & Routines
+                  <CheckCircle2 className="w-5 h-5 text-red-600" />
+                  Critical Tasks
                 </CardTitle>
                 <p className="text-sm text-gray-600 mt-1">
-                  Critical tasks, routines, and regular tasks - drag to reorder priorities
+                  High-priority tasks tied to your goals
                 </p>
               </div>
               
-              {/* Critical Tasks Completion Counter */}
               <div className="text-center bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-xl px-4 py-3">
                 <div className="flex items-center gap-2 mb-1">
                   <Trophy className="w-4 h-4 text-red-600" />
@@ -318,244 +339,160 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              {tasks
-                .sort((a, b) => a.priority - b.priority)
-                .map((task, index) => (
-                <div 
-                  key={task.id}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, task.id)}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, task.id)}
-                  className={`
-                    flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 cursor-move
-                    ${draggedTask === task.id ? 'opacity-50 bg-blue-50' : 'hover:bg-gray-50'}
-                    ${task.completed ? 'bg-green-50 border-green-200' : 'border-gray-200'}
-                  `}
-                >
-                  {/* Priority Number */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-gray-500 bg-gray-100 rounded px-2 py-1 min-w-[24px] text-center">
-                      {index + 1}
-                    </span>
-                    <div className="flex flex-col gap-1">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-4 w-4 p-0 text-gray-400 hover:text-gray-600"
-                        onClick={() => movePriority(task.id, 'up')}
-                        disabled={index === 0}
-                      >
-                        <ChevronUp className="w-3 h-3" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-4 w-4 p-0 text-gray-400 hover:text-gray-600"
-                        onClick={() => movePriority(task.id, 'down')}
-                        disabled={index === tasks.length - 1}
-                      >
-                        <ChevronDown className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Checkbox */}
-                  <input 
-                    type="checkbox" 
-                    checked={task.completed}
-                    onChange={() => handleTaskToggle(task.id)}
-                    className="w-5 h-5 text-green-600 rounded cursor-pointer"
-                  />
-
-                  {/* Task Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={`block transition-all duration-300 ${
-                        task.completed 
-                          ? 'line-through text-gray-500 opacity-60' 
-                          : 'text-gray-900'
-                      }`}>
-                        {task.text}
-                      </span>
-                      
-                      {/* Type Badge */}
-                      {task.type === 'critical' && (
-                        <Badge className="text-xs bg-red-100 text-red-700 hover:bg-red-100">
-                          Critical
-                        </Badge>
-                      )}
-                      {task.type === 'routine' && (
-                        <Badge className="text-xs bg-blue-100 text-blue-700 hover:bg-blue-100">
-                          {task.category}
-                        </Badge>
-                      )}
-                    </div>
-                    
-                    {task.time && (
-                      <span className={`text-xs px-2 py-1 rounded inline-block transition-opacity ${
-                        task.completed 
-                          ? 'opacity-40'
-                          : task.time.includes('Due') 
-                            ? 'text-orange-600 bg-orange-100' 
-                            : 'text-blue-600 bg-blue-100'
-                      }`}>
-                        {task.time}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Drag Handle */}
-                  <div className="text-gray-400">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M7 2a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM7 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM7 14a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM17 2a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM17 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM17 14a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"></path>
-                    </svg>
-                  </div>
-                </div>
-              ))}
-              
-              <div className="flex items-center justify-center p-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add new task
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Compact Performance Calendar */}
-        <Card className="border-0 shadow-lg mb-8">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <div className="w-6 h-6 bg-gradient-to-r from-green-400 to-blue-400 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm">📊</span>
-              </div>
-              Daily Performance Calendar
-            </CardTitle>
-            <p className="text-sm text-gray-600 mt-1">
-              Track your daily scores and identify patterns
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-7 gap-1 mb-2">
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
-                <div key={`day-${index}`} className="text-center text-xs font-medium text-gray-500 py-1">
-                  {day}
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7 gap-1">
-              {Array.from({ length: 28 }, (_, i) => {
-                const dayNumber = i + 1;
-                const score = Math.floor(Math.random() * 100) + 1;
-                const isToday = dayNumber === 15;
-                const gradientClass = 
-                  score >= 90 ? 'bg-gradient-to-br from-green-400 to-green-600' :
-                  score >= 80 ? 'bg-gradient-to-br from-green-300 to-green-500' :
-                  score >= 70 ? 'bg-gradient-to-br from-yellow-300 to-yellow-500' :
-                  score >= 60 ? 'bg-gradient-to-br from-orange-300 to-orange-500' :
-                  'bg-gradient-to-br from-red-300 to-red-500';
+            <div className="space-y-3">
+              {criticalTasks.map((task, index) => {
+                const goal = getGoalById(task.goalId);
                 
                 return (
-                  <div
-                    key={`score-${i}`}
-                    className={`
-                      aspect-square rounded-md flex items-center justify-center text-white font-bold cursor-pointer transition-all duration-200 hover:scale-110 shadow-sm
-                      ${isToday ? 'ring-2 ring-blue-500 ring-offset-1' : ''}
-                      ${gradientClass}
-                    `}
-                    title={`Day ${dayNumber}: ${score}% performance`}
+                  <div 
+                    key={task.id}
+                    className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-200 ${
+                      task.completed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200 hover:bg-red-100'
+                    }`}
                   >
-                    <span className="text-sm">{score}</span>
+                    <input 
+                      type="checkbox" 
+                      checked={task.completed}
+                      onChange={() => handleCriticalTaskToggle(task.id)}
+                      className="w-5 h-5 text-red-600 rounded cursor-pointer"
+                    />
+
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-1">
+                        <span className={`font-semibold transition-all duration-300 ${
+                          task.completed 
+                            ? 'line-through text-gray-500' 
+                            : 'text-gray-900'
+                        }`}>
+                          {task.text}
+                        </span>
+                        {task.time && (
+                          <Badge variant="outline" className="text-xs text-red-600 border-red-300">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {task.time}
+                          </Badge>
+                        )}
+                      </div>
+                      {goal && (
+                        <div className="flex items-center gap-2">
+                          <div className={`w-3 h-3 rounded-full ${goal.color}`}></div>
+                          <span className="text-sm text-gray-600">{goal.title}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
             </div>
-            <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-green-600 rounded"></div>
-                  <span>90+</span>
+          </CardContent>
+        </Card>
+
+        {/* Morning Routines */}
+        <Card className="border-0 shadow-lg mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Coffee className="w-5 h-5 text-amber-600" />
+              Morning Routines
+            </CardTitle>
+            <p className="text-sm text-gray-600 mt-1">
+              Start your day with purposeful habits
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {morningRoutines.map((routine) => (
+                <div 
+                  key={routine.id}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
+                    routine.completed ? 'bg-amber-50 border-amber-200' : 'border-gray-200 hover:bg-amber-50'
+                  }`}
+                >
+                  <input 
+                    type="checkbox" 
+                    checked={routine.completed}
+                    onChange={() => handleMorningRoutineToggle(routine.id)}
+                    className="w-5 h-5 text-amber-600 rounded cursor-pointer"
+                  />
+                  <span className={`flex-1 transition-all duration-300 ${
+                    routine.completed 
+                      ? 'line-through text-gray-500' 
+                      : 'text-gray-900'
+                  }`}>
+                    {routine.text}
+                  </span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-gradient-to-r from-yellow-300 to-yellow-500 rounded"></div>
-                  <span>70+</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-gradient-to-r from-red-300 to-red-500 rounded"></div>
-                  <span>&lt;70</span>
-                </div>
-              </div>
-              <span>Today: 85%</span>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Link href="/goals">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <Target className="w-6 h-6 text-white" />
+        {/* Evening Routines */}
+        <Card className="border-0 shadow-lg mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Moon className="w-5 h-5 text-indigo-600" />
+              Evening Routines
+            </CardTitle>
+            <p className="text-sm text-gray-600 mt-1">
+              End your day with reflection and preparation
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {eveningRoutines.map((routine) => (
+                <div 
+                  key={routine.id}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
+                    routine.completed ? 'bg-indigo-50 border-indigo-200' : 'border-gray-200 hover:bg-indigo-50'
+                  }`}
+                >
+                  <input 
+                    type="checkbox" 
+                    checked={routine.completed}
+                    onChange={() => handleEveningRoutineToggle(routine.id)}
+                    className="w-5 h-5 text-indigo-600 rounded cursor-pointer"
+                  />
+                  <span className={`flex-1 transition-all duration-300 ${
+                    routine.completed 
+                      ? 'line-through text-gray-500' 
+                      : 'text-gray-900'
+                  }`}>
+                    {routine.text}
+                  </span>
                 </div>
-                <h3 className="font-semibold text-gray-900">Goals</h3>
-                <p className="text-xs text-gray-500 mt-1">Future Folder</p>
-              </CardContent>
-            </Card>
-          </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-          <Link href="/habits">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <Repeat className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-gray-900">Habits</h3>
-                <p className="text-xs text-gray-500 mt-1">67-day formation</p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/read">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <BookOpen className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-gray-900">Read</h3>
-                <p className="text-xs text-gray-500 mt-1">Daily sessions</p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/community">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <Star className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-gray-900">Community</h3>
-                <p className="text-xs text-gray-500 mt-1">Share progress</p>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
-
-        {/* Modals */}
-        <NewGoalModal 
-          open={showNewGoalModal} 
-          onOpenChange={setShowNewGoalModal}
-          onSuccess={() => setShowNewGoalModal(false)}
-        />
-        <NewHabitModal 
-          open={showNewHabitModal} 
-          onOpenChange={setShowNewHabitModal}
-          onSuccess={() => setShowNewHabitModal(false)}
-        />
+        {/* Calendar placeholder */}
+        <Card className="border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-lg">Today's Performance</CardTitle>
+            <p className="text-sm text-gray-600">Track your daily progress and momentum</p>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-4xl mb-4">📅</div>
+                <p className="text-gray-600">Calendar view coming soon</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </main>
+
+      <NewGoalModal 
+        open={showNewGoalModal} 
+        onOpenChange={setShowNewGoalModal}
+        onSuccess={() => {}}
+      />
+      
+      <NewHabitModal 
+        open={showNewHabitModal} 
+        onOpenChange={setShowNewHabitModal}
+        onSuccess={() => {}}
+      />
     </div>
   );
 }
