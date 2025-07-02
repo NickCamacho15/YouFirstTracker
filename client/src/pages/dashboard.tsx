@@ -35,12 +35,12 @@ export default function DashboardPage() {
   // Critical tasks completion counter - tracks lifetime achievements
   const [criticalTasksCompleted, setCriticalTasksCompleted] = useState(147);
   
-  // Goals with task completion tracking
+  // Goals with cumulative task completion tracking
   const [goals] = useState([
-    { id: 1, title: 'Q4 Business Review', description: 'Complete quarterly business analysis', tasksCompleted: 12, totalTasks: 18, color: 'bg-gradient-to-r from-blue-500 to-indigo-600' },
-    { id: 2, title: 'Team Leadership', description: 'Develop team processes and culture', tasksCompleted: 8, totalTasks: 15, color: 'bg-gradient-to-r from-purple-500 to-pink-600' },
-    { id: 3, title: 'Personal Development', description: 'Health and wellness improvements', tasksCompleted: 25, totalTasks: 30, color: 'bg-gradient-to-r from-emerald-500 to-teal-600' },
-    { id: 4, title: 'Home Organization', description: 'Organize and optimize living space', tasksCompleted: 6, totalTasks: 12, color: 'bg-gradient-to-r from-orange-500 to-red-600' }
+    { id: 1, title: 'Q4 Business Review', description: 'Complete quarterly business analysis', tasksCompleted: 234, daysWorking: 45, color: 'bg-gradient-to-r from-blue-500 to-indigo-600' },
+    { id: 2, title: 'Team Leadership', description: 'Develop team processes and culture', tasksCompleted: 187, daysWorking: 62, color: 'bg-gradient-to-r from-purple-500 to-pink-600' },
+    { id: 3, title: 'Personal Development', description: 'Health and wellness improvements', tasksCompleted: 456, daysWorking: 89, color: 'bg-gradient-to-r from-emerald-500 to-teal-600' },
+    { id: 4, title: 'Home Organization', description: 'Organize and optimize living space', tasksCompleted: 98, daysWorking: 23, color: 'bg-gradient-to-r from-orange-500 to-red-600' }
   ]);
 
   // Critical tasks tied to goals
@@ -227,8 +227,6 @@ export default function DashboardPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {goals.map((goal) => {
-                const progressPercentage = Math.round((goal.tasksCompleted / goal.totalTasks) * 100);
-                
                 return (
                   <div key={goal.id} className={`${goal.color} p-6 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}>
                     <div className="flex items-start justify-between mb-4">
@@ -237,24 +235,31 @@ export default function DashboardPage() {
                         <p className="text-white/90 text-sm">{goal.description}</p>
                       </div>
                       <div className="text-right">
-                        <div className="text-3xl font-black">{goal.tasksCompleted}</div>
-                        <div className="text-sm text-white/80">of {goal.totalTasks}</div>
+                        <div className="text-4xl font-black">{goal.tasksCompleted}</div>
+                        <div className="text-sm text-white/80">tasks completed</div>
                       </div>
                     </div>
                     
-                    {/* Progress Bar */}
-                    <div className="w-full bg-white/20 rounded-full h-3 mb-3">
-                      <div 
-                        className="h-3 bg-white rounded-full transition-all duration-500"
-                        style={{ width: `${progressPercentage}%` }}
-                      />
+                    {/* Commitment Stats */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-white/20 rounded-lg px-3 py-2">
+                          <div className="text-lg font-bold">{goal.daysWorking}</div>
+                          <div className="text-xs text-white/80">days working</div>
+                        </div>
+                        <div className="bg-white/20 rounded-lg px-3 py-2">
+                          <div className="text-lg font-bold">{Math.round(goal.tasksCompleted / goal.daysWorking)}</div>
+                          <div className="text-xs text-white/80">avg/day</div>
+                        </div>
+                      </div>
+                      <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                        <Trophy className="w-3 h-3 mr-1" />
+                        Persistent
+                      </Badge>
                     </div>
                     
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-white/90">{progressPercentage}% Complete</span>
-                      <Badge variant="secondary" className="bg-white/20 text-white border-0">
-                        {goal.totalTasks - goal.tasksCompleted} remaining
-                      </Badge>
+                    <div className="text-sm text-white/90">
+                      <strong>Commitment Score:</strong> {goal.tasksCompleted} tasks over {goal.daysWorking} days
                     </div>
                   </div>
                 );
@@ -314,27 +319,66 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        {/* Critical Tasks */}
+        {/* Morning Priming */}
+        <Card className="border-0 shadow-lg mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Coffee className="w-5 h-5 text-amber-600" />
+              Morning Priming
+            </CardTitle>
+            <p className="text-sm text-gray-600 mt-1">
+              Start your day with purposeful habits
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {morningRoutines.map((routine) => (
+                <div 
+                  key={routine.id}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
+                    routine.completed ? 'bg-amber-50 border-amber-200' : 'border-gray-200 hover:bg-amber-50'
+                  }`}
+                >
+                  <input 
+                    type="checkbox" 
+                    checked={routine.completed}
+                    onChange={() => handleMorningRoutineToggle(routine.id)}
+                    className="w-5 h-5 text-amber-600 rounded cursor-pointer"
+                  />
+                  <span className={`flex-1 transition-all duration-300 ${
+                    routine.completed 
+                      ? 'line-through text-gray-500' 
+                      : 'text-gray-900'
+                  }`}>
+                    {routine.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Gold Critical Tasks */}
         <Card className="border-0 shadow-lg mb-6">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-red-600" />
-                  Critical Tasks
+                  <Star className="w-5 h-5 text-yellow-600" />
+                  Gold Actions
                 </CardTitle>
                 <p className="text-sm text-gray-600 mt-1">
-                  High-priority tasks tied to your goals
+                  Premium actions that drive your goals forward
                 </p>
               </div>
               
-              <div className="text-center bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-xl px-4 py-3">
+              <div className="text-center bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-xl px-4 py-3">
                 <div className="flex items-center gap-2 mb-1">
-                  <Trophy className="w-4 h-4 text-red-600" />
-                  <span className="text-xs font-semibold text-red-600 uppercase tracking-wider">Critical Completed</span>
+                  <Trophy className="w-4 h-4 text-yellow-600" />
+                  <span className="text-xs font-semibold text-yellow-600 uppercase tracking-wider">Gold Completed</span>
                 </div>
-                <div className="text-2xl font-black text-red-700">{criticalTasksCompleted}</div>
-                <div className="text-xs text-red-500">lifetime total</div>
+                <div className="text-2xl font-black text-yellow-700">{criticalTasksCompleted}</div>
+                <div className="text-xs text-yellow-600">lifetime total</div>
               </div>
             </div>
           </CardHeader>
@@ -347,14 +391,14 @@ export default function DashboardPage() {
                   <div 
                     key={task.id}
                     className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-200 ${
-                      task.completed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200 hover:bg-red-100'
+                      task.completed ? 'bg-green-50 border-green-200' : 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200 hover:from-yellow-100 hover:to-amber-100'
                     }`}
                   >
                     <input 
                       type="checkbox" 
                       checked={task.completed}
                       onChange={() => handleCriticalTaskToggle(task.id)}
-                      className="w-5 h-5 text-red-600 rounded cursor-pointer"
+                      className="w-5 h-5 text-yellow-600 rounded cursor-pointer"
                     />
 
                     <div className="flex-1">
@@ -367,7 +411,7 @@ export default function DashboardPage() {
                           {task.text}
                         </span>
                         {task.time && (
-                          <Badge variant="outline" className="text-xs text-red-600 border-red-300">
+                          <Badge variant="outline" className="text-xs text-yellow-700 border-yellow-300 bg-yellow-100">
                             <Clock className="w-3 h-3 mr-1" />
                             {task.time}
                           </Badge>
@@ -387,7 +431,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Morning Routines */}
+        {/* Evening Routines */}
         <Card className="border-0 shadow-lg mb-6">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">

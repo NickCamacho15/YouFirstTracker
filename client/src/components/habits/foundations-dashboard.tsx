@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, Circle, Settings, Flame, TrendingUp } from 'lucide-react';
+import { useState, useRef } from 'react';
 
 interface Habit {
   id: number;
@@ -40,9 +41,7 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
       case 'mind':
         return {
           bg: 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700',
-          light: 'from-blue-100 via-indigo-100 to-purple-100',
-          dark: 'from-blue-900/90 via-indigo-900/90 to-purple-900/90',
-          glow: 'shadow-blue-500/40',
+          light: 'bg-blue-50',
           border: 'border-blue-300',
           text: 'text-blue-700',
           color: '#6366f1',
@@ -51,9 +50,7 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
       case 'body':
         return {
           bg: 'bg-gradient-to-br from-orange-500 via-red-600 to-rose-700',
-          light: 'from-orange-100 via-red-100 to-rose-100',
-          dark: 'from-orange-900/90 via-red-900/90 to-rose-900/90',
-          glow: 'shadow-orange-500/40',
+          light: 'bg-orange-50',
           border: 'border-orange-300',
           text: 'text-orange-700',
           color: '#f97316',
@@ -62,9 +59,7 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
       case 'soul':
         return {
           bg: 'bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700',
-          light: 'from-emerald-100 via-teal-100 to-cyan-100',
-          dark: 'from-emerald-900/90 via-teal-900/90 to-cyan-900/90',
-          glow: 'shadow-emerald-500/40',
+          light: 'bg-emerald-50',
           border: 'border-emerald-300',
           text: 'text-emerald-700',
           color: '#10b981',
@@ -73,9 +68,7 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
       default:
         return {
           bg: 'bg-gradient-to-br from-gray-500 to-slate-600',
-          light: 'from-gray-100 to-slate-100',
-          dark: 'from-gray-900/90 to-slate-900/90',
-          glow: 'shadow-gray-500/40',
+          light: 'bg-gray-50',
           border: 'border-gray-300',
           text: 'text-gray-700',
           color: '#64748b',
@@ -200,11 +193,99 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
         {habits.map((habit) => {
           const colors = getCategoryGradient(habit.category);
+          const [isDragging, setIsDragging] = useState(false);
+          const [dragOffset, setDragOffset] = useState(0);
+          const [startY, setStartY] = useState(0);
+          const cardRef = useRef<HTMLDivElement>(null);
+          
+          const handleTouchStart = (e: React.TouchEvent) => {
+            if (habit.completedToday) return;
+            setIsDragging(true);
+            setStartY(e.touches[0].clientY);
+          };
+
+          const handleTouchMove = (e: React.TouchEvent) => {
+            if (!isDragging || habit.completedToday) return;
+            const currentY = e.touches[0].clientY;
+            const diff = startY - currentY; // Positive when swiping up
+            
+            if (diff > 0) {
+              setDragOffset(Math.min(diff, 100)); // Limit to 100px
+            }
+          };
+
+          const handleTouchEnd = () => {
+            if (!isDragging || habit.completedToday) return;
+            
+            if (dragOffset > 50) { // Threshold for completion
+              onToggleHabit(habit.id, true);
+              // Add haptic feedback if available
+              if (navigator.vibrate) {
+                navigator.vibrate([50, 50, 50]);
+              }
+            }
+            
+            setIsDragging(false);
+            setDragOffset(0);
+          };
+
+          const handleMouseDown = (e: React.MouseEvent) => {
+            if (habit.completedToday) return;
+            setIsDragging(true);
+            setStartY(e.clientY);
+          };
+
+          const handleMouseMove = (e: React.MouseEvent) => {
+            if (!isDragging || habit.completedToday) return;
+            const diff = startY - e.clientY;
+            
+            if (diff > 0) {
+              setDragOffset(Math.min(diff, 100));
+            }
+          };
+
+          const handleMouseUp = () => {
+            if (!isDragging || habit.completedToday) return;
+            
+            if (dragOffset > 50) {
+              onToggleHabit(habit.id, true);
+            }
+            
+            setIsDragging(false);
+            setDragOffset(0);
+          };
           
           return (
-            <div key={habit.id} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 border-2 ${colors.border} hover:shadow-xl hover:${colors.glow} transition-all duration-300 hover:scale-[1.05] aspect-square flex flex-col shadow-lg`}>
-              {/* Animated background gradient */}
-              <div className={`absolute inset-0 ${colors.bg} opacity-5 group-hover:opacity-10 transition-opacity duration-300`}></div>
+            <div 
+              key={habit.id} 
+              ref={cardRef}
+              className={`group relative overflow-hidden rounded-2xl bg-white border-2 ${colors.border} hover:shadow-xl transition-all duration-300 hover:scale-[1.05] aspect-square flex flex-col shadow-lg select-none cursor-pointer ${
+                isDragging ? 'scale-105' : ''
+              }`}
+              style={{
+                transform: `translateY(-${dragOffset}px)`,
+                transition: isDragging ? 'none' : 'transform 0.3s ease-out'
+              }}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+            >
+              {/* Light background tint */}
+              <div className={`absolute inset-0 ${colors.light} opacity-50 group-hover:opacity-70 transition-opacity duration-300`}></div>
+              
+              {/* Slide indicator */}
+              {!habit.completedToday && dragOffset > 10 && (
+                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-20">
+                  <div className={`w-8 h-1 ${colors.bg} rounded-full animate-pulse`}></div>
+                  <div className="text-xs text-center mt-1 font-semibold text-gray-600">
+                    {dragOffset > 50 ? 'Release!' : 'Slide up'}
+                  </div>
+                </div>
+              )}
               
               <div className="relative z-10 p-4 flex flex-col h-full">
                 {/* Header with icon and settings */}
@@ -213,7 +294,10 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onEditHabit(habit)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditHabit(habit);
+                    }}
                     className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                   >
                     <Settings className="w-4 h-4" />
@@ -234,22 +318,24 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
                   <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">days</div>
                 </div>
                 
-                {/* Large Completion Button */}
-                <Button
-                  onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
-                  disabled={isLoading}
-                  className={`w-full h-12 rounded-xl text-lg font-bold transition-all duration-300 hover:scale-105 ${
-                    habit.completedToday 
-                      ? `${colors.bg} text-white hover:opacity-90 shadow-lg animate-pulse`
-                      : `bg-gray-50 dark:bg-gray-800 border-2 ${colors.border} text-gray-700 dark:text-gray-300 hover:${colors.bg} hover:text-white hover:border-transparent`
-                  }`}
-                >
+                {/* Completion Status */}
+                <div className={`w-full h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                  habit.completedToday 
+                    ? `${colors.bg} text-white shadow-lg`
+                    : `bg-gray-50 dark:bg-gray-800 border-2 ${colors.border} text-gray-700 dark:text-gray-300`
+                }`}>
                   {habit.completedToday ? (
-                    <CheckCircle2 className="w-6 h-6" />
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-6 h-6 animate-bounce" />
+                      <span className="font-bold">Complete!</span>
+                    </div>
                   ) : (
-                    <Circle className="w-6 h-6" />
+                    <div className="flex flex-col items-center">
+                      <Circle className="w-6 h-6 mb-1" />
+                      <span className="text-xs font-medium">Slide up to complete</span>
+                    </div>
                   )}
-                </Button>
+                </div>
               </div>
             </div>
           );
@@ -286,7 +372,7 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
             }
             
             return (
-              <div key={habit.id} className={`bg-gradient-to-r ${colors.light} dark:bg-gradient-to-r dark:${colors.dark} rounded-2xl p-6 border-2 ${colors.border} shadow-lg`}>
+              <div key={habit.id} className={`${colors.light} rounded-2xl p-6 border-2 ${colors.border} shadow-lg`}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-4">
                     <div className="text-3xl">{colors.icon}</div>
