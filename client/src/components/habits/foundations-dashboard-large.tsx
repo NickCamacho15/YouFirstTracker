@@ -334,10 +334,23 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
           return (
             <div 
               key={`large-${habit.id}`}
-              className={`relative rounded-3xl p-8 transition-all duration-500 hover:scale-105 transform ${colors.bg} ${colors.shadow} border-0 min-h-[300px]`}
+              className={`relative rounded-3xl p-8 transition-all duration-700 hover:scale-105 transform ${colors.bg} ${colors.shadow} border-0 min-h-[300px] ${
+                habit.completedToday ? 'animate-pulse' : ''
+              }`}
             >
-              {/* Glow effect */}
-              <div className={`absolute inset-0 ${colors.glow} rounded-3xl blur-xl opacity-60 -z-10`}></div>
+              {/* Enhanced glow effect */}
+              <div className={`absolute inset-0 ${colors.glow} rounded-3xl blur-xl ${
+                habit.completedToday ? 'opacity-80 animate-pulse' : 'opacity-40'
+              } -z-10`}></div>
+              
+              {/* Celebration sparkles when completed */}
+              {habit.completedToday && (
+                <>
+                  <div className="absolute top-4 right-4 text-2xl animate-bounce">✨</div>
+                  <div className="absolute top-6 left-4 text-xl animate-bounce delay-200">⭐</div>
+                  <div className="absolute bottom-4 right-6 text-lg animate-bounce delay-500">🎉</div>
+                </>
+              )}
               
               {/* Content */}
               <div className="relative text-center h-full flex flex-col">
@@ -377,16 +390,19 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
                     <span className={`text-sm font-bold ${colors.text} opacity-80`}>days</span>
                   </div>
                   
-                  {/* Completion overlay - visual feedback */}
-                  <div className={`absolute inset-0 rounded-full transition-all duration-300 ${
+                  {/* Completion overlay - enhanced visual feedback */}
+                  <div className={`absolute inset-0 rounded-full transition-all duration-500 ${
                     habit.completedToday 
-                      ? 'bg-white/20 scale-100' 
+                      ? 'bg-white/30 scale-105 shadow-2xl' 
                       : 'bg-white/10 scale-95 group-hover:scale-100 group-hover:bg-white/15'
                   }`}></div>
                   
-                  {/* Pulse effect when completed */}
+                  {/* Multiple pulse effects when completed */}
                   {habit.completedToday && (
-                    <div className="absolute inset-0 rounded-full bg-white/30 animate-ping"></div>
+                    <>
+                      <div className="absolute inset-0 rounded-full bg-white/40 animate-ping"></div>
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent animate-pulse"></div>
+                    </>
                   )}
                 </div>
                 
@@ -402,17 +418,17 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
                     </div>
                   </div>
                   
-                  {/* Large Completion Indicator */}
+                  {/* Large Completion Indicator with enhanced styling */}
                   <div className="flex justify-center mb-6">
                     {habit.completedToday ? (
                       <div className="flex flex-col items-center">
-                        <CheckCircle2 className={`w-12 h-12 ${colors.text} mb-2`} />
-                        <span className={`text-sm font-bold ${colors.text} opacity-90`}>COMPLETED</span>
+                        <CheckCircle2 className={`w-12 h-12 ${colors.text} mb-2 animate-bounce`} />
+                        <span className={`text-sm font-bold ${colors.text} bg-white/20 px-3 py-1 rounded-full`}>✅ COMPLETED</span>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center">
-                        <Circle className={`w-12 h-12 ${colors.text} opacity-60 mb-2`} />
-                        <span className={`text-sm font-bold ${colors.text} opacity-60`}>TAP TO COMPLETE</span>
+                        <Circle className={`w-12 h-12 ${colors.text} opacity-60 mb-2 group-hover:opacity-80 transition-opacity`} />
+                        <span className={`text-sm font-bold ${colors.text} opacity-60 group-hover:opacity-80`}>TAP TO COMPLETE</span>
                       </div>
                     )}
                   </div>
