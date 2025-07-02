@@ -196,82 +196,131 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
         </div>
       </div>
 
-      {/* Habits Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Compact Habits Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-8">
         {habits.map((habit) => {
           const colors = getCategoryGradient(habit.category);
           
           return (
-            <div key={habit.id} className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${colors.light} dark:bg-gradient-to-br dark:${colors.dark} border ${colors.border} dark:border-opacity-50 hover:shadow-xl hover:${colors.glow} transition-all duration-300 hover:scale-[1.02] min-h-[280px] flex flex-col`}>
+            <div key={habit.id} className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${colors.light} dark:bg-gradient-to-br dark:${colors.dark} border ${colors.border} dark:border-opacity-50 hover:shadow-lg hover:${colors.glow} transition-all duration-300 hover:scale-[1.05] aspect-square flex flex-col`}>
               {/* Animated background gradient */}
-              <div className={`absolute inset-0 ${colors.bg} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+              <div className={`absolute inset-0 ${colors.bg} opacity-0 group-hover:opacity-15 transition-opacity duration-300`}></div>
               
-              <div className="relative z-10 p-6 flex flex-col h-full">
+              <div className="relative z-10 p-3 flex flex-col h-full">
                 {/* Header with icon and settings */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="text-3xl">{colors.icon}</div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-lg">{colors.icon}</div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => onEditHabit(habit)}
-                    className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                   >
-                    <Settings className="w-4 h-4" />
+                    <Settings className="w-3 h-3" />
                   </Button>
                 </div>
 
-                {/* Title and description */}
-                <div className="mb-6">
-                  <h3 className="font-bold text-xl text-gray-800 dark:text-gray-200 mb-2">{habit.title}</h3>
-                  {habit.description && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{habit.description}</p>
-                  )}
+                {/* Title */}
+                <div className="mb-2 flex-grow">
+                  <h3 className="font-semibold text-sm text-gray-800 dark:text-gray-200 leading-tight line-clamp-2">{habit.title}</h3>
                 </div>
                 
-                {/* Streak visualization */}
-                <div className="mb-6 flex-grow flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Flame className="w-5 h-5 text-amber-500" />
-                      <span className="text-3xl font-black text-gray-800 dark:text-gray-200">{habit.streak}</span>
-                    </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">day streak</div>
+                {/* Streak */}
+                <div className="text-center mb-2">
+                  <div className="flex items-center justify-center gap-1">
+                    <Flame className="w-3 h-3 text-amber-500" />
+                    <span className="text-lg font-bold text-gray-800 dark:text-gray-200">{habit.streak}</span>
                   </div>
+                  <div className="text-xs text-gray-500">days</div>
                 </div>
                 
-                {/* Large Interactive Completion Button */}
+                {/* Compact Completion Button */}
                 <Button
                   onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
                   disabled={isLoading}
-                  className={`w-full h-14 rounded-xl text-lg font-bold transition-all duration-300 hover:scale-105 transform-gpu ${
+                  className={`w-full h-8 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-105 ${
                     habit.completedToday 
-                      ? `${colors.bg} text-white hover:opacity-90 ${colors.glow} shadow-lg animate-pulse`
-                      : `bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 ${colors.border} dark:border-opacity-30 text-gray-700 dark:text-gray-300 hover:${colors.bg} hover:text-white hover:border-transparent`
+                      ? `${colors.bg} text-white hover:opacity-90 shadow-md`
+                      : `bg-white/80 dark:bg-gray-800/80 border ${colors.border} text-gray-700 dark:text-gray-300 hover:${colors.bg} hover:text-white hover:border-transparent`
                   }`}
                 >
-                  <div className="flex items-center justify-center gap-3">
-                    {habit.completedToday ? (
-                      <>
-                        <CheckCircle2 className="w-6 h-6 animate-bounce" />
-                        <span>Foundation Complete!</span>
-                        <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="relative">
-                          <Circle className="w-6 h-6" />
-                          <div className={`absolute inset-0 w-6 h-6 border-2 ${colors.border} rounded-full opacity-0 group-hover:opacity-100 transition-opacity animate-pulse`}></div>
-                        </div>
-                        <span>Build Foundation</span>
-                        <div className={`w-2 h-2 ${colors.bg} rounded-full animate-ping opacity-75`}></div>
-                      </>
-                    )}
-                  </div>
+                  {habit.completedToday ? (
+                    <CheckCircle2 className="w-4 h-4" />
+                  ) : (
+                    <Circle className="w-4 h-4" />
+                  )}
                 </Button>
               </div>
             </div>
           );
         })}
+      </div>
+
+      {/* Development Period Graph */}
+      <div className="bg-gradient-to-br from-slate-50 to-gray-100 dark:from-slate-900 dark:to-gray-900 rounded-3xl p-6 border border-gray-200 dark:border-gray-700">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
+          <TrendingUp className="w-5 h-5 text-indigo-600" />
+          67-Day Formation Journey
+        </h3>
+        
+        <div className="space-y-4">
+          {habits.map((habit) => {
+            const colors = getCategoryGradient(habit.category);
+            const progressPercentage = Math.min((habit.streak / 67) * 100, 100);
+            
+            // Determine stage
+            let stage = '';
+            let stageColor = '';
+            if (habit.streak <= 18) {
+              stage = 'Initial Formation';
+              stageColor = 'text-blue-600';
+            } else if (habit.streak <= 45) {
+              stage = 'Strengthening';
+              stageColor = 'text-amber-600';
+            } else if (habit.streak <= 67) {
+              stage = 'Automaticity';
+              stageColor = 'text-emerald-600';
+            } else {
+              stage = 'Mastered';
+              stageColor = 'text-purple-600';
+            }
+            
+            return (
+              <div key={habit.id} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="text-xl">{colors.icon}</div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900 dark:text-gray-100">{habit.title}</h4>
+                      <p className={`text-sm ${stageColor} font-medium`}>{stage} • Day {habit.streak}/67</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-lg font-bold text-gray-900 dark:text-gray-100">{Math.round(progressPercentage)}%</div>
+                    <div className="text-xs text-gray-500">complete</div>
+                  </div>
+                </div>
+                
+                {/* Progress Bar */}
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                  <div 
+                    className={`h-3 ${colors.bg} transition-all duration-1000 ease-out rounded-full relative`}
+                    style={{ width: `${progressPercentage}%` }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/20"></div>
+                  </div>
+                </div>
+                
+                {/* Stage Markers */}
+                <div className="flex justify-between mt-2 text-xs text-gray-400">
+                  <span className={habit.streak > 18 ? 'text-blue-600 font-medium' : ''}>18</span>
+                  <span className={habit.streak > 45 ? 'text-amber-600 font-medium' : ''}>45</span>
+                  <span className={habit.streak >= 67 ? 'text-emerald-600 font-medium' : ''}>67</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
