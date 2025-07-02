@@ -238,6 +238,8 @@ export class DatabaseStorage implements IStorage {
       type: posts.type,
       message: posts.message,
       relatedId: posts.relatedId,
+      isPrivate: posts.isPrivate,
+      metadata: posts.metadata,
       createdAt: posts.createdAt,
       user: {
         displayName: users.displayName,
@@ -245,6 +247,7 @@ export class DatabaseStorage implements IStorage {
     })
     .from(posts)
     .innerJoin(users, eq(posts.userId, users.id))
+    .where(eq(posts.isPrivate, false)) // Only show public posts
     .orderBy(desc(posts.createdAt))
     .limit(limit);
   }
@@ -292,6 +295,136 @@ export class DatabaseStorage implements IStorage {
   async deleteTask(id: number): Promise<boolean> {
     const result = await db.delete(tasks).where(eq(tasks.id, id));
     return result.rowCount > 0;
+  }
+
+  // Social Features
+  async followUser(followerId: number, followingId: number): Promise<Follower> {
+    const result = await db.insert(followers).values({
+      followerId,
+      followingId
+    }).returning();
+    return result[0];
+  }
+
+  async unfollowUser(followerId: number, followingId: number): Promise<boolean> {
+    const result = await db.delete(followers)
+      .where(and(eq(followers.followerId, followerId), eq(followers.followingId, followingId)));
+    return result.rowCount > 0;
+  }
+
+  async getFollowers(userId: number): Promise<(Follower & { follower: Pick<User, 'id' | 'displayName'> })[]> {
+    return await db.select({
+      id: followers.id,
+      followerId: followers.followerId,
+      followingId: followers.followingId,
+      createdAt: followers.createdAt,
+      follower: {
+        id: users.id,
+        displayName: users.displayName,
+      },
+    })
+    .from(followers)
+    .innerJoin(users, eq(followers.followerId, users.id))
+    .where(eq(followers.followingId, userId))
+    .orderBy(desc(followers.createdAt));
+  }
+
+  async getFollowing(userId: number): Promise<(Follower & { following: Pick<User, 'id' | 'displayName'> })[]> {
+    return await db.select({
+      id: followers.id,
+      followerId: followers.followerId,
+      followingId: followers.followingId,
+      createdAt: followers.createdAt,
+      following: {
+        id: users.id,
+        displayName: users.displayName,
+      },
+    })
+    .from(followers)
+    .innerJoin(users, eq(followers.followingId, users.id))
+    .where(eq(followers.followerId, userId))
+    .orderBy(desc(followers.createdAt));
+  }
+
+  async getTimelinePosts(userId: number, limit: number = 20): Promise<(Post & { user: Pick<User, 'displayName'> })[]> {
+    // Get posts from users that the current user follows
+    const followingSubquery = db.select({ followingId: followers.followingId })
+      .from(followers)
+      .where(eq(followers.followerId, userId));
+
+    return await db.select({
+      id: posts.id,
+      userId: posts.userId,
+      type: posts.type,
+      message: posts.message,
+      relatedId: posts.relatedId,
+      isPrivate: posts.isPrivate,
+      metadata: posts.metadata,
+      createdAt: posts.createdAt,
+      user: {
+        displayName: users.displayName,
+      },
+    })
+    .from(posts)
+    .innerJoin(users, eq(posts.userId, users.id))
+    .where(and(
+      eq(posts.isPrivate, false),
+      sql`${posts.userId} IN ${followingSubquery}`
+    ))
+    .orderBy(desc(posts.createdAt))
+    .limit(limit);
+  }
+
+  // Post Reactions
+  async addPostReaction(reaction: InsertPostReaction): Promise<PostReaction> {
+    const result = await db.insert(postReactions).values(reaction).returning();
+    return result[0];
+  }
+
+  async removePostReaction(postId: number, userId: number): Promise<boolean> {
+    const result = await db.delete(postReactions)
+      .where(and(eq(postReactions.postId, postId), eq(postReactions.userId, userId)));
+    return result.rowCount > 0;
+  }
+
+  async getPostReactions(postId: number): Promise<(PostReaction & { user: Pick<User, 'displayName'> })[]> {
+    return await db.select({
+      id: postReactions.id,
+      postId: postReactions.postId,
+      userId: postReactions.userId,
+      type: postReactions.type,
+      createdAt: postReactions.createdAt,
+      user: {
+        displayName: users.displayName,
+      },
+    })
+    .from(postReactions)
+    .innerJoin(users, eq(postReactions.userId, users.id))
+    .where(eq(postReactions.postId, postId))
+    .orderBy(desc(postReactions.createdAt));
+  }
+
+  // Post Comments
+  async addPostComment(comment: InsertPostComment): Promise<PostComment> {
+    const result = await db.insert(postComments).values(comment).returning();
+    return result[0];
+  }
+
+  async getPostComments(postId: number): Promise<(PostComment & { user: Pick<User, 'displayName'> })[]> {
+    return await db.select({
+      id: postComments.id,
+      postId: postComments.postId,
+      userId: postComments.userId,
+      message: postComments.message,
+      createdAt: postComments.createdAt,
+      user: {
+        displayName: users.displayName,
+      },
+    })
+    .from(postComments)
+    .innerJoin(users, eq(postComments.userId, users.id))
+    .where(eq(postComments.postId, postId))
+    .orderBy(postComments.createdAt);
   }
 }
 

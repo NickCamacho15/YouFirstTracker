@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
-import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertPostSchema } from "@shared/schema";
+import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema } from "@shared/schema";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -358,6 +358,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get posts error:", error);
       res.status(500).json({ message: "Failed to get posts" });
+    }
+  });
+
+  // Social features routes
+  app.get("/api/timeline", requireAuth, async (req: any, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const posts = await storage.getTimelinePosts(req.user.id, limit);
+      res.json(posts);
+    } catch (error) {
+      console.error("Get timeline error:", error);
+      res.status(500).json({ message: "Failed to get timeline" });
+    }
+  });
+
+  app.get("/api/following", requireAuth, async (req: any, res) => {
+    try {
+      const following = await storage.getFollowing(req.user.id);
+      res.json(following);
+    } catch (error) {
+      console.error("Get following error:", error);
+      res.status(500).json({ message: "Failed to get following" });
+    }
+  });
+
+  app.get("/api/followers", requireAuth, async (req: any, res) => {
+    try {
+      const followers = await storage.getFollowers(req.user.id);
+      res.json(followers);
+    } catch (error) {
+      console.error("Get followers error:", error);
+      res.status(500).json({ message: "Failed to get followers" });
+    }
+  });
+
+  app.post("/api/follow", requireAuth, async (req: any, res) => {
+    try {
+      const { followingId } = insertFollowerSchema.parse({
+        followerId: req.user.id,
+        ...req.body
+      });
+      const follow = await storage.followUser(req.user.id, followingId);
+      res.json(follow);
+    } catch (error) {
+      console.error("Follow user error:", error);
+      res.status(500).json({ message: "Failed to follow user" });
+    }
+  });
+
+  app.delete("/api/follow/:followingId", requireAuth, async (req: any, res) => {
+    try {
+      const followingId = parseInt(req.params.followingId);
+      const success = await storage.unfollowUser(req.user.id, followingId);
+      res.json({ success });
+    } catch (error) {
+      console.error("Unfollow user error:", error);
+      res.status(500).json({ message: "Failed to unfollow user" });
+    }
+  });
+
+  // Post reactions
+  app.post("/api/posts/:postId/reactions", requireAuth, async (req: any, res) => {
+    try {
+      const postId = parseInt(req.params.postId);
+      const reaction = insertPostReactionSchema.parse({
+        postId,
+        userId: req.user.id,
+        ...req.body
+      });
+      const result = await storage.addPostReaction(reaction);
+      res.json(result);
+    } catch (error) {
+      console.error("Add reaction error:", error);
+      res.status(500).json({ message: "Failed to add reaction" });
+    }
+  });
+
+  app.delete("/api/posts/:postId/reactions", requireAuth, async (req: any, res) => {
+    try {
+      const postId = parseInt(req.params.postId);
+      const success = await storage.removePostReaction(postId, req.user.id);
+      res.json({ success });
+    } catch (error) {
+      console.error("Remove reaction error:", error);
+      res.status(500).json({ message: "Failed to remove reaction" });
+    }
+  });
+
+  app.get("/api/posts/:postId/reactions", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.postId);
+      const reactions = await storage.getPostReactions(postId);
+      res.json(reactions);
+    } catch (error) {
+      console.error("Get reactions error:", error);
+      res.status(500).json({ message: "Failed to get reactions" });
+    }
+  });
+
+  // Post comments
+  app.post("/api/posts/:postId/comments", requireAuth, async (req: any, res) => {
+    try {
+      const postId = parseInt(req.params.postId);
+      const comment = insertPostCommentSchema.parse({
+        postId,
+        userId: req.user.id,
+        ...req.body
+      });
+      const result = await storage.addPostComment(comment);
+      res.json(result);
+    } catch (error) {
+      console.error("Add comment error:", error);
+      res.status(500).json({ message: "Failed to add comment" });
+    }
+  });
+
+  app.get("/api/posts/:postId/comments", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.postId);
+      const comments = await storage.getPostComments(postId);
+      res.json(comments);
+    } catch (error) {
+      console.error("Get comments error:", error);
+      res.status(500).json({ message: "Failed to get comments" });
     }
   });
 
