@@ -25,6 +25,7 @@ export interface IStorage {
   getUserById(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser & { password: string }): Promise<User>;
+  updateUser(id: number, updates: Partial<Omit<User, 'id' | 'createdAt' | 'passwordHash'>>): Promise<User | undefined>;
   validatePassword(email: string, password: string): Promise<User | null>;
 
   // Goals

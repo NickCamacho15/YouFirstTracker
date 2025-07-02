@@ -7,6 +7,8 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   displayName: text("display_name").notNull(),
   passwordHash: text("password_hash").notNull(),
+  bio: text("bio"),
+  profileImageUrl: text("profile_image_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -15,6 +17,9 @@ export const goals = pgTable("goals", {
   userId: integer("user_id").references(() => users.id).notNull(),
   title: text("title").notNull(),
   description: text("description"),
+  type: text("type", { enum: ["physical", "financial", "career", "personal", "health"] }).default("personal").notNull(),
+  benefits: text("benefits").array().notNull(), // At least 3 benefits
+  consequences: text("consequences").array().notNull(), // What happens if you don't follow through
   dueDate: timestamp("due_date"),
   completed: boolean("completed").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -140,6 +145,8 @@ export const insertGoalSchema = createInsertSchema(goals).omit({
   completed: true,
 }).extend({
   dueDate: z.string().optional().transform((val) => val && val !== "" ? new Date(val) : undefined),
+  benefits: z.array(z.string().min(1)).min(3, "At least 3 benefits are required"),
+  consequences: z.array(z.string().min(1)).min(1, "At least 1 consequence is required"),
 });
 
 export const insertMicroGoalSchema = createInsertSchema(microGoals).omit({

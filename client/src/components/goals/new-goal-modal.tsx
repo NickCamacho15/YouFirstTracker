@@ -11,15 +11,27 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, X, Heart, DollarSign, Briefcase, User, Shield, AlertTriangle } from "lucide-react";
 
 const goalSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
+  type: z.enum(["physical", "financial", "career", "personal", "health"]),
+  benefits: z.array(z.string().min(1)).min(3, "At least 3 benefits are required"),
+  consequences: z.array(z.string().min(1)).min(1, "At least 1 consequence is required"),
   dueDate: z.string().optional(),
 });
 
 type GoalFormData = z.infer<typeof goalSchema>;
+
+const goalTypes = [
+  { value: "physical", label: "Physical", icon: Heart, color: "bg-red-500", lightColor: "bg-red-50 text-red-700 border-red-200" },
+  { value: "financial", label: "Financial", icon: DollarSign, color: "bg-green-500", lightColor: "bg-green-50 text-green-700 border-green-200" },
+  { value: "career", label: "Career", icon: Briefcase, color: "bg-blue-500", lightColor: "bg-blue-50 text-blue-700 border-blue-200" },
+  { value: "personal", label: "Personal", icon: User, color: "bg-purple-500", lightColor: "bg-purple-50 text-purple-700 border-purple-200" },
+  { value: "health", label: "Health", icon: Shield, color: "bg-emerald-500", lightColor: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+];
 
 interface NewGoalModalProps {
   open: boolean;
