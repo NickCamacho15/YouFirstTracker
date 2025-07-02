@@ -80,15 +80,26 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
   const completedToday = habits.filter(h => h.completedToday).length;
   const completionRate = Math.round((completedToday / habits.length) * 100);
   
-  // Generate last 7 days completion data for the graph
+  // Calculate category-specific completion rates
+  const mindHabits = habits.filter(h => h.category === 'mind');
+  const bodyHabits = habits.filter(h => h.category === 'body');
+  const soulHabits = habits.filter(h => h.category === 'soul');
+  
+  const mindCompletion = mindHabits.length > 0 ? Math.round((mindHabits.filter(h => h.completedToday).length / mindHabits.length) * 100) : 0;
+  const bodyCompletion = bodyHabits.length > 0 ? Math.round((bodyHabits.filter(h => h.completedToday).length / bodyHabits.length) * 100) : 0;
+  const soulCompletion = soulHabits.length > 0 ? Math.round((soulHabits.filter(h => h.completedToday).length / soulHabits.length) * 100) : 0;
+  
+  // Generate last 7 days completion data for each category
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - (6 - i));
-    // Mock completion rates for visualization
-    const mockRate = Math.floor(Math.random() * 40) + 60; // 60-100%
+    
     return {
       day: date.toLocaleDateString('en', { weekday: 'short' }),
-      completion: i === 6 ? completionRate : mockRate // Today's actual rate
+      mind: i === 6 ? mindCompletion : Math.floor(Math.random() * 40) + 60,
+      body: i === 6 ? bodyCompletion : Math.floor(Math.random() * 40) + 60,
+      soul: i === 6 ? soulCompletion : Math.floor(Math.random() * 40) + 60,
+      overall: i === 6 ? completionRate : Math.floor(Math.random() * 40) + 60
     };
   });
 
@@ -113,15 +124,22 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
             </div>
           </div>
 
-          {/* Line Graph */}
+          {/* Multi-Line Graph */}
           <div className="relative h-32 mb-4">
             <svg className="w-full h-full" viewBox="0 0 400 120">
               {/* Grid lines */}
               <defs>
-                <linearGradient id="graphGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <linearGradient id="mindGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity="0.8"/>
+                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.6"/>
+                </linearGradient>
+                <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#f97316" stopOpacity="0.8"/>
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity="0.6"/>
+                </linearGradient>
+                <linearGradient id="soulGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stopColor="#10b981" stopOpacity="0.8"/>
-                  <stop offset="50%" stopColor="#06b6d4" stopOpacity="0.6"/>
-                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.4"/>
+                  <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.6"/>
                 </linearGradient>
               </defs>
               
@@ -130,27 +148,67 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
                 <line key={y} x1="0" y1={y} x2="400" y2={y} stroke="#374151" strokeWidth="0.5" opacity="0.3"/>
               ))}
               
-              {/* Data line */}
+              {/* Mind line */}
               <polyline
                 fill="none"
-                stroke="url(#graphGradient)"
+                stroke="#6366f1"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                points={last7Days.map((day, i) => `${(i * 400) / 6},${120 - (day.completion * 120) / 100}`).join(' ')}
+                points={last7Days.map((day, i) => `${(i * 400) / 6},${120 - (day.mind * 120) / 100}`).join(' ')}
               />
               
-              {/* Data points */}
+              {/* Body line */}
+              <polyline
+                fill="none"
+                stroke="#f97316"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                points={last7Days.map((day, i) => `${(i * 400) / 6},${120 - (day.body * 120) / 100}`).join(' ')}
+              />
+              
+              {/* Soul line */}
+              <polyline
+                fill="none"
+                stroke="#10b981"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                points={last7Days.map((day, i) => `${(i * 400) / 6},${120 - (day.soul * 120) / 100}`).join(' ')}
+              />
+              
+              {/* Data points for each category */}
               {last7Days.map((day, i) => (
-                <circle
-                  key={i}
-                  cx={(i * 400) / 6}
-                  cy={120 - (day.completion * 120) / 100}
-                  r="3"
-                  fill="#10b981"
-                  stroke="#1f2937"
-                  strokeWidth="1"
-                />
+                <g key={i}>
+                  {/* Mind points */}
+                  <circle
+                    cx={(i * 400) / 6}
+                    cy={120 - (day.mind * 120) / 100}
+                    r="3"
+                    fill="#6366f1"
+                    stroke="#1f2937"
+                    strokeWidth="1"
+                  />
+                  {/* Body points */}
+                  <circle
+                    cx={(i * 400) / 6}
+                    cy={120 - (day.body * 120) / 100}
+                    r="3"
+                    fill="#f97316"
+                    stroke="#1f2937"
+                    strokeWidth="1"
+                  />
+                  {/* Soul points */}
+                  <circle
+                    cx={(i * 400) / 6}
+                    cy={120 - (day.soul * 120) / 100}
+                    r="3"
+                    fill="#10b981"
+                    stroke="#1f2937"
+                    strokeWidth="1"
+                  />
+                </g>
               ))}
             </svg>
             
@@ -164,6 +222,22 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
             </div>
           </div>
 
+          {/* Legend */}
+          <div className="flex justify-center gap-6 mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-indigo-600"></div>
+              <span className="text-xs text-gray-600 font-medium">Mind</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-orange-600"></div>
+              <span className="text-xs text-gray-600 font-medium">Body</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-emerald-600"></div>
+              <span className="text-xs text-gray-600 font-medium">Soul</span>
+            </div>
+          </div>
+
           {/* X-axis labels */}
           <div className="flex justify-between text-xs text-gray-400 mb-6">
             {last7Days.map((day, i) => (
@@ -171,19 +245,23 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
             ))}
           </div>
 
-          {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-4">
+          {/* Category Stats Row */}
+          <div className="grid grid-cols-4 gap-3">
+            <div className="text-center">
+              <div className="text-indigo-400 text-lg font-bold">{mindCompletion}%</div>
+              <div className="text-gray-400 text-xs">MIND</div>
+            </div>
+            <div className="text-center">
+              <div className="text-orange-400 text-lg font-bold">{bodyCompletion}%</div>
+              <div className="text-gray-400 text-xs">BODY</div>
+            </div>
+            <div className="text-center">
+              <div className="text-emerald-400 text-lg font-bold">{soulCompletion}%</div>
+              <div className="text-gray-400 text-xs">SOUL</div>
+            </div>
             <div className="text-center">
               <div className="text-cyan-400 text-lg font-bold">{completedToday}</div>
               <div className="text-gray-400 text-xs">TODAY</div>
-            </div>
-            <div className="text-center">
-              <div className="text-emerald-400 text-lg font-bold">{Math.max(...habits.map(h => h.streak))}</div>
-              <div className="text-gray-400 text-xs">MAX STREAK</div>
-            </div>
-            <div className="text-center">
-              <div className="text-purple-400 text-lg font-bold">{habits.length}</div>
-              <div className="text-gray-400 text-xs">TOTAL</div>
             </div>
           </div>
         </div>
