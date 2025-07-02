@@ -11,6 +11,32 @@ interface SlideToCompleteProps {
   };
 }
 
+// Helper function to get darkened solid colors for the drag bar
+const getDarkColor = (colorName: string): string => {
+  const colorMap: { [key: string]: string } = {
+    'blue': '#1e40af',      // blue-800
+    'electric-blue': '#1e40af', 
+    'amber': '#92400e',     // amber-800
+    'orange': '#9a3412',    // orange-800
+    'gold': '#92400e',      // amber-800
+    'emerald': '#065f46',   // emerald-800
+    'teal': '#115e59',      // teal-800
+    'purple': '#581c87',    // purple-800
+    'indigo': '#3730a3',    // indigo-800
+    'green': '#166534',     // green-800
+  };
+  
+  // Extract color name from Tailwind classes or use direct mapping
+  for (const [key, value] of Object.entries(colorMap)) {
+    if (colorName.includes(key)) {
+      return value;
+    }
+  }
+  
+  // Fallback to a dark gray
+  return '#374151';
+};
+
 export function SlideToComplete({ onComplete, disabled = false, colors }: SlideToCompleteProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
@@ -137,7 +163,7 @@ export function SlideToComplete({ onComplete, disabled = false, colors }: SlideT
           }`}
           style={{
             transform: `translateX(${dragOffset}px)`,
-            backgroundColor: colors.bg.includes('bg-') ? colors.stroke : colors.bg,
+            backgroundColor: getDarkColor(colors.bg + ' ' + colors.stroke),
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
           }}
           onMouseDown={handleMouseDown}
