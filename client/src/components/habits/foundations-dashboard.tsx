@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, Circle, Settings, Flame, TrendingUp } from 'lucide-react';
+import { CheckCircle2, Circle, Settings, Flame, TrendingUp, X } from 'lucide-react';
 import { useState, useRef } from 'react';
 
 interface Habit {
@@ -21,6 +21,8 @@ interface FoundationsDashboardProps {
 }
 
 export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoading }: FoundationsDashboardProps) {
+  const [showTip, setShowTip] = useState(true);
+  const [showScience, setShowScience] = useState(true);
   if (habits.length === 0) {
     return (
       <div className="text-center py-16">
@@ -105,22 +107,23 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
 
   return (
     <div className="space-y-6">
-      {/* Central Completion Graph - Whoop Style */}
-      <div className="relative p-6 bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 rounded-3xl border border-gray-700 overflow-hidden">
+      {/* Central Completion Graph - Transparent and Floating */}
+      <div className="relative p-6 backdrop-blur-xl bg-white/15 border border-white/25 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-4 right-4 w-20 h-20 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-xl animate-pulse"></div>
           <div className="absolute bottom-4 left-4 w-16 h-16 bg-gradient-to-br from-emerald-500/15 to-teal-500/15 rounded-full blur-lg animate-pulse delay-1000"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/10 via-purple-50/10 to-emerald-50/10 rounded-3xl"></div>
         </div>
         
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-bold text-white mb-1">FOUNDATION MONITOR</h2>
-              <p className="text-gray-400 text-sm">Last updated {new Date().toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })}</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-1">FOUNDATION MONITOR</h2>
+              <p className="text-gray-600 text-sm">Last updated {new Date().toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })}</p>
             </div>
             <div className="text-right">
-              <div className="text-emerald-400 text-sm font-semibold">HIGH</div>
-              <div className="text-white text-2xl font-bold">{completionRate}%</div>
+              <div className="text-emerald-600 text-sm font-semibold">HIGH</div>
+              <div className="text-gray-900 text-2xl font-bold">{completionRate}%</div>
             </div>
           </div>
 
@@ -145,14 +148,14 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
               
               {/* Grid */}
               {[0, 30, 60, 90, 120].map((y) => (
-                <line key={y} x1="0" y1={y} x2="400" y2={y} stroke="#374151" strokeWidth="0.5" opacity="0.3"/>
+                <line key={y} x1="0" y1={y} x2="400" y2={y} stroke="#94a3b8" strokeWidth="0.5" opacity="0.4"/>
               ))}
               
               {/* Mind line */}
               <polyline
                 fill="none"
                 stroke="#6366f1"
-                strokeWidth="2"
+                strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 points={last7Days.map((day, i) => `${(i * 400) / 6},${120 - (day.mind * 120) / 100}`).join(' ')}
@@ -162,7 +165,7 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
               <polyline
                 fill="none"
                 stroke="#f97316"
-                strokeWidth="2"
+                strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 points={last7Days.map((day, i) => `${(i * 400) / 6},${120 - (day.body * 120) / 100}`).join(' ')}
@@ -172,7 +175,7 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
               <polyline
                 fill="none"
                 stroke="#10b981"
-                strokeWidth="2"
+                strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 points={last7Days.map((day, i) => `${(i * 400) / 6},${120 - (day.soul * 120) / 100}`).join(' ')}
@@ -267,152 +270,311 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
         </div>
       </div>
 
-      {/* Compact Habits Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
+      {/* Progress Circles for Each Habit */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
         {habits.map((habit) => {
           const colors = getCategoryGradient(habit.category);
+          const progressPercentage = Math.min((habit.streak / 67) * 100, 100);
+          const circumference = 2 * Math.PI * 45;
+          const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
           
           return (
-            <div key={habit.id} className="relative group">
-              {/* Edit Button - Floating outside tile */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEditHabit(habit);
-                }}
-                className="absolute -top-2 -right-2 z-20 h-8 w-8 p-0 bg-white border border-gray-200 shadow-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-400 hover:text-gray-600"
-              >
-                <Settings className="w-4 h-4" />
-              </Button>
-              
-              {/* Habit Tile */}
-              <div 
-                className={`relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02] aspect-square flex flex-col shadow-lg ${
-                  habit.completedToday 
-                    ? `${colors.light} border-2 ${colors.border} bg-opacity-80` 
-                    : 'bg-white border-2 border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div className="relative z-10 p-4 flex flex-col h-full">
-                  {/* Header with icon and checkbox */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="text-3xl">{colors.icon}</div>
-                    <button
-                      onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
-                      className="flex-shrink-0"
-                      disabled={isLoading}
-                    >
-                      <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
-                        habit.completedToday 
-                          ? `${colors.bg} ${colors.border} text-white` 
-                          : 'border-gray-300 hover:border-gray-400'
-                      }`}>
-                        {habit.completedToday && (
-                          <CheckCircle2 className="w-4 h-4" />
-                        )}
-                      </div>
-                    </button>
-                  </div>
-
-                  {/* Title */}
-                  <div className="mb-3 flex-grow">
-                    <h3 className="font-bold text-base text-gray-900 dark:text-gray-100 leading-tight line-clamp-2">{habit.title}</h3>
-                  </div>
-                  
-                  {/* Streak */}
-                  <div className="text-center mb-3">
-                    <div className="flex items-center justify-center gap-1 mb-1">
-                      <Flame className="w-4 h-4 text-amber-500" />
-                      <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{habit.streak}</span>
-                    </div>
-                    <div className="text-xs font-semibold text-gray-600 dark:text-gray-400">day streak</div>
-                  </div>
-                  
-                  {/* Completion Status */}
-                  <div className="mt-auto">
-                    <div className={`w-full py-2 px-3 rounded-lg text-center transition-all duration-300 ${
-                      habit.completedToday 
-                        ? `${colors.bg} text-white`
-                        : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      <span className="text-sm font-medium">
-                        {habit.completedToday ? '✅ Complete!' : 'Pending'}
-                      </span>
-                    </div>
+            <div key={habit.id} className="flex flex-col items-center space-y-3">
+              {/* Progress Circle */}
+              <div className="relative">
+                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                  {/* Background circle */}
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="45"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    fill="transparent"
+                    className="text-gray-200"
+                  />
+                  {/* Progress circle */}
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="45"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    fill="transparent"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                    className={`${colors.text} transition-all duration-500 ease-out`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                {/* Center content */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-xl font-black text-gray-900">{habit.streak}</div>
+                    <div className="text-xs text-gray-600">days</div>
                   </div>
                 </div>
+              </div>
+              
+              {/* Habit name and edit button */}
+              <div className="text-center space-y-1">
+                <h4 className="font-semibold text-sm text-gray-900 line-clamp-2">{habit.title}</h4>
+                <div className="text-xs text-gray-500">{habit.streak}/67 days</div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEditHabit(habit)}
+                  className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
+                >
+                  <Settings className="w-3 h-3" />
+                </Button>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Development Period Graph */}
+      {/* Compact Daily Completion Tiles */}
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-8">
+        {habits.map((habit) => {
+          const colors = getCategoryGradient(habit.category);
+          
+          return (
+            <div 
+              key={`tile-${habit.id}`}
+              className={`relative rounded-xl p-4 aspect-square flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 cursor-pointer ${
+                habit.completedToday 
+                  ? `${colors.bg} shadow-lg` 
+                  : 'bg-gray-100 hover:bg-gray-200 shadow-md'
+              }`}
+              onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
+            >
+              {/* Icon */}
+              <div className={`text-2xl mb-2 ${habit.completedToday ? 'text-white' : 'text-gray-600'}`}>
+                {colors.icon}
+              </div>
+              
+              {/* Completion indicator */}
+              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                habit.completedToday 
+                  ? 'bg-white border-white' 
+                  : 'border-gray-400'
+              }`}>
+                {habit.completedToday && (
+                  <CheckCircle2 className={`w-4 h-4 ${colors.text}`} />
+                )}
+              </div>
+              
+              {/* Title */}
+              <div className={`text-xs font-semibold mt-2 text-center line-clamp-2 ${
+                habit.completedToday ? 'text-white' : 'text-gray-700'
+              }`}>
+                {habit.title}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Mandala-Style Habit Radar Chart */}
       <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 border-2 border-gray-200 dark:border-gray-700 shadow-xl">
         <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100 mb-8 flex items-center gap-3">
           <TrendingUp className="w-6 h-6 text-blue-600" />
-          67-Day Formation Journey
+          Habit Formation Mandala
         </h3>
         
-        <div className="space-y-6">
-          {habits.map((habit) => {
-            const colors = getCategoryGradient(habit.category);
-            const progressPercentage = Math.min((habit.streak / 67) * 100, 100);
-            
-            // Determine stage
-            let stage = '';
-            let stageColor = '';
-            if (habit.streak <= 18) {
-              stage = 'Initial Formation';
-              stageColor = 'text-blue-700';
-            } else if (habit.streak <= 45) {
-              stage = 'Strengthening';
-              stageColor = 'text-amber-700';
-            } else if (habit.streak <= 67) {
-              stage = 'Automaticity';
-              stageColor = 'text-emerald-700';
-            } else {
-              stage = 'Mastered';
-              stageColor = 'text-purple-700';
-            }
-            
-            return (
-              <div key={habit.id} className={`${colors.light} rounded-2xl p-6 border-2 ${colors.border} shadow-lg`}>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="text-3xl">{colors.icon}</div>
-                    <div>
-                      <h4 className="font-black text-xl text-gray-900 dark:text-gray-100">{habit.title}</h4>
-                      <p className={`text-base ${stageColor} font-bold`}>{stage} • Day {habit.streak}/67</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-black text-gray-900 dark:text-gray-100">{Math.round(progressPercentage)}%</div>
-                    <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">complete</div>
-                  </div>
-                </div>
+        <div className="flex flex-col items-center">
+          {/* Radar Chart */}
+          <div className="relative w-96 h-96 md:w-[500px] md:h-[500px] mb-8">
+            <svg viewBox="0 0 400 400" className="w-full h-full">
+              {/* Background circles for progress levels */}
+              {[20, 40, 60, 80, 100].map((level, index) => (
+                <circle
+                  key={level}
+                  cx="200"
+                  cy="200"
+                  r={level * 1.5}
+                  fill="none"
+                  stroke="#e5e7eb"
+                  strokeWidth="1"
+                  opacity={0.3}
+                />
+              ))}
+              
+              {/* Grid lines from center */}
+              {habits.map((_, index) => {
+                const angle = (index * 360) / habits.length;
+                const x2 = 200 + 150 * Math.cos((angle - 90) * Math.PI / 180);
+                const y2 = 200 + 150 * Math.sin((angle - 90) * Math.PI / 180);
                 
-                {/* Progress Bar */}
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden shadow-inner">
+                return (
+                  <line
+                    key={`grid-${index}`}
+                    x1="200"
+                    y1="200"
+                    x2={x2}
+                    y2={y2}
+                    stroke="#e5e7eb"
+                    strokeWidth="1"
+                    opacity={0.3}
+                  />
+                );
+              })}
+              
+              {/* Habit progress areas */}
+              {habits.map((habit, index) => {
+                const colors = getCategoryGradient(habit.category);
+                const progressValue = Math.min((habit.streak / 67) * 150, 150);
+                const angle = (index * 360) / habits.length;
+                const x = 200 + progressValue * Math.cos((angle - 90) * Math.PI / 180);
+                const y = 200 + progressValue * Math.sin((angle - 90) * Math.PI / 180);
+                
+                return (
+                  <g key={`habit-${habit.id}`}>
+                    {/* Habit progress point - larger and more engaging */}
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r="12"
+                      fill={colors.bg.includes('blue') ? '#3b82f6' : 
+                           colors.bg.includes('purple') ? '#8b5cf6' :
+                           colors.bg.includes('emerald') ? '#10b981' :
+                           colors.bg.includes('amber') ? '#f59e0b' : '#ef4444'}
+                      stroke="white"
+                      strokeWidth="4"
+                      className="drop-shadow-lg animate-pulse"
+                    />
+                    
+                    {/* Inner glow effect */}
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r="8"
+                      fill={colors.bg.includes('blue') ? '#60a5fa' : 
+                           colors.bg.includes('purple') ? '#a78bfa' :
+                           colors.bg.includes('emerald') ? '#34d399' :
+                           colors.bg.includes('amber') ? '#fbbf24' : '#f87171'}
+                      opacity="0.6"
+                    />
+                    
+                    {/* Habit icon */}
+                    <text
+                      x={200 + (progressValue + 25) * Math.cos((angle - 90) * Math.PI / 180)}
+                      y={200 + (progressValue + 25) * Math.sin((angle - 90) * Math.PI / 180)}
+                      textAnchor="middle"
+                      fontSize="16"
+                      fill="#374151"
+                    >
+                      {colors.icon}
+                    </text>
+                    
+                    {/* Habit label */}
+                    <text
+                      x={200 + (progressValue + 45) * Math.cos((angle - 90) * Math.PI / 180)}
+                      y={200 + (progressValue + 45) * Math.sin((angle - 90) * Math.PI / 180)}
+                      textAnchor="middle"
+                      fontSize="11"
+                      fill="#374151"
+                      className="font-semibold"
+                    >
+                      {habit.title.split(' ')[0]}
+                    </text>
+                    
+                    {/* Progress value */}
+                    <text
+                      x={200 + (progressValue + 60) * Math.cos((angle - 90) * Math.PI / 180)}
+                      y={200 + (progressValue + 60) * Math.sin((angle - 90) * Math.PI / 180)}
+                      textAnchor="middle"
+                      fontSize="10"
+                      fill="#6b7280"
+                    >
+                      {habit.streak}d
+                    </text>
+                  </g>
+                );
+              })}
+              
+              {/* Center completion indicator - larger and more prominent */}
+              <circle
+                cx="200"
+                cy="200"
+                r="45"
+                fill="url(#centerGradient)"
+                stroke="#3b82f6"
+                strokeWidth="6"
+                className="drop-shadow-xl"
+              />
+              
+              {/* Center glow effect */}
+              <circle
+                cx="200"
+                cy="200"
+                r="35"
+                fill="url(#centerInnerGradient)"
+                opacity="0.8"
+              />
+              
+              {/* Center text - larger and more prominent */}
+              <text
+                x="200"
+                y="195"
+                textAnchor="middle"
+                fontSize="24"
+                fill="white"
+                className="font-black"
+              >
+                {habits.length > 0 ? Math.round(habits.reduce((sum, h) => sum + h.streak, 0) / habits.length) : 0}
+              </text>
+              <text
+                x="200"
+                y="215"
+                textAnchor="middle"
+                fontSize="12"
+                fill="white"
+                className="font-semibold"
+              >
+                avg days
+              </text>
+              
+              {/* Gradient definitions */}
+              <defs>
+                <radialGradient id="centerGradient" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#60a5fa" />
+                  <stop offset="100%" stopColor="#3b82f6" />
+                </radialGradient>
+                <radialGradient id="centerInnerGradient" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#93c5fd" />
+                  <stop offset="100%" stopColor="#60a5fa" />
+                </radialGradient>
+              </defs>
+            </svg>
+          </div>
+          
+          {/* Legend */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            {habits.map((habit) => {
+              const colors = getCategoryGradient(habit.category);
+              const progressPercentage = Math.min((habit.streak / 67) * 100, 100);
+              
+              return (
+                <div key={`legend-${habit.id}`} className="flex items-center gap-2">
                   <div 
-                    className={`h-4 ${colors.bg} transition-all duration-1000 ease-out rounded-full relative shadow-lg`}
-                    style={{ width: `${progressPercentage}%` }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-white/40"></div>
+                    className="w-4 h-4 rounded-full"
+                    style={{ 
+                      backgroundColor: colors.bg.includes('blue') ? '#3b82f6' : 
+                                     colors.bg.includes('purple') ? '#8b5cf6' :
+                                     colors.bg.includes('emerald') ? '#10b981' :
+                                     colors.bg.includes('amber') ? '#f59e0b' : '#ef4444'
+                    }}
+                  />
+                  <div>
+                    <div className="font-medium text-gray-900">{habit.title}</div>
+                    <div className="text-xs text-gray-500">{Math.round(progressPercentage)}% complete</div>
                   </div>
                 </div>
-                
-                {/* Stage Markers */}
-                <div className="flex justify-between mt-3 text-sm font-bold">
-                  <span className={habit.streak > 18 ? 'text-blue-700 font-black' : 'text-gray-400'}>18</span>
-                  <span className={habit.streak > 45 ? 'text-amber-700 font-black' : 'text-gray-400'}>45</span>
-                  <span className={habit.streak >= 67 ? 'text-emerald-700 font-black' : 'text-gray-400'}>67</span>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

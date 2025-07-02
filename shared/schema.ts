@@ -133,6 +133,36 @@ export const userStats = pgTable("user_stats", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Insights tracking table
+export const insights = pgTable("insights", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  category: text("category"), // reflection, breakthrough, lesson, etc.
+  tags: text("tags").array(),
+  isPrivate: boolean("is_private").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User profile extensions for social features
+export const userProfiles = pgTable("user_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull().unique(),
+  bio: text("bio"),
+  location: text("location"),
+  website: text("website"),
+  joinedAt: timestamp("joined_at").defaultNow(),
+  totalReadingMinutes: integer("total_reading_minutes").default(0),
+  booksCompleted: integer("books_completed").default(0),
+  favoriteGenres: text("favorite_genres").array(),
+  currentlyReading: text("currently_reading"),
+  profileVisibility: text("profile_visibility").default("public"), // public, private, friends
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -211,6 +241,18 @@ export const insertUserStatsSchema = createInsertSchema(userStats).omit({
   updatedAt: true,
 });
 
+export const insertInsightSchema = createInsertSchema(insights).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertUserProfileSchema = createInsertSchema(userProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -238,3 +280,7 @@ export type PostReaction = typeof postReactions.$inferSelect;
 export type InsertPostReaction = z.infer<typeof insertPostReactionSchema>;
 export type PostComment = typeof postComments.$inferSelect;
 export type InsertPostComment = z.infer<typeof insertPostCommentSchema>;
+export type Insight = typeof insights.$inferSelect;
+export type InsertInsight = z.infer<typeof insertInsightSchema>;
+export type UserProfile = typeof userProfiles.$inferSelect;
+export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;

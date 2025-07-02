@@ -84,11 +84,11 @@ export default function HabitsPage() {
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [showFormationInfo, setShowFormationInfo] = useState(true);
   const [rules, setRules] = useState([
-    { id: 1, text: "No social media before 10 AM", violated: false, streak: 12, category: "Digital Wellness", completedToday: true },
-    { id: 2, text: "No processed food on weekdays", violated: false, streak: 8, category: "Nutrition", completedToday: true },
-    { id: 3, text: "No screens 1 hour before bed", violated: true, streak: 0, category: "Sleep Hygiene", completedToday: false },
-    { id: 4, text: "No negative self-talk", violated: false, streak: 5, category: "Mental Health", completedToday: true },
-    { id: 5, text: "No skipping workouts without valid reason", violated: false, streak: 15, category: "Fitness", completedToday: true },
+    { id: 1, text: "No social media before 10 AM", violated: false, streak: 12, category: "Digital Wellness", completedToday: true, failures: 2 },
+    { id: 2, text: "No processed food on weekdays", violated: false, streak: 8, category: "Nutrition", completedToday: true, failures: 0 },
+    { id: 3, text: "No screens 1 hour before bed", violated: true, streak: 0, category: "Sleep Hygiene", completedToday: false, failures: 5 },
+    { id: 4, text: "No negative self-talk", violated: false, streak: 5, category: "Mental Health", completedToday: true, failures: 1 },
+    { id: 5, text: "No skipping workouts without valid reason", violated: false, streak: 15, category: "Fitness", completedToday: true, failures: 0 },
   ]);
   const [newRule, setNewRule] = useState("");
   const [newRuleCategory, setNewRuleCategory] = useState("Personal");
@@ -140,7 +140,8 @@ export default function HabitsPage() {
         violated: false,
         streak: 0,
         category: newRuleCategory,
-        completedToday: false
+        completedToday: false,
+        failures: 0
       };
       setRules(prev => [...prev, newRuleObj]);
       setNewRule("");
@@ -186,7 +187,8 @@ export default function HabitsPage() {
             ...rule, 
             completedToday: false,
             violated: true,
-            streak: 0
+            streak: 0,
+            failures: rule.failures + 1
           }
         : rule
     ));
@@ -196,6 +198,26 @@ export default function HabitsPage() {
       toast({
         title: "Promise broken",
         description: `"${rule.text}" - Tomorrow is a fresh start to rebuild integrity`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const markRuleFailure = (id: number) => {
+    setRules(rules.map(rule => 
+      rule.id === id 
+        ? { 
+            ...rule, 
+            failures: rule.failures + 1
+          }
+        : rule
+    ));
+    
+    const rule = rules.find(r => r.id === id);
+    if (rule) {
+      toast({
+        title: "Failure recorded",
+        description: `"${rule.text}" - Tracking for growth and awareness`,
         variant: "destructive",
       });
     }
@@ -258,7 +280,7 @@ export default function HabitsPage() {
                         variant="ghost" 
                         size="sm"
                         onClick={() => setShowFormationInfo(false)}
-                        className="text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900"
+                        className="text-blue-600 hover:text-blue-800"
                       >
                         <X className="w-4 h-4" />
                       </Button>
@@ -623,9 +645,23 @@ export default function HabitsPage() {
                               <span className={rule.completedToday ? 'text-green-600' : 'text-gray-500'}>
                                 {rule.completedToday ? '✅ Promise kept today' : `🔄 ${rule.streak} day streak`}
                               </span>
+                              {rule.failures > 0 && (
+                                <span className="text-red-500 text-xs">
+                                  ⚠️ {rule.failures} failures tracked
+                                </span>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => markRuleFailure(rule.id)}
+                              className="text-orange-400 hover:text-orange-600"
+                              title="Mark failure"
+                            >
+                              ⚠️
+                            </Button>
                             <Button
                               variant="ghost"
                               size="sm"
