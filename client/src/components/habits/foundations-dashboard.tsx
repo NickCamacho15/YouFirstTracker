@@ -273,82 +273,74 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
           const colors = getCategoryGradient(habit.category);
           
           return (
-            <div 
-              key={habit.id} 
-              className={`group relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02] aspect-square flex flex-col shadow-lg ${
-                habit.completedToday 
-                  ? `${colors.light} border-2 ${colors.border} bg-opacity-80` 
-                  : 'bg-white border-2 border-gray-200 hover:border-gray-300'
-              }`}
-            >
+            <div key={habit.id} className="relative group">
+              {/* Edit Button - Floating outside tile */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditHabit(habit);
+                }}
+                className="absolute -top-2 -right-2 z-20 h-8 w-8 p-0 bg-white border border-gray-200 shadow-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-400 hover:text-gray-600"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
               
-              <div className="relative z-10 p-4 flex flex-col h-full">
-                {/* Header with checkbox and settings */}
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="text-2xl">{colors.icon}</div>
+              {/* Habit Tile */}
+              <div 
+                className={`relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02] aspect-square flex flex-col shadow-lg ${
+                  habit.completedToday 
+                    ? `${colors.light} border-2 ${colors.border} bg-opacity-80` 
+                    : 'bg-white border-2 border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="relative z-10 p-4 flex flex-col h-full">
+                  {/* Header with icon and checkbox */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="text-3xl">{colors.icon}</div>
                     <button
                       onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
                       className="flex-shrink-0"
                       disabled={isLoading}
                     >
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                      <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
                         habit.completedToday 
                           ? `${colors.bg} ${colors.border} text-white` 
                           : 'border-gray-300 hover:border-gray-400'
                       }`}>
                         {habit.completedToday && (
-                          <CheckCircle2 className="w-3 h-3" />
+                          <CheckCircle2 className="w-4 h-4" />
                         )}
                       </div>
                     </button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEditHabit(habit);
-                    }}
-                    className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-                  >
-                    <Settings className="w-4 h-4" />
-                  </Button>
-                </div>
 
-                {/* Title */}
-                <div className="mb-3 flex-grow">
-                  <h3 className="font-bold text-base text-gray-900 dark:text-gray-100 leading-tight line-clamp-2">{habit.title}</h3>
-                </div>
-                
-                {/* Completion Counter */}
-                <div className="text-center mb-2">
-                  <div className="text-2xl font-black text-gray-900 dark:text-gray-100">
-                    {/* Generate a realistic completion count based on streak */}
-                    {Math.max(habit.streak + Math.floor(habit.streak * 0.3), habit.streak)}
+                  {/* Title */}
+                  <div className="mb-3 flex-grow">
+                    <h3 className="font-bold text-base text-gray-900 dark:text-gray-100 leading-tight line-clamp-2">{habit.title}</h3>
                   </div>
-                  <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">COMPLETIONS</div>
-                </div>
-
-                {/* Streak */}
-                <div className="text-center mb-3">
-                  <div className="flex items-center justify-center gap-1 mb-1">
-                    <Flame className="w-4 h-4 text-amber-500" />
-                    <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{habit.streak}</span>
+                  
+                  {/* Streak */}
+                  <div className="text-center mb-3">
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <Flame className="w-4 h-4 text-amber-500" />
+                      <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{habit.streak}</span>
+                    </div>
+                    <div className="text-xs font-semibold text-gray-600 dark:text-gray-400">day streak</div>
                   </div>
-                  <div className="text-xs font-semibold text-gray-600 dark:text-gray-400">day streak</div>
-                </div>
-                
-                {/* Completion Status */}
-                <div className="mt-auto">
-                  <div className={`w-full py-2 px-3 rounded-lg text-center transition-all duration-300 ${
-                    habit.completedToday 
-                      ? `${colors.bg} text-white`
-                      : 'bg-gray-100 text-gray-600'
-                  }`}>
-                    <span className="text-sm font-medium">
-                      {habit.completedToday ? '✅ Complete!' : 'Pending'}
-                    </span>
+                  
+                  {/* Completion Status */}
+                  <div className="mt-auto">
+                    <div className={`w-full py-2 px-3 rounded-lg text-center transition-all duration-300 ${
+                      habit.completedToday 
+                        ? `${colors.bg} text-white`
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      <span className="text-sm font-medium">
+                        {habit.completedToday ? '✅ Complete!' : 'Pending'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
