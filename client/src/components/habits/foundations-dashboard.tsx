@@ -318,23 +318,30 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
                   <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">days</div>
                 </div>
                 
-                {/* Completion Status */}
-                <div className={`w-full h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                  habit.completedToday 
-                    ? `${colors.bg} text-white shadow-lg`
-                    : `bg-gray-50 dark:bg-gray-800 border-2 ${colors.border} text-gray-700 dark:text-gray-300`
-                }`}>
-                  {habit.completedToday ? (
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-6 h-6 animate-bounce" />
-                      <span className="font-bold">Complete!</span>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center">
-                      <Circle className="w-6 h-6 mb-1" />
-                      <span className="text-xs font-medium">Slide up to complete</span>
-                    </div>
+                {/* Completion Status with Grab Bar */}
+                <div className="relative">
+                  {/* Darker Grab Bar - Only show when not completed */}
+                  {!habit.completedToday && (
+                    <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gray-600 rounded-full shadow-sm"></div>
                   )}
+                  
+                  <div className={`w-full h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                    habit.completedToday 
+                      ? `${colors.bg} text-white shadow-lg`
+                      : `bg-gray-100 border-2 ${colors.border} text-gray-700 shadow-inner`
+                  }`}>
+                    {habit.completedToday ? (
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-6 h-6 animate-bounce" />
+                        <span className="font-bold">Complete!</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center">
+                        <Circle className="w-6 h-6 mb-1" />
+                        <span className="text-xs font-medium">Slide up to complete</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
