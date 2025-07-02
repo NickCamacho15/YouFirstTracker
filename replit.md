@@ -123,6 +123,17 @@ Build scripts include:
 
 ## Changelog
 
+- July 2, 2025: Major Social Features Integration - Home Timeline + Follower Feed
+  - **NEW**: Home page now serves as social timeline feed (Instagram Stories + habit-tracking community)
+  - **RESTRUCTURED**: You page moved to `/you` route and remains as personal "You. Dashboard" 
+  - Added comprehensive social schema: followers, post reactions, comments, privacy settings
+  - Created profile circles with story-style design showing users you follow
+  - Timeline feed displays posts from followed users with reaction system (heart, fire, pray, celebrate)
+  - Post types include habit completions, goal achievements, micro-goals, reading reflections, milestones
+  - Implemented social storage layer with following/followers functionality
+  - Added social API routes for timeline, following, reactions, and comments
+  - Navigation restructured: Home (timeline) → You (personal dashboard) → Goals → Habits → Read
+  - Updated branding from "You. First." to ".uoY" throughout interface
 - July 1, 2025: Completed "You. Dashboard" - The Premium Personal Excellence Platform
   - **FINALIZED**: You page (dashboard) is complete and should not be adjusted further
   - Restructured task system with goals tied to cumulative task completion counters (234, 456+ tasks)

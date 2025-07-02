@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Bell, Home, Target, Repeat, BookOpen, ImageIcon, Clipboard } from "lucide-react";
+import { Bell, Home, Target, Repeat, BookOpen, ImageIcon, User, Sparkles } from "lucide-react";
 
 export function Navigation() {
   const [location] = useLocation();
@@ -33,7 +33,7 @@ export function Navigation() {
               <div className="flex-shrink-0">
                 <Link href="/">
                   <h1 className="text-xl font-bold text-foreground cursor-pointer">
-                    You. <span className="text-accent">First.</span>
+                    .uoY
                   </h1>
                 </Link>
               </div>
@@ -63,7 +63,18 @@ export function Navigation() {
                 ? "text-accent bg-accent/10"
                 : "text-muted-foreground hover:text-foreground"
             }`}>
-              <Clipboard className="w-5 h-5 mb-1" />
+              <Home className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">Home</span>
+            </div>
+          </Link>
+
+          <Link href="/you">
+            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
+              isActive("/you")
+                ? "text-accent bg-accent/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}>
+              <User className="w-5 h-5 mb-1" />
               <span className="text-xs font-medium">You</span>
             </div>
           </Link>
