@@ -4,10 +4,13 @@ import { eq, desc, and, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { 
   users, goals, microGoals, habits, habitLogs, readingSessions, posts, visionBoard, tasks,
+  followers, postReactions, postComments,
   type User, type InsertUser, type Goal, type InsertGoal, type MicroGoal, type InsertMicroGoal,
   type Habit, type InsertHabit, type HabitLog, type InsertHabitLog,
   type ReadingSession, type InsertReadingSession, type Post, type InsertPost,
-  type VisionBoardItem, type InsertVisionBoardItem, type Task, type InsertTask
+  type VisionBoardItem, type InsertVisionBoardItem, type Task, type InsertTask,
+  type Follower, type InsertFollower, type PostReaction, type InsertPostReaction,
+  type PostComment, type InsertPostComment
 } from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -69,6 +72,22 @@ export interface IStorage {
   createTask(task: InsertTask): Promise<Task>;
   updateTask(id: number, updates: Partial<Task>): Promise<Task | undefined>;
   deleteTask(id: number): Promise<boolean>;
+
+  // Social Features
+  followUser(followerId: number, followingId: number): Promise<Follower>;
+  unfollowUser(followerId: number, followingId: number): Promise<boolean>;
+  getFollowers(userId: number): Promise<(Follower & { follower: Pick<User, 'id' | 'displayName'> })[]>;
+  getFollowing(userId: number): Promise<(Follower & { following: Pick<User, 'id' | 'displayName'> })[]>;
+  getTimelinePosts(userId: number, limit?: number): Promise<(Post & { user: Pick<User, 'displayName'> })[]>;
+  
+  // Post Reactions
+  addPostReaction(reaction: InsertPostReaction): Promise<PostReaction>;
+  removePostReaction(postId: number, userId: number): Promise<boolean>;
+  getPostReactions(postId: number): Promise<(PostReaction & { user: Pick<User, 'displayName'> })[]>;
+  
+  // Post Comments
+  addPostComment(comment: InsertPostComment): Promise<PostComment>;
+  getPostComments(postId: number): Promise<(PostComment & { user: Pick<User, 'displayName'> })[]>;
 }
 
 export class DatabaseStorage implements IStorage {

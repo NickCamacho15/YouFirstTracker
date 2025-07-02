@@ -58,12 +58,38 @@ export const readingSessions = pgTable("reading_sessions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Social features
+export const followers = pgTable("followers", {
+  id: serial("id").primaryKey(),
+  followerId: integer("follower_id").references(() => users.id).notNull(),
+  followingId: integer("following_id").references(() => users.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const posts = pgTable("posts", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  type: text("type").notNull(), // goal, micro-goal, habit, reflection
+  type: text("type").notNull(), // goal, micro-goal, habit, reflection, milestone
   message: text("message").notNull(),
   relatedId: integer("related_id"), // ID of related goal/habit/session
+  isPrivate: boolean("is_private").default(false).notNull(),
+  metadata: text("metadata"), // JSON string for additional data like streaks, milestones
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const postReactions = pgTable("post_reactions", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id").references(() => posts.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  type: text("type", { enum: ["heart", "fire", "pray", "celebrate"] }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const postComments = pgTable("post_comments", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id").references(() => posts.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  message: text("message").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -139,7 +165,22 @@ export const insertReadingSessionSchema = createInsertSchema(readingSessions).om
   createdAt: true,
 });
 
+export const insertFollowerSchema = createInsertSchema(followers).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertPostSchema = createInsertSchema(posts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPostReactionSchema = createInsertSchema(postReactions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPostCommentSchema = createInsertSchema(postComments).omit({
   id: true,
   createdAt: true,
 });
@@ -184,3 +225,9 @@ export type Task = typeof tasks.$inferSelect;
 export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type UserStats = typeof userStats.$inferSelect;
 export type InsertUserStats = z.infer<typeof insertUserStatsSchema>;
+export type Follower = typeof followers.$inferSelect;
+export type InsertFollower = z.infer<typeof insertFollowerSchema>;
+export type PostReaction = typeof postReactions.$inferSelect;
+export type InsertPostReaction = z.infer<typeof insertPostReactionSchema>;
+export type PostComment = typeof postComments.$inferSelect;
+export type InsertPostComment = z.infer<typeof insertPostCommentSchema>;
