@@ -30,6 +30,9 @@ export default function DashboardPage() {
   const [showNewGoalModal, setShowNewGoalModal] = useState(false);
   const [showNewHabitModal, setShowNewHabitModal] = useState(false);
   
+  // Critical tasks completion counter - tracks lifetime achievements
+  const [criticalTasksCompleted, setCriticalTasksCompleted] = useState(147); // Starting with example number
+  
   // Combined tasks, routines, and critical items - in real app this would come from API
   const [tasks, setTasks] = useState([
     { id: 'routine-1', text: 'Meditation (10 min)', completed: true, type: 'routine', category: 'Morning', priority: 1 },
@@ -47,9 +50,23 @@ export default function DashboardPage() {
   const [draggedTask, setDraggedTask] = useState<string | null>(null);
 
   const handleTaskToggle = (taskId: string) => {
-    setTasks(prev => prev.map(task => 
-      task.id === taskId ? { ...task, completed: !task.completed } : task
-    ));
+    setTasks(prev => prev.map(task => {
+      if (task.id === taskId) {
+        const updatedTask = { ...task, completed: !task.completed };
+        
+        // Increment counter when a critical task is completed
+        if (updatedTask.completed && task.type === 'critical') {
+          setCriticalTasksCompleted(count => count + 1);
+        }
+        // Decrement counter when a critical task is unchecked
+        else if (!updatedTask.completed && task.type === 'critical' && task.completed) {
+          setCriticalTasksCompleted(count => Math.max(0, count - 1));
+        }
+        
+        return updatedTask;
+      }
+      return task;
+    }));
   };
 
   const handleDragStart = (e: React.DragEvent, taskId: string) => {
@@ -278,13 +295,27 @@ export default function DashboardPage() {
         {/* Today's Tasks - To-Do List */}
         <Card className="border-0 shadow-lg mb-6">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-gray-600" />
-              Today's Tasks & Routines
-            </CardTitle>
-            <p className="text-sm text-gray-600 mt-1">
-              Critical tasks, routines, and regular tasks - drag to reorder priorities
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-gray-600" />
+                  Today's Tasks & Routines
+                </CardTitle>
+                <p className="text-sm text-gray-600 mt-1">
+                  Critical tasks, routines, and regular tasks - drag to reorder priorities
+                </p>
+              </div>
+              
+              {/* Critical Tasks Completion Counter */}
+              <div className="text-center bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-xl px-4 py-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <Trophy className="w-4 h-4 text-red-600" />
+                  <span className="text-xs font-semibold text-red-600 uppercase tracking-wider">Critical Completed</span>
+                </div>
+                <div className="text-2xl font-black text-red-700">{criticalTasksCompleted}</div>
+                <div className="text-xs text-red-500">lifetime total</div>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
