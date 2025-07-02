@@ -29,6 +29,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.session.userId) {
       return res.status(401).json({ message: "Authentication required" });
     }
+    // Set user object for compatibility with social routes
+    req.user = { id: req.session.userId };
     next();
   };
 
