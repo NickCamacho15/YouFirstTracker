@@ -43,14 +43,77 @@ export default function DashboardPage() {
     { id: 4, title: 'Home Organization', description: 'Organize and optimize living space', tasksCompleted: 98, daysWorking: 23, color: 'bg-gradient-to-r from-orange-500 to-red-600' }
   ]);
 
-  // Critical tasks tied to goals
-  const [criticalTasks, setCriticalTasks] = useState([
-    { id: 'critical-1', text: 'Review quarterly metrics', completed: false, goalId: 1, time: 'Due 2 PM', priority: 1 },
-    { id: 'critical-2', text: 'Team standup meeting', completed: false, goalId: 2, time: '10 AM', priority: 2 },
-    { id: 'critical-3', text: 'Prepare presentation slides', completed: false, goalId: 1, priority: 3 },
-    { id: 'critical-4', text: 'Update project timeline', completed: false, goalId: 2, priority: 4 },
-    { id: 'critical-5', text: 'Doctor appointment', completed: false, goalId: 3, time: '3 PM', priority: 5 }
-  ]);
+  // Get current day and week
+  const currentDay = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const [selectedDay, setSelectedDay] = useState(currentDay === 0 ? 1 : currentDay); // Default to Monday if Sunday
+
+  // Weekly tasks organized by day
+  const [weeklyTasks, setWeeklyTasks] = useState({
+    1: [ // Monday
+      { id: 'mon-1', text: 'Team standup meeting', completed: false, goalId: 2, time: '9 AM', priority: 1 },
+      { id: 'mon-2', text: 'Review quarterly metrics', completed: false, goalId: 1, time: 'Due 2 PM', priority: 2 },
+      { id: 'mon-3', text: 'Plan weekly priorities', completed: false, goalId: 1, priority: 3 }
+    ],
+    2: [ // Tuesday
+      { id: 'tue-1', text: 'Client presentation prep', completed: false, goalId: 1, time: '10 AM', priority: 1 },
+      { id: 'tue-2', text: 'Fitness training session', completed: false, goalId: 3, time: '6 PM', priority: 2 },
+      { id: 'tue-3', text: 'Team 1:1 meetings', completed: false, goalId: 2, priority: 3 }
+    ],
+    3: [ // Wednesday
+      { id: 'wed-1', text: 'Mid-week project review', completed: false, goalId: 1, time: '2 PM', priority: 1 },
+      { id: 'wed-2', text: 'Meal prep for week', completed: false, goalId: 3, priority: 2 },
+      { id: 'wed-3', text: 'Update project timeline', completed: false, goalId: 2, priority: 3 }
+    ],
+    4: [ // Thursday
+      { id: 'thu-1', text: 'Prepare presentation slides', completed: false, goalId: 1, time: '11 AM', priority: 1 },
+      { id: 'thu-2', text: 'Doctor appointment', completed: false, goalId: 3, time: '3 PM', priority: 2 },
+      { id: 'thu-3', text: 'Team retrospective', completed: false, goalId: 2, priority: 3 }
+    ],
+    5: [ // Friday
+      { id: 'fri-1', text: 'Week wrap-up meeting', completed: false, goalId: 2, time: '4 PM', priority: 1 },
+      { id: 'fri-2', text: 'Complete weekly reports', completed: false, goalId: 1, priority: 2 },
+      { id: 'fri-3', text: 'Plan weekend activities', completed: false, goalId: 3, priority: 3 }
+    ],
+    6: [ // Saturday
+      { id: 'sat-1', text: 'Home organization project', completed: false, goalId: 4, time: '10 AM', priority: 1 },
+      { id: 'sat-2', text: 'Family time activities', completed: false, goalId: 3, priority: 2 },
+      { id: 'sat-3', text: 'Personal development reading', completed: false, goalId: 3, priority: 3 }
+    ],
+    0: [ // Sunday
+      { id: 'sun-1', text: 'Weekly reflection & planning', completed: false, goalId: 1, time: '6 PM', priority: 1 },
+      { id: 'sun-2', text: 'Prepare for upcoming week', completed: false, goalId: 2, priority: 2 },
+      { id: 'sun-3', text: 'Rest and recharge', completed: false, goalId: 3, priority: 3 }
+    ]
+  });
+
+  // Auto refresh on Sunday
+  useEffect(() => {
+    const checkSundayRefresh = () => {
+      const now = new Date();
+      const day = now.getDay();
+      
+      // If it's Sunday and past 6 PM, reset the week
+      if (day === 0 && now.getHours() >= 18) {
+        // Reset all tasks to uncompleted for the new week
+        setWeeklyTasks(prev => {
+          const resetTasks = { ...prev };
+          Object.keys(resetTasks).forEach(dayKey => {
+            resetTasks[dayKey] = resetTasks[dayKey].map(task => ({ ...task, completed: false }));
+          });
+          return resetTasks;
+        });
+      }
+    };
+
+    // Check every hour
+    const interval = setInterval(checkSundayRefresh, 60 * 60 * 1000);
+    checkSundayRefresh(); // Check immediately
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const currentDayTasks = weeklyTasks[selectedDay] || [];
 
   // Morning routines
   const [morningRoutines, setMorningRoutines] = useState([
@@ -68,20 +131,23 @@ export default function DashboardPage() {
     { id: 'evening-4', text: 'Gratitude practice', completed: false, priority: 4 }
   ]);
 
-  const handleCriticalTaskToggle = (taskId: string) => {
-    setCriticalTasks(prev => prev.map(task => {
-      if (task.id === taskId) {
-        const updatedTask = { ...task, completed: !task.completed };
-        
-        if (updatedTask.completed && !task.completed) {
-          setCriticalTasksCompleted(count => count + 1);
-        } else if (!updatedTask.completed && task.completed) {
-          setCriticalTasksCompleted(count => Math.max(0, count - 1));
+  const handleWeeklyTaskToggle = (taskId: string) => {
+    setWeeklyTasks(prev => ({
+      ...prev,
+      [selectedDay]: prev[selectedDay as keyof typeof prev].map(task => {
+        if (task.id === taskId) {
+          const updatedTask = { ...task, completed: !task.completed };
+          
+          if (updatedTask.completed && !task.completed) {
+            setCriticalTasksCompleted(count => count + 1);
+          } else if (!updatedTask.completed && task.completed) {
+            setCriticalTasksCompleted(count => Math.max(0, count - 1));
+          }
+          
+          return updatedTask;
         }
-        
-        return updatedTask;
-      }
-      return task;
+        return task;
+      })
     }));
   };
 
@@ -358,17 +424,17 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Today's Tasks */}
+        {/* Weekly Tasks with Day Tabs */}
         <Card className="border-0 shadow-lg mb-6">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-blue-600" />
-                  Today's Tasks
+                  Weekly Tasks
                 </CardTitle>
                 <p className="text-sm text-gray-600 mt-1">
-                  Important tasks that drive your goals forward
+                  Plan your week for maximum productivity
                 </p>
               </div>
               
@@ -381,10 +447,42 @@ export default function DashboardPage() {
                 <div className="text-xs text-blue-600">lifetime total</div>
               </div>
             </div>
+
+            {/* Day Selection Tabs */}
+            <div className="flex flex-wrap gap-1 mt-4 bg-gray-100 rounded-lg p-1">
+              {[1, 2, 3, 4, 5, 6, 0].map((day) => {
+                const dayName = dayNames[day];
+                const isSelected = selectedDay === day;
+                const isToday = currentDay === day;
+                
+                return (
+                  <button
+                    key={day}
+                    onClick={() => setSelectedDay(day)}
+                    className={`px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 ${
+                      isSelected 
+                        ? 'bg-blue-600 text-white shadow-sm' 
+                        : isToday
+                        ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                        : 'text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {dayName.slice(0, 3)}
+                    {isToday && <span className="ml-1 text-xs">•</span>}
+                  </button>
+                );
+              })}
+            </div>
           </CardHeader>
           <CardContent>
+            <div className="mb-4">
+              <h3 className="font-semibold text-gray-900 mb-2">
+                {dayNames[selectedDay]} Tasks
+                {selectedDay === currentDay && <span className="text-blue-600 ml-2">(Today)</span>}
+              </h3>
+            </div>
             <div className="space-y-3">
-              {criticalTasks.map((task, index) => {
+              {currentDayTasks.map((task, index) => {
                 const goal = getGoalById(task.goalId);
                 
                 return (
@@ -397,7 +495,7 @@ export default function DashboardPage() {
                     <input 
                       type="checkbox" 
                       checked={task.completed}
-                      onChange={() => handleCriticalTaskToggle(task.id)}
+                      onChange={() => handleWeeklyTaskToggle(task.id)}
                       className="w-5 h-5 text-blue-600 rounded cursor-pointer"
                     />
 
