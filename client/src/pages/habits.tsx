@@ -247,7 +247,7 @@ export default function HabitsPage() {
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="formation" className="flex items-center gap-2">
                 <BarChart3 className="w-4 h-4" />
-                Formation
+                New habits
               </TabsTrigger>
               <TabsTrigger value="foundations" className="flex items-center gap-2">
                 <Flame className="w-4 h-4" />
