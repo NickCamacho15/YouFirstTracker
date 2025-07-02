@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GoalCard } from "@/components/goals/goal-card";
 import { NewGoalModal } from "@/components/goals/new-goal-modal";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus, Target, Star, ImageIcon, Upload, X } from "lucide-react";
+import { Plus, Target, Star, ImageIcon, Upload, X, Heart, Camera, Trophy } from "lucide-react";
 
 interface Goal {
   id: number;
@@ -113,32 +113,36 @@ export default function GoalsPage() {
             <Target className="w-6 h-6 text-accent" />
             Goals & Vision
           </h1>
-          <p className="text-muted-foreground">Set aspirations and visualize your future</p>
+          <p className="text-muted-foreground">Set aspirations, visualize your future, and remember your why</p>
         </div>
 
         {/* Tabs */}
         <Tabs defaultValue="goals" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="goals" className="flex items-center gap-2">
               <Target className="w-4 h-4" />
-              Goals
+              Vision
             </TabsTrigger>
             <TabsTrigger value="vision" className="flex items-center gap-2">
               <Star className="w-4 h-4" />
-              Future Folder
+              Vision Board
+            </TabsTrigger>
+            <TabsTrigger value="reasons" className="flex items-center gap-2">
+              <Heart className="w-4 h-4" />
+              Reasons
             </TabsTrigger>
           </TabsList>
 
-          {/* Goals Tab */}
+          {/* Vision Tab */}
           <TabsContent value="goals" className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold">Your Goals</h2>
-                <p className="text-sm text-muted-foreground">Break down your aspirations into actionable steps</p>
+                <h2 className="text-xl font-semibold">Your Vision</h2>
+                <p className="text-sm text-muted-foreground">Transform your aspirations into actionable steps</p>
               </div>
               <Button onClick={() => setShowNewGoalModal(true)}>
                 <Plus className="w-4 h-4 mr-2" />
-                New Goal
+                New Vision
               </Button>
             </div>
 
@@ -146,13 +150,13 @@ export default function GoalsPage() {
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Target className="w-12 h-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No goals yet</h3>
+                  <h3 className="text-lg font-medium mb-2">No vision set yet</h3>
                   <p className="text-muted-foreground text-center mb-6">
-                    Start by creating your first goal to track your progress
+                    Start by creating your first vision to track your progress toward excellence
                   </p>
                   <Button onClick={() => setShowNewGoalModal(true)}>
                     <Plus className="w-4 h-4 mr-2" />
-                    Create Your First Goal
+                    Create Your First Vision
                   </Button>
                 </CardContent>
               </Card>
@@ -253,11 +257,11 @@ export default function GoalsPage() {
             )}
           </TabsContent>
 
-          {/* Future Folder (Vision Board) Tab */}
+          {/* Vision Board Tab */}
           <TabsContent value="vision" className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold">Future Folder</h2>
+                <h2 className="text-xl font-semibold">Vision Board</h2>
                 <p className="text-sm text-muted-foreground">Visualize your dreams and aspirations</p>
               </div>
               <div className="flex gap-2">
@@ -317,6 +321,197 @@ export default function GoalsPage() {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          {/* Reasons Tab */}
+          <TabsContent value="reasons" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold">Your Why</h2>
+                <p className="text-sm text-muted-foreground">Remember why you're committed to excellence</p>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  id="reasons-upload"
+                />
+                <Button 
+                  variant="outline" 
+                  onClick={() => document.getElementById('reasons-upload')?.click()}
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  Add Photo
+                </Button>
+              </div>
+            </div>
+
+            {/* Motivation Dashboard */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Family & Loved Ones */}
+              <Card className="border-0 shadow-lg bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-950/50 dark:to-pink-950/50">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-rose-100 dark:bg-rose-900 rounded-lg">
+                      <Heart className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Family & Loved Ones</CardTitle>
+                      <p className="text-sm text-muted-foreground">Who you're building this life for</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Sample family photos - replace with user uploads */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="aspect-square rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+                      <Camera className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <div className="aspect-square rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+                      <Camera className="w-8 h-8 text-gray-400" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-rose-800 dark:text-rose-200">Your Daily Reminders:</h4>
+                    <ul className="space-y-1 text-sm text-rose-700 dark:text-rose-300">
+                      <li>• "I am building a legacy for my family"</li>
+                      <li>• "My growth creates security for those I love"</li>
+                      <li>• "Every day I choose to be better for them"</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Future Self */}
+              <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                      <Trophy className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Future Self</CardTitle>
+                      <p className="text-sm text-muted-foreground">The person you're becoming</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-4 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                    <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">1000-Day Vision:</h4>
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      "In 1000 days, I will be someone who has built unshakeable habits, 
+                      achieved meaningful goals, and created a life of purpose and abundance."
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-blue-800 dark:text-blue-200">What Success Looks Like:</h4>
+                    <ul className="space-y-1 text-sm text-blue-700 dark:text-blue-300">
+                      <li>• Financial freedom and security</li>
+                      <li>• Peak physical and mental health</li>
+                      <li>• Deep, meaningful relationships</li>
+                      <li>• Mastery in my chosen field</li>
+                      <li>• Daily peace and fulfillment</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Pain & Gain */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* What You're Moving Away From */}
+              <Card className="border-0 shadow-lg bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/50 dark:to-orange-950/50">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg text-red-800 dark:text-red-200">Moving Away From</CardTitle>
+                  <p className="text-sm text-red-600 dark:text-red-400">What you refuse to accept</p>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-red-700 dark:text-red-300">
+                    <li>• Mediocrity and settling for less</li>
+                    <li>• Financial stress and uncertainty</li>
+                    <li>• Feeling out of control</li>
+                    <li>• Wasting potential and time</li>
+                    <li>• Living without purpose</li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* What You're Moving Toward */}
+              <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg text-green-800 dark:text-green-200">Moving Toward</CardTitle>
+                  <p className="text-sm text-green-600 dark:text-green-400">What you're building</p>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-green-700 dark:text-green-300">
+                    <li>• Excellence in all areas of life</li>
+                    <li>• Abundance and freedom</li>
+                    <li>• Deep confidence and self-mastery</li>
+                    <li>• Impact and meaningful contribution</li>
+                    <li>• Daily joy and fulfillment</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Daily Mantras */}
+            <Card className="border-0 shadow-lg bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/50 dark:to-indigo-950/50">
+              <CardHeader>
+                <CardTitle className="text-lg">Daily Mantras</CardTitle>
+                <p className="text-sm text-muted-foreground">Remind yourself who you are and where you're going</p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div className="p-3 bg-white/50 dark:bg-black/20 rounded-lg">
+                      <p className="text-sm font-medium text-purple-800 dark:text-purple-200">
+                        "I am committed to excellence over perfection"
+                      </p>
+                    </div>
+                    <div className="p-3 bg-white/50 dark:bg-black/20 rounded-lg">
+                      <p className="text-sm font-medium text-purple-800 dark:text-purple-200">
+                        "Every action I take builds my future self"
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-white/50 dark:bg-black/20 rounded-lg">
+                      <p className="text-sm font-medium text-purple-800 dark:text-purple-200">
+                        "I choose growth over comfort, always"
+                      </p>
+                    </div>
+                    <div className="p-3 bg-white/50 dark:bg-black/20 rounded-lg">
+                      <p className="text-sm font-medium text-purple-800 dark:text-purple-200">
+                        "My consistency creates my destiny"
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Emergency Motivation */}
+            <Card className="border-0 shadow-lg bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/50 dark:to-yellow-950/50">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <span className="text-2xl">🚨</span>
+                  Emergency Motivation
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">For when you need an instant reminder of your why</p>
+              </CardHeader>
+              <CardContent>
+                <div className="p-4 bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 rounded-lg">
+                  <p className="text-center text-amber-800 dark:text-amber-200 font-medium">
+                    "The pain of discipline weighs ounces. The pain of regret weighs tons. 
+                    Choose your pain wisely."
+                  </p>
+                  <p className="text-center text-sm text-amber-700 dark:text-amber-300 mt-2">
+                    Remember: You've already started. Don't stop now.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 

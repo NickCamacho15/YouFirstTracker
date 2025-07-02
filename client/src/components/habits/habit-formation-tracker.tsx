@@ -1,21 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { format, startOfDay, subDays, isSameDay } from "date-fns";
 import { CheckCircle2, Circle, Brain, Zap, Trophy } from "lucide-react";
-
-interface HabitLog {
-  id: number;
-  habitId: number;
-  date: string;
-  completed: boolean;
-}
 
 interface Habit {
   id: number;
   title: string;
   streak: number;
   category?: string;
+  completedToday: boolean;
 }
 
 interface HabitFormationTrackerProps {
@@ -28,269 +20,75 @@ export function HabitFormationTracker({ habits }: HabitFormationTrackerProps) {
   
   if (formationHabits.length === 0) {
     return (
-      <Card className="w-full">
+      <Card className="border-0 shadow-lg">
         <CardContent className="p-8 text-center">
-          <p className="text-muted-foreground">No habits in formation. All your habits are fully formed!</p>
+          <Trophy className="w-12 h-12 text-gold-500 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">All Habits Mastered!</h3>
+          <p className="text-muted-foreground">
+            Congratulations! All your habits have reached the 67-day mastery milestone.
+          </p>
         </CardContent>
       </Card>
     );
   }
-  
-  const { data: habitLogs = [] } = useQuery({
-    queryKey: ["/api/habit-logs"],
-  });
-
-  // Generate last 67 days (based on habit formation science + bonus day for .uoY)
-  const getLast67Days = () => {
-    const days = [];
-    for (let i = 66; i >= 0; i--) {
-      days.push(subDays(new Date(), i));
-    }
-    return days;
-  };
-
-  const days = getLast67Days();
-
-  const isCompletedOnDay = (habitId: number, date: Date) => {
-    return (habitLogs as HabitLog[]).some((log: HabitLog) => 
-      log.habitId === habitId && 
-      log.completed && 
-      isSameDay(new Date(log.date), startOfDay(date))
-    );
-  };
-
-  const getHabitColor = (habit: Habit) => {
-    if (habit.category === 'mind') {
-      return { bg: 'bg-blue-500', light: 'bg-blue-100', text: 'text-blue-700', icon: '🧠' };
-    } else if (habit.category === 'body') {
-      return { bg: 'bg-amber-500', light: 'bg-amber-100', text: 'text-amber-700', icon: '💪' };
-    } else if (habit.category === 'soul') {
-      return { bg: 'bg-emerald-500', light: 'bg-emerald-100', text: 'text-emerald-700', icon: '🙏' };
-    }
-    return { bg: 'bg-gray-500', light: 'bg-gray-100', text: 'text-gray-700', icon: '⚡' };
-  };
-
-  // Select primary habit for detailed tracker
-  const primaryHabit = formationHabits[0];
 
   return (
-    <div className="space-y-6">
-      {/* Small Habit Tiles Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-        {formationHabits.map((habit) => {
-          const colors = getHabitColor(habit);
-          const completionPercentage = Math.min((habit.streak / 67) * 100, 100);
-          
-          return (
-            <Card key={habit.id} className="p-3 hover:shadow-md transition-shadow">
-              <div className="text-center">
-                <div className="text-2xl mb-2">{colors.icon}</div>
-                <h4 className="font-semibold text-sm mb-2 line-clamp-2">{habit.title}</h4>
-                
-                {/* Mini Progress Ring */}
-                <div className="relative w-16 h-16 mx-auto mb-2">
-                  <svg className="w-16 h-16 transform -rotate-90">
-                    <circle 
-                      cx="32" 
-                      cy="32" 
-                      r="28" 
-                      stroke="currentColor" 
-                      strokeWidth="4" 
-                      fill="none" 
-                      className="text-gray-200" 
-                    />
-                    <circle 
-                      cx="32" 
-                      cy="32" 
-                      r="28" 
-                      stroke="currentColor" 
-                      strokeWidth="4" 
-                      fill="none" 
-                      strokeDasharray={`${2 * Math.PI * 28}`}
-                      strokeDashoffset={`${2 * Math.PI * 28 * (1 - completionPercentage / 100)}`}
-                      strokeLinecap="round"
-                      className={colors.text}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-sm font-bold">{habit.streak}</span>
+    <Card className="border-0 shadow-lg">
+      <CardHeader>
+        <CardTitle className="text-xl">Formation Progress Tracker</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Track your habits through the three stages of formation
+        </p>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-6">
+          {formationHabits.map((habit) => {
+            const stage = habit.streak <= 18 ? 1 : habit.streak <= 45 ? 2 : 3;
+            const stageProgress = stage === 1 
+              ? (habit.streak / 18) * 100 
+              : stage === 2 
+              ? ((habit.streak - 18) / 27) * 100 
+              : ((habit.streak - 45) / 22) * 100;
+
+            const stageColors = {
+              1: 'text-blue-600',
+              2: 'text-orange-600', 
+              3: 'text-emerald-600'
+            };
+
+            return (
+              <div key={habit.id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h4 className="font-semibold">{habit.title}</h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline" className={stageColors[stage as keyof typeof stageColors]}>
+                        Stage {stage}
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">
+                        Day {habit.streak}/67
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-emerald-600">
+                    {habit.streak}
                   </div>
                 </div>
                 
-                <div className="text-xs text-muted-foreground">
-                  {habit.streak}/67 days
+                {/* Progress Bar */}
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                  <div 
+                    className="bg-gradient-to-r from-blue-500 to-emerald-500 h-2 rounded-full transition-all duration-500"
+                    style={{ width: `${(habit.streak / 67) * 100}%` }}
+                  />
+                </div>
+                
+                <div className="text-xs text-muted-foreground text-center">
+                  {Math.round((habit.streak / 67) * 100)}% to mastery
                 </div>
               </div>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Detailed Formation Tracker */}
-      {primaryHabit && (
-        <Card className="p-6">
-          <CardHeader className="px-0 pt-0">
-            <CardTitle className="flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-amber-500" />
-              Formation Progress: {primaryHabit.title}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-0 pb-0">
-            {renderDetailedTracker(primaryHabit)}
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-
-  function renderDetailedTracker(habit: Habit) {
-    const colors = getHabitColor(habit);
-    
-    // Split into three stages based on habit formation science (plus bonus day)
-    const stage1Days = days.slice(0, 18); // Days 1-18: Initial formation
-    const stage2Days = days.slice(18, 45); // Days 19-45: Strengthening 
-    const stage3Days = days.slice(45, 66); // Days 46-66: Automaticity
-    const bonusDay = days.slice(66, 67); // Day 67: Bonus day for .uoY
-
-    const getStageCompletion = (stageDays: Date[]) => {
-      const completed = stageDays.filter(day => isCompletedOnDay(habit.id, day)).length;
-      return { completed, total: stageDays.length, percentage: Math.round((completed / stageDays.length) * 100) };
-    };
-
-    const stage1Stats = getStageCompletion(stage1Days);
-    const stage2Stats = getStageCompletion(stage2Days);
-    const stage3Stats = getStageCompletion(stage3Days);
-
-    return (
-      <div className="space-y-6">
-        {/* Full 67-Day Grid */}
-        <div className="space-y-4">
-          <h3 className="font-semibold text-lg">67-Day Formation Journey</h3>
-          <div className="grid grid-cols-10 gap-1">
-            {days.map((day, index) => {
-              const isCompleted = isCompletedOnDay(habit.id, day);
-              const isToday = isSameDay(day, new Date());
-              
-              let stageColor = 'bg-gray-200';
-              if (index < 18) stageColor = 'bg-orange-200'; // Stage 1
-              else if (index < 45) stageColor = 'bg-blue-200'; // Stage 2
-              else if (index < 66) stageColor = 'bg-green-200'; // Stage 3
-              else stageColor = 'bg-purple-200'; // Bonus day
-              
-              return (
-                <div
-                  key={index}
-                  className={`w-6 h-6 rounded-md transition-all duration-200 ${
-                    isCompleted 
-                      ? colors.bg + ' text-white' 
-                      : stageColor
-                  } ${isToday ? 'ring-2 ring-offset-1 ring-current' : ''} 
-                  flex items-center justify-center text-xs font-bold`}
-                  title={`Day ${index + 1}: ${format(day, 'MMM d')} - ${isCompleted ? 'Completed' : 'Not completed'}`}
-                >
-                  {index + 1}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        
-        {/* Stage Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-orange-50 border-l-4 border-orange-400 p-4 rounded">
-            <h4 className="font-semibold text-orange-800">Stage 1: Initial Formation</h4>
-            <p className="text-sm text-orange-600 mb-2">Days 1-18 • Building awareness</p>
-            <div className="text-2xl font-bold text-orange-800">
-              {stage1Stats.completed}/{stage1Stats.total}
-            </div>
-            <div className="text-sm text-orange-600">{stage1Stats.percentage}% complete</div>
-          </div>
-          
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
-            <h4 className="font-semibold text-blue-800">Stage 2: Strengthening</h4>
-            <p className="text-sm text-blue-600 mb-2">Days 19-45 • Neural development</p>
-            <div className="text-2xl font-bold text-blue-800">
-              {stage2Stats.completed}/{stage2Stats.total}
-            </div>
-            <div className="text-sm text-blue-600">{stage2Stats.percentage}% complete</div>
-          </div>
-          
-          <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded">
-            <h4 className="font-semibold text-green-800">Stage 3: Automaticity</h4>
-            <p className="text-sm text-green-600 mb-2">Days 46-67 • Becoming automatic</p>
-            <div className="text-2xl font-bold text-green-800">
-              {stage3Stats.completed}/{stage3Stats.total}
-            </div>
-            <div className="text-sm text-green-600">{stage3Stats.percentage}% complete</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-}
-          </div>
-
-          {/* Stage 2 */}
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Brain className="w-4 h-4 text-blue-500" />
-              <span className="text-sm font-semibold">Stage 2</span>
-            </div>
-            <div className="text-xs text-muted-foreground mb-2">Days 19-45</div>
-            <div className="text-2xl font-bold text-blue-600">{stage2Stats.completed}/27</div>
-            <div className="w-full bg-blue-100 dark:bg-blue-900/20 rounded-full h-2 mt-2">
-              <div 
-                className="bg-gradient-to-r from-blue-500 to-cyan-400 h-2 rounded-full transition-all duration-500" 
-                style={{ width: `${stage2Stats.percentage}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Stage 3 */}
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Trophy className="w-4 h-4 text-green-500" />
-              <span className="text-sm font-semibold">Stage 3</span>
-            </div>
-            <div className="text-xs text-muted-foreground mb-2">Days 46-67</div>
-            <div className="text-2xl font-bold text-green-600">{stage3Stats.completed}/22</div>
-            <div className="w-full bg-green-100 dark:bg-green-900/20 rounded-full h-2 mt-2">
-              <div 
-                className="bg-gradient-to-r from-green-500 to-emerald-400 h-2 rounded-full transition-all duration-500" 
-                style={{ width: `${stage3Stats.percentage}%` }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Large Overall Progress Bar */}
-        <div className="relative p-6 bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-fuchsia-950/30 rounded-2xl border border-violet-200 dark:border-violet-700/50">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-lg font-bold text-gray-800 dark:text-gray-200">Overall Formation Progress</span>
-            <span className="text-lg font-bold text-purple-600">
-              {stage1Stats.completed + stage2Stats.completed + stage3Stats.completed}/67 days
-            </span>
-          </div>
-          
-          {/* Large Visual Progress Bar */}
-          <div className="relative w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 mb-3 overflow-hidden shadow-inner">
-            <div
-              className={`${colors.bg} h-6 rounded-full transition-all duration-1000 ease-out shadow-lg relative`}
-              style={{
-                width: `${Math.round(((stage1Stats.completed + stage2Stats.completed + stage3Stats.completed) / 67) * 100)}%`
-              }}
-            >
-              {/* Shimmer effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
-            </div>
-          </div>
-          
-          <div className="text-center">
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              {habit.streak < 67 ? `${67 - habit.streak} days until habit mastery` : "🎉 Habit mastered - Bonus day for .uoY!"}
-            </span>
-          </div>
+            );
+          })}
         </div>
       </CardContent>
     </Card>

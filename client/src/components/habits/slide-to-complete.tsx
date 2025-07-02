@@ -4,11 +4,8 @@ import { ChevronRight } from "lucide-react";
 interface SlideToCompleteProps {
   onComplete: () => void;
   disabled?: boolean;
-  colors: {
-    bg: string;
-    stroke: string;
-    text: string;
-  };
+  completed?: boolean;
+  habitTitle?: string;
 }
 
 // Helper function to get darkened solid colors for the drag bar
@@ -37,7 +34,7 @@ const getDarkColor = (colorName: string): string => {
   return '#374151';
 };
 
-export function SlideToComplete({ onComplete, disabled = false, colors }: SlideToCompleteProps) {
+export function SlideToComplete({ onComplete, disabled = false, completed = false, habitTitle }: SlideToCompleteProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const [isCompleting, setIsCompleting] = useState(false);
@@ -139,10 +136,10 @@ export function SlideToComplete({ onComplete, disabled = false, colors }: SlideT
       >
         {/* Progress background */}
         <div
-          className={`absolute inset-0 transition-all duration-200 rounded-xl`}
+          className={`absolute inset-0 transition-all duration-200 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600`}
           style={{
-            background: `linear-gradient(to right, ${colors.bg.includes('bg-') ? colors.bg.replace('bg-', '') : colors.bg} ${progressPercentage}%, transparent ${progressPercentage}%)`,
-            opacity: 0.3,
+            opacity: progressPercentage > 0 ? 0.3 : 0,
+            width: `${progressPercentage}%`,
           }}
         />
         
@@ -163,7 +160,7 @@ export function SlideToComplete({ onComplete, disabled = false, colors }: SlideT
           }`}
           style={{
             transform: `translateX(${dragOffset}px)`,
-            backgroundColor: getDarkColor(colors.bg + ' ' + colors.stroke),
+            backgroundColor: '#3730a3',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
           }}
           onMouseDown={handleMouseDown}
