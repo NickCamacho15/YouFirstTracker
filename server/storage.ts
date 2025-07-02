@@ -113,6 +113,11 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  async updateUser(id: number, updates: Partial<Omit<User, 'id' | 'createdAt' | 'passwordHash'>>): Promise<User | undefined> {
+    const result = await db.update(users).set(updates).where(eq(users.id, id)).returning();
+    return result[0];
+  }
+
   async validatePassword(email: string, password: string): Promise<User | null> {
     const user = await this.getUserByEmail(email);
     if (!user) return null;

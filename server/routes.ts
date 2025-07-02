@@ -98,6 +98,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user profile
+  app.put("/api/auth/profile", requireAuth, async (req: any, res) => {
+    try {
+      const { displayName, bio, profileImageUrl } = req.body;
+      const user = await storage.updateUser(req.user.id, {
+        displayName,
+        bio,
+        profileImageUrl,
+      });
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { passwordHash, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword });
+    } catch (error) {
+      console.error("Update profile error:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
   // Goals routes
   app.get("/api/goals", requireAuth, async (req, res) => {
     try {
