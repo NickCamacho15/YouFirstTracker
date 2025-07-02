@@ -169,6 +169,34 @@ export function EditHabitModal({ open, onOpenChange, onSuccess, habit }: EditHab
               )}
             />
 
+            {/* Habit Formation Framework */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
+              <h3 className="font-semibold text-blue-900 text-sm">Habit Formation Framework</h3>
+              <div className="grid grid-cols-3 gap-3 text-xs">
+                <div className="text-center">
+                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                    <span className="text-orange-600 font-bold">R</span>
+                  </div>
+                  <div className="font-semibold text-orange-800">Reminder</div>
+                  <div className="text-orange-600">The trigger that starts your habit</div>
+                </div>
+                <div className="text-center">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                    <span className="text-blue-600 font-bold">R</span>
+                  </div>
+                  <div className="font-semibold text-blue-800">Routine</div>
+                  <div className="text-blue-600">The behavior you want to make automatic</div>
+                </div>
+                <div className="text-center">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                    <span className="text-green-600 font-bold">R</span>
+                  </div>
+                  <div className="font-semibold text-green-800">Reward</div>
+                  <div className="text-green-600">The benefit that reinforces the habit</div>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
