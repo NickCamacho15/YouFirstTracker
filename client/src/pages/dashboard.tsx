@@ -358,27 +358,27 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Gold Critical Tasks */}
+        {/* Today's Tasks */}
         <Card className="border-0 shadow-lg mb-6">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Star className="w-5 h-5 text-yellow-600" />
-                  Gold Actions
+                  <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                  Today's Tasks
                 </CardTitle>
                 <p className="text-sm text-gray-600 mt-1">
-                  Premium actions that drive your goals forward
+                  Important tasks that drive your goals forward
                 </p>
               </div>
               
-              <div className="text-center bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-xl px-4 py-3">
+              <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl px-4 py-3">
                 <div className="flex items-center gap-2 mb-1">
-                  <Trophy className="w-4 h-4 text-yellow-600" />
-                  <span className="text-xs font-semibold text-yellow-600 uppercase tracking-wider">Gold Completed</span>
+                  <Trophy className="w-4 h-4 text-blue-600" />
+                  <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Tasks Completed</span>
                 </div>
-                <div className="text-2xl font-black text-yellow-700">{criticalTasksCompleted}</div>
-                <div className="text-xs text-yellow-600">lifetime total</div>
+                <div className="text-2xl font-black text-blue-700">{criticalTasksCompleted}</div>
+                <div className="text-xs text-blue-600">lifetime total</div>
               </div>
             </div>
           </CardHeader>
@@ -391,14 +391,14 @@ export default function DashboardPage() {
                   <div 
                     key={task.id}
                     className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-200 ${
-                      task.completed ? 'bg-green-50 border-green-200' : 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200 hover:from-yellow-100 hover:to-amber-100'
+                      task.completed ? 'bg-green-50 border-green-200' : 'bg-blue-50 border-blue-200 hover:bg-blue-100'
                     }`}
                   >
                     <input 
                       type="checkbox" 
                       checked={task.completed}
                       onChange={() => handleCriticalTaskToggle(task.id)}
-                      className="w-5 h-5 text-yellow-600 rounded cursor-pointer"
+                      className="w-5 h-5 text-blue-600 rounded cursor-pointer"
                     />
 
                     <div className="flex-1">
@@ -411,7 +411,7 @@ export default function DashboardPage() {
                           {task.text}
                         </span>
                         {task.time && (
-                          <Badge variant="outline" className="text-xs text-yellow-700 border-yellow-300 bg-yellow-100">
+                          <Badge variant="outline" className="text-xs text-blue-700 border-blue-300 bg-blue-100">
                             <Clock className="w-3 h-3 mr-1" />
                             {task.time}
                           </Badge>
@@ -431,44 +431,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Evening Routines */}
-        <Card className="border-0 shadow-lg mb-6">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Coffee className="w-5 h-5 text-amber-600" />
-              Morning Routines
-            </CardTitle>
-            <p className="text-sm text-gray-600 mt-1">
-              Start your day with purposeful habits
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {morningRoutines.map((routine) => (
-                <div 
-                  key={routine.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
-                    routine.completed ? 'bg-amber-50 border-amber-200' : 'border-gray-200 hover:bg-amber-50'
-                  }`}
-                >
-                  <input 
-                    type="checkbox" 
-                    checked={routine.completed}
-                    onChange={() => handleMorningRoutineToggle(routine.id)}
-                    className="w-5 h-5 text-amber-600 rounded cursor-pointer"
-                  />
-                  <span className={`flex-1 transition-all duration-300 ${
-                    routine.completed 
-                      ? 'line-through text-gray-500' 
-                      : 'text-gray-900'
-                  }`}>
-                    {routine.text}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+
 
         {/* Evening Routines */}
         <Card className="border-0 shadow-lg mb-6">
