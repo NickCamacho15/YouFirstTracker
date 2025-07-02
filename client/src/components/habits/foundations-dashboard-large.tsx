@@ -325,216 +325,252 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
         </div>
       </div>
 
-      {/* Large Interactive Habit Tiles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {habits.map((habit) => {
-          const colors = getLargeTileColors(habit.category, habit.completedToday);
-          const progressPercentage = Math.min((habit.streak / 67) * 100, 100);
+      {/* Category-Based Habit Layout */}
+      <div className="space-y-8 mb-8">
+        {['mind', 'body', 'soul'].map((category) => {
+          const categoryHabits = habits.filter(habit => 
+            habit.category?.toLowerCase() === category
+          );
+          
+          if (categoryHabits.length === 0) return null;
+          
+          const categoryConfigs = {
+            mind: { 
+              icon: '🧠', 
+              label: 'Mind', 
+              color: 'from-violet-500 to-purple-600',
+              textColor: 'text-violet-700'
+            },
+            body: { 
+              icon: '💪', 
+              label: 'Body', 
+              color: 'from-orange-500 to-red-600',
+              textColor: 'text-orange-700'
+            },
+            soul: { 
+              icon: '✨', 
+              label: 'Soul', 
+              color: 'from-emerald-500 to-teal-600',
+              textColor: 'text-emerald-700'
+            }
+          };
+          
+          const categoryConfig = categoryConfigs[category as keyof typeof categoryConfigs] || {
+            icon: '⚡',
+            label: 'Other',
+            color: 'from-gray-500 to-gray-600',
+            textColor: 'text-gray-700'
+          };
           
           return (
-            <div 
-              key={`large-${habit.id}`}
-              className={`relative rounded-3xl p-8 transition-all duration-700 hover:scale-105 transform ${colors.bg} ${colors.shadow} border-0 min-h-[300px] ${
-                habit.completedToday ? 'animate-pulse' : ''
-              }`}
-            >
-              {/* Enhanced glow effect */}
-              <div className={`absolute inset-0 ${colors.glow} rounded-3xl blur-xl ${
-                habit.completedToday ? 'opacity-80 animate-pulse' : 'opacity-40'
-              } -z-10`}></div>
-              
-              {/* Celebration sparkles when completed */}
-              {habit.completedToday && (
-                <>
-                  <div className="absolute top-4 right-4 text-2xl animate-bounce">✨</div>
-                  <div className="absolute top-6 left-4 text-xl animate-bounce delay-200">⭐</div>
-                  <div className="absolute bottom-4 right-6 text-lg animate-bounce delay-500">🎉</div>
-                </>
-              )}
-              
-              {/* Content */}
-              <div className="relative text-center h-full flex flex-col">
-                {/* Category Icon */}
-                <div className="text-5xl mb-4">{colors.icon}</div>
-                
-                {/* Large Clickable Progress Ring */}
-                <div 
-                  className="relative w-32 h-32 mx-auto mb-6 cursor-pointer group" 
-                  onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
-                >
-                  <svg className="w-32 h-32 transform -rotate-90 group-hover:scale-110 transition-transform duration-300">
-                    <circle
-                      cx="64"
-                      cy="64"
-                      r="56"
-                      stroke="currentColor"
-                      strokeWidth="10"
-                      fill="none"
-                      className="text-white/30"
-                    />
-                    <circle
-                      cx="64"
-                      cy="64"
-                      r="56"
-                      stroke={colors.ring}
-                      strokeWidth="10"
-                      fill="none"
-                      strokeDasharray={`${2 * Math.PI * 56}`}
-                      strokeDashoffset={`${2 * Math.PI * 56 * (1 - progressPercentage / 100)}`}
-                      strokeLinecap="round"
-                      className="transition-all duration-700 drop-shadow-lg"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className={`text-3xl font-black ${colors.text} mb-1`}>{habit.streak}</span>
-                    <span className={`text-sm font-bold ${colors.text} opacity-80`}>days</span>
-                  </div>
-                  
-                  {/* Completion overlay - enhanced visual feedback */}
-                  <div className={`absolute inset-0 rounded-full transition-all duration-500 ${
-                    habit.completedToday 
-                      ? 'bg-white/30 scale-105 shadow-2xl' 
-                      : 'bg-white/10 scale-95 group-hover:scale-100 group-hover:bg-white/15'
-                  }`}></div>
-                  
-                  {/* Multiple pulse effects when completed */}
-                  {habit.completedToday && (
-                    <>
-                      <div className="absolute inset-0 rounded-full bg-white/40 animate-ping"></div>
-                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent animate-pulse"></div>
-                    </>
-                  )}
+            <div key={category} className="space-y-4">
+              {/* Category Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${categoryConfig.color} flex items-center justify-center text-2xl shadow-lg`}>
+                  {categoryConfig.icon}
                 </div>
-                
-                {/* Title and Progress */}
-                <div className="flex-1 flex flex-col justify-between">
-                  <div>
-                    <h4 className={`font-bold text-lg mb-2 line-clamp-2 ${colors.text}`}>{habit.title}</h4>
-                    <div className={`text-sm mb-4 ${colors.text} opacity-90 font-semibold`}>{habit.streak}/67 days formation</div>
-                    
-                    {/* Category Badge */}
-                    <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-bold ${colors.text} bg-white/25 backdrop-blur-sm mb-6`}>
-                      {habit.category?.toUpperCase() || 'GENERAL'}
+                <div>
+                  <h3 className={`text-xl font-bold ${categoryConfig.textColor}`}>
+                    {categoryConfig.label}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {categoryHabits.length} habit{categoryHabits.length !== 1 ? 's' : ''}
+                  </p>
+                </div>
+              </div>
+              
+              {/* Habit Tiles Row */}
+              <div className="flex gap-4 overflow-x-auto pb-2">
+                {categoryHabits.map((habit) => {
+                  const colors = getLargeTileColors(habit.category, habit.completedToday);
+                  const progressPercentage = Math.min((habit.streak / 67) * 100, 100);
+                  
+                  return (
+                    <div 
+                      key={`category-${habit.id}`}
+                      className="flex-shrink-0 w-32"
+                    >
+                      {/* Habit Title */}
+                      <div className="text-center mb-3">
+                        <h4 className="font-semibold text-sm text-gray-800 mb-1 line-clamp-2 leading-tight">
+                          {habit.title}
+                        </h4>
+                        <div className="text-xs text-gray-600">
+                          {habit.streak}/67 days
+                        </div>
+                      </div>
+                      
+                      {/* Clickable Tile */}
+                      <div 
+                        className={`relative rounded-xl p-3 transition-all duration-700 hover:scale-105 transform ${colors.bg} ${colors.shadow} border-0 cursor-pointer h-28 flex flex-col justify-center ${
+                          habit.completedToday ? 'animate-pulse' : ''
+                        }`}
+                        onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
+                      >
+                        {/* Enhanced glow effect */}
+                        <div className={`absolute inset-0 ${colors.glow} rounded-xl blur-lg ${
+                          habit.completedToday ? 'opacity-80 animate-pulse' : 'opacity-40'
+                        } -z-10`}></div>
+                        
+                        {/* Celebration sparkles when completed */}
+                        {habit.completedToday && (
+                          <>
+                            <div className="absolute top-1 right-1 text-sm animate-bounce">✨</div>
+                            <div className="absolute top-2 left-1 text-xs animate-bounce delay-200">⭐</div>
+                          </>
+                        )}
+                        
+                        {/* Content */}
+                        <div className="relative text-center">
+                          {/* Progress Ring */}
+                          <div className="relative w-16 h-16 mx-auto mb-2">
+                            <svg className="w-16 h-16 transform -rotate-90 hover:scale-110 transition-transform duration-300">
+                              <circle
+                                cx="32"
+                                cy="32"
+                                r="26"
+                                stroke="currentColor"
+                                strokeWidth="5"
+                                fill="none"
+                                className="text-white/30"
+                              />
+                              <circle
+                                cx="32"
+                                cy="32"
+                                r="26"
+                                stroke={colors.ring}
+                                strokeWidth="5"
+                                fill="none"
+                                strokeDasharray={`${2 * Math.PI * 26}`}
+                                strokeDashoffset={`${2 * Math.PI * 26 * (1 - progressPercentage / 100)}`}
+                                strokeLinecap="round"
+                                className="transition-all duration-700 drop-shadow-lg"
+                              />
+                            </svg>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className={`text-lg font-black ${colors.text}`}>{habit.streak}</span>
+                            </div>
+                            
+                            {/* Multiple pulse effects when completed */}
+                            {habit.completedToday && (
+                              <>
+                                <div className="absolute inset-0 rounded-full bg-white/40 animate-ping"></div>
+                                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent animate-pulse"></div>
+                              </>
+                            )}
+                          </div>
+                          
+                          {/* Completion Status */}
+                          <div className="flex justify-center">
+                            {habit.completedToday ? (
+                              <CheckCircle2 className={`w-5 h-5 ${colors.text} animate-bounce`} />
+                            ) : (
+                              <Circle className={`w-5 h-5 ${colors.text} opacity-60 hover:opacity-80 transition-opacity`} />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Edit Button */}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEditHabit(habit)}
+                        className="w-full text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-100 py-1 mt-2"
+                      >
+                        <Settings className="w-3 h-3 mr-1" />
+                        Edit
+                      </Button>
                     </div>
-                  </div>
-                  
-                  {/* Large Completion Indicator with enhanced styling */}
-                  <div className="flex justify-center mb-6">
-                    {habit.completedToday ? (
-                      <div className="flex flex-col items-center">
-                        <CheckCircle2 className={`w-12 h-12 ${colors.text} mb-2 animate-bounce`} />
-                        <span className={`text-sm font-bold ${colors.text} bg-white/20 px-3 py-1 rounded-full`}>✅ COMPLETED</span>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center">
-                        <Circle className={`w-12 h-12 ${colors.text} opacity-60 mb-2 group-hover:opacity-80 transition-opacity`} />
-                        <span className={`text-sm font-bold ${colors.text} opacity-60 group-hover:opacity-80`}>TAP TO COMPLETE</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Edit Button */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEditHabit(habit);
-                    }}
-                    className={`w-full ${colors.text} hover:bg-white/20 border-2 border-white/30 rounded-xl py-3`}
-                  >
-                    <Settings className="w-4 h-4 mr-2" />
-                    EDIT HABIT
-                  </Button>
-                </div>
+                  );
+                })}
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Habit Formation Mandala - Enhanced */}
-      <div className="relative">
-        <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-gray-900">
-          <TrendingUp className="w-6 h-6 text-blue-600" />
-          Habit Formation Mandala
+      {/* Formation Progress Mandala - Enhanced Visual */}
+      <div className="relative mt-12 mb-8">
+        <h3 className="text-2xl font-bold mb-8 text-center text-gray-900">
+          🌸 Formation Progress Mandala 🌸
         </h3>
         
         <div className="flex flex-col items-center">
-          {/* Radar Chart - Even Larger */}
-          <div className="relative w-96 h-96 md:w-[500px] md:h-[500px] mb-8">
+          {/* Mandala Visualization */}
+          <div className="relative w-80 h-80 md:w-96 md:h-96 mb-8">
             <svg viewBox="0 0 400 400" className="w-full h-full">
-              {/* Background circles */}
-              {[20, 40, 60, 80, 100].map((level) => (
-                <circle
-                  key={level}
-                  cx="200"
-                  cy="200"
-                  r={level * 1.8}
-                  fill="none"
-                  stroke="#e5e7eb"
-                  strokeWidth="1"
-                  opacity={0.3}
-                />
+              {/* Background mandala rings */}
+              {[60, 120, 180].map((radius, index) => (
+                <g key={`ring-${index}`}>
+                  <circle
+                    cx="200"
+                    cy="200"
+                    r={radius}
+                    fill="none"
+                    stroke="rgba(156, 163, 175, 0.2)"
+                    strokeWidth="2"
+                    className="animate-pulse"
+                    style={{ animationDelay: `${index * 0.5}s` }}
+                  />
+                  {/* Decorative petals */}
+                  {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+                    <g key={`petal-${radius}-${angle}`} transform={`rotate(${angle} 200 200)`}>
+                      <path
+                        d={`M 200 ${200 - radius + 10} Q ${200 + 15} ${200 - radius} 200 ${200 - radius - 10} Q ${200 - 15} ${200 - radius} 200 ${200 - radius + 10}`}
+                        fill="rgba(167, 139, 250, 0.1)"
+                        className="animate-pulse"
+                        style={{ animationDelay: `${(index + angle / 45) * 0.2}s` }}
+                      />
+                    </g>
+                  ))}
+                </g>
               ))}
               
-              {/* Grid lines */}
-              {habits.map((_, index) => {
-                const angle = (index * 360) / habits.length;
-                const x2 = 200 + 180 * Math.cos((angle - 90) * Math.PI / 180);
-                const y2 = 200 + 180 * Math.sin((angle - 90) * Math.PI / 180);
-                
-                return (
-                  <line
-                    key={`grid-${index}`}
-                    x1="200"
-                    y1="200"
-                    x2={x2}
-                    y2={y2}
-                    stroke="#e5e7eb"
-                    strokeWidth="1"
-                    opacity={0.3}
-                  />
-                );
-              })}
-              
-              {/* Habit progress points */}
+              {/* Habit points on mandala */}
               {habits.map((habit, index) => {
-                const progressValue = Math.min((habit.streak / 67) * 180, 180);
                 const angle = (index * 360) / habits.length;
-                const x = 200 + progressValue * Math.cos((angle - 90) * Math.PI / 180);
-                const y = 200 + progressValue * Math.sin((angle - 90) * Math.PI / 180);
+                const radius = 60 + (habit.streak / 67) * 120; // Radius based on progress
+                const x = 200 + radius * Math.cos((angle - 90) * Math.PI / 180);
+                const y = 200 + radius * Math.sin((angle - 90) * Math.PI / 180);
+                const colors = getLargeTileColors(habit.category, habit.completedToday);
                 
                 return (
-                  <g key={`habit-${habit.id}`}>
-                    {/* Habit progress point */}
-                    <circle
-                      cx={x}
-                      cy={y}
-                      r="15"
-                      fill={habit.completedToday ? '#8b5cf6' : '#94a3b8'}
-                      stroke="white"
-                      strokeWidth="4"
-                      className="drop-shadow-lg animate-pulse"
+                  <g key={`mandala-${habit.id}`}>
+                    {/* Progress trail */}
+                    <path
+                      d={`M 200 140 Q ${200 + 30 * Math.cos((angle - 90) * Math.PI / 180)} ${200 + 30 * Math.sin((angle - 90) * Math.PI / 180)} ${x} ${y}`}
+                      fill="none"
+                      stroke={habit.completedToday ? colors.ring : 'rgba(156, 163, 175, 0.3)'}
+                      strokeWidth="3"
+                      className="transition-all duration-1000"
                     />
                     
-                    {/* Inner glow effect */}
+                    {/* Habit node */}
                     <circle
                       cx={x}
                       cy={y}
-                      r="10"
-                      fill={habit.completedToday ? '#ffffff' : '#94a3b8'}
-                      opacity="0.8"
+                      r={habit.completedToday ? "12" : "8"}
+                      fill={habit.completedToday ? colors.ring : 'rgba(156, 163, 175, 0.6)'}
+                      className={`transition-all duration-500 ${habit.completedToday ? 'animate-pulse' : ''}`}
                     />
+                    
+                    {/* Streak number */}
+                    <text
+                      x={x}
+                      y={y + 4}
+                      textAnchor="middle"
+                      className="text-xs font-bold fill-white"
+                    >
+                      {habit.streak}
+                    </text>
                     
                     {/* Habit label */}
                     <text
-                      x={200 + (progressValue + 25) * Math.cos((angle - 90) * Math.PI / 180)}
-                      y={200 + (progressValue + 25) * Math.sin((angle - 90) * Math.PI / 180)}
+                      x={x}
+                      y={y + 25}
                       textAnchor="middle"
-                      fontSize="10"
-                      fill="#374151"
-                      className="font-semibold"
+                      className="text-xs font-semibold fill-gray-700"
                     >
                       {habit.title.split(' ')[0]}
                     </text>
@@ -546,56 +582,127 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
               <circle
                 cx="200"
                 cy="200"
-                r="45"
+                r="30"
                 fill="url(#centerGradient)"
-                stroke="#3b82f6"
-                strokeWidth="6"
-                className="drop-shadow-xl"
+                className="animate-pulse"
               />
-              
-              {/* Center glow effect */}
-              <circle
-                cx="200"
-                cy="200"
-                r="35"
-                fill="url(#centerInnerGradient)"
-                opacity="0.8"
-              />
-              
-              {/* Center text */}
-              <text
-                x="200"
-                y="195"
-                textAnchor="middle"
-                fontSize="24"
-                fill="white"
-                className="font-black"
-              >
-                {habits.length > 0 ? Math.round(habits.reduce((sum, h) => sum + h.streak, 0) / habits.length) : 0}
-              </text>
-              <text
-                x="200"
-                y="215"
-                textAnchor="middle"
-                fontSize="12"
-                fill="white"
-                className="font-semibold"
-              >
-                avg days
-              </text>
               
               {/* Gradient definitions */}
               <defs>
                 <radialGradient id="centerGradient" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#60a5fa" />
-                  <stop offset="100%" stopColor="#3b82f6" />
-                </radialGradient>
-                <radialGradient id="centerInnerGradient" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#93c5fd" />
-                  <stop offset="100%" stopColor="#60a5fa" />
+                  <stop offset="0%" style={{ stopColor: 'rgba(99, 102, 241, 0.8)' }} />
+                  <stop offset="100%" style={{ stopColor: 'rgba(139, 92, 246, 0.4)' }} />
                 </radialGradient>
               </defs>
+              
+              {/* Center completion percentage */}
+              <text
+                x="200"
+                y="195"
+                textAnchor="middle"
+                className="text-sm font-bold fill-white"
+              >
+                {Math.round((habits.filter(h => h.completedToday).length / habits.length) * 100)}%
+              </text>
+              <text
+                x="200"
+                y="210"
+                textAnchor="middle"
+                className="text-xs font-medium fill-white opacity-80"
+              >
+                Today
+              </text>
             </svg>
+          </div>
+          
+          {/* Side Bar Graphs */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
+            {['mind', 'body', 'soul'].map((category) => {
+              const categoryHabits = habits.filter(h => h.category?.toLowerCase() === category);
+              const avgStreak = categoryHabits.length > 0 ? 
+                categoryHabits.reduce((sum, h) => sum + h.streak, 0) / categoryHabits.length : 0;
+              const completionRate = categoryHabits.length > 0 ?
+                (categoryHabits.filter(h => h.completedToday).length / categoryHabits.length) * 100 : 0;
+              
+              const categoryConfigs = {
+                mind: { 
+                  icon: '🧠', 
+                  label: 'Mind', 
+                  color: 'from-violet-500 to-purple-600',
+                  bgColor: 'bg-violet-100',
+                  textColor: 'text-violet-700'
+                },
+                body: { 
+                  icon: '💪', 
+                  label: 'Body', 
+                  color: 'from-orange-500 to-red-600',
+                  bgColor: 'bg-orange-100',
+                  textColor: 'text-orange-700'
+                },
+                soul: { 
+                  icon: '✨', 
+                  label: 'Soul', 
+                  color: 'from-emerald-500 to-teal-600',
+                  bgColor: 'bg-emerald-100',
+                  textColor: 'text-emerald-700'
+                }
+              };
+              
+              const categoryConfig = categoryConfigs[category as keyof typeof categoryConfigs] || {
+                icon: '⚡',
+                label: 'Other',
+                color: 'from-gray-500 to-gray-600',
+                bgColor: 'bg-gray-100',
+                textColor: 'text-gray-700'
+              };
+              
+              return (
+                <div key={category} className={`${categoryConfig.bgColor} rounded-2xl p-6 space-y-4`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full bg-gradient-to-r ${categoryConfig.color} flex items-center justify-center text-xl`}>
+                      {categoryConfig.icon}
+                    </div>
+                    <div>
+                      <h4 className={`text-lg font-bold ${categoryConfig.textColor}`}>
+                        {categoryConfig.label}
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        {categoryHabits.length} habits
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Animated progress bars */}
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-700">Avg Streak</span>
+                        <span className="font-bold">{Math.round(avgStreak)} days</span>
+                      </div>
+                      <div className="w-full bg-white/50 rounded-full h-3">
+                        <div 
+                          className={`bg-gradient-to-r ${categoryConfig.color} h-3 rounded-full transition-all duration-1000 ease-out`}
+                          style={{ width: `${Math.min((avgStreak / 67) * 100, 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-700">Today Complete</span>
+                        <span className="font-bold">{Math.round(completionRate)}%</span>
+                      </div>
+                      <div className="w-full bg-white/50 rounded-full h-3">
+                        <div 
+                          className={`bg-gradient-to-r ${categoryConfig.color} h-3 rounded-full transition-all duration-1000 ease-out`}
+                          style={{ width: `${completionRate}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
