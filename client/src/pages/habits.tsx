@@ -140,16 +140,16 @@ export default function HabitsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-4 pt-8 pb-24">
+    <div className="min-h-screen bg-background relative pb-20">
+      <div className="max-w-2xl mx-auto px-4 pt-8 pb-24">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-              <Zap className="w-8 h-8 text-accent" />
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <Zap className="w-6 h-6 text-accent" />
               Your Habits
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground">
               Build consistency and track your daily progress
             </p>
           </div>

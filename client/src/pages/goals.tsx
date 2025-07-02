@@ -105,12 +105,12 @@ export default function GoalsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-6xl mx-auto px-4 pt-8 pb-24">
+    <div className="min-h-screen bg-background relative pb-20">
+      <div className="max-w-2xl mx-auto px-4 pt-8 pb-24">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2 mb-2">
-            <Target className="w-8 h-8 text-accent" />
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <Target className="w-6 h-6 text-accent" />
             Goals & Vision
           </h1>
           <p className="text-muted-foreground">Set aspirations and visualize your future</p>

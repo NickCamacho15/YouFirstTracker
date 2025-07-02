@@ -136,6 +136,68 @@ export default function YouPage() {
             ))
           )}
         </div>
+
+        {/* Reading Insights Section */}
+        <div className="mt-8">
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-xl font-semibold text-foreground">Reading Insights</h2>
+            <Button variant="outline" size="sm" className="ml-auto">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Insight
+            </Button>
+          </div>
+          
+          <div className="grid gap-4">
+            {/* Sample insights - replace with actual data */}
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="flex-1">
+                    <p className="text-sm text-muted-foreground mb-1">From "Atomic Habits" • Today</p>
+                    <p className="text-foreground">"The most effective way to change your habits is to focus not on what you want to achieve, but on who you wish to become."</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="secondary" className="text-xs">Identity</Badge>
+                      <Badge variant="secondary" className="text-xs">Habits</Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="flex-1">
+                    <p className="text-sm text-muted-foreground mb-1">From "Deep Work" • Yesterday</p>
+                    <p className="text-foreground">"Human beings, it seems, are at their best when immersed deeply in something challenging."</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="secondary" className="text-xs">Focus</Badge>
+                      <Badge variant="secondary" className="text-xs">Productivity</Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="flex-1">
+                    <p className="text-sm text-muted-foreground mb-1">From "Mindset" • 2 days ago</p>
+                    <p className="text-foreground">"Becoming is better than being. The power of yet hasn't happened yet."</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="secondary" className="text-xs">Growth</Badge>
+                      <Badge variant="secondary" className="text-xs">Mindset</Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
 
       {/* Instagram-style Record Button */}

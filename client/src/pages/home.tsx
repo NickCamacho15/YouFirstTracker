@@ -295,56 +295,62 @@ export default function HomePage() {
 
   if (postsLoading || followingLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your timeline...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your timeline...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background relative pb-20">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-background border-b border-border sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">.uoY</h1>
+            <h1 className="text-2xl font-bold text-foreground">.uoY</h1>
             <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-purple-600" />
-              <span className="text-sm text-gray-600">Home</span>
+              <Sparkles className="w-5 h-5 text-accent" />
+              <span className="text-sm text-muted-foreground">Home</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto px-4 py-6 pb-24">
         {/* Profile Circles - Stories Style */}
         {following.length > 0 && (
-          <div className="bg-white rounded-lg p-4 mb-6 shadow-sm">
-            <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide">
-              {(following as Following[]).map((follow) => (
-                <ProfileCircle
-                  key={follow.id}
-                  user={follow.following}
-                  onClick={() => handleProfileClick(follow.following.id)}
-                />
-              ))}
-            </div>
-          </div>
+          <Card className="mb-6">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide">
+                {(following as Following[]).map((follow) => (
+                  <ProfileCircle
+                    key={follow.id}
+                    user={follow.following}
+                    onClick={() => handleProfileClick(follow.following.id)}
+                  />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Timeline Feed */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           {timelinePosts.length === 0 ? (
-            <div className="bg-white rounded-lg p-8 text-center shadow-sm">
-              <Sparkles className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Welcome to your timeline!</h3>
-              <p className="text-gray-600">
-                Follow other users to see their progress and milestones here.
-              </p>
-            </div>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center py-8">
+                  <Sparkles className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Welcome to your timeline!</h3>
+                  <p className="text-muted-foreground">
+                    Follow other users to see their progress and milestones here.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           ) : (
             (timelinePosts as Post[]).map((post) => (
               <PostCard key={post.id} post={post} />

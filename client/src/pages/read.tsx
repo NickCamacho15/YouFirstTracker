@@ -37,15 +37,15 @@ export default function ReadPage() {
   const averageSession = totalSessions > 0 ? Math.round(totalMinutes / totalSessions) : 0;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-4 pt-8 pb-24">
+    <div className="min-h-screen bg-background relative pb-20">
+      <div className="max-w-2xl mx-auto px-4 pt-8 pb-24">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-            <BookOpen className="w-8 h-8 text-accent" />
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <BookOpen className="w-6 h-6 text-accent" />
             Reading Sessions
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-muted-foreground">
             Track your reading time and reflect on your learning
           </p>
         </div>
