@@ -243,10 +243,14 @@ export default function HabitsPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
           </div>
         ) : (
-          <Tabs defaultValue="formation" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="formation" className="flex items-center gap-2">
+          <Tabs defaultValue="overview" className="w-full">
+            <TabsList className="grid w-full grid-cols-4 mb-8">
+              <TabsTrigger value="overview" className="flex items-center gap-2">
                 <BarChart3 className="w-4 h-4" />
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="formation" className="flex items-center gap-2">
+                <Star className="w-4 h-4" />
                 New habits
               </TabsTrigger>
               <TabsTrigger value="foundations" className="flex items-center gap-2">
@@ -258,6 +262,171 @@ export default function HabitsPage() {
                 Rules
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="overview" className="space-y-6">
+              {/* Main Habits Overview Dashboard */}
+              <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-black rounded-3xl p-8 text-white mb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h1 className="text-3xl font-black mb-2">HABIT MASTERY</h1>
+                    <p className="text-gray-300">Complete wellness & personal growth analytics</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-green-400 text-sm font-bold tracking-wide">OVERALL SCORE</div>
+                    <div className="text-5xl font-black text-white">
+                      {habits.length > 0 ? Math.round(((habits as Habit[]).filter(h => h.completedToday).length / habits.length) * 100) : 0}
+                    </div>
+                    <div className="text-green-400 text-sm">EXCELLENT</div>
+                  </div>
+                </div>
+                
+                {/* Comprehensive Metrics Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                    <div className="text-blue-400 text-2xl font-black">{habits.length}</div>
+                    <div className="text-gray-300 text-xs font-medium">TOTAL HABITS</div>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                    <div className="text-green-400 text-2xl font-black">
+                      {(habits as Habit[]).filter(h => h.completedToday).length}
+                    </div>
+                    <div className="text-gray-300 text-xs font-medium">TODAY</div>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                    <div className="text-yellow-400 text-2xl font-black">
+                      {habits.length > 0 ? Math.round((habits as Habit[]).reduce((sum, h) => sum + h.streak, 0) / habits.length) : 0}
+                    </div>
+                    <div className="text-gray-300 text-xs font-medium">AVG STREAK</div>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                    <div className="text-red-400 text-2xl font-black">
+                      {habits.length > 0 ? Math.max(...(habits as Habit[]).map(h => h.streak)) : 0}
+                    </div>
+                    <div className="text-gray-300 text-xs font-medium">LONGEST</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Visual Data Layout - Engaging Habit Display */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                {/* Habit Health Radar Chart */}
+                <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
+                  <h3 className="text-xl font-bold mb-4 text-gray-900">Habit Health Score</h3>
+                  <HabitRadarChart habits={habits as Habit[]} rules={[]} />
+                </div>
+
+                {/* Category Breakdown Circles */}
+                <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
+                  <h3 className="text-xl font-bold mb-4 text-gray-900">Category Performance</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    {['mind', 'body', 'soul'].map((category) => {
+                      const categoryHabits = (habits as Habit[]).filter(h => h.category === category);
+                      const completionRate = categoryHabits.length > 0 
+                        ? Math.round((categoryHabits.filter(h => h.completedToday).length / categoryHabits.length) * 100)
+                        : 0;
+                      
+                      const colors = {
+                        mind: { bg: 'bg-purple-500', text: 'text-purple-600', icon: '🧠' },
+                        body: { bg: 'bg-orange-500', text: 'text-orange-600', icon: '💪' },
+                        soul: { bg: 'bg-emerald-500', text: 'text-emerald-600', icon: '✨' }
+                      }[category];
+                      
+                      return (
+                        <div key={category} className="text-center">
+                          <div className="relative w-20 h-20 mx-auto mb-3">
+                            <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 100 100">
+                              <circle
+                                cx="50"
+                                cy="50"
+                                r="40"
+                                stroke="currentColor"
+                                strokeWidth="8"
+                                fill="transparent"
+                                className="text-gray-200"
+                              />
+                              <circle
+                                cx="50"
+                                cy="50"
+                                r="40"
+                                stroke="currentColor"
+                                strokeWidth="8"
+                                fill="transparent"
+                                strokeDasharray={`${2 * Math.PI * 40}`}
+                                strokeDashoffset={`${2 * Math.PI * 40 * (1 - completionRate / 100)}`}
+                                className={colors.text.replace('text-', 'text-')}
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                              <span className="text-2xl mb-1">{colors.icon}</span>
+                              <span className="text-sm font-bold text-gray-900">{completionRate}%</span>
+                            </div>
+                          </div>
+                          <h4 className="font-semibold text-gray-900 capitalize">{category}</h4>
+                          <p className="text-xs text-gray-600">{categoryHabits.length} habits</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Habit Status Grid */}
+              <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100 mb-8">
+                <h3 className="text-xl font-bold mb-4 text-gray-900">Today's Progress</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {(habits as Habit[]).map((habit) => (
+                    <div 
+                      key={habit.id} 
+                      className={`p-4 rounded-xl border-2 transition-colors cursor-pointer ${
+                        habit.completedToday 
+                          ? 'bg-green-50 border-green-200' 
+                          : 'bg-gray-50 border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => handleToggleHabit(habit.id)}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-2xl">
+                          {habit.category === 'mind' ? '🧠' : habit.category === 'body' ? '💪' : '✨'}
+                        </span>
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                          habit.completedToday 
+                            ? 'bg-green-500 border-green-500' 
+                            : 'border-gray-400'
+                        }`}>
+                          {habit.completedToday && (
+                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                      <h4 className="font-semibold text-sm text-gray-900 mb-1">{habit.title}</h4>
+                      <p className="text-xs text-gray-600">{habit.streak} day streak</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="flex gap-4">
+                <Button 
+                  onClick={() => setShowCreateModal(true)}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3"
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Add New Habit
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="px-6 py-3"
+                  onClick={() => window.scrollTo(0, 0)}
+                >
+                  <BarChart3 className="w-5 h-5 mr-2" />
+                  View Details
+                </Button>
+              </div>
+            </TabsContent>
 
             <TabsContent value="formation" className="space-y-6">
               {/* Fitness-Style Analytics Dashboard for New Habits */}

@@ -123,6 +123,15 @@ Build scripts include:
 
 ## Changelog
 
+- July 3, 2025: Added Overview Tab + Reordered Navigation (Home → Habits → You → Goals → Read)
+  - **NEW**: Overview tab as default on habits page with comprehensive live visual dashboards
+  - **NEW**: "HABIT MASTERY" fitness-style header with complete wellness analytics
+  - **NEW**: Live visual data layout including habit health radar chart and category performance circles
+  - **NEW**: Interactive "Today's Progress" grid showing all habits with one-tap completion
+  - **NEW**: Category performance circles (Mind/Body/Soul) with real-time completion percentages
+  - **IMPROVED**: Navigation reordered - You. page now in center position as requested
+  - **IMPROVED**: Combined all habit data into single engaging overview with multiple visualization types
+  - Overview includes radar chart, category circles, live progress grid, and comprehensive metrics
 - July 3, 2025: Fixed Foundations Tab - Long-term Consistency Tracking (Not 67-day Formation)
   - **MAJOR**: Foundations now track long-term consistency like tasks on You page, not 67-day cycles
   - **FIXED**: Removed all flashing/pulsing animations - only simple color transitions
