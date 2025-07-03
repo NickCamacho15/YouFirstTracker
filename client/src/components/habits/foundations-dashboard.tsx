@@ -82,6 +82,11 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
   const completedToday = habits.filter(h => h.completedToday).length;
   const completionRate = Math.round((completedToday / habits.length) * 100);
   
+  // Calculate fitness-style metrics
+  const totalHabits = habits.length;
+  const avgStreak = habits.length > 0 ? Math.round(habits.reduce((sum, h) => sum + h.streak, 0) / habits.length) : 0;
+  const longestStreak = habits.length > 0 ? Math.max(...habits.map(h => h.streak)) : 0;
+  
   // Calculate category-specific completion rates
   const mindHabits = habits.filter(h => h.category === 'mind');
   const bodyHabits = habits.filter(h => h.category === 'body');
@@ -115,115 +120,117 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
           <div className="absolute bottom-4 left-4 w-24 h-24 bg-gradient-to-br from-emerald-500/15 to-teal-500/15 rounded-full blur-2xl animate-pulse delay-1000"></div>
         </div>
         
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">FOUNDATION MONITOR</h2>
-            <p className="text-gray-600">Real-time habit performance tracking</p>
+        {/* Header - Health Dashboard Style */}
+        <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-black rounded-3xl p-8 text-white mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-black mb-2">TODAY'S RECOVERY</h1>
+              <p className="text-gray-300">Foundation performance metrics</p>
+            </div>
+            <div className="text-right">
+              <div className="text-green-400 text-sm font-bold tracking-wide">OVERALL SCORE</div>
+              <div className="text-5xl font-black text-white">{completionRate}</div>
+              <div className="text-green-400 text-sm">OPTIMAL</div>
+            </div>
           </div>
-          <div className="text-right">
-            <div className="text-emerald-600 text-sm font-semibold">PERFORMANCE</div>
-            <div className="text-gray-900 text-3xl font-bold">{completionRate}%</div>
+          
+          {/* Key Metrics Row */}
+          <div className="grid grid-cols-4 gap-6">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+              <div className="text-yellow-400 text-2xl font-black">{avgStreak}</div>
+              <div className="text-gray-300 text-xs font-medium">AVG STRAIN</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+              <div className="text-red-400 text-2xl font-black">{longestStreak}</div>
+              <div className="text-gray-300 text-xs font-medium">PEAK DAYS</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+              <div className="text-blue-400 text-2xl font-black">{completedToday}</div>
+              <div className="text-gray-300 text-xs font-medium">COMPLETED</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+              <div className="text-purple-400 text-2xl font-black">{totalHabits}</div>
+              <div className="text-gray-300 text-xs font-medium">ACTIVE</div>
+            </div>
           </div>
         </div>
 
-        {/* Multi-Line Graph */}
-        <div className="relative h-32 mb-4">
-            <svg className="w-full h-full" viewBox="0 0 400 120">
-              {/* Grid lines */}
-              <defs>
-                <linearGradient id="mindGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#6366f1" stopOpacity="0.8"/>
-                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.6"/>
-                </linearGradient>
-                <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#f97316" stopOpacity="0.8"/>
-                  <stop offset="100%" stopColor="#ef4444" stopOpacity="0.6"/>
-                </linearGradient>
-                <linearGradient id="soulGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.8"/>
-                  <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.6"/>
-                </linearGradient>
-              </defs>
+        {/* Fitness-Style Performance Graph */}
+        <div className="bg-black rounded-3xl p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-white text-lg font-bold">7-DAY STRAIN</h3>
+            <div className="text-green-400 text-sm font-medium">RECOVERY ZONE</div>
+          </div>
+          
+          <div className="relative h-40">
+            <svg className="w-full h-full" viewBox="0 0 400 160">
+              {/* Heart rate zone backgrounds */}
+              <rect x="0" y="0" width="400" height="32" fill="#ef4444" opacity="0.1"/>
+              <rect x="0" y="32" width="400" height="32" fill="#f97316" opacity="0.1"/>
+              <rect x="0" y="64" width="400" height="32" fill="#eab308" opacity="0.1"/>
+              <rect x="0" y="96" width="400" height="32" fill="#22c55e" opacity="0.1"/>
+              <rect x="0" y="128" width="400" height="32" fill="#06b6d4" opacity="0.1"/>
               
-              {/* Grid */}
-              {[0, 30, 60, 90, 120].map((y) => (
-                <line key={y} x1="0" y1={y} x2="400" y2={y} stroke="#94a3b8" strokeWidth="0.5" opacity="0.4"/>
+              {/* Grid lines */}
+              {[0, 32, 64, 96, 128, 160].map((y) => (
+                <line key={y} x1="0" y1={y} x2="400" y2={y} stroke="#374151" strokeWidth="0.5"/>
               ))}
               
-              {/* Mind line */}
-              <polyline
-                fill="none"
-                stroke="#6366f1"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                points={last7Days.map((day, i) => `${(i * 400) / 6},${120 - (day.mind * 120) / 100}`).join(' ')}
+              {/* Strain area fill */}
+              <path
+                fill="url(#strainGradient)"
+                d={`M 0,160 ${last7Days.map((day, i) => `L ${(i * 400) / 6},${160 - (day.overall * 160) / 100}`).join(' ')} L 400,160 Z`}
+                opacity="0.3"
               />
               
-              {/* Body line */}
-              <polyline
-                fill="none"
-                stroke="#f97316"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                points={last7Days.map((day, i) => `${(i * 400) / 6},${120 - (day.body * 120) / 100}`).join(' ')}
-              />
-              
-              {/* Soul line */}
+              {/* Main strain line */}
               <polyline
                 fill="none"
                 stroke="#10b981"
-                strokeWidth="3"
+                strokeWidth="4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                points={last7Days.map((day, i) => `${(i * 400) / 6},${120 - (day.soul * 120) / 100}`).join(' ')}
+                points={last7Days.map((day, i) => `${(i * 400) / 6},${160 - (day.overall * 160) / 100}`).join(' ')}
               />
               
-              {/* Data points for each category */}
+              {/* Data points */}
               {last7Days.map((day, i) => (
-                <g key={i}>
-                  {/* Mind points */}
-                  <circle
-                    cx={(i * 400) / 6}
-                    cy={120 - (day.mind * 120) / 100}
-                    r="3"
-                    fill="#6366f1"
-                    stroke="#1f2937"
-                    strokeWidth="1"
-                  />
-                  {/* Body points */}
-                  <circle
-                    cx={(i * 400) / 6}
-                    cy={120 - (day.body * 120) / 100}
-                    r="3"
-                    fill="#f97316"
-                    stroke="#1f2937"
-                    strokeWidth="1"
-                  />
-                  {/* Soul points */}
-                  <circle
-                    cx={(i * 400) / 6}
-                    cy={120 - (day.soul * 120) / 100}
-                    r="3"
-                    fill="#10b981"
-                    stroke="#1f2937"
-                    strokeWidth="1"
-                  />
-                </g>
+                <circle
+                  key={i}
+                  cx={(i * 400) / 6}
+                  cy={160 - (day.overall * 160) / 100}
+                  r="4"
+                  fill="#10b981"
+                  stroke="#000"
+                  strokeWidth="2"
+                />
               ))}
+              
+              <defs>
+                <linearGradient id="strainGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.8"/>
+                  <stop offset="100%" stopColor="#10b981" stopOpacity="0.1"/>
+                </linearGradient>
+              </defs>
             </svg>
             
-            {/* Y-axis labels */}
-            <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-400 -ml-8">
-              <span>100</span>
-              <span>75</span>
-              <span>50</span>
-              <span>25</span>
-              <span>0</span>
+            {/* Zone labels */}
+            <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-400 -ml-16">
+              <span className="text-red-400">MAX</span>
+              <span className="text-orange-400">HIGH</span>
+              <span className="text-yellow-400">MOD</span>
+              <span className="text-green-400">LOW</span>
+              <span className="text-cyan-400">REST</span>
             </div>
           </div>
+          
+          {/* Day labels */}
+          <div className="flex justify-between text-xs text-gray-400 mt-2">
+            {last7Days.map((day, i) => (
+              <span key={i} className="text-center">{day.day}</span>
+            ))}
+          </div>
+        </div>
 
           {/* Legend */}
           <div className="flex justify-center gap-6 mb-4">
@@ -344,7 +351,7 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
           return (
             <div 
               key={`tile-${habit.id}`}
-              className={`group relative rounded-2xl p-6 transition-all duration-300 cursor-pointer hover:scale-105 ${
+              className={`group relative rounded-2xl p-4 min-h-[280px] flex flex-col transition-colors duration-300 cursor-pointer ${
                 habit.completedToday 
                   ? `${colors.bg} shadow-lg` 
                   : 'bg-white hover:bg-gray-50 shadow-lg border border-gray-200'
@@ -357,21 +364,21 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
               }}
             >
               {/* Large Progress Circle */}
-              <div className="flex flex-col items-center mb-4">
-                <div className={`relative w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${
+              <div className="flex flex-col items-center mb-3 flex-shrink-0">
+                <div className={`relative w-16 h-16 rounded-full border-4 flex items-center justify-center transition-colors duration-300 ${
                   habit.completedToday 
                     ? 'border-white/30 bg-white/10' 
                     : 'border-gray-200 bg-gray-50'
                 }`}>
                   {/* Progress fill */}
-                  <div className={`absolute inset-1 rounded-full transition-all duration-500 ${
+                  <div className={`absolute inset-1 rounded-full transition-colors duration-300 ${
                     habit.completedToday 
-                      ? 'bg-white/20 scale-100' 
-                      : 'bg-transparent scale-0'
+                      ? 'bg-white/20' 
+                      : 'bg-transparent'
                   }`} />
                   
                   {/* Icon */}
-                  <div className={`text-2xl z-10 transition-all duration-300 ${
+                  <div className={`text-xl z-10 transition-colors duration-300 ${
                     habit.completedToday ? 'text-white' : 'text-gray-600'
                   }`}>
                     {habit.completedToday ? '✓' : colors.icon}
@@ -380,47 +387,46 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
               </div>
               
               {/* Title */}
-              <h4 className={`font-bold text-sm leading-tight text-center mb-2 ${
+              <h4 className={`font-bold text-sm leading-tight text-center mb-2 flex-shrink-0 ${
                 habit.completedToday ? 'text-white' : 'text-gray-800'
               }`}>
                 {habit.title}
               </h4>
               
               {/* Completion status */}
-              <div className={`text-xs font-medium text-center ${
+              <div className={`text-xs font-medium text-center mb-3 flex-shrink-0 ${
                 habit.completedToday ? 'text-white/80' : 'text-gray-500'
               }`}>
                 {habit.completedToday ? 'Complete' : 'Tap to complete'}
               </div>
               
               {/* Live Progress Bar Graph */}
-              <div className="mt-3 w-full">
-                <div className="flex items-end justify-center gap-1 h-8">
+              <div className="mt-auto w-full flex-shrink-0">
+                <div className="flex items-end justify-center gap-1 h-6 mb-2">
                   {Array.from({ length: 7 }, (_, i) => {
                     // Simulate last 7 days of completion (in real app, this would come from habit logs)
                     const isCompleted = Math.random() > 0.3; // Random for demo
                     const isToday = i === 6;
-                    const height = isCompleted ? 'h-full' : 'h-2';
                     
                     return (
                       <div
                         key={i}
-                        className={`w-2 rounded-sm transition-all duration-300 ${
+                        className={`w-2 rounded-sm transition-colors duration-300 ${
                           isToday && habit.completedToday
                             ? 'bg-white/80 h-full'
                             : isCompleted
                             ? habit.completedToday 
-                              ? 'bg-white/50 h-6' 
-                              : 'bg-blue-500 h-6'
+                              ? 'bg-white/50 h-4' 
+                              : 'bg-blue-500 h-4'
                             : habit.completedToday
-                            ? 'bg-white/20 h-2'
-                            : 'bg-gray-300 h-2'
+                            ? 'bg-white/20 h-1'
+                            : 'bg-gray-300 h-1'
                         }`}
                       />
                     );
                   })}
                 </div>
-                <div className={`text-xs text-center mt-1 font-medium ${
+                <div className={`text-xs text-center font-medium ${
                   habit.completedToday ? 'text-white/70' : 'text-gray-500'
                 }`}>
                   7 day streak

@@ -507,52 +507,104 @@ export default function HabitsPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {/* Commitment Gamification Dashboard */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-4 rounded-lg shadow-sm">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-2xl">🎯</span>
-                        <span className="text-sm font-medium">Commitment Score</span>
+                  {/* Fitness-Style Analytics Dashboard */}
+                  <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-black rounded-3xl p-8 text-white mb-8">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h2 className="text-3xl font-black mb-2">DISCIPLINE METRICS</h2>
+                        <p className="text-gray-300">Behavioral optimization tracking</p>
                       </div>
-                      <div className="text-2xl font-bold text-green-600">
-                        {Math.round((rules.filter(r => !r.violated).length / rules.length) * 100)}%
+                      <div className="text-right">
+                        <div className="text-red-400 text-sm font-bold tracking-wide">WILLPOWER SCORE</div>
+                        <div className="text-5xl font-black text-white">
+                          {Math.round((rules.filter(r => !r.violated).length / rules.length) * 100)}
+                        </div>
+                        <div className="text-red-400 text-sm">ELITE</div>
                       </div>
-                      <div className="text-xs text-muted-foreground">Overall integrity</div>
                     </div>
                     
-                    <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-4 rounded-lg shadow-sm">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-2xl">🔥</span>
-                        <span className="text-sm font-medium">Longest Streak</span>
+                    {/* Key Metrics Row */}
+                    <div className="grid grid-cols-4 gap-6">
+                      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                        <div className="text-yellow-400 text-2xl font-black">
+                          {Math.max(...rules.map(r => r.streak))}
+                        </div>
+                        <div className="text-gray-300 text-xs font-medium">MAX STREAK</div>
                       </div>
-                      <div className="text-2xl font-bold text-blue-600">
-                        {Math.max(...rules.map(r => r.streak))} days
+                      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                        <div className="text-green-400 text-2xl font-black">
+                          {rules.filter(r => r.completedToday).length}
+                        </div>
+                        <div className="text-gray-300 text-xs font-medium">TODAY</div>
                       </div>
-                      <div className="text-xs text-muted-foreground">Personal record</div>
+                      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                        <div className="text-purple-400 text-2xl font-black">
+                          {rules.reduce((sum, r) => sum + r.failures, 0)}
+                        </div>
+                        <div className="text-gray-300 text-xs font-medium">FAILURES</div>
+                      </div>
+                      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                        <div className="text-blue-400 text-2xl font-black">
+                          {Math.round(rules.reduce((sum, r) => sum + r.streak, 0) / rules.length)}
+                        </div>
+                        <div className="text-gray-300 text-xs font-medium">AVG STREAK</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Recovery Zone Performance Chart */}
+                  <div className="bg-black rounded-3xl p-6 mb-8">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-white text-lg font-bold">7-DAY DISCIPLINE</h3>
+                      <div className="text-green-400 text-sm font-medium">OPTIMAL ZONE</div>
                     </div>
                     
-                    <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-4 rounded-lg shadow-sm">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-2xl">💪</span>
-                        <span className="text-sm font-medium">Recovery Rate</span>
+                    <div className="relative h-40">
+                      <svg className="w-full h-full" viewBox="0 0 400 160">
+                        {/* Performance zone backgrounds */}
+                        <rect x="0" y="0" width="400" height="32" fill="#ef4444" opacity="0.1"/>
+                        <rect x="0" y="32" width="400" height="32" fill="#f97316" opacity="0.1"/>
+                        <rect x="0" y="64" width="400" height="32" fill="#eab308" opacity="0.1"/>
+                        <rect x="0" y="96" width="400" height="32" fill="#22c55e" opacity="0.1"/>
+                        <rect x="0" y="128" width="400" height="32" fill="#06b6d4" opacity="0.1"/>
+                        
+                        {/* Grid lines */}
+                        {[0, 32, 64, 96, 128, 160].map((y) => (
+                          <line key={y} x1="0" y1={y} x2="400" y2={y} stroke="#374151" strokeWidth="0.5"/>
+                        ))}
+                        
+                        {/* Discipline performance line */}
+                        {Array.from({ length: 7 }, (_, i) => {
+                          const performance = Math.random() * 80 + 20; // Mock 7-day data
+                          return (
+                            <circle
+                              key={i}
+                              cx={(i * 400) / 6}
+                              cy={160 - (performance * 160) / 100}
+                              r="4"
+                              fill="#22c55e"
+                              stroke="#000"
+                              strokeWidth="2"
+                            />
+                          );
+                        })}
+                      </svg>
+                      
+                      {/* Zone labels */}
+                      <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-400 -ml-16">
+                        <span className="text-red-400">FAIL</span>
+                        <span className="text-orange-400">WEAK</span>
+                        <span className="text-yellow-400">AVG</span>
+                        <span className="text-green-400">GOOD</span>
+                        <span className="text-cyan-400">ELITE</span>
                       </div>
-                      <div className="text-2xl font-bold text-purple-600">
-                        {Math.round((rules.filter(r => r.violated && r.streak > 0).length / Math.max(rules.filter(r => r.violated).length, 1)) * 100)}%
-                      </div>
-                      <div className="text-xs text-muted-foreground">Bounce back strength</div>
                     </div>
                     
-                    <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-4 rounded-lg shadow-sm">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-2xl">🎖️</span>
-                        <span className="text-sm font-medium">Mastery Level</span>
-                      </div>
-                      <div className="text-2xl font-bold text-amber-600">
-                        {rules.filter(r => r.streak >= 30).length > 2 ? 'Elite' : 
-                         rules.filter(r => r.streak >= 14).length > 1 ? 'Advanced' : 
-                         rules.filter(r => r.streak >= 7).length > 0 ? 'Developing' : 'Beginner'}
-                      </div>
-                      <div className="text-xs text-muted-foreground">Current tier</div>
+                    {/* Day labels */}
+                    <div className="flex justify-between text-xs text-gray-400 mt-2">
+                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => (
+                        <span key={i} className="text-center">{day}</span>
+                      ))}
                     </div>
                   </div>
 
