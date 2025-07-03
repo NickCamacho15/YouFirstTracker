@@ -168,114 +168,242 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white">
       <main className="p-4 pb-20">
-        {/* Progress Circles Overview - Free Floating */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          {/* Habits Progress */}
-          <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-3">
-              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f3f4f6"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#10b981"
-                  strokeWidth="3"
-                  strokeDasharray={`${75}, 100`}
-                  className="drop-shadow-sm"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl font-bold text-gray-900">75%</span>
-              </div>
+        {/* Gamified Visual Analytics Dashboard */}
+        <div className="mb-8">
+          {/* Performance Visual Layout - Colorful Expanding Data */}
+          <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-3xl p-8 shadow-2xl border border-indigo-100 overflow-hidden">
+            {/* Animated Background Pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full blur-3xl animate-pulse"></div>
+              <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full blur-3xl animate-pulse delay-1000"></div>
+              <div className="absolute top-1/2 left-1/2 w-28 h-28 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-full blur-3xl animate-pulse delay-2000"></div>
             </div>
-            <h3 className="font-semibold text-gray-900">Habits</h3>
-            <p className="text-xs text-gray-500">Daily completion</p>
-          </div>
 
-          {/* Tasks Progress */}
-          <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-3">
-              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f3f4f6"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#3b82f6"
-                  strokeWidth="3"
-                  strokeDasharray={`${40}, 100`}
-                  className="drop-shadow-sm"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl font-bold text-gray-900">40%</span>
-              </div>
-            </div>
-            <h3 className="font-semibold text-gray-900">Tasks</h3>
-            <p className="text-xs text-gray-500">Today's progress</p>
-          </div>
+            <div className="relative z-10">
+              <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Personal Excellence Analytics</h2>
+              
+              {/* Central Visual Data Layout - Expanding Toward Edges */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                {/* Left: Habit Ecosystem Visual */}
+                <div className="relative">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Habit Ecosystem</h3>
+                  <div className="relative w-48 h-48 mx-auto">
+                    {/* Central Core */}
+                    <div className="absolute inset-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full shadow-lg flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">Core</span>
+                    </div>
+                    
+                    {/* Mind Ring - Blue */}
+                    <div className="absolute inset-0 border-8 border-transparent rounded-full">
+                      <div 
+                        className="w-full h-full rounded-full border-8 border-blue-400/60 relative"
+                        style={{
+                          background: `conic-gradient(from 0deg, #3b82f6 0deg, #3b82f6 ${75 * 3.6}deg, transparent ${75 * 3.6}deg, transparent 360deg)`
+                        }}
+                      >
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-blue-500 rounded-full shadow-lg flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">M</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Body Ring - Orange */}
+                    <div className="absolute inset-4 border-8 border-transparent rounded-full">
+                      <div 
+                        className="w-full h-full rounded-full border-8 border-orange-400/60 relative"
+                        style={{
+                          background: `conic-gradient(from 120deg, #f97316 0deg, #f97316 ${60 * 3.6}deg, transparent ${60 * 3.6}deg, transparent 360deg)`
+                        }}
+                      >
+                        <div className="absolute top-0 right-0 w-6 h-6 bg-orange-500 rounded-full shadow-lg flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">B</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Soul Ring - Purple */}
+                    <div className="absolute inset-8 border-8 border-transparent rounded-full">
+                      <div 
+                        className="w-full h-full rounded-full border-8 border-purple-400/60 relative"
+                        style={{
+                          background: `conic-gradient(from 240deg, #8b5cf6 0deg, #8b5cf6 ${85 * 3.6}deg, transparent ${85 * 3.6}deg, transparent 360deg)`
+                        }}
+                      >
+                        <div className="absolute bottom-0 left-1/2 transform translate-x-1/2 w-6 h-6 bg-purple-500 rounded-full shadow-lg flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">S</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Floating Data Points */}
+                    <div className="absolute -top-6 -left-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                      Mind 75%
+                    </div>
+                    <div className="absolute -top-6 -right-6 bg-gradient-to-r from-orange-500 to-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                      Body 60%
+                    </div>
+                    <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-500 to-pink-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                      Soul 85%
+                    </div>
+                  </div>
+                </div>
 
-          {/* Goals Progress */}
-          <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-3">
-              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f3f4f6"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#8b5cf6"
-                  strokeWidth="3"
-                  strokeDasharray={`${65}, 100`}
-                  className="drop-shadow-sm"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl font-bold text-gray-900">65%</span>
-              </div>
-            </div>
-            <h3 className="font-semibold text-gray-900">Goals</h3>
-            <p className="text-xs text-gray-500">Weekly targets</p>
-          </div>
+                {/* Center: Performance Radar */}
+                <div className="relative">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Performance Matrix</h3>
+                  <div className="relative w-48 h-48 mx-auto">
+                    {/* Hexagonal Radar Background */}
+                    <svg viewBox="0 0 200 200" className="w-full h-full">
+                      {/* Grid Lines */}
+                      <defs>
+                        <radialGradient id="radarGradient" cx="50%" cy="50%" r="50%">
+                          <stop offset="0%" stopColor="#f0f9ff" />
+                          <stop offset="100%" stopColor="#e0e7ff" />
+                        </radialGradient>
+                      </defs>
+                      
+                      {/* Background Rings */}
+                      {[0.2, 0.4, 0.6, 0.8, 1.0].map((scale, i) => (
+                        <polygon
+                          key={i}
+                          points="100,20 173,50 173,150 100,180 27,150 27,50"
+                          fill="none"
+                          stroke="#e2e8f0"
+                          strokeWidth="1"
+                          transform={`scale(${scale})`}
+                          style={{ transformOrigin: '100px 100px' }}
+                        />
+                      ))}
+                      
+                      {/* Data Polygon - Colorful Fill */}
+                      <polygon
+                        points="100,35 156,55 156,135 100,165 44,135 44,55"
+                        fill="url(#performanceGradient)"
+                        stroke="#4f46e5"
+                        strokeWidth="3"
+                        opacity="0.8"
+                      />
+                      
+                      {/* Gradient Definition */}
+                      <defs>
+                        <linearGradient id="performanceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#6366f1" stopOpacity="0.6" />
+                          <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.4" />
+                          <stop offset="100%" stopColor="#ec4899" stopOpacity="0.6" />
+                        </linearGradient>
+                      </defs>
+                      
+                      {/* Data Points */}
+                      <circle cx="100" cy="35" r="4" fill="#4f46e5" />
+                      <circle cx="156" cy="55" r="4" fill="#7c3aed" />
+                      <circle cx="156" cy="135" r="4" fill="#ec4899" />
+                      <circle cx="100" cy="165" r="4" fill="#f59e0b" />
+                      <circle cx="44" cy="135" r="4" fill="#10b981" />
+                      <circle cx="44" cy="55" r="4" fill="#3b82f6" />
+                    </svg>
+                    
+                    {/* Performance Labels */}
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-indigo-600">Consistency</div>
+                    <div className="absolute top-8 -right-8 text-xs font-semibold text-purple-600">Momentum</div>
+                    <div className="absolute bottom-8 -right-8 text-xs font-semibold text-pink-600">Growth</div>
+                    <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-amber-600">Balance</div>
+                    <div className="absolute bottom-8 -left-8 text-xs font-semibold text-emerald-600">Focus</div>
+                    <div className="absolute top-8 -left-8 text-xs font-semibold text-blue-600">Excellence</div>
+                  </div>
+                  
+                  {/* Overall Score */}
+                  <div className="text-center mt-4">
+                    <div className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">A-</div>
+                    <div className="text-sm text-gray-600">Overall Performance</div>
+                  </div>
+                </div>
 
-          {/* Reading Progress */}
-          <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-3">
-              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f3f4f6"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f59e0b"
-                  strokeWidth="3"
-                  strokeDasharray={`${80}, 100`}
-                  className="drop-shadow-sm"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl font-bold text-gray-900">80%</span>
+                {/* Right: Task Analytics */}
+                <div className="relative">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Task Analytics</h3>
+                  <div className="space-y-4">
+                    {/* Task Completion Meter */}
+                    <div className="relative">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium text-gray-700">Today's Tasks</span>
+                        <span className="text-sm font-bold text-blue-600">8/12</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500" style={{width: '67%'}}></div>
+                      </div>
+                    </div>
+                    
+                    {/* Goal Progress Bars */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+                        <div className="flex-1">
+                          <div className="flex justify-between text-xs mb-1">
+                            <span>Business</span>
+                            <span>234 tasks</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="bg-gradient-to-r from-blue-400 to-indigo-500 h-2 rounded-full" style={{width: '85%'}}></div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-600"></div>
+                        <div className="flex-1">
+                          <div className="flex justify-between text-xs mb-1">
+                            <span>Leadership</span>
+                            <span>187 tasks</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="bg-gradient-to-r from-purple-400 to-pink-500 h-2 rounded-full" style={{width: '72%'}}></div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600"></div>
+                        <div className="flex-1">
+                          <div className="flex justify-between text-xs mb-1">
+                            <span>Personal</span>
+                            <span>456 tasks</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="bg-gradient-to-r from-emerald-400 to-teal-500 h-2 rounded-full" style={{width: '93%'}}></div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 rounded-full bg-gradient-to-r from-orange-500 to-red-600"></div>
+                        <div className="flex-1">
+                          <div className="flex justify-between text-xs mb-1">
+                            <span>Home</span>
+                            <span>98 tasks</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="bg-gradient-to-r from-orange-400 to-red-500 h-2 rounded-full" style={{width: '45%'}}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Weekly Stats */}
+                    <div className="mt-6 grid grid-cols-2 gap-3 text-center">
+                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3">
+                        <div className="text-lg font-bold text-blue-600">147</div>
+                        <div className="text-xs text-blue-700">Total Complete</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg p-3">
+                        <div className="text-lg font-bold text-emerald-600">73%</div>
+                        <div className="text-xs text-emerald-700">This Week</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <h3 className="font-semibold text-gray-900">Reading</h3>
-            <p className="text-xs text-gray-500">Weekly goal</p>
           </div>
         </div>
 

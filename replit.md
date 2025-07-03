@@ -123,6 +123,15 @@ Build scripts include:
 
 ## Changelog
 
+- July 3, 2025: Replaced Navigation Tiles with Gamified Visual Analytics
+  - **MAJOR**: Replaced navigation tiles with comprehensive "Personal Excellence Analytics" dashboard
+  - **NEW**: Colorful expanding visual data layouts including Habit Ecosystem with ring progressions
+  - **NEW**: Performance Matrix hexagonal radar chart with colorful gradient fills (not dot plots)
+  - **NEW**: Task Analytics section with real-time progress bars and goal tracking
+  - **DESIGN**: Three-column layout: Habit Ecosystem (rings) → Performance Matrix (radar) → Task Analytics (bars)
+  - **VISUAL**: Data grows toward edges with animated backgrounds, floating data points, and colorful gradients
+  - **IMPROVED**: Morning priming and evening routines sections remain below analytics dashboard
+  - Visual design emphasizes expanding, colorful data presentation over simple navigation tiles
 - July 3, 2025: Added Overview Tab + Reordered Navigation (Home → Habits → You → Goals → Read)
   - **NEW**: Overview tab as default on habits page with comprehensive live visual dashboards
   - **NEW**: "HABIT MASTERY" fitness-style header with complete wellness analytics
