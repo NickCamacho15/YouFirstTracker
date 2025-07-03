@@ -375,137 +375,137 @@ export default function HabitsPage() {
 
 
 
-              {/* SUPER CLEAR Check-Off Sections */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+              {/* Clean Check-Off Sections */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
                 
-                {/* NEW HABITS - Bold and Clear */}
-                <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl p-6 text-white shadow-2xl border-4 border-blue-400">
-                  <div className="flex items-center justify-between mb-6">
+                {/* New Habits */}
+                <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50">
+                  <CardHeader className="pb-4">
                     <div className="flex items-center space-x-3">
-                      <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
-                        <Plus className="w-8 h-8 text-white" />
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <Plus className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-black text-white">NEW HABITS</h3>
-                        <p className="text-blue-100 font-semibold">67-Day Formation</p>
+                        <CardTitle className="text-lg">New Habits</CardTitle>
+                        <p className="text-sm text-muted-foreground">67-day formation tracking</p>
                       </div>
                     </div>
-                  </div>
-                  <div className="space-y-4">
-                    {(habits as Habit[]).filter(h => h.category === 'mind').slice(0, 3).map((habit) => (
-                      <div key={habit.id} className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border-2 border-white/30">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <h4 className="text-white font-bold text-lg">{habit.title}</h4>
-                            <p className="text-blue-100 text-sm">Day {habit.streak} of 67</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {(habits as Habit[]).filter(h => h.category === 'mind').slice(0, 3).map((habit) => (
+                        <div key={habit.id} className="flex items-center justify-between p-4 bg-white rounded-lg border hover:border-blue-300 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                            <div>
+                              <span className="text-sm font-medium">{habit.title}</span>
+                              <p className="text-xs text-gray-500">Day {habit.streak}</p>
+                            </div>
                           </div>
                           <button
                             onClick={() => toggleHabit.mutate({ habitId: habit.id, completed: !habit.completedToday })}
-                            className={`w-16 h-16 rounded-full transition-all transform hover:scale-105 border-4 font-black text-xl ${
+                            className={`w-12 h-12 rounded-full transition-all ${
                               habit.completedToday 
-                                ? 'bg-green-500 border-green-300 text-white shadow-lg' 
-                                : 'bg-white/20 border-white/50 text-white hover:bg-white/30'
+                                ? 'bg-blue-500 text-white border-2 border-blue-400' 
+                                : 'border-2 border-gray-300 hover:border-blue-500 bg-white'
                             }`}
                           >
-                            {habit.completedToday ? '✓' : 'TAP'}
+                            {habit.completedToday && <CheckCircle2 className="w-6 h-6 mx-auto" />}
                           </button>
                         </div>
-                      </div>
-                    ))}
-                    {(habits as Habit[]).filter(h => h.category === 'mind').length === 0 && (
-                      <div className="text-center py-8">
-                        <p className="text-blue-100 text-lg font-semibold">No habits yet</p>
-                        <p className="text-blue-200 text-sm">Start your journey!</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                      ))}
+                      {(habits as Habit[]).filter(h => h.category === 'mind').length === 0 && (
+                        <p className="text-sm text-gray-500 text-center py-4">No new habits yet</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
 
-                {/* FOUNDATIONS - Bold and Clear */}
-                <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-3xl p-6 text-white shadow-2xl border-4 border-emerald-400">
-                  <div className="flex items-center justify-between mb-6">
+                {/* Foundations */}
+                <Card className="border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-teal-50">
+                  <CardHeader className="pb-4">
                     <div className="flex items-center space-x-3">
-                      <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
-                        <Layers className="w-8 h-8 text-white" />
+                      <div className="p-2 bg-emerald-100 rounded-lg">
+                        <Layers className="w-5 h-5 text-emerald-600" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-black text-white">FOUNDATIONS</h3>
-                        <p className="text-emerald-100 font-semibold">Long-Term Building</p>
+                        <CardTitle className="text-lg">Foundations</CardTitle>
+                        <p className="text-sm text-muted-foreground">Long-term consistency</p>
                       </div>
                     </div>
-                  </div>
-                  <div className="space-y-4">
-                    {(habits as Habit[]).filter(h => h.category === 'body').slice(0, 3).map((habit) => (
-                      <div key={habit.id} className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border-2 border-white/30">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <h4 className="text-white font-bold text-lg">{habit.title}</h4>
-                            <p className="text-emerald-100 text-sm">{habit.streak} day streak</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {(habits as Habit[]).filter(h => h.category === 'body').slice(0, 3).map((habit) => (
+                        <div key={habit.id} className="flex items-center justify-between p-4 bg-white rounded-lg border hover:border-emerald-300 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+                            <div>
+                              <span className="text-sm font-medium">{habit.title}</span>
+                              <p className="text-xs text-gray-500">{habit.streak} days</p>
+                            </div>
                           </div>
                           <button
                             onClick={() => toggleHabit.mutate({ habitId: habit.id, completed: !habit.completedToday })}
-                            className={`w-16 h-16 rounded-full transition-all transform hover:scale-105 border-4 font-black text-xl ${
+                            className={`w-12 h-12 rounded-full transition-all ${
                               habit.completedToday 
-                                ? 'bg-green-500 border-green-300 text-white shadow-lg' 
-                                : 'bg-white/20 border-white/50 text-white hover:bg-white/30'
+                                ? 'bg-emerald-500 text-white border-2 border-emerald-400' 
+                                : 'border-2 border-gray-300 hover:border-emerald-500 bg-white'
                             }`}
                           >
-                            {habit.completedToday ? '✓' : 'TAP'}
+                            {habit.completedToday && <CheckCircle2 className="w-6 h-6 mx-auto" />}
                           </button>
                         </div>
-                      </div>
-                    ))}
-                    {(habits as Habit[]).filter(h => h.category === 'body').length === 0 && (
-                      <div className="text-center py-8">
-                        <p className="text-emerald-100 text-lg font-semibold">No foundations yet</p>
-                        <p className="text-emerald-200 text-sm">Build your base!</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                      ))}
+                      {(habits as Habit[]).filter(h => h.category === 'body').length === 0 && (
+                        <p className="text-sm text-gray-500 text-center py-4">No foundations yet</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
 
-                {/* RULES - Bold and Clear */}
-                <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-3xl p-6 text-white shadow-2xl border-4 border-purple-400">
-                  <div className="flex items-center justify-between mb-6">
+                {/* Rules */}
+                <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-pink-50">
+                  <CardHeader className="pb-4">
                     <div className="flex items-center space-x-3">
-                      <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
-                        <Shield className="w-8 h-8 text-white" />
+                      <div className="p-2 bg-purple-100 rounded-lg">
+                        <Shield className="w-5 h-5 text-purple-600" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-black text-white">RULES</h3>
-                        <p className="text-purple-100 font-semibold">Behavioral Guard Rails</p>
+                        <CardTitle className="text-lg">Rules</CardTitle>
+                        <p className="text-sm text-muted-foreground">Behavioral optimization</p>
                       </div>
                     </div>
-                  </div>
-                  <div className="space-y-4">
-                    {(habits as Habit[]).filter(h => h.category === 'soul').slice(0, 3).map((habit) => (
-                      <div key={habit.id} className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border-2 border-white/30">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <h4 className="text-white font-bold text-lg">{habit.title}</h4>
-                            <p className="text-purple-100 text-sm">Keep the promise</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {(habits as Habit[]).filter(h => h.category === 'soul').slice(0, 3).map((habit) => (
+                        <div key={habit.id} className="flex items-center justify-between p-4 bg-white rounded-lg border hover:border-purple-300 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                            <div>
+                              <span className="text-sm font-medium">{habit.title}</span>
+                              <p className="text-xs text-gray-500">Active</p>
+                            </div>
                           </div>
                           <button
                             onClick={() => toggleHabit.mutate({ habitId: habit.id, completed: !habit.completedToday })}
-                            className={`w-16 h-16 rounded-full transition-all transform hover:scale-105 border-4 font-black text-xl ${
+                            className={`w-12 h-12 rounded-full transition-all ${
                               habit.completedToday 
-                                ? 'bg-green-500 border-green-300 text-white shadow-lg' 
-                                : 'bg-white/20 border-white/50 text-white hover:bg-white/30'
+                                ? 'bg-purple-500 text-white border-2 border-purple-400' 
+                                : 'border-2 border-gray-300 hover:border-purple-500 bg-white'
                             }`}
                           >
-                            {habit.completedToday ? '✓' : 'TAP'}
+                            {habit.completedToday && <CheckCircle2 className="w-6 h-6 mx-auto" />}
                           </button>
                         </div>
-                      </div>
-                    ))}
-                    {(habits as Habit[]).filter(h => h.category === 'soul').length === 0 && (
-                      <div className="text-center py-8">
-                        <p className="text-purple-100 text-lg font-semibold">No rules yet</p>
-                        <p className="text-purple-200 text-sm">Set your boundaries!</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                      ))}
+                      {(habits as Habit[]).filter(h => h.category === 'soul').length === 0 && (
+                        <p className="text-sm text-gray-500 text-center py-4">No rules yet</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </TabsContent>
 
