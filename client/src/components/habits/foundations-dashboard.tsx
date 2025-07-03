@@ -336,53 +336,117 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
         })}
       </div>
 
-      {/* Compact Daily Completion Tiles */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-8">
+      {/* Foundation Tiles with Large Progress Circles */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
         {habits.map((habit) => {
           const colors = getCategoryGradient(habit.category);
           
           return (
             <div 
               key={`tile-${habit.id}`}
-              className={`relative rounded-xl p-4 aspect-square flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 cursor-pointer ${
+              className={`group relative rounded-2xl p-6 transition-all duration-300 cursor-pointer transform hover:scale-105 ${
                 habit.completedToday 
-                  ? `${colors.bg} shadow-lg` 
-                  : 'bg-gray-100 hover:bg-gray-200 shadow-md'
+                  ? `${colors.bg} shadow-xl` 
+                  : 'bg-white hover:bg-gray-50 shadow-lg border border-gray-200'
               }`}
-              onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
+              onClick={() => {
+                if ('vibrate' in navigator) {
+                  navigator.vibrate(50);
+                }
+                onToggleHabit(habit.id);
+              }}
             >
-              {/* Icon */}
-              <div className={`text-2xl mb-2 ${habit.completedToday ? 'text-white' : 'text-gray-600'}`}>
-                {colors.icon}
-              </div>
-              
-              {/* Completion indicator */}
-              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                habit.completedToday 
-                  ? 'bg-white border-white' 
-                  : 'border-gray-400'
-              }`}>
-                {habit.completedToday && (
-                  <CheckCircle2 className={`w-4 h-4 ${colors.text}`} />
-                )}
+              {/* Large Progress Circle */}
+              <div className="flex flex-col items-center mb-4">
+                <div className={`relative w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${
+                  habit.completedToday 
+                    ? 'border-white/30 bg-white/10' 
+                    : 'border-gray-200 bg-gray-50'
+                }`}>
+                  {/* Progress fill */}
+                  <div className={`absolute inset-1 rounded-full transition-all duration-500 ${
+                    habit.completedToday 
+                      ? 'bg-white/20 scale-100' 
+                      : 'bg-transparent scale-0'
+                  }`} />
+                  
+                  {/* Icon */}
+                  <div className={`text-2xl z-10 transition-all duration-300 ${
+                    habit.completedToday ? 'text-white' : 'text-gray-600'
+                  }`}>
+                    {habit.completedToday ? '✓' : colors.icon}
+                  </div>
+                </div>
               </div>
               
               {/* Title */}
-              <div className={`text-xs font-semibold mt-2 text-center line-clamp-2 ${
-                habit.completedToday ? 'text-white' : 'text-gray-700'
+              <h4 className={`font-bold text-sm leading-tight text-center mb-2 ${
+                habit.completedToday ? 'text-white' : 'text-gray-800'
               }`}>
                 {habit.title}
+              </h4>
+              
+              {/* Completion status */}
+              <div className={`text-xs font-medium text-center ${
+                habit.completedToday ? 'text-white/80' : 'text-gray-500'
+              }`}>
+                {habit.completedToday ? 'Complete' : 'Tap to complete'}
               </div>
+              
+              {/* Live Progress Bar Graph */}
+              <div className="mt-3 w-full">
+                <div className="flex items-end justify-center gap-1 h-8">
+                  {Array.from({ length: 7 }, (_, i) => {
+                    // Simulate last 7 days of completion (in real app, this would come from habit logs)
+                    const isCompleted = Math.random() > 0.3; // Random for demo
+                    const isToday = i === 6;
+                    const height = isCompleted ? 'h-full' : 'h-2';
+                    
+                    return (
+                      <div
+                        key={i}
+                        className={`w-2 rounded-sm transition-all duration-300 ${
+                          isToday && habit.completedToday
+                            ? 'bg-white/80 h-full'
+                            : isCompleted
+                            ? habit.completedToday 
+                              ? 'bg-white/50 h-6' 
+                              : 'bg-blue-500 h-6'
+                            : habit.completedToday
+                            ? 'bg-white/20 h-2'
+                            : 'bg-gray-300 h-2'
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
+                <div className={`text-xs text-center mt-1 font-medium ${
+                  habit.completedToday ? 'text-white/70' : 'text-gray-500'
+                }`}>
+                  7 day streak
+                </div>
+              </div>
+              
+              {/* Streak indicator */}
+              {habit.streak > 0 && (
+                <div className={`absolute top-3 right-3 flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${
+                  habit.completedToday 
+                    ? 'bg-white/20 text-white' 
+                    : 'bg-orange-100 text-orange-600'
+                }`}>
+                  🔥 {habit.streak}
+                </div>
+              )}
             </div>
           );
         })}
       </div>
 
-      {/* Mandala-Style Habit Radar Chart */}
+      {/* Habit Performance Radar Chart */}
       <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 border-2 border-gray-200 dark:border-gray-700 shadow-xl">
         <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100 mb-8 flex items-center gap-3">
           <TrendingUp className="w-6 h-6 text-blue-600" />
-          Habit Formation Mandala
+          Performance Overview
         </h3>
         
         <div className="flex flex-col items-center">

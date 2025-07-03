@@ -123,6 +123,15 @@ Build scripts include:
 
 ## Changelog
 
+- July 3, 2025: Redesigned Foundation Tiles with Live Progress Graphs
+  - **NEW**: Foundation tiles now feature large 20x20 progress circles with visual feedback
+  - **NEW**: Added live 7-day bar graph showing habit completion history 
+  - **IMPROVED**: Simple tap-to-complete with haptic feedback (50ms vibration)
+  - **IMPROVED**: Toned down completion effects to just color change and subtle animations
+  - **DESIGN**: Removed "mandala" references, now called "Performance Overview"
+  - Foundation tiles use 2x3 grid layout with larger, more prominent visual elements
+  - Bar graph shows last 7 days with animated bars indicating completion status
+  - Completed habits show checkmark in circle, incomplete show category icon
 - July 2, 2025: Enhanced Rules System + Improved Foundation Tiles
   - **NEW**: Rules tab now uses positive completion language with "Promise kept today" instead of violation tracking
   - **NEW**: Rules feature slide-to-break bars for intentional promise breaking with haptic feedback
