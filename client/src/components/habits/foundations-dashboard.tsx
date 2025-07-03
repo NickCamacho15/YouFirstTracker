@@ -344,9 +344,9 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
           return (
             <div 
               key={`tile-${habit.id}`}
-              className={`group relative rounded-2xl p-6 transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+              className={`group relative rounded-2xl p-6 transition-all duration-300 cursor-pointer hover:scale-105 ${
                 habit.completedToday 
-                  ? `${colors.bg} shadow-xl` 
+                  ? `${colors.bg} shadow-lg` 
                   : 'bg-white hover:bg-gray-50 shadow-lg border border-gray-200'
               }`}
               onClick={() => {
