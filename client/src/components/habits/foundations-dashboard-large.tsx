@@ -15,7 +15,7 @@ interface Habit {
 
 interface FoundationsDashboardProps {
   habits: Habit[];
-  onToggleHabit: (habitId: number, completed: boolean) => void;
+  onToggleHabit: (habitId: number) => void;
   onEditHabit: (habit: Habit) => void;
   isLoading: boolean;
 }

@@ -127,8 +127,8 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
           </div>
         </div>
 
-          {/* Multi-Line Graph */}
-          <div className="relative h-32 mb-4">
+        {/* Multi-Line Graph */}
+        <div className="relative h-32 mb-4">
             <svg className="w-full h-full" viewBox="0 0 400 120">
               {/* Grid lines */}
               <defs>
@@ -247,8 +247,10 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
               <span key={i}>{day.day}</span>
             ))}
           </div>
+        </div>
 
-          {/* Category Stats Row */}
+        {/* Category Stats Row */}
+        <div className="bg-white/40 backdrop-blur-sm rounded-xl p-6">
           <div className="grid grid-cols-4 gap-3">
             <div className="text-center">
               <div className="text-indigo-400 text-lg font-bold">{mindCompletion}%</div>
