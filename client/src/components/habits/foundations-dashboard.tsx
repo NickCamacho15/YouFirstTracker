@@ -116,41 +116,43 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
       <div className="relative">
         {/* Background Effects */}
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-4 right-4 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-4 left-4 w-24 h-24 bg-gradient-to-br from-emerald-500/15 to-teal-500/15 rounded-full blur-2xl animate-pulse delay-1000"></div>
+          <div className="absolute top-4 right-4 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-4 left-4 w-24 h-24 bg-gradient-to-br from-emerald-500/8 to-teal-500/8 rounded-full blur-2xl"></div>
         </div>
         
-        {/* Header - Health Dashboard Style */}
+        {/* Long-term Consistency Dashboard */}
         <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-black rounded-3xl p-8 text-white mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-black mb-2">TODAY'S RECOVERY</h1>
-              <p className="text-gray-300">Foundation performance metrics</p>
+              <h1 className="text-3xl font-black mb-2">FOUNDATION CONSISTENCY</h1>
+              <p className="text-gray-300">Long-term personal investment tracking</p>
             </div>
             <div className="text-right">
-              <div className="text-green-400 text-sm font-bold tracking-wide">OVERALL SCORE</div>
+              <div className="text-green-400 text-sm font-bold tracking-wide">CONSISTENCY RATE</div>
               <div className="text-5xl font-black text-white">{completionRate}</div>
-              <div className="text-green-400 text-sm">OPTIMAL</div>
+              <div className="text-green-400 text-sm">EXCELLENT</div>
             </div>
           </div>
           
-          {/* Key Metrics Row */}
+          {/* Long-term Metrics Row */}
           <div className="grid grid-cols-4 gap-6">
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-              <div className="text-yellow-400 text-2xl font-black">{avgStreak}</div>
-              <div className="text-gray-300 text-xs font-medium">AVG STRAIN</div>
+              <div className="text-yellow-400 text-2xl font-black">{totalHabits}</div>
+              <div className="text-gray-300 text-xs font-medium">FOUNDATIONS</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
               <div className="text-red-400 text-2xl font-black">{longestStreak}</div>
-              <div className="text-gray-300 text-xs font-medium">PEAK DAYS</div>
+              <div className="text-gray-300 text-xs font-medium">LONGEST</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
               <div className="text-blue-400 text-2xl font-black">{completedToday}</div>
-              <div className="text-gray-300 text-xs font-medium">COMPLETED</div>
+              <div className="text-gray-300 text-xs font-medium">TODAY</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-              <div className="text-purple-400 text-2xl font-black">{totalHabits}</div>
-              <div className="text-gray-300 text-xs font-medium">ACTIVE</div>
+              <div className="text-purple-400 text-2xl font-black">
+                {habits.length > 0 ? Math.round((habits.reduce((sum, h) => sum + Math.min(h.streak, 365), 0) / habits.length) * 100 / 365) : 0}%
+              </div>
+              <div className="text-gray-300 text-xs font-medium">YEAR PROGRESS</div>
             </div>
           </div>
         </div>
@@ -279,7 +281,7 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
         </div>
       </div>
 
-        {/* Category-Based Habit Tiles */}
+        {/* Long-term Foundation Categories */}
         {['mind', 'body', 'soul'].map((category) => {
           const categoryHabits = habits.filter(h => h.category === category);
           if (categoryHabits.length === 0) return null;
@@ -289,140 +291,106 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
               name: 'Mind', 
               icon: '🧠', 
               color: 'bg-purple-500',
-              lightColor: 'bg-purple-100',
-              textColor: 'text-purple-600'
+              lightColor: 'bg-purple-50',
+              textColor: 'text-purple-600',
+              borderColor: 'border-purple-200'
             },
             body: { 
               name: 'Body', 
               icon: '💪', 
               color: 'bg-orange-500',
-              lightColor: 'bg-orange-100', 
-              textColor: 'text-orange-600'
+              lightColor: 'bg-orange-50', 
+              textColor: 'text-orange-600',
+              borderColor: 'border-orange-200'
             },
             soul: { 
               name: 'Soul', 
               icon: '✨', 
               color: 'bg-emerald-500',
-              lightColor: 'bg-emerald-100',
-              textColor: 'text-emerald-600'
+              lightColor: 'bg-emerald-50',
+              textColor: 'text-emerald-600',
+              borderColor: 'border-emerald-200'
             }
           }[category];
           
+          const categoryConsistency = categoryHabits.length > 0 
+            ? Math.round((categoryHabits.filter(h => h.completedToday).length / categoryHabits.length) * 100)
+            : 0;
+          
           return (
-            <div key={category} className="mb-8">
+            <div key={category} className={`${categoryConfig.lightColor} ${categoryConfig.borderColor} border-2 rounded-3xl p-6 mb-6`}>
               {/* Category Header */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`w-12 h-12 ${categoryConfig.color} rounded-full flex items-center justify-center`}>
-                  <span className="text-2xl">{categoryConfig.icon}</span>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className={`w-16 h-16 ${categoryConfig.color} rounded-full flex items-center justify-center shadow-lg`}>
+                    <span className="text-3xl">{categoryConfig.icon}</span>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">{categoryConfig.name}</h3>
+                    <p className="text-gray-600">{categoryHabits.length} foundation{categoryHabits.length !== 1 ? 's' : ''}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">{categoryConfig.name}</h3>
-                  <p className="text-sm text-gray-600">{categoryHabits.length} habit{categoryHabits.length !== 1 ? 's' : ''}</p>
+                
+                {/* Category Consistency Score */}
+                <div className="text-right">
+                  <div className={`${categoryConfig.textColor} text-sm font-bold`}>CONSISTENCY</div>
+                  <div className="text-3xl font-black text-gray-900">{categoryConsistency}%</div>
+                  <div className="text-xs text-gray-600">TODAY</div>
                 </div>
               </div>
               
-              {/* Habit Cards Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Foundation Items within Category */}
+              <div className="space-y-3">
                 {categoryHabits.map((habit) => (
-                  <div key={habit.id} className="relative">
-                    {/* Habit Card */}
-                    <div 
-                      className={`
-                        p-4 rounded-2xl border-2 cursor-pointer transition-colors duration-200
-                        ${habit.completedToday 
-                          ? `${categoryConfig.color} border-transparent` 
-                          : `${categoryConfig.lightColor} border-gray-200 hover:border-gray-300`
-                        }
-                      `}
-                      onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
-                    >
-                      {/* Stars for completed streaks */}
-                      {habit.streak > 0 && (
-                        <div className="absolute -top-1 -right-1 flex">
-                          {habit.streak >= 7 && <span className="text-yellow-400 text-sm">⭐</span>}
-                          {habit.streak >= 30 && <span className="text-yellow-400 text-sm">⭐</span>}
-                        </div>
-                      )}
-                      
-                      {/* Habit Title */}
-                      <h4 className={`font-semibold text-sm mb-2 ${
-                        habit.completedToday ? 'text-white' : 'text-gray-900'
-                      }`}>
-                        {habit.title}
-                      </h4>
-                      
-                      {/* Streak Progress */}
-                      <div className={`text-xs mb-3 ${
-                        habit.completedToday ? 'text-white/80' : 'text-gray-600'
-                      }`}>
-                        {habit.streak}/67 days
-                      </div>
-                      
-                      {/* Progress Circle */}
-                      <div className="flex justify-center mb-3">
-                        <div className="relative w-16 h-16">
-                          <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 100 100">
-                            {/* Background circle */}
-                            <circle
-                              cx="50"
-                              cy="50"
-                              r="40"
-                              stroke="currentColor"
-                              strokeWidth="8"
-                              fill="transparent"
-                              className={habit.completedToday ? "text-white/20" : "text-gray-300"}
-                            />
-                            {/* Progress circle */}
-                            <circle
-                              cx="50"
-                              cy="50"
-                              r="40"
-                              stroke="currentColor"
-                              strokeWidth="8"
-                              fill="transparent"
-                              strokeDasharray={`${2 * Math.PI * 40}`}
-                              strokeDashoffset={`${2 * Math.PI * 40 * (1 - Math.min(habit.streak / 67, 1))}`}
-                              className={habit.completedToday ? "text-white" : categoryConfig.textColor}
-                              strokeLinecap="round"
-                            />
-                          </svg>
-                          {/* Center number */}
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className={`text-xl font-bold ${
-                              habit.completedToday ? 'text-white' : 'text-gray-900'
-                            }`}>
-                              {habit.streak}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Completion Status */}
-                      <div className="flex justify-center">
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                          habit.completedToday 
-                            ? 'bg-white border-white' 
-                            : 'border-gray-400'
-                        }`}>
+                  <div key={habit.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        {/* Simple Completion Circle */}
+                        <button
+                          onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
+                          className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${
+                            habit.completedToday 
+                              ? `${categoryConfig.color} border-transparent`
+                              : `border-gray-300 hover:${categoryConfig.borderColor}`
+                          }`}
+                        >
                           {habit.completedToday && (
-                            <svg className="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
                           )}
+                        </button>
+                        
+                        {/* Habit Details */}
+                        <div>
+                          <h4 className="font-semibold text-gray-900">{habit.title}</h4>
+                          <p className="text-sm text-gray-600">
+                            {habit.streak} day streak • 
+                            {habit.streak >= 365 ? ' Yearly Master' : 
+                             habit.streak >= 100 ? ' Century Club' : 
+                             habit.streak >= 30 ? ' Monthly Champion' : 
+                             habit.streak >= 7 ? ' Weekly Winner' : ' Building...'}
+                          </p>
                         </div>
                       </div>
+                      
+                      {/* Long-term Progress & Edit */}
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <div className={`text-lg font-bold ${categoryConfig.textColor}`}>
+                            {Math.round((habit.streak / 365) * 100)}%
+                          </div>
+                          <div className="text-xs text-gray-500">YEAR</div>
+                        </div>
+                        
+                        <button 
+                          onClick={() => onEditHabit(habit)}
+                          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                          <Settings className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
-                    
-                    {/* Edit Button */}
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEditHabit(habit);
-                      }}
-                      className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 rounded-full p-1 shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <Settings className="w-4 h-4 text-gray-600" />
-                    </button>
                   </div>
                 ))}
               </div>
@@ -430,26 +398,9 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
           );
         })}
       </div>
-
-      {/* Foundation Tiles with Large Progress Circles */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-        {habits.map((habit) => {
-          const colors = getCategoryGradient(habit.category);
-          
-          return (
-            <div 
-              key={`tile-${habit.id}`}
-              className={`group relative rounded-2xl p-4 min-h-[280px] flex flex-col transition-colors duration-300 cursor-pointer ${
-                habit.completedToday 
-                  ? `${colors.bg} shadow-lg` 
-                  : 'bg-white hover:bg-gray-50 shadow-lg border border-gray-200'
-              }`}
-              onClick={() => {
-                if ('vibrate' in navigator) {
-                  navigator.vibrate(50);
-                }
-                onToggleHabit(habit.id);
-              }}
+    </div>
+  );
+}
             >
               {/* Large Progress Circle */}
               <div className="flex flex-col items-center mb-3 flex-shrink-0">

@@ -123,6 +123,16 @@ Build scripts include:
 
 ## Changelog
 
+- July 3, 2025: Fixed Foundations Tab - Long-term Consistency Tracking (Not 67-day Formation)
+  - **MAJOR**: Foundations now track long-term consistency like tasks on You page, not 67-day cycles
+  - **FIXED**: Removed all flashing/pulsing animations - only simple color transitions
+  - **NEW**: Category-based organization with "tiles within tiles" - category tiles containing habit tiles
+  - **NEW**: "FOUNDATION CONSISTENCY" dashboard with fitness-style black header
+  - **NEW**: Year progress tracking (streak/365 * 100%) instead of formation cycles  
+  - **NEW**: Long-term milestones: Yearly Master (365+), Century Club (100+), Monthly Champion (30+)
+  - **IMPROVED**: Simple completion circles with no complex animations
+  - **IMPROVED**: Individual habit tiles within category tiles (Mind, Body, Soul) 
+  - Foundations emphasize building long-term personal investment consistency over habit formation
 - July 3, 2025: Transformed Habits Section into Health & Fitness App Interface
   - **MAJOR**: Complete redesign inspired by Whoop fitness tracker interface
   - **NEW**: "TODAY'S RECOVERY" dashboard with dark gradient header and fitness metrics
