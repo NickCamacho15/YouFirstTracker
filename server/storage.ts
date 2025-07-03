@@ -3,12 +3,12 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { eq, desc, and, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { 
-  users, goals, microGoals, habits, habitLogs, readingSessions, posts, visionBoard, tasks,
+  users, goals, microGoals, habits, habitLogs, readingSessions, posts, visionBoard, tasks, rules,
   followers, postReactions, postComments,
   type User, type InsertUser, type Goal, type InsertGoal, type MicroGoal, type InsertMicroGoal,
   type Habit, type InsertHabit, type HabitLog, type InsertHabitLog,
   type ReadingSession, type InsertReadingSession, type Post, type InsertPost,
-  type VisionBoardItem, type InsertVisionBoardItem, type Task, type InsertTask,
+  type VisionBoardItem, type InsertVisionBoardItem, type Task, type InsertTask, type Rule, type InsertRule,
   type Follower, type InsertFollower, type PostReaction, type InsertPostReaction,
   type PostComment, type InsertPostComment
 } from "@shared/schema";
@@ -89,6 +89,15 @@ export interface IStorage {
   // Post Comments
   addPostComment(comment: InsertPostComment): Promise<PostComment>;
   getPostComments(postId: number): Promise<(PostComment & { user: Pick<User, 'displayName'> })[]>;
+
+  // Rules
+  getRulesByUserId(userId: number): Promise<Rule[]>;
+  getRuleById(id: number): Promise<Rule | undefined>;
+  createRule(rule: InsertRule): Promise<Rule>;
+  updateRule(id: number, updates: Partial<Rule>): Promise<Rule | undefined>;
+  deleteRule(id: number): Promise<boolean>;
+  toggleRuleCompletion(ruleId: number, userId: number): Promise<{ success: boolean; reason?: string; rule?: Rule }>;
+  markRuleViolation(ruleId: number, userId: number): Promise<{ success: boolean; reason?: string; rule?: Rule }>;
 }
 
 export class DatabaseStorage implements IStorage {

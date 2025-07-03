@@ -121,6 +121,20 @@ export const tasks = pgTable("tasks", {
   completedAt: timestamp("completed_at"),
 });
 
+export const rules = pgTable("rules", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  text: text("text").notNull(),
+  category: text("category").notNull().default("Personal"), // Digital Wellness, Nutrition, Sleep Hygiene, Mental Health, Fitness, Personal
+  streak: integer("streak").default(0).notNull(),
+  failures: integer("failures").default(0).notNull(),
+  completedToday: boolean("completed_today").default(false).notNull(),
+  violated: boolean("violated").default(false).notNull(),
+  lastCompletionTime: timestamp("last_completion_time"),
+  lastViolationTime: timestamp("last_violation_time"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const userStats = pgTable("user_stats", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull().unique(),
@@ -235,6 +249,13 @@ export const insertTaskSchema = createInsertSchema(tasks).omit({
   dueDate: z.string().optional().transform((val) => val && val !== "" ? new Date(val) : undefined),
 });
 
+export const insertRuleSchema = createInsertSchema(rules).omit({
+  id: true,
+  createdAt: true,
+  lastCompletionTime: true,
+  lastViolationTime: true,
+});
+
 export const insertUserStatsSchema = createInsertSchema(userStats).omit({
   id: true,
   createdAt: true,
@@ -272,6 +293,8 @@ export type VisionBoardItem = typeof visionBoard.$inferSelect;
 export type InsertVisionBoardItem = z.infer<typeof insertVisionBoardSchema>;
 export type Task = typeof tasks.$inferSelect;
 export type InsertTask = z.infer<typeof insertTaskSchema>;
+export type Rule = typeof rules.$inferSelect;
+export type InsertRule = z.infer<typeof insertRuleSchema>;
 export type UserStats = typeof userStats.$inferSelect;
 export type InsertUserStats = z.infer<typeof insertUserStatsSchema>;
 export type Follower = typeof followers.$inferSelect;

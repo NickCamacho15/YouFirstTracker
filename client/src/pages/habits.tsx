@@ -371,193 +371,141 @@ export default function HabitsPage() {
                 </div>
               </div>
 
-              {/* Live Habit Status Grid */}
-              <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100 mb-8">
-                <h3 className="text-xl font-bold mb-4 text-gray-900">Today's Progress</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {(habits as Habit[]).map((habit) => (
-                    <div 
-                      key={habit.id} 
-                      className={`p-4 rounded-xl border-2 transition-colors cursor-pointer ${
-                        habit.completedToday 
-                          ? 'bg-green-50 border-green-200' 
-                          : 'bg-gray-50 border-gray-200 hover:border-gray-300'
-                      }`}
-                      onClick={() => handleToggleHabit(habit.id)}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-2xl">
-                          {habit.category === 'mind' ? '🧠' : habit.category === 'body' ? '💪' : '✨'}
-                        </span>
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                          habit.completedToday 
-                            ? 'bg-green-500 border-green-500' 
-                            : 'border-gray-400'
-                        }`}>
-                          {habit.completedToday && (
-                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </div>
-                      </div>
-                      <h4 className="font-semibold text-sm text-gray-900 mb-1">{habit.title}</h4>
-                      <p className="text-xs text-gray-600">{habit.streak} day streak</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
 
-              {/* Quick Actions */}
-              <div className="flex gap-4">
-                <Button 
-                  onClick={() => setShowCreateModal(true)}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3"
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  Add New Habit
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="px-6 py-3"
-                  onClick={() => window.scrollTo(0, 0)}
-                >
-                  <BarChart3 className="w-5 h-5 mr-2" />
-                  View Details
-                </Button>
-              </div>
 
-              {/* Simple Completion Sections */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+
+
+              {/* SUPER CLEAR Check-Off Sections */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
                 
-                {/* New Habits Completion */}
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50">
-                  <CardHeader className="pb-4">
+                {/* NEW HABITS - Bold and Clear */}
+                <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl p-6 text-white shadow-2xl border-4 border-blue-400">
+                  <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Plus className="w-5 h-5 text-blue-600" />
+                      <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+                        <Plus className="w-8 h-8 text-white" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">New Habits</CardTitle>
-                        <p className="text-sm text-muted-foreground">67-day formation tracking</p>
+                        <h3 className="text-2xl font-black text-white">NEW HABITS</h3>
+                        <p className="text-blue-100 font-semibold">67-Day Formation</p>
                       </div>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {(habits as Habit[]).filter(h => h.category === 'mind').slice(0, 3).map((habit) => (
-                        <div key={habit.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                          <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                            <span className="text-sm font-medium">{habit.title}</span>
+                  </div>
+                  <div className="space-y-4">
+                    {(habits as Habit[]).filter(h => h.category === 'mind').slice(0, 3).map((habit) => (
+                      <div key={habit.id} className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border-2 border-white/30">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h4 className="text-white font-bold text-lg">{habit.title}</h4>
+                            <p className="text-blue-100 text-sm">Day {habit.streak} of 67</p>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">Day {habit.streak}</span>
-                            <button 
-                              onClick={() => toggleHabit.mutate({ habitId: habit.id, completed: !habit.completedToday })}
-                              className={`w-6 h-6 rounded-full transition-colors ${
-                                habit.completedToday 
-                                  ? 'bg-blue-500 text-white' 
-                                  : 'border-2 border-gray-300 hover:border-blue-500'
-                              }`}
-                            >
-                              {habit.completedToday && <CheckCircle2 className="w-4 h-4" />}
-                            </button>
-                          </div>
+                          <button
+                            onClick={() => toggleHabit.mutate({ habitId: habit.id, completed: !habit.completedToday })}
+                            className={`w-16 h-16 rounded-full transition-all transform hover:scale-105 border-4 font-black text-xl ${
+                              habit.completedToday 
+                                ? 'bg-green-500 border-green-300 text-white shadow-lg' 
+                                : 'bg-white/20 border-white/50 text-white hover:bg-white/30'
+                            }`}
+                          >
+                            {habit.completedToday ? '✓' : 'TAP'}
+                          </button>
                         </div>
-                      ))}
-                      {(habits as Habit[]).filter(h => h.category === 'mind').length === 0 && (
-                        <p className="text-sm text-gray-500 text-center py-4">No new habits yet</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                      </div>
+                    ))}
+                    {(habits as Habit[]).filter(h => h.category === 'mind').length === 0 && (
+                      <div className="text-center py-8">
+                        <p className="text-blue-100 text-lg font-semibold">No habits yet</p>
+                        <p className="text-blue-200 text-sm">Start your journey!</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-                {/* Foundations Completion */}
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-teal-50">
-                  <CardHeader className="pb-4">
+                {/* FOUNDATIONS - Bold and Clear */}
+                <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-3xl p-6 text-white shadow-2xl border-4 border-emerald-400">
+                  <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-emerald-100 rounded-lg">
-                        <Layers className="w-5 h-5 text-emerald-600" />
+                      <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+                        <Layers className="w-8 h-8 text-white" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">Foundations</CardTitle>
-                        <p className="text-sm text-muted-foreground">Long-term consistency</p>
+                        <h3 className="text-2xl font-black text-white">FOUNDATIONS</h3>
+                        <p className="text-emerald-100 font-semibold">Long-Term Building</p>
                       </div>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {(habits as Habit[]).filter(h => h.category === 'body').slice(0, 3).map((habit) => (
-                        <div key={habit.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                          <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                            <span className="text-sm font-medium">{habit.title}</span>
+                  </div>
+                  <div className="space-y-4">
+                    {(habits as Habit[]).filter(h => h.category === 'body').slice(0, 3).map((habit) => (
+                      <div key={habit.id} className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border-2 border-white/30">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h4 className="text-white font-bold text-lg">{habit.title}</h4>
+                            <p className="text-emerald-100 text-sm">{habit.streak} day streak</p>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">{habit.streak} days</span>
-                            <button 
-                              onClick={() => toggleHabit.mutate({ habitId: habit.id, completed: !habit.completedToday })}
-                              className={`w-6 h-6 rounded-full transition-colors ${
-                                habit.completedToday 
-                                  ? 'bg-emerald-500 text-white' 
-                                  : 'border-2 border-gray-300 hover:border-emerald-500'
-                              }`}
-                            >
-                              {habit.completedToday && <CheckCircle2 className="w-4 h-4" />}
-                            </button>
-                          </div>
+                          <button
+                            onClick={() => toggleHabit.mutate({ habitId: habit.id, completed: !habit.completedToday })}
+                            className={`w-16 h-16 rounded-full transition-all transform hover:scale-105 border-4 font-black text-xl ${
+                              habit.completedToday 
+                                ? 'bg-green-500 border-green-300 text-white shadow-lg' 
+                                : 'bg-white/20 border-white/50 text-white hover:bg-white/30'
+                            }`}
+                          >
+                            {habit.completedToday ? '✓' : 'TAP'}
+                          </button>
                         </div>
-                      ))}
-                      {(habits as Habit[]).filter(h => h.category === 'body').length === 0 && (
-                        <p className="text-sm text-gray-500 text-center py-4">No foundations yet</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                      </div>
+                    ))}
+                    {(habits as Habit[]).filter(h => h.category === 'body').length === 0 && (
+                      <div className="text-center py-8">
+                        <p className="text-emerald-100 text-lg font-semibold">No foundations yet</p>
+                        <p className="text-emerald-200 text-sm">Build your base!</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-                {/* Rules Completion */}
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-pink-50">
-                  <CardHeader className="pb-4">
+                {/* RULES - Bold and Clear */}
+                <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-3xl p-6 text-white shadow-2xl border-4 border-purple-400">
+                  <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-purple-100 rounded-lg">
-                        <Shield className="w-5 h-5 text-purple-600" />
+                      <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+                        <Shield className="w-8 h-8 text-white" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">Rules</CardTitle>
-                        <p className="text-sm text-muted-foreground">Behavioral optimization</p>
+                        <h3 className="text-2xl font-black text-white">RULES</h3>
+                        <p className="text-purple-100 font-semibold">Behavioral Guard Rails</p>
                       </div>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {(habits as Habit[]).filter(h => h.category === 'soul').slice(0, 3).map((habit) => (
-                        <div key={habit.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                          <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                            <span className="text-sm font-medium">{habit.title}</span>
+                  </div>
+                  <div className="space-y-4">
+                    {(habits as Habit[]).filter(h => h.category === 'soul').slice(0, 3).map((habit) => (
+                      <div key={habit.id} className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border-2 border-white/30">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h4 className="text-white font-bold text-lg">{habit.title}</h4>
+                            <p className="text-purple-100 text-sm">Keep the promise</p>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">Active</span>
-                            <button 
-                              onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
-                              className={`w-6 h-6 rounded-full transition-colors ${
-                                habit.completedToday 
-                                  ? 'bg-purple-500 text-white' 
-                                  : 'border-2 border-gray-300 hover:border-purple-500'
-                              }`}
-                            >
-                              {habit.completedToday && <CheckCircle2 className="w-4 h-4" />}
-                            </button>
-                          </div>
+                          <button
+                            onClick={() => toggleHabit.mutate({ habitId: habit.id, completed: !habit.completedToday })}
+                            className={`w-16 h-16 rounded-full transition-all transform hover:scale-105 border-4 font-black text-xl ${
+                              habit.completedToday 
+                                ? 'bg-green-500 border-green-300 text-white shadow-lg' 
+                                : 'bg-white/20 border-white/50 text-white hover:bg-white/30'
+                            }`}
+                          >
+                            {habit.completedToday ? '✓' : 'TAP'}
+                          </button>
                         </div>
-                      ))}
-                      {(habits as Habit[]).filter(h => h.category === 'soul').length === 0 && (
-                        <p className="text-sm text-gray-500 text-center py-4">No rules yet</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                      </div>
+                    ))}
+                    {(habits as Habit[]).filter(h => h.category === 'soul').length === 0 && (
+                      <div className="text-center py-8">
+                        <p className="text-purple-100 text-lg font-semibold">No rules yet</p>
+                        <p className="text-purple-200 text-sm">Set your boundaries!</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </TabsContent>
 
@@ -1071,7 +1019,7 @@ export default function HabitsPage() {
                         <span className="text-2xl">📱</span>
                         Digital Wellness
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-3">
                         {rules.filter(rule => rule.category === 'Digital Wellness').map((rule) => (
                           <div
                             key={rule.id}
@@ -1129,7 +1077,7 @@ export default function HabitsPage() {
                         <span className="text-2xl">🥗</span>
                         Nutrition
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-3">
                         {rules.filter(rule => rule.category === 'Nutrition').map((rule) => (
                           <div
                             key={rule.id}
@@ -1187,7 +1135,7 @@ export default function HabitsPage() {
                         <span className="text-2xl">😴</span>
                         Sleep Hygiene
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-3">
                         {rules.filter(rule => rule.category === 'Sleep Hygiene').map((rule) => (
                           <div
                             key={rule.id}
@@ -1245,7 +1193,7 @@ export default function HabitsPage() {
                         <span className="text-2xl">🧠</span>
                         Mental Health
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-3">
                         {rules.filter(rule => rule.category === 'Mental Health').map((rule) => (
                           <div
                             key={rule.id}
@@ -1303,7 +1251,7 @@ export default function HabitsPage() {
                         <span className="text-2xl">💪</span>
                         Fitness
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-3">
                         {rules.filter(rule => rule.category === 'Fitness').map((rule) => (
                           <div
                             key={rule.id}
@@ -1361,7 +1309,7 @@ export default function HabitsPage() {
                         <span className="text-2xl">✨</span>
                         Personal
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-3">
                         {rules.filter(rule => rule.category === 'Personal').map((rule) => (
                           <div
                             key={rule.id}
