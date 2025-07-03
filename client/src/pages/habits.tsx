@@ -260,35 +260,50 @@ export default function HabitsPage() {
             </TabsList>
 
             <TabsContent value="formation" className="space-y-6">
-              {/* Dismissible 67-Day Formation Info */}
-              {showFormationInfo && (
-                <Card className="border-0 shadow-lg bg-blue-50 dark:bg-gray-700 border border-blue-200 dark:border-gray-600">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                          <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-blue-900 dark:text-blue-100">67-Day Formation Science</h3>
-                          <p className="text-sm text-blue-700 dark:text-blue-300">
-                            Research shows it takes 66 days on average to form a habit. We give you an extra day for .uoY excellence. 
-                            Track your progress through three key stages: Initial Formation (1-18), Strengthening (19-45), and Automaticity (46-67).
-                          </p>
-                        </div>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => setShowFormationInfo(false)}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
+              {/* Fitness-Style Analytics Dashboard for New Habits */}
+              <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-black rounded-3xl p-8 text-white mb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h1 className="text-3xl font-black mb-2">HABIT FORMATION</h1>
+                    <p className="text-gray-300">67-day transformation tracking</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-blue-400 text-sm font-bold tracking-wide">FORMATION RATE</div>
+                    <div className="text-5xl font-black text-white">
+                      {habits.length > 0 ? Math.round((habits.filter(h => h.streak >= 21).length / habits.length) * 100) : 0}
                     </div>
-                  </CardContent>
-                </Card>
-              )}
+                    <div className="text-blue-400 text-sm">BUILDING</div>
+                  </div>
+                </div>
+                
+                {/* Key Metrics Row */}
+                <div className="grid grid-cols-4 gap-6">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                    <div className="text-green-400 text-2xl font-black">
+                      {habits.filter(h => h.streak >= 67).length}
+                    </div>
+                    <div className="text-gray-300 text-xs font-medium">MASTERED</div>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                    <div className="text-yellow-400 text-2xl font-black">
+                      {habits.filter(h => h.streak >= 21 && h.streak < 67).length}
+                    </div>
+                    <div className="text-gray-300 text-xs font-medium">FORMING</div>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                    <div className="text-orange-400 text-2xl font-black">
+                      {habits.filter(h => h.streak < 21).length}
+                    </div>
+                    <div className="text-gray-300 text-xs font-medium">STARTING</div>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                    <div className="text-purple-400 text-2xl font-black">
+                      {habits.length > 0 ? Math.round(habits.reduce((sum, h) => sum + h.streak, 0) / habits.length) : 0}
+                    </div>
+                    <div className="text-gray-300 text-xs font-medium">AVG DAYS</div>
+                  </div>
+                </div>
+              </div>
 
               {/* Scientific Habit Formation Overview */}
               {showFormationScience && (
@@ -405,68 +420,143 @@ export default function HabitsPage() {
               </Card>
               )}
 
-              {/* Compact Habit Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+              {/* Enhanced Habit Tiles with Clear Reminder/Routine/Reward */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {(habits as Habit[]).map((habit) => {
                   const colors = getCategoryColors(habit.category);
                   const progressPercentage = Math.min((habit.streak / 67) * 100, 100);
                   
                   return (
-                    <Card key={habit.id} className="border-0 shadow-md hover:shadow-lg transition-shadow">
-                      <CardContent className="p-4">
-                        <div className="text-center mb-3">
-                          <div className="relative w-16 h-16 mx-auto mb-2">
-                            <svg className="w-16 h-16 transform -rotate-90">
-                              <circle 
-                                cx="32" 
-                                cy="32" 
-                                r="28" 
-                                stroke="currentColor" 
-                                strokeWidth="4" 
-                                fill="none" 
-                                className="text-gray-200" 
+                    <Card key={habit.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-200">
+                      <CardContent className="p-6">
+                        {/* Header with Category and Progress */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                              habit.category === 'mind' ? 'bg-purple-500' : 
+                              habit.category === 'body' ? 'bg-orange-500' : 'bg-emerald-500'
+                            }`}>
+                              <span className="text-2xl">
+                                {habit.category === 'mind' ? '🧠' : habit.category === 'body' ? '💪' : '✨'}
+                              </span>
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-bold text-gray-900">{habit.title}</h3>
+                              <p className="text-sm text-gray-600 capitalize">{habit.category} • {habit.streak}/67 days</p>
+                            </div>
+                          </div>
+                          
+                          {/* Large Progress Circle */}
+                          <div className="relative w-16 h-16">
+                            <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 100 100">
+                              <circle
+                                cx="50"
+                                cy="50"
+                                r="40"
+                                stroke="currentColor"
+                                strokeWidth="8"
+                                fill="transparent"
+                                className="text-gray-200"
                               />
-                              <circle 
-                                cx="32" 
-                                cy="32" 
-                                r="28" 
-                                stroke={colors.text.includes('blue') ? '#3b82f6' : colors.text.includes('orange') ? '#f59e0b' : '#10b981'}
-                                strokeWidth="4" 
-                                fill="none" 
-                                strokeDasharray={`${2 * Math.PI * 28}`}
-                                strokeDashoffset={`${2 * Math.PI * 28 * (1 - progressPercentage / 100)}`}
+                              <circle
+                                cx="50"
+                                cy="50"
+                                r="40"
+                                stroke="currentColor"
+                                strokeWidth="8"
+                                fill="transparent"
+                                strokeDasharray={`${2 * Math.PI * 40}`}
+                                strokeDashoffset={`${2 * Math.PI * 40 * (1 - progressPercentage / 100)}`}
+                                className={habit.category === 'mind' ? 'text-purple-500' : 
+                                          habit.category === 'body' ? 'text-orange-500' : 'text-emerald-500'}
                                 strokeLinecap="round"
-                                className="transition-all duration-700"
                               />
                             </svg>
                             <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-sm font-bold">{habit.streak}</span>
+                              <span className="text-lg font-bold text-gray-900">{habit.streak}</span>
                             </div>
                           </div>
-                          <h4 className="font-semibold text-sm mb-1 line-clamp-2">{habit.title}</h4>
-                          <div className="text-xs text-muted-foreground">{habit.streak}/67 days</div>
-                          <Badge 
-                            variant="secondary" 
-                            className={`text-xs mt-2 ${colors.light}`}
-                          >
-                            {habit.category === 'mind' ? '🧠' : habit.category === 'body' ? '💪' : '✨'} {habit.category}
-                          </Badge>
                         </div>
-                        <SlideToComplete
-                          onComplete={() => handleToggleHabit(habit.id)}
-                          completed={habit.completedToday}
-                          disabled={toggleHabitMutation.isPending}
-                          habitTitle={habit.title}
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditHabit(habit)}
-                          className="w-full mt-2 text-xs"
-                        >
-                          <Settings className="w-3 h-3 mr-1" />
-                          Edit
-                        </Button>
+
+                        {/* Reminder, Routine, Reward Framework */}
+                        <div className="space-y-4 mb-6">
+                          <div className="bg-blue-50 rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-sm font-bold">R</span>
+                              </div>
+                              <h4 className="font-semibold text-blue-900">Reminder</h4>
+                            </div>
+                            <p className="text-sm text-blue-800">
+                              {habit.timeOfDay ? `${habit.timeOfDay}` : 'Set your reminder time'}
+                              {habit.description && ` • ${habit.description}`}
+                            </p>
+                          </div>
+                          
+                          <div className="bg-green-50 rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-sm font-bold">R</span>
+                              </div>
+                              <h4 className="font-semibold text-green-900">Routine</h4>
+                            </div>
+                            <p className="text-sm text-green-800 font-medium">
+                              {habit.title}
+                            </p>
+                            <p className="text-xs text-green-700 mt-1">
+                              {habit.frequency || 'Daily practice'}
+                            </p>
+                          </div>
+                          
+                          <div className="bg-amber-50 rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-sm font-bold">R</span>
+                              </div>
+                              <h4 className="font-semibold text-amber-900">Reward</h4>
+                            </div>
+                            <p className="text-sm text-amber-800">
+                              {habit.streak > 0 ? `${habit.streak} day streak!` : 'Build your first streak'}
+                              {habit.streak >= 7 && ' ⭐'}
+                              {habit.streak >= 30 && ' 🏆'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Completion Button */}
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => handleToggleHabit(habit.id)}
+                            disabled={toggleHabitMutation.isPending}
+                            className={`flex-1 py-3 px-4 rounded-xl font-semibold text-center transition-colors duration-200 ${
+                              habit.completedToday
+                                ? `${habit.category === 'mind' ? 'bg-purple-500' : 
+                                     habit.category === 'body' ? 'bg-orange-500' : 'bg-emerald-500'
+                                   } text-white`
+                                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                            }`}
+                          >
+                            {habit.completedToday ? (
+                              <div className="flex items-center justify-center gap-2">
+                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                                Completed Today
+                              </div>
+                            ) : (
+                              'Mark Complete'
+                            )}
+                          </button>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditHabit(habit)}
+                            className="px-4"
+                          >
+                            <Settings className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   );

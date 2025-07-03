@@ -279,64 +279,152 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
         </div>
       </div>
 
-      {/* Progress Circles for Each Habit */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
-        {habits.map((habit) => {
-          const colors = getCategoryGradient(habit.category);
-          const progressPercentage = Math.min((habit.streak / 67) * 100, 100);
-          const circumference = 2 * Math.PI * 45;
-          const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
+        {/* Category-Based Habit Tiles */}
+        {['mind', 'body', 'soul'].map((category) => {
+          const categoryHabits = habits.filter(h => h.category === category);
+          if (categoryHabits.length === 0) return null;
+          
+          const categoryConfig = {
+            mind: { 
+              name: 'Mind', 
+              icon: '🧠', 
+              color: 'bg-purple-500',
+              lightColor: 'bg-purple-100',
+              textColor: 'text-purple-600'
+            },
+            body: { 
+              name: 'Body', 
+              icon: '💪', 
+              color: 'bg-orange-500',
+              lightColor: 'bg-orange-100', 
+              textColor: 'text-orange-600'
+            },
+            soul: { 
+              name: 'Soul', 
+              icon: '✨', 
+              color: 'bg-emerald-500',
+              lightColor: 'bg-emerald-100',
+              textColor: 'text-emerald-600'
+            }
+          }[category];
           
           return (
-            <div key={habit.id} className="flex flex-col items-center space-y-3">
-              {/* Progress Circle */}
-              <div className="relative">
-                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
-                  {/* Background circle */}
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    stroke="currentColor"
-                    strokeWidth="6"
-                    fill="transparent"
-                    className="text-gray-200"
-                  />
-                  {/* Progress circle */}
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    stroke="currentColor"
-                    strokeWidth="6"
-                    fill="transparent"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={strokeDashoffset}
-                    className={`${colors.text} transition-all duration-500 ease-out`}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                {/* Center content */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-xl font-black text-gray-900">{habit.streak}</div>
-                    <div className="text-xs text-gray-600">days</div>
-                  </div>
+            <div key={category} className="mb-8">
+              {/* Category Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-12 h-12 ${categoryConfig.color} rounded-full flex items-center justify-center`}>
+                  <span className="text-2xl">{categoryConfig.icon}</span>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">{categoryConfig.name}</h3>
+                  <p className="text-sm text-gray-600">{categoryHabits.length} habit{categoryHabits.length !== 1 ? 's' : ''}</p>
                 </div>
               </div>
               
-              {/* Habit name and edit button */}
-              <div className="text-center space-y-1">
-                <h4 className="font-semibold text-sm text-gray-900 line-clamp-2">{habit.title}</h4>
-                <div className="text-xs text-gray-500">{habit.streak}/67 days</div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onEditHabit(habit)}
-                  className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
-                >
-                  <Settings className="w-3 h-3" />
-                </Button>
+              {/* Habit Cards Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {categoryHabits.map((habit) => (
+                  <div key={habit.id} className="relative">
+                    {/* Habit Card */}
+                    <div 
+                      className={`
+                        p-4 rounded-2xl border-2 cursor-pointer transition-colors duration-200
+                        ${habit.completedToday 
+                          ? `${categoryConfig.color} border-transparent` 
+                          : `${categoryConfig.lightColor} border-gray-200 hover:border-gray-300`
+                        }
+                      `}
+                      onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
+                    >
+                      {/* Stars for completed streaks */}
+                      {habit.streak > 0 && (
+                        <div className="absolute -top-1 -right-1 flex">
+                          {habit.streak >= 7 && <span className="text-yellow-400 text-sm">⭐</span>}
+                          {habit.streak >= 30 && <span className="text-yellow-400 text-sm">⭐</span>}
+                        </div>
+                      )}
+                      
+                      {/* Habit Title */}
+                      <h4 className={`font-semibold text-sm mb-2 ${
+                        habit.completedToday ? 'text-white' : 'text-gray-900'
+                      }`}>
+                        {habit.title}
+                      </h4>
+                      
+                      {/* Streak Progress */}
+                      <div className={`text-xs mb-3 ${
+                        habit.completedToday ? 'text-white/80' : 'text-gray-600'
+                      }`}>
+                        {habit.streak}/67 days
+                      </div>
+                      
+                      {/* Progress Circle */}
+                      <div className="flex justify-center mb-3">
+                        <div className="relative w-16 h-16">
+                          <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 100 100">
+                            {/* Background circle */}
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r="40"
+                              stroke="currentColor"
+                              strokeWidth="8"
+                              fill="transparent"
+                              className={habit.completedToday ? "text-white/20" : "text-gray-300"}
+                            />
+                            {/* Progress circle */}
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r="40"
+                              stroke="currentColor"
+                              strokeWidth="8"
+                              fill="transparent"
+                              strokeDasharray={`${2 * Math.PI * 40}`}
+                              strokeDashoffset={`${2 * Math.PI * 40 * (1 - Math.min(habit.streak / 67, 1))}`}
+                              className={habit.completedToday ? "text-white" : categoryConfig.textColor}
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          {/* Center number */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className={`text-xl font-bold ${
+                              habit.completedToday ? 'text-white' : 'text-gray-900'
+                            }`}>
+                              {habit.streak}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Completion Status */}
+                      <div className="flex justify-center">
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                          habit.completedToday 
+                            ? 'bg-white border-white' 
+                            : 'border-gray-400'
+                        }`}>
+                          {habit.completedToday && (
+                            <svg className="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Edit Button */}
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEditHabit(habit);
+                      }}
+                      className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 rounded-full p-1 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <Settings className="w-4 h-4 text-gray-600" />
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           );
