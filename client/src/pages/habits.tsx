@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Settings, CheckCircle2, Circle, Flame, Star, Zap, BarChart3, Shield, X } from "lucide-react";
+import { Plus, Settings, CheckCircle2, Circle, Flame, Star, Zap, BarChart3, Shield, X, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -425,6 +425,139 @@ export default function HabitsPage() {
                   <BarChart3 className="w-5 h-5 mr-2" />
                   View Details
                 </Button>
+              </div>
+
+              {/* Simple Completion Sections */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                
+                {/* New Habits Completion */}
+                <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <Plus className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">New Habits</CardTitle>
+                        <p className="text-sm text-muted-foreground">67-day formation tracking</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {(habits as Habit[]).filter(h => h.category === 'mind').slice(0, 3).map((habit) => (
+                        <div key={habit.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                            <span className="text-sm font-medium">{habit.title}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">Day {habit.streak}</span>
+                            <button 
+                              onClick={() => toggleHabit.mutate({ habitId: habit.id, completed: !habit.completedToday })}
+                              className={`w-6 h-6 rounded-full transition-colors ${
+                                habit.completedToday 
+                                  ? 'bg-blue-500 text-white' 
+                                  : 'border-2 border-gray-300 hover:border-blue-500'
+                              }`}
+                            >
+                              {habit.completedToday && <CheckCircle2 className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      {(habits as Habit[]).filter(h => h.category === 'mind').length === 0 && (
+                        <p className="text-sm text-gray-500 text-center py-4">No new habits yet</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Foundations Completion */}
+                <Card className="border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-teal-50">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-emerald-100 rounded-lg">
+                        <Layers className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">Foundations</CardTitle>
+                        <p className="text-sm text-muted-foreground">Long-term consistency</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {(habits as Habit[]).filter(h => h.category === 'body').slice(0, 3).map((habit) => (
+                        <div key={habit.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+                            <span className="text-sm font-medium">{habit.title}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">{habit.streak} days</span>
+                            <button 
+                              onClick={() => toggleHabit.mutate({ habitId: habit.id, completed: !habit.completedToday })}
+                              className={`w-6 h-6 rounded-full transition-colors ${
+                                habit.completedToday 
+                                  ? 'bg-emerald-500 text-white' 
+                                  : 'border-2 border-gray-300 hover:border-emerald-500'
+                              }`}
+                            >
+                              {habit.completedToday && <CheckCircle2 className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      {(habits as Habit[]).filter(h => h.category === 'body').length === 0 && (
+                        <p className="text-sm text-gray-500 text-center py-4">No foundations yet</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Rules Completion */}
+                <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-pink-50">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-purple-100 rounded-lg">
+                        <Shield className="w-5 h-5 text-purple-600" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">Rules</CardTitle>
+                        <p className="text-sm text-muted-foreground">Behavioral optimization</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {(habits as Habit[]).filter(h => h.category === 'soul').slice(0, 3).map((habit) => (
+                        <div key={habit.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                            <span className="text-sm font-medium">{habit.title}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">Active</span>
+                            <button 
+                              onClick={() => onToggleHabit(habit.id, !habit.completedToday)}
+                              className={`w-6 h-6 rounded-full transition-colors ${
+                                habit.completedToday 
+                                  ? 'bg-purple-500 text-white' 
+                                  : 'border-2 border-gray-300 hover:border-purple-500'
+                              }`}
+                            >
+                              {habit.completedToday && <CheckCircle2 className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      {(habits as Habit[]).filter(h => h.category === 'soul').length === 0 && (
+                        <p className="text-sm text-gray-500 text-center py-4">No rules yet</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </TabsContent>
 
@@ -930,74 +1063,355 @@ export default function HabitsPage() {
                     </div>
                   </div>
 
-                  {/* Rules List */}
-                  <div className="space-y-3">
-                    {rules.map((rule) => (
-                      <div
-                        key={rule.id}
-                        className={`p-4 rounded-lg border transition-all duration-200 ${
-                          rule.completedToday 
-                            ? 'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800' 
-                            : 'bg-white border-gray-200 dark:bg-gray-700 dark:border-gray-600'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
+                  {/* Rules Categories */}
+                  <div className="space-y-6">
+                    {/* Digital Wellness Category */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span className="text-2xl">📱</span>
+                        Digital Wellness
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {rules.filter(rule => rule.category === 'Digital Wellness').map((rule) => (
+                          <div
+                            key={rule.id}
+                            className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                              rule.completedToday 
+                                ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 shadow-lg' 
+                                : 'bg-white border-gray-200 hover:border-blue-300 shadow-md'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-3">
                               <div 
-                                className="flex items-center gap-2 cursor-pointer"
+                                className="flex items-center gap-3 cursor-pointer flex-1"
                                 onClick={() => toggleRuleCompletion(rule.id)}
                               >
-                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
                                   rule.completedToday 
                                     ? 'bg-green-500 border-green-500 text-white' 
                                     : 'border-gray-300 hover:border-green-400'
                                 }`}>
                                   {rule.completedToday && (
-                                    <CheckCircle2 className="w-3 h-3" />
+                                    <CheckCircle2 className="w-4 h-4" />
                                   )}
                                 </div>
-                                <span className={`font-semibold ${rule.completedToday ? 'text-green-700 dark:text-green-300' : 'text-gray-900 dark:text-gray-100'}`}>
+                                <span className={`font-medium ${rule.completedToday ? 'text-green-700' : 'text-gray-900'}`}>
                                   {rule.text}
                                 </span>
                               </div>
-                              <Badge variant="outline" className="text-xs">
-                                {rule.category}
-                              </Badge>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => markRuleFailure(rule.id)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-xs font-bold"
+                              >
+                                BROKE RULE
+                              </Button>
                             </div>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                              <span className={rule.completedToday ? 'text-green-600' : 'text-gray-500'}>
-                                {rule.completedToday ? '✅ Promise kept today' : `🔄 ${rule.streak} day streak`}
+                            <div className="flex items-center justify-between text-sm">
+                              <span className={rule.completedToday ? 'text-green-600 font-medium' : 'text-gray-500'}>
+                                {rule.completedToday ? '✅ Promise kept' : `🔥 ${rule.streak} day streak`}
                               </span>
                               {rule.failures > 0 && (
-                                <span className="text-red-500 text-xs">
-                                  ⚠️ {rule.failures} failures tracked
+                                <span className="text-red-500 text-xs font-medium">
+                                  ⚠️ {rule.failures} breaks
                                 </span>
                               )}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => markRuleFailure(rule.id)}
-                              className="text-orange-400 hover:text-orange-600"
-                              title="Mark failure"
-                            >
-                              ⚠️
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteRule(rule.id)}
-                              className="text-gray-400 hover:text-red-600"
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
+                        ))}
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Nutrition Category */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span className="text-2xl">🥗</span>
+                        Nutrition
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {rules.filter(rule => rule.category === 'Nutrition').map((rule) => (
+                          <div
+                            key={rule.id}
+                            className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                              rule.completedToday 
+                                ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 shadow-lg' 
+                                : 'bg-white border-gray-200 hover:border-orange-300 shadow-md'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <div 
+                                className="flex items-center gap-3 cursor-pointer flex-1"
+                                onClick={() => toggleRuleCompletion(rule.id)}
+                              >
+                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                                  rule.completedToday 
+                                    ? 'bg-green-500 border-green-500 text-white' 
+                                    : 'border-gray-300 hover:border-green-400'
+                                }`}>
+                                  {rule.completedToday && (
+                                    <CheckCircle2 className="w-4 h-4" />
+                                  )}
+                                </div>
+                                <span className={`font-medium ${rule.completedToday ? 'text-green-700' : 'text-gray-900'}`}>
+                                  {rule.text}
+                                </span>
+                              </div>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => markRuleFailure(rule.id)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-xs font-bold"
+                              >
+                                BROKE RULE
+                              </Button>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className={rule.completedToday ? 'text-green-600 font-medium' : 'text-gray-500'}>
+                                {rule.completedToday ? '✅ Promise kept' : `🔥 ${rule.streak} day streak`}
+                              </span>
+                              {rule.failures > 0 && (
+                                <span className="text-red-500 text-xs font-medium">
+                                  ⚠️ {rule.failures} breaks
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Sleep Hygiene Category */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span className="text-2xl">😴</span>
+                        Sleep Hygiene
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {rules.filter(rule => rule.category === 'Sleep Hygiene').map((rule) => (
+                          <div
+                            key={rule.id}
+                            className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                              rule.completedToday 
+                                ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 shadow-lg' 
+                                : 'bg-white border-gray-200 hover:border-purple-300 shadow-md'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <div 
+                                className="flex items-center gap-3 cursor-pointer flex-1"
+                                onClick={() => toggleRuleCompletion(rule.id)}
+                              >
+                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                                  rule.completedToday 
+                                    ? 'bg-green-500 border-green-500 text-white' 
+                                    : 'border-gray-300 hover:border-green-400'
+                                }`}>
+                                  {rule.completedToday && (
+                                    <CheckCircle2 className="w-4 h-4" />
+                                  )}
+                                </div>
+                                <span className={`font-medium ${rule.completedToday ? 'text-green-700' : 'text-gray-900'}`}>
+                                  {rule.text}
+                                </span>
+                              </div>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => markRuleFailure(rule.id)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-xs font-bold"
+                              >
+                                BROKE RULE
+                              </Button>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className={rule.completedToday ? 'text-green-600 font-medium' : 'text-gray-500'}>
+                                {rule.completedToday ? '✅ Promise kept' : `🔥 ${rule.streak} day streak`}
+                              </span>
+                              {rule.failures > 0 && (
+                                <span className="text-red-500 text-xs font-medium">
+                                  ⚠️ {rule.failures} breaks
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Mental Health Category */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span className="text-2xl">🧠</span>
+                        Mental Health
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {rules.filter(rule => rule.category === 'Mental Health').map((rule) => (
+                          <div
+                            key={rule.id}
+                            className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                              rule.completedToday 
+                                ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 shadow-lg' 
+                                : 'bg-white border-gray-200 hover:border-indigo-300 shadow-md'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <div 
+                                className="flex items-center gap-3 cursor-pointer flex-1"
+                                onClick={() => toggleRuleCompletion(rule.id)}
+                              >
+                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                                  rule.completedToday 
+                                    ? 'bg-green-500 border-green-500 text-white' 
+                                    : 'border-gray-300 hover:border-green-400'
+                                }`}>
+                                  {rule.completedToday && (
+                                    <CheckCircle2 className="w-4 h-4" />
+                                  )}
+                                </div>
+                                <span className={`font-medium ${rule.completedToday ? 'text-green-700' : 'text-gray-900'}`}>
+                                  {rule.text}
+                                </span>
+                              </div>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => markRuleFailure(rule.id)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-xs font-bold"
+                              >
+                                BROKE RULE
+                              </Button>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className={rule.completedToday ? 'text-green-600 font-medium' : 'text-gray-500'}>
+                                {rule.completedToday ? '✅ Promise kept' : `🔥 ${rule.streak} day streak`}
+                              </span>
+                              {rule.failures > 0 && (
+                                <span className="text-red-500 text-xs font-medium">
+                                  ⚠️ {rule.failures} breaks
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Fitness Category */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span className="text-2xl">💪</span>
+                        Fitness
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {rules.filter(rule => rule.category === 'Fitness').map((rule) => (
+                          <div
+                            key={rule.id}
+                            className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                              rule.completedToday 
+                                ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 shadow-lg' 
+                                : 'bg-white border-gray-200 hover:border-red-300 shadow-md'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <div 
+                                className="flex items-center gap-3 cursor-pointer flex-1"
+                                onClick={() => toggleRuleCompletion(rule.id)}
+                              >
+                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                                  rule.completedToday 
+                                    ? 'bg-green-500 border-green-500 text-white' 
+                                    : 'border-gray-300 hover:border-green-400'
+                                }`}>
+                                  {rule.completedToday && (
+                                    <CheckCircle2 className="w-4 h-4" />
+                                  )}
+                                </div>
+                                <span className={`font-medium ${rule.completedToday ? 'text-green-700' : 'text-gray-900'}`}>
+                                  {rule.text}
+                                </span>
+                              </div>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => markRuleFailure(rule.id)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-xs font-bold"
+                              >
+                                BROKE RULE
+                              </Button>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className={rule.completedToday ? 'text-green-600 font-medium' : 'text-gray-500'}>
+                                {rule.completedToday ? '✅ Promise kept' : `🔥 ${rule.streak} day streak`}
+                              </span>
+                              {rule.failures > 0 && (
+                                <span className="text-red-500 text-xs font-medium">
+                                  ⚠️ {rule.failures} breaks
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Personal Category */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span className="text-2xl">✨</span>
+                        Personal
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {rules.filter(rule => rule.category === 'Personal').map((rule) => (
+                          <div
+                            key={rule.id}
+                            className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                              rule.completedToday 
+                                ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 shadow-lg' 
+                                : 'bg-white border-gray-200 hover:border-pink-300 shadow-md'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <div 
+                                className="flex items-center gap-3 cursor-pointer flex-1"
+                                onClick={() => toggleRuleCompletion(rule.id)}
+                              >
+                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                                  rule.completedToday 
+                                    ? 'bg-green-500 border-green-500 text-white' 
+                                    : 'border-gray-300 hover:border-green-400'
+                                }`}>
+                                  {rule.completedToday && (
+                                    <CheckCircle2 className="w-4 h-4" />
+                                  )}
+                                </div>
+                                <span className={`font-medium ${rule.completedToday ? 'text-green-700' : 'text-gray-900'}`}>
+                                  {rule.text}
+                                </span>
+                              </div>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => markRuleFailure(rule.id)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-xs font-bold"
+                              >
+                                BROKE RULE
+                              </Button>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className={rule.completedToday ? 'text-green-600 font-medium' : 'text-gray-500'}>
+                                {rule.completedToday ? '✅ Promise kept' : `🔥 ${rule.streak} day streak`}
+                              </span>
+                              {rule.failures > 0 && (
+                                <span className="text-red-500 text-xs font-medium">
+                                  ⚠️ {rule.failures} breaks
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

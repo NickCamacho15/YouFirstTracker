@@ -168,9 +168,174 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white">
       <main className="p-4 pb-20">
-        {/* Gamified Visual Analytics Dashboard */}
+        {/* Progress Circles Overview - Restored */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          {/* Habits Progress */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#f3f4f6"
+                  strokeWidth="3"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#10b981"
+                  strokeWidth="3"
+                  strokeDasharray={`${75}, 100`}
+                  className="drop-shadow-sm"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xl font-bold text-gray-900">75%</span>
+              </div>
+            </div>
+            <h3 className="font-semibold text-gray-900">Habits</h3>
+            <p className="text-xs text-gray-500">Daily completion</p>
+          </div>
+
+          {/* Tasks Progress */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#f3f4f6"
+                  strokeWidth="3"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#3b82f6"
+                  strokeWidth="3"
+                  strokeDasharray={`${40}, 100`}
+                  className="drop-shadow-sm"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xl font-bold text-gray-900">40%</span>
+              </div>
+            </div>
+            <h3 className="font-semibold text-gray-900">Tasks</h3>
+            <p className="text-xs text-gray-500">Today's progress</p>
+          </div>
+
+          {/* Goals Progress */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#f3f4f6"
+                  strokeWidth="3"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#8b5cf6"
+                  strokeWidth="3"
+                  strokeDasharray={`${65}, 100`}
+                  className="drop-shadow-sm"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xl font-bold text-gray-900">65%</span>
+              </div>
+            </div>
+            <h3 className="font-semibold text-gray-900">Goals</h3>
+            <p className="text-xs text-gray-500">Weekly targets</p>
+          </div>
+
+          {/* Reading Progress */}
+          <div className="text-center">
+            <div className="relative w-20 h-20 mx-auto mb-3">
+              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#f3f4f6"
+                  strokeWidth="3"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#f59e0b"
+                  strokeWidth="3"
+                  strokeDasharray={`${80}, 100`}
+                  className="drop-shadow-sm"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xl font-bold text-gray-900">80%</span>
+              </div>
+            </div>
+            <h3 className="font-semibold text-gray-900">Reading</h3>
+            <p className="text-xs text-gray-500">Weekly goal</p>
+          </div>
+        </div>
+
+        {/* Goals Grid with Task Counters */}
+        <Card className="border-0 shadow-lg mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Target className="w-5 h-5 text-gray-600" />
+              Active Goals
+            </CardTitle>
+            <p className="text-sm text-gray-600 mt-1">
+              Track task completion progress for each goal
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {goals.map((goal) => {
+                return (
+                  <div key={goal.id} className={`${goal.color} p-6 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold mb-2">{goal.title}</h3>
+                        <p className="text-white/90 text-sm">{goal.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-4xl font-black">{goal.tasksCompleted}</div>
+                        <div className="text-sm text-white/80">tasks completed</div>
+                      </div>
+                    </div>
+                    
+                    {/* Commitment Stats */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-white/20 rounded-lg px-3 py-2">
+                          <div className="text-lg font-bold">{goal.daysWorking}</div>
+                          <div className="text-xs text-white/80">days working</div>
+                        </div>
+                        <div className="bg-white/20 rounded-lg px-3 py-2">
+                          <div className="text-lg font-bold">{Math.round(goal.tasksCompleted / goal.daysWorking)}</div>
+                          <div className="text-xs text-white/80">avg/day</div>
+                        </div>
+                      </div>
+                      <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                        <Trophy className="w-3 h-3 mr-1" />
+                        Persistent
+                      </Badge>
+                    </div>
+                    
+                    <div className="text-sm text-white/90">
+                      <strong>Commitment Score:</strong> {goal.tasksCompleted} tasks over {goal.daysWorking} days
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Personal Excellence Analytics Dashboard */}
         <div className="mb-8">
-          {/* Performance Visual Layout - Colorful Expanding Data */}
           <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-3xl p-8 shadow-2xl border border-indigo-100 overflow-hidden">
             {/* Animated Background Pattern */}
             <div className="absolute inset-0 opacity-10">
@@ -182,69 +347,67 @@ export default function DashboardPage() {
             <div className="relative z-10">
               <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Personal Excellence Analytics</h2>
               
-              {/* Central Visual Data Layout - Expanding Toward Edges */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Side-by-Side Bar Graph Analytics */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 
                 {/* Left: Habit Ecosystem Visual */}
                 <div className="relative">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Habit Ecosystem</h3>
-                  <div className="relative w-48 h-48 mx-auto">
-                    {/* Central Core */}
-                    <div className="absolute inset-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full shadow-lg flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">Core</span>
-                    </div>
-                    
-                    {/* Mind Ring - Blue */}
-                    <div className="absolute inset-0 border-8 border-transparent rounded-full">
-                      <div 
-                        className="w-full h-full rounded-full border-8 border-blue-400/60 relative"
-                        style={{
-                          background: `conic-gradient(from 0deg, #3b82f6 0deg, #3b82f6 ${75 * 3.6}deg, transparent ${75 * 3.6}deg, transparent 360deg)`
-                        }}
-                      >
-                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-blue-500 rounded-full shadow-lg flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">M</span>
-                        </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-6 text-center">Category Performance</h3>
+                  <div className="space-y-6">
+                    {/* Mind Category */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-blue-600">Mind</span>
+                        <span className="text-sm font-bold text-blue-800">75%</span>
+                      </div>
+                      <div className="w-full bg-blue-100 rounded-full h-4 overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-1000 ease-out"
+                          style={{ width: '75%' }}
+                        ></div>
                       </div>
                     </div>
                     
-                    {/* Body Ring - Orange */}
-                    <div className="absolute inset-4 border-8 border-transparent rounded-full">
-                      <div 
-                        className="w-full h-full rounded-full border-8 border-orange-400/60 relative"
-                        style={{
-                          background: `conic-gradient(from 120deg, #f97316 0deg, #f97316 ${60 * 3.6}deg, transparent ${60 * 3.6}deg, transparent 360deg)`
-                        }}
-                      >
-                        <div className="absolute top-0 right-0 w-6 h-6 bg-orange-500 rounded-full shadow-lg flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">B</span>
-                        </div>
+                    {/* Body Category */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-orange-600">Body</span>
+                        <span className="text-sm font-bold text-orange-800">60%</span>
+                      </div>
+                      <div className="w-full bg-orange-100 rounded-full h-4 overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full transition-all duration-1000 ease-out"
+                          style={{ width: '60%' }}
+                        ></div>
                       </div>
                     </div>
                     
-                    {/* Soul Ring - Purple */}
-                    <div className="absolute inset-8 border-8 border-transparent rounded-full">
-                      <div 
-                        className="w-full h-full rounded-full border-8 border-purple-400/60 relative"
-                        style={{
-                          background: `conic-gradient(from 240deg, #8b5cf6 0deg, #8b5cf6 ${85 * 3.6}deg, transparent ${85 * 3.6}deg, transparent 360deg)`
-                        }}
-                      >
-                        <div className="absolute bottom-0 left-1/2 transform translate-x-1/2 w-6 h-6 bg-purple-500 rounded-full shadow-lg flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">S</span>
-                        </div>
+                    {/* Soul Category */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-purple-600">Soul</span>
+                        <span className="text-sm font-bold text-purple-800">85%</span>
+                      </div>
+                      <div className="w-full bg-purple-100 rounded-full h-4 overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full transition-all duration-1000 ease-out"
+                          style={{ width: '85%' }}
+                        ></div>
                       </div>
                     </div>
                     
-                    {/* Floating Data Points */}
-                    <div className="absolute -top-6 -left-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                      Mind 75%
-                    </div>
-                    <div className="absolute -top-6 -right-6 bg-gradient-to-r from-orange-500 to-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                      Body 60%
-                    </div>
-                    <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-500 to-pink-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                      Soul 85%
+                    {/* Overall Performance */}
+                    <div className="space-y-2 pt-4 border-t border-gray-200">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-gray-700">Overall Excellence</span>
+                        <span className="text-sm font-bold text-gray-900">73%</span>
+                      </div>
+                      <div className="w-full bg-gray-100 rounded-full h-5 overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500 rounded-full transition-all duration-1000 ease-out"
+                          style={{ width: '73%' }}
+                        ></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -407,111 +570,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Goals Grid with Task Counters */}
-        <Card className="border-0 shadow-lg mb-6">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Target className="w-5 h-5 text-gray-600" />
-              Active Goals
-            </CardTitle>
-            <p className="text-sm text-gray-600 mt-1">
-              Track task completion progress for each goal
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {goals.map((goal) => {
-                return (
-                  <div key={goal.id} className={`${goal.color} p-6 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold mb-2">{goal.title}</h3>
-                        <p className="text-white/90 text-sm">{goal.description}</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-4xl font-black">{goal.tasksCompleted}</div>
-                        <div className="text-sm text-white/80">tasks completed</div>
-                      </div>
-                    </div>
-                    
-                    {/* Commitment Stats */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-white/20 rounded-lg px-3 py-2">
-                          <div className="text-lg font-bold">{goal.daysWorking}</div>
-                          <div className="text-xs text-white/80">days working</div>
-                        </div>
-                        <div className="bg-white/20 rounded-lg px-3 py-2">
-                          <div className="text-lg font-bold">{Math.round(goal.tasksCompleted / goal.daysWorking)}</div>
-                          <div className="text-xs text-white/80">avg/day</div>
-                        </div>
-                      </div>
-                      <Badge variant="secondary" className="bg-white/20 text-white border-0">
-                        <Trophy className="w-3 h-3 mr-1" />
-                        Persistent
-                      </Badge>
-                    </div>
-                    
-                    <div className="text-sm text-white/90">
-                      <strong>Commitment Score:</strong> {goal.tasksCompleted} tasks over {goal.daysWorking} days
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Quick Actions Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Link href="/goals">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <Target className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-gray-900">Goals</h3>
-                <p className="text-xs text-gray-500 mt-1">Set & track</p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/habits">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <Repeat className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-gray-900">Habits</h3>
-                <p className="text-xs text-gray-500 mt-1">Build consistency</p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/read">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <BookOpen className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-gray-900">Read</h3>
-                <p className="text-xs text-gray-500 mt-1">Daily sessions</p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/vision">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
-              <CardContent className="p-4 text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <Star className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-gray-900">Vision</h3>
-                <p className="text-xs text-gray-500 mt-1">Future Folder</p>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
 
         {/* Morning Priming */}
         <Card className="border-0 shadow-lg mb-6">

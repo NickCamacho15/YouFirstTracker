@@ -123,6 +123,13 @@ Build scripts include:
 
 ## Changelog
 
+- July 3, 2025: Removed Navigation Tiles + Enhanced Rules with Category Tiles
+  - **REMOVED**: Navigation tiles (Goals, Habits, Read, Vision) from You page dashboard per user request
+  - **ENHANCED**: Rules section with clearer failure buttons - changed from small warning icon to prominent red "BROKE RULE" button
+  - **NEW**: Category-based rule tiles organized into 6 sections (Digital Wellness, Nutrition, Sleep Hygiene, Mental Health, Fitness, Personal)
+  - **IMPROVED**: Each category displays rules as individual tiles in 2-column grid layout for better visibility
+  - **DESIGN**: Category sections with emoji headers and color-coded hover states for different categories
+  - Rules interface now emphasizes clear action buttons and organized category-based layout
 - July 3, 2025: Replaced Navigation Tiles with Gamified Visual Analytics
   - **MAJOR**: Replaced navigation tiles with comprehensive "Personal Excellence Analytics" dashboard
   - **NEW**: Colorful expanding visual data layouts including Habit Ecosystem with ring progressions
