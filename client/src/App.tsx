@@ -13,6 +13,7 @@ import HabitsPage from "@/pages/habits";
 import ReadPage from "@/pages/read";
 import VisionPage from "@/pages/vision";
 import ProfilePage from "@/pages/profile";
+import HealthPage from "@/pages/health";
 import NotFound from "@/pages/not-found";
 import { Navigation } from "@/components/layout/navigation";
 
@@ -26,6 +27,7 @@ function AuthenticatedApp() {
         <Route path="/goals" component={GoalsPage} />
         <Route path="/habits" component={HabitsPage} />
         <Route path="/read" component={ReadPage} />
+        <Route path="/health" component={HealthPage} />
         <Route path="/vision" component={VisionPage} />
         <Route path="/profile" component={ProfilePage} />
         <Route component={NotFound} />

@@ -573,6 +573,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Workout routes
+  app.get("/api/workouts", requireAuth, async (req, res) => {
+    try {
+      const workouts = await storage.getWorkoutsByUserId(req.session.userId);
+      res.json(workouts);
+    } catch (error) {
+      console.error("Get workouts error:", error);
+      res.status(500).json({ message: "Failed to get workouts" });
+    }
+  });
+
+  app.post("/api/workouts", requireAuth, async (req, res) => {
+    try {
+      const workoutData = {
+        ...req.body,
+        userId: req.session.userId
+      };
+      const workout = await storage.createWorkout(workoutData);
+      res.json(workout);
+    } catch (error) {
+      console.error("Create workout error:", error);
+      res.status(500).json({ message: "Failed to create workout" });
+    }
+  });
+
+  app.get("/api/exercises", async (req, res) => {
+    try {
+      const exercises = await storage.getExercises();
+      res.json(exercises);
+    } catch (error) {
+      console.error("Get exercises error:", error);
+      res.status(500).json({ message: "Failed to get exercises" });
+    }
+  });
+
+  // Body weight logs routes
+  app.get("/api/body-weight-logs", requireAuth, async (req, res) => {
+    try {
+      const logs = await storage.getBodyWeightLogsByUserId(req.session.userId);
+      res.json(logs);
+    } catch (error) {
+      console.error("Get body weight logs error:", error);
+      res.status(500).json({ message: "Failed to get body weight logs" });
+    }
+  });
+
+  app.post("/api/body-weight-logs", requireAuth, async (req, res) => {
+    try {
+      const logData = {
+        ...req.body,
+        userId: req.session.userId
+      };
+      const log = await storage.createBodyWeightLog(logData);
+      res.json(log);
+    } catch (error) {
+      console.error("Create body weight log error:", error);
+      res.status(500).json({ message: "Failed to create body weight log" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

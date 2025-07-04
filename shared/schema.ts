@@ -177,6 +177,51 @@ export const userProfiles = pgTable("user_profiles", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Workout tracking tables
+export const workouts = pgTable("workouts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  name: text("name").notNull(),
+  date: date("date").notNull(),
+  notes: text("notes"),
+  duration: integer("duration"), // in minutes
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const exercises = pgTable("exercises", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  category: text("category", { enum: ["strength", "cardio", "flexibility", "balance", "sports"] }).default("strength").notNull(),
+  muscleGroups: text("muscle_groups").array(), // e.g., ["chest", "triceps", "shoulders"]
+  equipment: text("equipment"), // e.g., "barbell", "dumbbells", "bodyweight"
+  instructions: text("instructions"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const workoutExercises = pgTable("workout_exercises", {
+  id: serial("id").primaryKey(),
+  workoutId: integer("workout_id").references(() => workouts.id, { onDelete: "cascade" }).notNull(),
+  exerciseId: integer("exercise_id").references(() => exercises.id).notNull(),
+  sets: integer("sets").notNull(),
+  reps: integer("reps"),
+  weight: integer("weight"), // in lbs
+  duration: integer("duration"), // in seconds for time-based exercises
+  distance: integer("distance"), // in meters for distance-based exercises
+  restTime: integer("rest_time"), // in seconds
+  notes: text("notes"),
+  orderIndex: integer("order_index").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const bodyWeightLogs = pgTable("body_weight_logs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  weight: integer("weight").notNull(), // in lbs * 10 (e.g., 1735 = 173.5 lbs)
+  date: date("date").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -274,6 +319,30 @@ export const insertUserProfileSchema = createInsertSchema(userProfiles).omit({
   updatedAt: true,
 });
 
+export const insertWorkoutSchema = createInsertSchema(workouts).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  date: z.string().transform((val) => val),
+});
+
+export const insertExerciseSchema = createInsertSchema(exercises).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertWorkoutExerciseSchema = createInsertSchema(workoutExercises).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertBodyWeightLogSchema = createInsertSchema(bodyWeightLogs).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  date: z.string().transform((val) => val),
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -307,3 +376,11 @@ export type Insight = typeof insights.$inferSelect;
 export type InsertInsight = z.infer<typeof insertInsightSchema>;
 export type UserProfile = typeof userProfiles.$inferSelect;
 export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
+export type Workout = typeof workouts.$inferSelect;
+export type InsertWorkout = z.infer<typeof insertWorkoutSchema>;
+export type Exercise = typeof exercises.$inferSelect;
+export type InsertExercise = z.infer<typeof insertExerciseSchema>;
+export type WorkoutExercise = typeof workoutExercises.$inferSelect;
+export type InsertWorkoutExercise = z.infer<typeof insertWorkoutExerciseSchema>;
+export type BodyWeightLog = typeof bodyWeightLogs.$inferSelect;
+export type InsertBodyWeightLog = z.infer<typeof insertBodyWeightLogSchema>;

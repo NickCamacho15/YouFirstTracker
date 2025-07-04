@@ -4,13 +4,15 @@ import { eq, desc, and, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { 
   users, goals, microGoals, habits, habitLogs, readingSessions, posts, visionBoard, tasks, rules,
-  followers, postReactions, postComments,
+  followers, postReactions, postComments, workouts, exercises, workoutExercises, bodyWeightLogs,
   type User, type InsertUser, type Goal, type InsertGoal, type MicroGoal, type InsertMicroGoal,
   type Habit, type InsertHabit, type HabitLog, type InsertHabitLog,
   type ReadingSession, type InsertReadingSession, type Post, type InsertPost,
   type VisionBoardItem, type InsertVisionBoardItem, type Task, type InsertTask, type Rule, type InsertRule,
   type Follower, type InsertFollower, type PostReaction, type InsertPostReaction,
-  type PostComment, type InsertPostComment
+  type PostComment, type InsertPostComment, type Workout, type InsertWorkout,
+  type Exercise, type InsertExercise, type WorkoutExercise, type InsertWorkoutExercise,
+  type BodyWeightLog, type InsertBodyWeightLog
 } from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -98,6 +100,29 @@ export interface IStorage {
   deleteRule(id: number): Promise<boolean>;
   toggleRuleCompletion(ruleId: number, userId: number): Promise<{ success: boolean; reason?: string; rule?: Rule }>;
   markRuleViolation(ruleId: number, userId: number): Promise<{ success: boolean; reason?: string; rule?: Rule }>;
+
+  // Workouts
+  getWorkoutsByUserId(userId: number): Promise<Workout[]>;
+  getWorkoutById(id: number): Promise<Workout | undefined>;
+  createWorkout(workout: InsertWorkout): Promise<Workout>;
+  updateWorkout(id: number, updates: Partial<Workout>): Promise<Workout | undefined>;
+  deleteWorkout(id: number): Promise<boolean>;
+
+  // Exercises
+  getExercises(): Promise<Exercise[]>;
+  getExerciseById(id: number): Promise<Exercise | undefined>;
+  createExercise(exercise: InsertExercise): Promise<Exercise>;
+
+  // Workout Exercises
+  getWorkoutExercisesByWorkoutId(workoutId: number): Promise<(WorkoutExercise & { exercise: Exercise })[]>;
+  createWorkoutExercise(workoutExercise: InsertWorkoutExercise): Promise<WorkoutExercise>;
+  updateWorkoutExercise(id: number, updates: Partial<WorkoutExercise>): Promise<WorkoutExercise | undefined>;
+  deleteWorkoutExercise(id: number): Promise<boolean>;
+
+  // Body Weight Logs
+  getBodyWeightLogsByUserId(userId: number): Promise<BodyWeightLog[]>;
+  createBodyWeightLog(log: InsertBodyWeightLog): Promise<BodyWeightLog>;
+  getLatestBodyWeightLog(userId: number): Promise<BodyWeightLog | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -440,6 +465,173 @@ export class DatabaseStorage implements IStorage {
     .innerJoin(users, eq(postComments.userId, users.id))
     .where(eq(postComments.postId, postId))
     .orderBy(postComments.createdAt);
+  }
+
+  // Workouts
+  async getWorkoutsByUserId(userId: number): Promise<Workout[]> {
+    return await db.select().from(workouts).where(eq(workouts.userId, userId)).orderBy(desc(workouts.date));
+  }
+
+  async getWorkoutById(id: number): Promise<Workout | undefined> {
+    const result = await db.select().from(workouts).where(eq(workouts.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createWorkout(workout: InsertWorkout): Promise<Workout> {
+    const result = await db.insert(workouts).values(workout).returning();
+    return result[0];
+  }
+
+  async updateWorkout(id: number, updates: Partial<Workout>): Promise<Workout | undefined> {
+    const result = await db.update(workouts).set(updates).where(eq(workouts.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteWorkout(id: number): Promise<boolean> {
+    const result = await db.delete(workouts).where(eq(workouts.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Exercises
+  async getExercises(): Promise<Exercise[]> {
+    return await db.select().from(exercises).orderBy(exercises.name);
+  }
+
+  async getExerciseById(id: number): Promise<Exercise | undefined> {
+    const result = await db.select().from(exercises).where(eq(exercises.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createExercise(exercise: InsertExercise): Promise<Exercise> {
+    const result = await db.insert(exercises).values(exercise).returning();
+    return result[0];
+  }
+
+  // Workout Exercises
+  async getWorkoutExercisesByWorkoutId(workoutId: number): Promise<(WorkoutExercise & { exercise: Exercise })[]> {
+    return await db.select({
+      id: workoutExercises.id,
+      workoutId: workoutExercises.workoutId,
+      exerciseId: workoutExercises.exerciseId,
+      sets: workoutExercises.sets,
+      reps: workoutExercises.reps,
+      weight: workoutExercises.weight,
+      duration: workoutExercises.duration,
+      distance: workoutExercises.distance,
+      restTime: workoutExercises.restTime,
+      notes: workoutExercises.notes,
+      orderIndex: workoutExercises.orderIndex,
+      createdAt: workoutExercises.createdAt,
+      exercise: exercises,
+    })
+    .from(workoutExercises)
+    .innerJoin(exercises, eq(workoutExercises.exerciseId, exercises.id))
+    .where(eq(workoutExercises.workoutId, workoutId))
+    .orderBy(workoutExercises.orderIndex);
+  }
+
+  async createWorkoutExercise(workoutExercise: InsertWorkoutExercise): Promise<WorkoutExercise> {
+    const result = await db.insert(workoutExercises).values(workoutExercise).returning();
+    return result[0];
+  }
+
+  async updateWorkoutExercise(id: number, updates: Partial<WorkoutExercise>): Promise<WorkoutExercise | undefined> {
+    const result = await db.update(workoutExercises).set(updates).where(eq(workoutExercises.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteWorkoutExercise(id: number): Promise<boolean> {
+    const result = await db.delete(workoutExercises).where(eq(workoutExercises.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Body Weight Logs
+  async getBodyWeightLogsByUserId(userId: number): Promise<BodyWeightLog[]> {
+    return await db.select().from(bodyWeightLogs).where(eq(bodyWeightLogs.userId, userId)).orderBy(desc(bodyWeightLogs.date));
+  }
+
+  async createBodyWeightLog(log: InsertBodyWeightLog): Promise<BodyWeightLog> {
+    const result = await db.insert(bodyWeightLogs).values(log).returning();
+    return result[0];
+  }
+
+  async getLatestBodyWeightLog(userId: number): Promise<BodyWeightLog | undefined> {
+    const result = await db.select().from(bodyWeightLogs)
+      .where(eq(bodyWeightLogs.userId, userId))
+      .orderBy(desc(bodyWeightLogs.date))
+      .limit(1);
+    return result[0];
+  }
+
+  // Rules implementation
+  async getRulesByUserId(userId: number): Promise<Rule[]> {
+    return await db.select().from(rules).where(eq(rules.userId, userId)).orderBy(rules.createdAt);
+  }
+
+  async getRuleById(id: number): Promise<Rule | undefined> {
+    const result = await db.select().from(rules).where(eq(rules.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createRule(rule: InsertRule): Promise<Rule> {
+    const result = await db.insert(rules).values(rule).returning();
+    return result[0];
+  }
+
+  async updateRule(id: number, updates: Partial<Rule>): Promise<Rule | undefined> {
+    const result = await db.update(rules).set(updates).where(eq(rules.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteRule(id: number): Promise<boolean> {
+    const result = await db.delete(rules).where(eq(rules.id, id));
+    return result.rowCount > 0;
+  }
+
+  async toggleRuleCompletion(ruleId: number, userId: number): Promise<{ success: boolean; reason?: string; rule?: Rule }> {
+    const rule = await this.getRuleById(ruleId);
+    if (!rule || rule.userId !== userId) {
+      return { success: false, reason: "Rule not found or access denied" };
+    }
+
+    const now = new Date();
+    const updatedRule = await db.update(rules)
+      .set({ lastCompletionTime: now })
+      .where(eq(rules.id, ruleId))
+      .returning();
+
+    return { success: true, rule: updatedRule[0] };
+  }
+
+  async markRuleViolation(ruleId: number, userId: number): Promise<{ success: boolean; reason?: string; rule?: Rule }> {
+    const rule = await this.getRuleById(ruleId);
+    if (!rule || rule.userId !== userId) {
+      return { success: false, reason: "Rule not found or access denied" };
+    }
+
+    const now = new Date();
+    const lastViolation = rule.lastViolationTime;
+    
+    // Check 24-hour cooldown
+    if (lastViolation) {
+      const timeDiff = now.getTime() - lastViolation.getTime();
+      const hoursDiff = timeDiff / (1000 * 60 * 60);
+      
+      if (hoursDiff < 24) {
+        const hoursLeft = Math.ceil(24 - hoursDiff);
+        return { 
+          success: false, 
+          reason: `Rule violation cooldown active. Try again in ${hoursLeft} hour${hoursLeft > 1 ? 's' : ''}.` 
+        };
+      }
+    }
+
+    const updatedRule = await db.update(rules)
+      .set({ lastViolationTime: now })
+      .where(eq(rules.id, ruleId))
+      .returning();
+
+    return { success: true, rule: updatedRule[0] };
   }
 }
 

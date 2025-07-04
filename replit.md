@@ -123,6 +123,16 @@ Build scripts include:
 
 ## Changelog
 
+- July 4, 2025: Added Health & Fitness Section with Workout Tracking Foundation
+  - **NEW**: Health tab added to bottom navigation with Activity icon
+  - **NEW**: Health page with workout tracking dashboard, logger, and progress tabs
+  - **NEW**: Workout database schema (workouts, exercises, workout_exercises, body_weight_logs tables)
+  - **NEW**: Comprehensive workout storage layer with full CRUD operations
+  - **NEW**: Workout API routes for data management
+  - **FOUNDATION**: Dashboard shows workout metrics (This Week, Total Workouts, Current Weight, Last Workout)
+  - **FOUNDATION**: Three-tab interface: Dashboard, Log Workout, Progress tracking
+  - **DESIGN**: Colorful metric cards matching fitness app aesthetic from user screenshots
+  - Health section designed to expand with nutrition tracking and comprehensive fitness analytics
 - July 3, 2025: Removed Navigation Tiles + Enhanced Rules with Category Tiles
   - **REMOVED**: Navigation tiles (Goals, Habits, Read, Vision) from You page dashboard per user request
   - **ENHANCED**: Rules section with clearer failure buttons - changed from small warning icon to prominent red "BROKE RULE" button
