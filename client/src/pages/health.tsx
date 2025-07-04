@@ -170,15 +170,19 @@ export default function HealthPage() {
     const dbExercises = exercises as any[];
     const dbExerciseNames = new Set(dbExercises.map((ex: any) => ex.name));
     const commonExercisesNotInDb = COMMON_EXERCISES.filter(ex => !dbExerciseNames.has(ex.name));
-    return [...dbExercises, ...commonExercisesNotInDb];
+    const combined = [...dbExercises, ...commonExercisesNotInDb];
+    // Sort alphabetically
+    return combined.sort((a, b) => a.name.localeCompare(b.name));
   }, [exercises]);
 
   // Filter exercises based on search
   const filteredExercises = useMemo(() => {
     if (!exerciseSearchValue) return allExercises;
-    return allExercises.filter(exercise =>
+    const filtered = allExercises.filter(exercise =>
       exercise.name.toLowerCase().includes(exerciseSearchValue.toLowerCase())
     );
+    // Keep alphabetical order in filtered results
+    return filtered.sort((a, b) => a.name.localeCompare(b.name));
   }, [allExercises, exerciseSearchValue]);
 
 

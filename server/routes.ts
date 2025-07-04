@@ -641,6 +641,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/exercises", async (req, res) => {
+    try {
+      const exercise = await storage.createExercise(req.body);
+      res.json(exercise);
+    } catch (error) {
+      console.error("Create exercise error:", error);
+      res.status(500).json({ message: "Failed to create exercise" });
+    }
+  });
+
   // Body weight logs routes
   app.get("/api/body-weight-logs", requireAuth, async (req, res) => {
     try {
