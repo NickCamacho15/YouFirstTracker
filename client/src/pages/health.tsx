@@ -374,6 +374,37 @@ export default function HealthPage() {
     },
   });
 
+  // Delete workout mutation
+  const deleteWorkoutMutation = useMutation({
+    mutationFn: async (workoutId: number) => {
+      const response = await fetch(`/api/workouts/${workoutId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete workout');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/workouts'] });
+      toast({
+        title: "Workout deleted",
+        description: "The workout has been removed from your history.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error deleting workout",
+        description: error.message || "Failed to delete workout. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const deleteWorkout = (workoutId: number) => {
+    if (confirm('Are you sure you want to delete this workout? This action cannot be undone.')) {
+      deleteWorkoutMutation.mutate(workoutId);
+    }
+  };
+
   const onAddExerciseToSession = (data: z.infer<typeof workoutLogSchema>) => {
     // Clean up the data to remove undefined values and ensure proper types
     const cleanedData = {
@@ -512,8 +543,8 @@ export default function HealthPage() {
                     <div className="space-y-4">
                       {workouts.map((workout: any) => (
                         <div key={workout.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                          <div className="flex justify-between items-start">
-                            <div>
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="flex-1">
                               <h4 className="font-medium text-gray-900">{workout.name}</h4>
                               <p className="text-sm text-gray-500 mt-1">
                                 {new Date(workout.date).toLocaleDateString('en-US', { 
@@ -523,22 +554,81 @@ export default function HealthPage() {
                                   day: 'numeric' 
                                 })}
                               </p>
-                              {workout.notes && (
-                                <p className="text-sm text-gray-600 mt-2">{workout.notes}</p>
-                              )}
                             </div>
-                            <div className="text-right">
-                              <p className="text-sm font-medium text-blue-600">
-                                {workout.duration ? `${workout.duration} min` : 'Duration not recorded'}
-                              </p>
-                              <p className="text-xs text-gray-500 mt-1">
-                                {new Date(workout.createdAt).toLocaleTimeString('en-US', { 
-                                  hour: '2-digit', 
-                                  minute: '2-digit' 
-                                })}
-                              </p>
+                            <div className="flex items-center gap-2">
+                              <div className="text-right">
+                                <p className="text-sm font-medium text-blue-600">
+                                  {workout.duration ? `${workout.duration} min` : 'Duration not recorded'}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {new Date(workout.createdAt).toLocaleTimeString('en-US', { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit' 
+                                  })}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => deleteWorkout(workout.id)}
+                                className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50"
+                                title="Delete workout"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
                             </div>
                           </div>
+                          
+                          {/* Exercise Details */}
+                          {workout.workoutExercises && workout.workoutExercises.length > 0 && (
+                            <div className="mt-3 space-y-2">
+                              <h5 className="text-sm font-medium text-gray-700">Exercises:</h5>
+                              <div className="space-y-1">
+                                {workout.workoutExercises.map((we: any) => (
+                                  <div key={we.id} className="flex justify-between items-center text-sm bg-gray-50 p-2 rounded">
+                                    <span className="font-medium text-gray-900">{we.exercise?.name || 'Unknown Exercise'}</span>
+                                    <div className="flex gap-3 text-gray-600">
+                                      {we.weight && (
+                                        <span className="text-blue-600">{we.weight} lbs</span>
+                                      )}
+                                      {we.reps && (
+                                        <span className="text-green-600">{we.reps} reps</span>
+                                      )}
+                                      {we.sets && (
+                                        <span className="text-purple-600">{we.sets} sets</span>
+                                      )}
+                                      {we.distance && (
+                                        <span className="text-orange-600">{we.distance}m</span>
+                                      )}
+                                      {we.duration && (
+                                        <span className="text-red-600">{we.duration} min</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Workout Notes */}
+                          {workout.notes && (
+                            <div className="mt-3 p-3 bg-blue-50 rounded-md">
+                              <p className="text-sm text-gray-700"><strong>Workout Notes:</strong> {workout.notes}</p>
+                            </div>
+                          )}
+                          
+                          {/* Exercise Notes */}
+                          {workout.workoutExercises && workout.workoutExercises.some((we: any) => we.notes) && (
+                            <div className="mt-3 space-y-2">
+                              <h5 className="text-sm font-medium text-gray-700">Exercise Notes:</h5>
+                              {workout.workoutExercises.filter((we: any) => we.notes).map((we: any) => (
+                                <div key={we.id} className="p-2 bg-yellow-50 rounded text-sm">
+                                  <span className="font-medium text-yellow-800">{we.exercise?.name}:</span> 
+                                  <span className="text-yellow-700 ml-1">{we.notes}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -1067,15 +1157,11 @@ export default function HealthPage() {
                       <p className="text-gray-500">Loading progress data...</p>
                     </div>
                   ) : (() => {
-                    // Debug: Log workout data structure
-                    console.log('Workouts data:', workouts);
-                    
                     // Process workout data to extract exercise progress
                     const exerciseProgress: { [key: string]: Array<{ date: string, volume: number, session: number }> } = {};
                     
                     // Process all workouts to build exercise history
                     (workouts as any[]).forEach((workout: any) => {
-                      console.log('Processing workout:', workout);
                       if (workout.workoutExercises) {
                         workout.workoutExercises.forEach((we: any) => {
                           const exerciseName = we.exercise?.name || 'Unknown Exercise';
@@ -1165,12 +1251,12 @@ export default function HealthPage() {
                                   <svg className="absolute inset-0 w-full h-full">
                                     <defs>
                                       <linearGradient id={`gradient-${exerciseName}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
-                                        <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.1" />
+                                        <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.1" />
+                                        <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.05" />
                                       </linearGradient>
                                     </defs>
                                     
-                                    {/* Area under the curve */}
+                                    {/* Light area under the curve */}
                                     <path
                                       d={`M 0 100 ${sessions.map((session, index) => {
                                         const x = (index / (sessions.length - 1)) * 100;

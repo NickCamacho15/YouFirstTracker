@@ -631,6 +631,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/workouts/:id", requireAuth, async (req, res) => {
+    try {
+      const workoutId = parseInt(req.params.id);
+      const workout = await storage.getWorkoutById(workoutId);
+      
+      if (!workout) {
+        return res.status(404).json({ message: "Workout not found" });
+      }
+      
+      // Check if the workout belongs to the current user
+      if (workout.userId !== req.session.userId) {
+        return res.status(403).json({ message: "Not authorized to delete this workout" });
+      }
+      
+      await storage.deleteWorkout(workoutId);
+      res.json({ message: "Workout deleted successfully" });
+    } catch (error) {
+      console.error("Delete workout error:", error);
+      res.status(500).json({ message: "Failed to delete workout" });
+    }
+  });
+
   app.get("/api/exercises", async (req, res) => {
     try {
       const exercises = await storage.getExercises();

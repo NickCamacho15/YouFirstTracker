@@ -521,8 +521,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteWorkout(id: number): Promise<boolean> {
-    const result = await db.delete(workouts).where(eq(workouts.id, id));
-    return result.rowCount > 0;
+    try {
+      // First delete all workout exercises associated with this workout
+      await db.delete(workoutExercises).where(eq(workoutExercises.workoutId, id));
+      
+      // Then delete the workout itself
+      const result = await db.delete(workouts).where(eq(workouts.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error('Error deleting workout:', error);
+      return false;
+    }
   }
 
   // Exercises
