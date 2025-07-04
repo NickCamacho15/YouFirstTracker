@@ -156,7 +156,7 @@ export default function HealthPage() {
   });
 
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [workoutTab, setWorkoutTab] = useState("dashboard");
+  const [workoutTab, setWorkoutTab] = useState("log-workout");
   const [workoutSession, setWorkoutSession] = useState<any[]>([]);
   const [workoutDate, setWorkoutDate] = useState(new Date().toISOString().split('T')[0]);
   
@@ -488,17 +488,61 @@ export default function HealthPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Tabs value={workoutTab} onValueChange={setWorkoutTab}>
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="log-workout">Log Workout</TabsTrigger>
               <TabsTrigger value="progress">Progress</TabsTrigger>
+              <TabsTrigger value="workout-history">Workout History</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="dashboard" className="mt-6">
+            <TabsContent value="workout-history" className="mt-6">
               <div className="space-y-6">
-                {/* Workout Progress Charts */}
+                {/* Workout History */}
                 <div className="bg-white rounded-lg shadow-sm p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Detailed Workout Analytics</h3>
-                  <p className="text-gray-600">Coming soon - comprehensive workout analytics dashboard</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Workout History</h3>
+                  
+                  {workoutsLoading ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">Loading workout history...</p>
+                    </div>
+                  ) : workouts.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">No workouts recorded yet.</p>
+                      <p className="text-sm text-gray-400 mt-2">Start logging workouts to see your history here!</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {workouts.map((workout: any) => (
+                        <div key={workout.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h4 className="font-medium text-gray-900">{workout.name}</h4>
+                              <p className="text-sm text-gray-500 mt-1">
+                                {new Date(workout.date).toLocaleDateString('en-US', { 
+                                  weekday: 'long', 
+                                  year: 'numeric', 
+                                  month: 'long', 
+                                  day: 'numeric' 
+                                })}
+                              </p>
+                              {workout.notes && (
+                                <p className="text-sm text-gray-600 mt-2">{workout.notes}</p>
+                              )}
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-medium text-blue-600">
+                                {workout.duration ? `${workout.duration} min` : 'Duration not recorded'}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {new Date(workout.createdAt).toLocaleTimeString('en-US', { 
+                                  hour: '2-digit', 
+                                  minute: '2-digit' 
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </TabsContent>
@@ -1013,9 +1057,85 @@ export default function HealthPage() {
             </TabsContent>
 
             <TabsContent value="progress" className="mt-6">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Progress Tracking</h3>
-                <p className="text-gray-600">Coming soon - detailed progress analytics</p>
+              <div className="space-y-6">
+                {/* Progress Overview */}
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Progress Tracking</h3>
+                  
+                  {workoutsLoading ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">Loading progress data...</p>
+                    </div>
+                  ) : workouts.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">No progress data available yet.</p>
+                      <p className="text-sm text-gray-400 mt-2">Start logging workouts to track your progress!</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {/* Progress Stats */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0">
+                              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-sm font-medium">{workouts.length}</span>
+                              </div>
+                            </div>
+                            <div className="ml-3">
+                              <p className="text-sm font-medium text-blue-900">Total Workouts</p>
+                              <p className="text-xs text-blue-700">Sessions completed</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-green-50 p-4 rounded-lg">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0">
+                              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-sm font-medium">
+                                  {workouts.filter((w: any) => {
+                                    const workoutDate = new Date(w.date);
+                                    const today = new Date();
+                                    const diffTime = today.getTime() - workoutDate.getTime();
+                                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                    return diffDays <= 7;
+                                  }).length}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="ml-3">
+                              <p className="text-sm font-medium text-green-900">This Week</p>
+                              <p className="text-xs text-green-700">Recent sessions</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-purple-50 p-4 rounded-lg">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0">
+                              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-sm font-medium">
+                                  {workouts.length > 0 ? Math.round(workouts.reduce((sum: number, w: any) => sum + (w.duration || 0), 0) / workouts.length) : 0}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="ml-3">
+                              <p className="text-sm font-medium text-purple-900">Avg Duration</p>
+                              <p className="text-xs text-purple-700">Minutes per session</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Progress Chart Placeholder */}
+                      <div className="bg-gray-50 p-8 rounded-lg text-center">
+                        <p className="text-gray-600 mb-2">Workout Progress Chart</p>
+                        <p className="text-sm text-gray-500">Visual progress tracking coming soon</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </TabsContent>
           </Tabs>
