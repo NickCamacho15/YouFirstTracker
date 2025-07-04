@@ -634,19 +634,19 @@ export default function HealthPage() {
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="strength">
-                                <div className="flex flex-col">
+                                <div className="flex flex-col py-1">
                                   <span>Strength</span>
                                   <span className="text-xs text-white/80 data-[highlighted]:text-white">Focused on building muscle and increasing load capacity</span>
                                 </div>
                               </SelectItem>
                               <SelectItem value="cardio">
-                                <div className="flex flex-col">
+                                <div className="flex flex-col py-1">
                                   <span>Cardio</span>
                                   <span className="text-xs text-white/80 data-[highlighted]:text-white">Focused on endurance, heart rate, and aerobic capacity</span>
                                 </div>
                               </SelectItem>
                               <SelectItem value="functional">
-                                <div className="flex flex-col">
+                                <div className="flex flex-col py-1">
                                   <span>Functional</span>
                                   <span className="text-xs text-white/80 data-[highlighted]:text-white">Blends strength, mobility, and conditioning for real-world movement</span>
                                 </div>
