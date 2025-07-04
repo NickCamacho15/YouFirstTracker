@@ -123,6 +123,15 @@ Build scripts include:
 
 ## Changelog
 
+- July 4, 2025: Enhanced Workout Tracking with Category-Specific Metrics and Tooltips
+  - **ENHANCED**: Exercise categories updated with detailed tooltips: Strength (muscle/load capacity), Cardio (endurance/aerobic), Functional (real-world movement)
+  - **NEW**: Category-specific tracking metrics for comprehensive workout logging
+  - **STRENGTH**: Weight (lbs), Reps, Sets tracking for load capacity progression
+  - **CARDIO**: Distance, Time, Pace (auto-calc), Heart Rate (avg/max), Type (Run/Bike/Row/etc.) for endurance tracking
+  - **FUNCTIONAL**: Workout Name/Block, Time Domain, Rounds Completed, Reps per Round, RPE (1-10), Type (AMRAP/EMOM/For Time/Circuit/Tabata)
+  - **DYNAMIC**: Form fields change based on selected exercise category for relevant metric capture
+  - **ANALYTICS**: Foundation for category-specific trend analysis (avg weights, weekly cardio time, completion rates, RPE trends)
+  - Enhanced dropdown system remembers custom exercises with appropriate category-based tracking options
 - July 4, 2025: Added Health & Fitness Section with Workout Tracking Foundation
   - **NEW**: Health tab added to bottom navigation with Activity icon
   - **NEW**: Health page with workout tracking dashboard, logger, and progress tabs

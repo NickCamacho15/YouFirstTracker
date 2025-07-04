@@ -24,9 +24,23 @@ const createExerciseSchema = z.object({
 
 const workoutLogSchema = z.object({
   exerciseId: z.string().min(1, "Please select an exercise"),
+  // Strength fields
   weight: z.number().min(0, "Weight must be positive").optional(),
   reps: z.number().min(1, "Reps must be at least 1").optional(),
   sets: z.number().min(1, "Sets must be at least 1").optional(),
+  // Cardio fields
+  distance: z.string().optional(),
+  time: z.string().optional(),
+  pace: z.string().optional(),
+  heartRate: z.number().optional(),
+  cardioType: z.string().optional(),
+  // Functional fields
+  workoutName: z.string().optional(),
+  timeDomain: z.string().optional(),
+  roundsCompleted: z.number().optional(),
+  repsPerRound: z.number().optional(),
+  rpe: z.number().min(1).max(10).optional(),
+  functionalType: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -75,9 +89,25 @@ export default function HealthPage() {
       weight: undefined,
       reps: undefined,
       sets: undefined,
+      distance: "",
+      time: "",
+      pace: "",
+      heartRate: undefined,
+      cardioType: "",
+      workoutName: "",
+      timeDomain: "",
+      roundsCompleted: undefined,
+      repsPerRound: undefined,
+      rpe: undefined,
+      functionalType: "",
       notes: "",
     },
   });
+
+  // Get selected exercise to determine category
+  const selectedExerciseId = workoutForm.watch("exerciseId");
+  const selectedExercise = (exercises as any[]).find((e: any) => e.id.toString() === selectedExerciseId);
+  const exerciseCategory = selectedExercise?.category || "";
 
   // Create exercise mutation
   const createExerciseMutation = useMutation({
@@ -254,10 +284,24 @@ export default function HealthPage() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="strength">Strength</SelectItem>
-                                  <SelectItem value="cardio">Cardio</SelectItem>
-                                  <SelectItem value="flexibility">Flexibility</SelectItem>
-                                  <SelectItem value="balance">Balance</SelectItem>
+                                  <SelectItem value="strength">
+                                    <div className="flex flex-col">
+                                      <span>Strength</span>
+                                      <span className="text-xs text-gray-500">Focused on building muscle and increasing load capacity</span>
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="cardio">
+                                    <div className="flex flex-col">
+                                      <span>Cardio</span>
+                                      <span className="text-xs text-gray-500">Focused on endurance, heart rate, and aerobic capacity</span>
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="functional">
+                                    <div className="flex flex-col">
+                                      <span>Functional</span>
+                                      <span className="text-xs text-gray-500">Blends strength, mobility, and conditioning for real-world movement</span>
+                                    </div>
+                                  </SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -325,64 +369,283 @@ export default function HealthPage() {
                       )}
                     />
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <FormField
-                        control={workoutForm.control}
-                        name="weight"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Weight (lbs)</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                placeholder="e.g., 135"
-                                {...field}
-                                onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                    {/* Conditional fields based on exercise category */}
+                    {exerciseCategory === "strength" && (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          control={workoutForm.control}
+                          name="weight"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Weight (lbs)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  placeholder="e.g., 135"
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                      <FormField
-                        control={workoutForm.control}
-                        name="reps"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Reps</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                placeholder="e.g., 12"
-                                {...field}
-                                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                        <FormField
+                          control={workoutForm.control}
+                          name="reps"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Reps</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  placeholder="e.g., 12"
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                      <FormField
-                        control={workoutForm.control}
-                        name="sets"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Sets</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                placeholder="e.g., 3"
-                                {...field}
-                                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                        <FormField
+                          control={workoutForm.control}
+                          name="sets"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Sets</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  placeholder="e.g., 3"
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+
+                    {exerciseCategory === "cardio" && (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={workoutForm.control}
+                            name="distance"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Distance</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="e.g., 2.5 miles or 400m" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={workoutForm.control}
+                            name="time"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Time</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="e.g., 20:15 (mm:ss)" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={workoutForm.control}
+                            name="pace"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Pace (Optional)</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Auto-calculated or manual entry" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={workoutForm.control}
+                            name="heartRate"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Heart Rate (Optional)</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    placeholder="Avg or max BPM"
+                                    {...field}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={workoutForm.control}
+                          name="cardioType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Type</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select cardio type" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="run">Run</SelectItem>
+                                  <SelectItem value="bike">Bike</SelectItem>
+                                  <SelectItem value="row">Row</SelectItem>
+                                  <SelectItem value="swim">Swim</SelectItem>
+                                  <SelectItem value="walk">Walk</SelectItem>
+                                  <SelectItem value="elliptical">Elliptical</SelectItem>
+                                  <SelectItem value="stairs">Stairs</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+
+                    {exerciseCategory === "functional" && (
+                      <div className="space-y-4">
+                        <FormField
+                          control={workoutForm.control}
+                          name="workoutName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Workout Name or Block Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder='e.g., "Murph," "AMRAP 12: KB + Burpees"' {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={workoutForm.control}
+                            name="functionalType"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Type</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select workout type" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="amrap">AMRAP (As Many Rounds As Possible)</SelectItem>
+                                    <SelectItem value="emom">EMOM (Every Minute On the Minute)</SelectItem>
+                                    <SelectItem value="fortime">For Time</SelectItem>
+                                    <SelectItem value="circuit">Circuit</SelectItem>
+                                    <SelectItem value="tabata">Tabata</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={workoutForm.control}
+                            name="timeDomain"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Time Domain</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Total time or work/rest ratio" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <FormField
+                            control={workoutForm.control}
+                            name="roundsCompleted"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Rounds Completed</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    placeholder="e.g., 5"
+                                    {...field}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={workoutForm.control}
+                            name="repsPerRound"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Reps per Round</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    placeholder="e.g., 10"
+                                    {...field}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={workoutForm.control}
+                            name="rpe"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>RPE (1-10)</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min="1" 
+                                    max="10"
+                                    placeholder="Rate of Perceived Exertion"
+                                    {...field}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                    )}
 
                     <FormField
                       control={workoutForm.control}
