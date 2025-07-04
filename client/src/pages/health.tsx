@@ -1211,12 +1211,19 @@ export default function HealthPage() {
                           const sessions = exerciseProgress[exerciseName];
                           if (sessions.length < 2) return null; // Need at least 2 sessions to show progress
                           
-                          const maxVolume = Math.max(...sessions.map(s => s.volume));
-                          const minVolume = Math.min(...sessions.map(s => s.volume));
-                          const range = maxVolume - minVolume;
-                          const padding = range * 0.1; // 10% padding
-                          const chartMin = Math.max(0, minVolume - padding);
-                          const chartMax = maxVolume + padding;
+                          // Use weight-based progression instead of total volume for cleaner charts
+                          const weights = sessions.map(s => {
+                            const workout = (workouts as any[]).find(w => w.date === s.date);
+                            const exercise = workout?.workoutExercises?.find((we: any) => we.exercise?.name === exerciseName);
+                            return parseFloat(exercise?.weight) || 0;
+                          });
+                          
+                          const maxWeight = Math.max(...weights);
+                          const minWeight = Math.min(...weights);
+                          const range = maxWeight - minWeight;
+                          const padding = Math.max(range * 0.1, 5); // At least 5 lbs padding
+                          const chartMin = Math.max(0, minWeight - padding);
+                          const chartMax = maxWeight + padding;
                           const chartRange = chartMax - chartMin;
                           
                           return (
@@ -1251,16 +1258,16 @@ export default function HealthPage() {
                                   <svg className="absolute inset-0 w-full h-full">
                                     <defs>
                                       <linearGradient id={`gradient-${exerciseName}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.1" />
-                                        <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.05" />
+                                        <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.8" />
+                                        <stop offset="100%" stopColor="#e0f2fe" stopOpacity="0.3" />
                                       </linearGradient>
                                     </defs>
                                     
-                                    {/* Light area under the curve */}
+                                    {/* Light blue area under the curve */}
                                     <path
-                                      d={`M 0 100 ${sessions.map((session, index) => {
-                                        const x = (index / (sessions.length - 1)) * 100;
-                                        const y = 100 - ((session.volume - chartMin) / chartRange) * 100;
+                                      d={`M 0 100 ${weights.map((weight, index) => {
+                                        const x = (index / (weights.length - 1)) * 100;
+                                        const y = 100 - ((weight - chartMin) / chartRange) * 100;
                                         return `L ${x} ${y}`;
                                       }).join(' ')} L 100 100 Z`}
                                       fill={`url(#gradient-${exerciseName})`}
@@ -1268,9 +1275,9 @@ export default function HealthPage() {
                                     
                                     {/* Progress line */}
                                     <polyline
-                                      points={sessions.map((session, index) => {
-                                        const x = (index / (sessions.length - 1)) * 100;
-                                        const y = 100 - ((session.volume - chartMin) / chartRange) * 100;
+                                      points={weights.map((weight, index) => {
+                                        const x = (index / (weights.length - 1)) * 100;
+                                        const y = 100 - ((weight - chartMin) / chartRange) * 100;
                                         return `${x},${y}`;
                                       }).join(' ')}
                                       fill="none"
@@ -1281,9 +1288,9 @@ export default function HealthPage() {
                                     />
                                     
                                     {/* Data points */}
-                                    {sessions.map((session, index) => {
-                                      const x = (index / (sessions.length - 1)) * 100;
-                                      const y = 100 - ((session.volume - chartMin) / chartRange) * 100;
+                                    {weights.map((weight, index) => {
+                                      const x = (index / (weights.length - 1)) * 100;
+                                      const y = 100 - ((weight - chartMin) / chartRange) * 100;
                                       return (
                                         <circle
                                           key={index}
@@ -1298,11 +1305,14 @@ export default function HealthPage() {
                                     })}
                                   </svg>
                                   
-                                  {/* X-axis labels */}
+                                  {/* X-axis labels with dates */}
                                   <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-gray-600 pt-2">
                                     {sessions.map((session, index) => (
                                       <span key={index} className="text-center">
-                                        Session {session.session}
+                                        {new Date(session.date).toLocaleDateString('en-US', { 
+                                          month: 'short', 
+                                          day: 'numeric' 
+                                        })}
                                       </span>
                                     ))}
                                   </div>
@@ -1312,11 +1322,11 @@ export default function HealthPage() {
                               {/* Progress summary */}
                               <div className="mt-4 flex justify-between text-sm">
                                 <span className="text-gray-600">
-                                  Latest: {Math.round(sessions[sessions.length - 1].volume)} lbs total volume
+                                  Latest: {Math.round(weights[weights.length - 1])} lbs
                                 </span>
-                                <span className={`font-medium ${sessions[sessions.length - 1].volume > sessions[0].volume ? 'text-green-600' : 'text-red-600'}`}>
-                                  {sessions[sessions.length - 1].volume > sessions[0].volume ? '+' : ''}
-                                  {Math.round(sessions[sessions.length - 1].volume - sessions[0].volume)} lbs from start
+                                <span className={`font-medium ${weights[weights.length - 1] > weights[0] ? 'text-green-600' : 'text-red-600'}`}>
+                                  {weights[weights.length - 1] > weights[0] ? '+' : ''}
+                                  {Math.round(weights[weights.length - 1] - weights[0])} lbs from start
                                 </span>
                               </div>
                             </div>
