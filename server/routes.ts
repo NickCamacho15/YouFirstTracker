@@ -651,6 +651,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/exercises/:id", async (req, res) => {
+    try {
+      const exerciseId = parseInt(req.params.id);
+      const updates = req.body;
+      const updatedExercise = await storage.updateExercise(exerciseId, updates);
+      
+      if (!updatedExercise) {
+        return res.status(404).json({ message: "Exercise not found" });
+      }
+      
+      res.json(updatedExercise);
+    } catch (error) {
+      console.error("Update exercise error:", error);
+      res.status(500).json({ message: "Failed to update exercise" });
+    }
+  });
+
   // Body weight logs routes
   app.get("/api/body-weight-logs", requireAuth, async (req, res) => {
     try {

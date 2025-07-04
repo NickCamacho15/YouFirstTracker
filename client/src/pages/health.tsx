@@ -343,6 +343,37 @@ export default function HealthPage() {
     },
   });
 
+  // Update exercise category mutation
+  const updateExerciseMutation = useMutation({
+    mutationFn: async ({ exerciseId, category }: { exerciseId: number; category: string }) => {
+      const response = await fetch(`/api/exercises/${exerciseId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ category }),
+      });
+      if (!response.ok) throw new Error("Failed to update exercise");
+      return response.json();
+    },
+    onSuccess: (updatedExercise) => {
+      // Update the cache with the updated exercise
+      queryClient.setQueryData(["/api/exercises"], (oldData: any) => {
+        if (!oldData) return [];
+        return oldData.map((exercise: any) => 
+          exercise.id === updatedExercise.id 
+            ? { ...exercise, category: updatedExercise.category }
+            : exercise
+        );
+      });
+      
+      toast({
+        title: "Exercise updated",
+        description: `"${updatedExercise.name}" category updated to ${updatedExercise.category}.`,
+      });
+    },
+  });
+
   const onAddExerciseToSession = (data: z.infer<typeof workoutLogSchema>) => {
     // Clean up the data to remove undefined values and ensure proper types
     const cleanedData = {
@@ -626,7 +657,21 @@ export default function HealthPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Category</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                          <Select onValueChange={(newCategory) => {
+                            field.onChange(newCategory);
+                            
+                            // If an exercise is selected and the category is manually changed, update the exercise
+                            const selectedExerciseName = workoutForm.getValues("exerciseName");
+                            if (selectedExerciseName && exercises && Array.isArray(exercises)) {
+                              const selectedExercise = exercises.find((ex: any) => ex.name === selectedExerciseName);
+                              if (selectedExercise && selectedExercise.id && selectedExercise.category !== newCategory) {
+                                updateExerciseMutation.mutate({
+                                  exerciseId: selectedExercise.id,
+                                  category: newCategory
+                                });
+                              }
+                            }
+                          }} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select category" />
