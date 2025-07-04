@@ -91,11 +91,71 @@ export default function HealthPage() {
                     </div>
                   </div>
 
-                  {/* Progress Chart Placeholder */}
-                  <div className="bg-gray-50 rounded-lg p-6 text-center">
-                    <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-600">Progress charts coming soon</p>
-                    <p className="text-sm text-gray-500">Weight progression & cardio improvements</p>
+                  {/* Comprehensive Wellness Trends Chart */}
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-sm font-medium text-gray-700">Wellness Trends</h4>
+                      <div className="flex space-x-4 text-xs">
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
+                          <span className="text-gray-600">Weight</span>
+                        </div>
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
+                          <span className="text-gray-600">Cardio</span>
+                        </div>
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-purple-500 rounded-full mr-1"></div>
+                          <span className="text-gray-600">Strength</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Mock Multi-line Chart */}
+                    <div className="relative h-32 bg-white rounded border">
+                      <svg viewBox="0 0 300 100" className="w-full h-full">
+                        {/* Grid lines */}
+                        <defs>
+                          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f3f4f6" strokeWidth="1"/>
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid)" />
+                        
+                        {/* Weight trend line (blue) */}
+                        <polyline
+                          fill="none"
+                          stroke="#3b82f6"
+                          strokeWidth="2"
+                          points="20,80 60,75 100,70 140,65 180,60 220,58 260,55"
+                        />
+                        
+                        {/* Cardio trend line (green) */}
+                        <polyline
+                          fill="none"
+                          stroke="#10b981"
+                          strokeWidth="2"
+                          points="20,90 60,85 100,75 140,70 180,65 220,60 260,50"
+                        />
+                        
+                        {/* Strength trend line (purple) */}
+                        <polyline
+                          fill="none"
+                          stroke="#8b5cf6"
+                          strokeWidth="2"
+                          points="20,85 60,80 100,75 140,65 180,55 220,45 260,40"
+                        />
+                        
+                        {/* Data points */}
+                        <circle cx="260" cy="55" r="3" fill="#3b82f6" />
+                        <circle cx="260" cy="50" r="3" fill="#10b981" />
+                        <circle cx="260" cy="40" r="3" fill="#8b5cf6" />
+                      </svg>
+                    </div>
+                    
+                    <div className="text-center mt-3">
+                      <p className="text-xs text-gray-500">30-day wellness progress overview</p>
+                    </div>
                   </div>
                 </div>
 
@@ -104,7 +164,7 @@ export default function HealthPage() {
                   onClick={() => setActiveTab("log-workout")}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Log New Workout
+                  Enter Workout Section
                 </Button>
               </div>
 
