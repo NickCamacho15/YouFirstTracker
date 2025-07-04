@@ -23,7 +23,8 @@ const createExerciseSchema = z.object({
 });
 
 const workoutLogSchema = z.object({
-  exerciseId: z.string().min(1, "Please select an exercise"),
+  exerciseName: z.string().min(1, "Exercise name is required"),
+  category: z.string().min(1, "Please select a category"),
   // Strength fields
   weight: z.number().min(0, "Weight must be positive").optional(),
   reps: z.number().min(1, "Reps must be at least 1").optional(),
@@ -85,7 +86,8 @@ export default function HealthPage() {
   const workoutForm = useForm<z.infer<typeof workoutLogSchema>>({
     resolver: zodResolver(workoutLogSchema),
     defaultValues: {
-      exerciseId: "",
+      exerciseName: "",
+      category: "",
       weight: undefined,
       reps: undefined,
       sets: undefined,
@@ -104,10 +106,8 @@ export default function HealthPage() {
     },
   });
 
-  // Get selected exercise to determine category
-  const selectedExerciseId = workoutForm.watch("exerciseId");
-  const selectedExercise = (exercises as any[]).find((e: any) => e.id.toString() === selectedExerciseId);
-  const exerciseCategory = selectedExercise?.category || "";
+  // Get selected category to determine which fields to show
+  const selectedCategory = workoutForm.watch("category");
 
   // Create exercise mutation
   const createExerciseMutation = useMutation({
@@ -143,20 +143,33 @@ export default function HealthPage() {
   // Create workout log mutation
   const createWorkoutMutation = useMutation({
     mutationFn: async (data: z.infer<typeof workoutLogSchema>) => {
-      const exerciseList = exercises as any[];
-      const selectedExercise = exerciseList.find((e: any) => e.id.toString() === data.exerciseId);
-      if (!selectedExercise) throw new Error("Exercise not found");
+      // First create or find the exercise
+      const exerciseResponse = await fetch("/api/exercises", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: data.exerciseName,
+          category: data.category,
+          description: "",
+        }),
+      });
+      
+      const exercise = await exerciseResponse.json();
+      const exerciseId = exercise.id;
 
+      // Then create the workout
       const response = await fetch("/api/workouts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: `${selectedExercise.name} Workout`,
+          name: `${data.exerciseName} Session`,
           description: data.notes || "",
           exercises: [{
-            exerciseId: parseInt(data.exerciseId),
+            exerciseId: exerciseId,
             weight: data.weight,
             reps: data.reps,
             sets: data.sets,
@@ -168,6 +181,7 @@ export default function HealthPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/exercises"] });
       toast({
         title: "Workout logged",
         description: "Your workout has been successfully recorded.",
@@ -346,22 +360,49 @@ export default function HealthPage() {
                   <form onSubmit={workoutForm.handleSubmit(onLogWorkout)} className="space-y-6">
                     <FormField
                       control={workoutForm.control}
-                      name="exerciseId"
+                      name="exerciseName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Select Exercise</FormLabel>
+                          <FormLabel>Exercise Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., Front foot heel elevated squat" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={workoutForm.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Category</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Choose from your exercises" />
+                                <SelectValue placeholder="Select category" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {(exercises as any[]).map((exercise: any) => (
-                                <SelectItem key={exercise.id} value={exercise.id.toString()}>
-                                  {exercise.name}
-                                </SelectItem>
-                              ))}
+                              <SelectItem value="strength">
+                                <div className="flex flex-col">
+                                  <span>Strength</span>
+                                  <span className="text-xs text-gray-500">Focused on building muscle and increasing load capacity</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="cardio">
+                                <div className="flex flex-col">
+                                  <span>Cardio</span>
+                                  <span className="text-xs text-gray-500">Focused on endurance, heart rate, and aerobic capacity</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="functional">
+                                <div className="flex flex-col">
+                                  <span>Functional</span>
+                                  <span className="text-xs text-gray-500">Blends strength, mobility, and conditioning for real-world movement</span>
+                                </div>
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -369,8 +410,8 @@ export default function HealthPage() {
                       )}
                     />
 
-                    {/* Conditional fields based on exercise category */}
-                    {exerciseCategory === "strength" && (
+                    {/* Conditional fields based on selected category */}
+                    {selectedCategory === "strength" && (
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <FormField
                           control={workoutForm.control}
@@ -431,7 +472,7 @@ export default function HealthPage() {
                       </div>
                     )}
 
-                    {exerciseCategory === "cardio" && (
+                    {selectedCategory === "cardio" && (
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <FormField
@@ -527,7 +568,7 @@ export default function HealthPage() {
                       </div>
                     )}
 
-                    {exerciseCategory === "functional" && (
+                    {selectedCategory === "functional" && (
                       <div className="space-y-4">
                         <FormField
                           control={workoutForm.control}
