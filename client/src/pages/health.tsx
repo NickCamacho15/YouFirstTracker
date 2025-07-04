@@ -103,48 +103,54 @@ export default function HealthPage() {
   // Get selected category to determine which fields to show
   const selectedCategory = workoutForm.watch("category");
 
-
-
   // Create workout log mutation
   const createWorkoutMutation = useMutation({
     mutationFn: async (sessionData: { date: string; exercises: any[] }) => {
-      const workoutExercises = [];
-      
-      // Create exercises and collect workout data
-      for (const exerciseData of sessionData.exercises) {
-        const exerciseResponse = await fetch("/api/exercises", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: exerciseData.exerciseName,
-            category: exerciseData.category,
-            description: "",
-          }),
-        });
-        
-        const exercise = await exerciseResponse.json();
-        
-        workoutExercises.push({
-          exerciseId: exercise.id,
-          weight: exerciseData.weight,
-          reps: exerciseData.reps,
-          sets: exerciseData.sets,
-          distance: exerciseData.distance,
-          time: exerciseData.time,
-          pace: exerciseData.pace,
-          heartRate: exerciseData.heartRate,
-          cardioType: exerciseData.cardioType,
-          workoutName: exerciseData.workoutName,
-          timeDomain: exerciseData.timeDomain,
-          roundsCompleted: exerciseData.roundsCompleted,
-          repsPerRound: exerciseData.repsPerRound,
-          rpe: exerciseData.rpe,
-          functionalType: exerciseData.functionalType,
+      // Helper function to convert time format (mm:ss) to seconds
+      const parseTime = (timeString: string): number => {
+        if (!timeString) return 0;
+        const parts = timeString.split(':');
+        if (parts.length === 2) {
+          const minutes = parseInt(parts[0], 10) || 0;
+          const seconds = parseInt(parts[1], 10) || 0;
+          return minutes * 60 + seconds;
+        }
+        return 0;
+      };
+
+      // Transform exercises for backend
+      const workoutExercises = sessionData.exercises.map(exerciseData => {
+        const baseExercise = {
+          name: exerciseData.exerciseName,
+          category: exerciseData.category,
           notes: exerciseData.notes,
-        });
-      }
+        };
+
+        if (exerciseData.category === 'strength') {
+          return {
+            ...baseExercise,
+            sets: exerciseData.sets,
+            reps: exerciseData.reps,
+            weight: exerciseData.weight,
+          };
+        } else if (exerciseData.category === 'cardio') {
+          return {
+            ...baseExercise,
+            sets: 1,
+            distance: exerciseData.distance ? Math.round(parseFloat(exerciseData.distance) * 1609.34) : null, // Convert miles to meters
+            duration: exerciseData.time ? parseTime(exerciseData.time) : null,
+          };
+        } else if (exerciseData.category === 'functional') {
+          return {
+            ...baseExercise,
+            sets: exerciseData.roundsCompleted || 1,
+            reps: exerciseData.repsPerRound,
+            duration: exerciseData.timeDomain ? parseTime(exerciseData.timeDomain) : null,
+          };
+        }
+
+        return { ...baseExercise, sets: 1 };
+      });
 
       // Create the workout
       const response = await fetch("/api/workouts", {

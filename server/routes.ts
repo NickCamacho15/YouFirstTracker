@@ -586,11 +586,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/workouts", requireAuth, async (req, res) => {
     try {
-      const workoutData = {
-        ...req.body,
+      const { exercises, ...workoutData } = req.body;
+      
+      // Create the main workout record
+      const workout = await storage.createWorkout({
+        ...workoutData,
         userId: req.session.userId
-      };
-      const workout = await storage.createWorkout(workoutData);
+      });
+      
+      // Create each exercise record
+      if (exercises && exercises.length > 0) {
+        for (let i = 0; i < exercises.length; i++) {
+          const exerciseData = exercises[i];
+          
+          // Create or get the exercise
+          let exercise = await storage.getExerciseByName(exerciseData.name);
+          if (!exercise) {
+            exercise = await storage.createExercise({
+              name: exerciseData.name,
+              category: exerciseData.category || "strength"
+            });
+          }
+          
+          // Create the workout exercise record
+          await storage.createWorkoutExercise({
+            workoutId: workout.id,
+            exerciseId: exercise.id,
+            sets: exerciseData.sets || 1,
+            reps: exerciseData.reps || null,
+            weight: exerciseData.weight || null,
+            duration: exerciseData.duration || null,
+            distance: exerciseData.distance || null,
+            restTime: exerciseData.restTime || null,
+            notes: exerciseData.notes || null,
+            orderIndex: i
+          });
+        }
+      }
+      
       res.json(workout);
     } catch (error) {
       console.error("Create workout error:", error);

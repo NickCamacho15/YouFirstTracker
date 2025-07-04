@@ -111,6 +111,7 @@ export interface IStorage {
   // Exercises
   getExercises(): Promise<Exercise[]>;
   getExerciseById(id: number): Promise<Exercise | undefined>;
+  getExerciseByName(name: string): Promise<Exercise | undefined>;
   createExercise(exercise: InsertExercise): Promise<Exercise>;
 
   // Workout Exercises
@@ -499,6 +500,11 @@ export class DatabaseStorage implements IStorage {
 
   async getExerciseById(id: number): Promise<Exercise | undefined> {
     const result = await db.select().from(exercises).where(eq(exercises.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getExerciseByName(name: string): Promise<Exercise | undefined> {
+    const result = await db.select().from(exercises).where(eq(exercises.name, name)).limit(1);
     return result[0];
   }
 
