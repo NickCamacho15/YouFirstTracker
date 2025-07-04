@@ -1067,11 +1067,15 @@ export default function HealthPage() {
                       <p className="text-gray-500">Loading progress data...</p>
                     </div>
                   ) : (() => {
+                    // Debug: Log workout data structure
+                    console.log('Workouts data:', workouts);
+                    
                     // Process workout data to extract exercise progress
                     const exerciseProgress: { [key: string]: Array<{ date: string, volume: number, session: number }> } = {};
                     
                     // Process all workouts to build exercise history
                     (workouts as any[]).forEach((workout: any) => {
+                      console.log('Processing workout:', workout);
                       if (workout.workoutExercises) {
                         workout.workoutExercises.forEach((we: any) => {
                           const exerciseName = we.exercise?.name || 'Unknown Exercise';
