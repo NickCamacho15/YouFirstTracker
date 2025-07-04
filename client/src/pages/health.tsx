@@ -410,6 +410,13 @@ export default function HealthPage() {
                       )}
                     />
 
+                    {/* Debug: Show current category */}
+                    {selectedCategory && (
+                      <div className="text-sm text-gray-600 mb-4">
+                        Selected category: {selectedCategory}
+                      </div>
+                    )}
+
                     {/* Conditional fields based on selected category */}
                     {selectedCategory === "strength" && (
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
