@@ -563,6 +563,9 @@ export default function HealthPage() {
                                         variant="outline"
                                         size="sm"
                                         onClick={() => {
+                                          // Pre-populate the form with the search text
+                                          newExerciseForm.setValue("name", exerciseSearchValue);
+                                          newExerciseForm.setValue("category", "functional"); // Default category
                                           setShowAddExerciseDialog(true);
                                           setExerciseSearchOpen(false);
                                         }}
