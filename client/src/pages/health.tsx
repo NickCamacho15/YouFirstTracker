@@ -1058,83 +1058,183 @@ export default function HealthPage() {
 
             <TabsContent value="progress" className="mt-6">
               <div className="space-y-6">
-                {/* Progress Overview */}
+                {/* Exercise Progress Charts */}
                 <div className="bg-white rounded-lg shadow-sm p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Progress Tracking</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-6">Exercise Progress</h3>
                   
                   {workoutsLoading ? (
                     <div className="text-center py-8">
                       <p className="text-gray-500">Loading progress data...</p>
                     </div>
-                  ) : workouts.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">No progress data available yet.</p>
-                      <p className="text-sm text-gray-400 mt-2">Start logging workouts to track your progress!</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {/* Progress Stats */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-blue-50 p-4 rounded-lg">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                                <span className="text-white text-sm font-medium">{workouts.length}</span>
-                              </div>
-                            </div>
-                            <div className="ml-3">
-                              <p className="text-sm font-medium text-blue-900">Total Workouts</p>
-                              <p className="text-xs text-blue-700">Sessions completed</p>
-                            </div>
-                          </div>
+                  ) : (() => {
+                    // Process workout data to extract exercise progress
+                    const exerciseProgress: { [key: string]: Array<{ date: string, volume: number, session: number }> } = {};
+                    
+                    // Process all workouts to build exercise history
+                    (workouts as any[]).forEach((workout: any) => {
+                      if (workout.workoutExercises) {
+                        workout.workoutExercises.forEach((we: any) => {
+                          const exerciseName = we.exercise?.name || 'Unknown Exercise';
+                          if (!exerciseProgress[exerciseName]) {
+                            exerciseProgress[exerciseName] = [];
+                          }
+                          
+                          // Calculate total volume: weight × reps × sets
+                          const weight = parseFloat(we.weight) || 0;
+                          const reps = parseInt(we.reps) || 0;
+                          const sets = parseInt(we.sets) || 1;
+                          const volume = weight * reps * sets;
+                          
+                          exerciseProgress[exerciseName].push({
+                            date: workout.date,
+                            volume: volume,
+                            session: exerciseProgress[exerciseName].length + 1
+                          });
+                        });
+                      }
+                    });
+                    
+                    // Sort each exercise's sessions by date
+                    Object.keys(exerciseProgress).forEach(exercise => {
+                      exerciseProgress[exercise].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                      // Update session numbers after sorting
+                      exerciseProgress[exercise] = exerciseProgress[exercise].map((session, index) => ({
+                        ...session,
+                        session: index + 1
+                      }));
+                    });
+                    
+                    const exerciseNames = Object.keys(exerciseProgress);
+                    
+                    if (exerciseNames.length === 0) {
+                      return (
+                        <div className="text-center py-8">
+                          <p className="text-gray-500">No exercise data available yet.</p>
+                          <p className="text-sm text-gray-400 mt-2">Start logging strength workouts to track your progress!</p>
                         </div>
-                        
-                        <div className="bg-green-50 p-4 rounded-lg">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                                <span className="text-white text-sm font-medium">
-                                  {workouts.filter((w: any) => {
-                                    const workoutDate = new Date(w.date);
-                                    const today = new Date();
-                                    const diffTime = today.getTime() - workoutDate.getTime();
-                                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                                    return diffDays <= 7;
-                                  }).length}
+                      );
+                    }
+                    
+                    return (
+                      <div className="space-y-8">
+                        {exerciseNames.map((exerciseName) => {
+                          const sessions = exerciseProgress[exerciseName];
+                          if (sessions.length < 2) return null; // Need at least 2 sessions to show progress
+                          
+                          const maxVolume = Math.max(...sessions.map(s => s.volume));
+                          const minVolume = Math.min(...sessions.map(s => s.volume));
+                          const range = maxVolume - minVolume;
+                          const padding = range * 0.1; // 10% padding
+                          const chartMin = Math.max(0, minVolume - padding);
+                          const chartMax = maxVolume + padding;
+                          const chartRange = chartMax - chartMin;
+                          
+                          return (
+                            <div key={exerciseName} className="border rounded-lg p-6">
+                              <h4 className="text-lg font-semibold text-gray-900 mb-4">{exerciseName} Progress</h4>
+                              
+                              {/* Chart Container */}
+                              <div className="relative h-64 bg-gray-50 rounded-lg p-4">
+                                {/* Y-axis labels */}
+                                <div className="absolute left-0 top-0 bottom-0 w-16 flex flex-col justify-between text-xs text-gray-600 py-4">
+                                  <span>{Math.round(chartMax)} lbs</span>
+                                  <span>{Math.round(chartMax - chartRange * 0.25)} lbs</span>
+                                  <span>{Math.round(chartMax - chartRange * 0.5)} lbs</span>
+                                  <span>{Math.round(chartMax - chartRange * 0.75)} lbs</span>
+                                  <span>{Math.round(chartMin)} lbs</span>
+                                </div>
+                                
+                                {/* Chart area */}
+                                <div className="ml-16 h-full relative">
+                                  {/* Grid lines */}
+                                  <div className="absolute inset-0">
+                                    {[0, 0.25, 0.5, 0.75, 1].map((ratio) => (
+                                      <div
+                                        key={ratio}
+                                        className="absolute w-full border-t border-gray-200"
+                                        style={{ top: `${ratio * 100}%` }}
+                                      />
+                                    ))}
+                                  </div>
+                                  
+                                  {/* Progress line */}
+                                  <svg className="absolute inset-0 w-full h-full">
+                                    <defs>
+                                      <linearGradient id={`gradient-${exerciseName}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
+                                        <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.1" />
+                                      </linearGradient>
+                                    </defs>
+                                    
+                                    {/* Area under the curve */}
+                                    <path
+                                      d={`M 0 100 ${sessions.map((session, index) => {
+                                        const x = (index / (sessions.length - 1)) * 100;
+                                        const y = 100 - ((session.volume - chartMin) / chartRange) * 100;
+                                        return `L ${x} ${y}`;
+                                      }).join(' ')} L 100 100 Z`}
+                                      fill={`url(#gradient-${exerciseName})`}
+                                    />
+                                    
+                                    {/* Progress line */}
+                                    <polyline
+                                      points={sessions.map((session, index) => {
+                                        const x = (index / (sessions.length - 1)) * 100;
+                                        const y = 100 - ((session.volume - chartMin) / chartRange) * 100;
+                                        return `${x},${y}`;
+                                      }).join(' ')}
+                                      fill="none"
+                                      stroke="#3b82f6"
+                                      strokeWidth="3"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                    
+                                    {/* Data points */}
+                                    {sessions.map((session, index) => {
+                                      const x = (index / (sessions.length - 1)) * 100;
+                                      const y = 100 - ((session.volume - chartMin) / chartRange) * 100;
+                                      return (
+                                        <circle
+                                          key={index}
+                                          cx={`${x}%`}
+                                          cy={`${y}%`}
+                                          r="4"
+                                          fill="#3b82f6"
+                                          stroke="white"
+                                          strokeWidth="2"
+                                        />
+                                      );
+                                    })}
+                                  </svg>
+                                  
+                                  {/* X-axis labels */}
+                                  <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-gray-600 pt-2">
+                                    {sessions.map((session, index) => (
+                                      <span key={index} className="text-center">
+                                        Session {session.session}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Progress summary */}
+                              <div className="mt-4 flex justify-between text-sm">
+                                <span className="text-gray-600">
+                                  Latest: {Math.round(sessions[sessions.length - 1].volume)} lbs total volume
+                                </span>
+                                <span className={`font-medium ${sessions[sessions.length - 1].volume > sessions[0].volume ? 'text-green-600' : 'text-red-600'}`}>
+                                  {sessions[sessions.length - 1].volume > sessions[0].volume ? '+' : ''}
+                                  {Math.round(sessions[sessions.length - 1].volume - sessions[0].volume)} lbs from start
                                 </span>
                               </div>
                             </div>
-                            <div className="ml-3">
-                              <p className="text-sm font-medium text-green-900">This Week</p>
-                              <p className="text-xs text-green-700">Recent sessions</p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="bg-purple-50 p-4 rounded-lg">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                                <span className="text-white text-sm font-medium">
-                                  {workouts.length > 0 ? Math.round(workouts.reduce((sum: number, w: any) => sum + (w.duration || 0), 0) / workouts.length) : 0}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="ml-3">
-                              <p className="text-sm font-medium text-purple-900">Avg Duration</p>
-                              <p className="text-xs text-purple-700">Minutes per session</p>
-                            </div>
-                          </div>
-                        </div>
+                          );
+                        }).filter(Boolean)}
                       </div>
-                      
-                      {/* Progress Chart Placeholder */}
-                      <div className="bg-gray-50 p-8 rounded-lg text-center">
-                        <p className="text-gray-600 mb-2">Workout Progress Chart</p>
-                        <p className="text-sm text-gray-500">Visual progress tracking coming soon</p>
-                      </div>
-                    </div>
-                  )}
+                    );
+                  })()}
                 </div>
               </div>
             </TabsContent>

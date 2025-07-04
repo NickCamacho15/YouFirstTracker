@@ -471,7 +471,38 @@ export class DatabaseStorage implements IStorage {
 
   // Workouts
   async getWorkoutsByUserId(userId: number): Promise<Workout[]> {
-    return await db.select().from(workouts).where(eq(workouts.userId, userId)).orderBy(desc(workouts.date));
+    const workoutResults = await db.select().from(workouts).where(eq(workouts.userId, userId)).orderBy(desc(workouts.date));
+    
+    // Fetch workout exercises for each workout
+    const workoutsWithExercises = await Promise.all(
+      workoutResults.map(async (workout) => {
+        const workoutExerciseList = await db
+          .select({
+            id: workoutExercises.id,
+            workoutId: workoutExercises.workoutId,
+            exerciseId: workoutExercises.exerciseId,
+            weight: workoutExercises.weight,
+            reps: workoutExercises.reps,
+            sets: workoutExercises.sets,
+            duration: workoutExercises.duration,
+            distance: workoutExercises.distance,
+            restTime: workoutExercises.restTime,
+            orderIndex: workoutExercises.orderIndex,
+            notes: workoutExercises.notes,
+            exercise: exercises
+          })
+          .from(workoutExercises)
+          .leftJoin(exercises, eq(workoutExercises.exerciseId, exercises.id))
+          .where(eq(workoutExercises.workoutId, workout.id));
+        
+        return {
+          ...workout,
+          workoutExercises: workoutExerciseList
+        };
+      })
+    );
+    
+    return workoutsWithExercises;
   }
 
   async getWorkoutById(id: number): Promise<Workout | undefined> {
