@@ -588,20 +588,6 @@ export default function HealthPage() {
                                       </CommandItem>
                                     ))}
                                   </CommandGroup>
-                                  <div className="border-t p-2">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="w-full justify-start"
-                                      onClick={() => {
-                                        setShowAddExerciseDialog(true);
-                                        setExerciseSearchOpen(false);
-                                      }}
-                                    >
-                                      <Plus className="mr-2 h-4 w-4" />
-                                      Add New Exercise
-                                    </Button>
-                                  </div>
                                 </CommandList>
                               </Command>
                             </PopoverContent>
