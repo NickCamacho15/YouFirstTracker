@@ -70,6 +70,8 @@ export default function HealthPage() {
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [workoutTab, setWorkoutTab] = useState("dashboard");
+  const [workoutSession, setWorkoutSession] = useState<any[]>([]);
+  const [workoutDate, setWorkoutDate] = useState(new Date().toISOString().split('T')[0]);
 
 
 
@@ -105,38 +107,56 @@ export default function HealthPage() {
 
   // Create workout log mutation
   const createWorkoutMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof workoutLogSchema>) => {
-      // First create or find the exercise
-      const exerciseResponse = await fetch("/api/exercises", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: data.exerciseName,
-          category: data.category,
-          description: "",
-        }),
-      });
+    mutationFn: async (sessionData: { date: string; exercises: any[] }) => {
+      const workoutExercises = [];
       
-      const exercise = await exerciseResponse.json();
-      const exerciseId = exercise.id;
+      // Create exercises and collect workout data
+      for (const exerciseData of sessionData.exercises) {
+        const exerciseResponse = await fetch("/api/exercises", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: exerciseData.exerciseName,
+            category: exerciseData.category,
+            description: "",
+          }),
+        });
+        
+        const exercise = await exerciseResponse.json();
+        
+        workoutExercises.push({
+          exerciseId: exercise.id,
+          weight: exerciseData.weight,
+          reps: exerciseData.reps,
+          sets: exerciseData.sets,
+          distance: exerciseData.distance,
+          time: exerciseData.time,
+          pace: exerciseData.pace,
+          heartRate: exerciseData.heartRate,
+          cardioType: exerciseData.cardioType,
+          workoutName: exerciseData.workoutName,
+          timeDomain: exerciseData.timeDomain,
+          roundsCompleted: exerciseData.roundsCompleted,
+          repsPerRound: exerciseData.repsPerRound,
+          rpe: exerciseData.rpe,
+          functionalType: exerciseData.functionalType,
+          notes: exerciseData.notes,
+        });
+      }
 
-      // Then create the workout
+      // Create the workout
       const response = await fetch("/api/workouts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: `${data.exerciseName} Session`,
-          description: data.notes || "",
-          exercises: [{
-            exerciseId: exerciseId,
-            weight: data.weight,
-            reps: data.reps,
-            sets: data.sets,
-          }],
+          name: `Workout - ${new Date(sessionData.date).toLocaleDateString()}`,
+          description: `Complete workout with ${sessionData.exercises.length} exercises`,
+          date: sessionData.date,
+          exercises: workoutExercises,
         }),
       });
       if (!response.ok) throw new Error("Failed to create workout");
@@ -147,9 +167,9 @@ export default function HealthPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/exercises"] });
       toast({
         title: "Workout logged",
-        description: "Your workout has been successfully recorded.",
+        description: `Complete workout with ${workoutSession.length} exercises recorded.`,
       });
-      workoutForm.reset();
+      setWorkoutSession([]);
       setWorkoutTab("dashboard");
     },
     onError: (error) => {
@@ -163,8 +183,36 @@ export default function HealthPage() {
 
 
 
-  const onLogWorkout = (data: z.infer<typeof workoutLogSchema>) => {
-    createWorkoutMutation.mutate(data);
+  const onAddExerciseToSession = (data: z.infer<typeof workoutLogSchema>) => {
+    const newExercise = {
+      id: Date.now(), // temporary ID for session
+      ...data
+    };
+    setWorkoutSession(prev => [...prev, newExercise]);
+    workoutForm.reset();
+    toast({
+      title: "Exercise added",
+      description: `${data.exerciseName} added to today's workout`,
+    });
+  };
+
+  const onLogCompleteWorkout = () => {
+    if (workoutSession.length === 0) {
+      toast({
+        title: "No exercises",
+        description: "Please add at least one exercise to log a workout",
+        variant: "destructive",
+      });
+      return;
+    }
+    createWorkoutMutation.mutate({
+      date: workoutDate,
+      exercises: workoutSession
+    });
+  };
+
+  const removeFromSession = (id: number) => {
+    setWorkoutSession(prev => prev.filter(ex => ex.id !== id));
   };
 
   if (!user) {
@@ -227,11 +275,57 @@ export default function HealthPage() {
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-6">Log New Workout</h3>
                 
+                {/* Workout Date */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Workout Date</label>
+                  <input
+                    type="date"
+                    value={workoutDate}
+                    onChange={(e) => setWorkoutDate(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
+                {/* Current Workout Session */}
+                {workoutSession.length > 0 && (
+                  <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="font-medium text-gray-900">Today's Workout ({workoutSession.length} exercises)</h4>
+                      <Button 
+                        onClick={onLogCompleteWorkout}
+                        disabled={createWorkoutMutation.isPending}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        {createWorkoutMutation.isPending ? "Logging..." : "Log Complete Workout"}
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      {workoutSession.map((exercise) => (
+                        <div key={exercise.id} className="flex justify-between items-center p-3 bg-white rounded border">
+                          <div>
+                            <span className="font-medium">{exercise.exerciseName}</span>
+                            <span className="text-sm text-gray-500 ml-2">({exercise.category})</span>
+                            {exercise.weight && <span className="text-sm text-gray-600 ml-2">{exercise.weight}lbs × {exercise.reps} × {exercise.sets}</span>}
+                            {exercise.distance && <span className="text-sm text-gray-600 ml-2">{exercise.distance}, {exercise.time}</span>}
+                            {exercise.workoutName && <span className="text-sm text-gray-600 ml-2">{exercise.workoutName}</span>}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeFromSession(exercise.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-                {/* Workout Logging Form */}
+                {/* Add Exercise Form */}
                 <Form {...workoutForm}>
-                  <form onSubmit={workoutForm.handleSubmit(onLogWorkout)} className="space-y-6">
+                  <form onSubmit={workoutForm.handleSubmit(onAddExerciseToSession)} className="space-y-6">
                     <FormField
                       control={workoutForm.control}
                       name="exerciseName"
@@ -579,9 +673,8 @@ export default function HealthPage() {
                     <Button 
                       type="submit" 
                       className="w-full bg-blue-600 hover:bg-blue-700"
-                      disabled={createWorkoutMutation.isPending}
                     >
-                      {createWorkoutMutation.isPending ? "Logging Workout..." : "Log Workout"}
+                      Add Exercise to Workout
                     </Button>
                   </form>
                 </Form>
