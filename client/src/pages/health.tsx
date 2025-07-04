@@ -1209,12 +1209,19 @@ export default function HealthPage() {
                       <div className="space-y-8">
                         {exerciseNames.map((exerciseName) => {
                           const sessions = exerciseProgress[exerciseName];
-                          if (sessions.length < 2) return null; // Need at least 2 sessions to show progress
+                          if (sessions.length < 1) return null; // Show progress even with single session
                           
                           // Use weight-based progression instead of total volume for cleaner charts
                           const weights = sessions.map(s => {
                             const workout = (workouts as any[]).find(w => w.date === s.date);
                             const exercise = workout?.workoutExercises?.find((we: any) => we.exercise?.name === exerciseName);
+                            // Debug the data structure
+                            console.log('Debug chart data:', { 
+                              exerciseName, 
+                              workout: workout?.name, 
+                              exercise: exercise,
+                              weight: exercise?.weight 
+                            });
                             return parseFloat(exercise?.weight) || 0;
                           });
                           
