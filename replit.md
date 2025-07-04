@@ -130,14 +130,14 @@ Build scripts include:
   - **NEW**: Comprehensive workout storage layer with full CRUD operations
   - **NEW**: Workout API routes for data management
   - **NEW**: Nutrition database schema (nutrition_plans, meals tables) for meal planning
-  - **DASHBOARD**: Split-layout dashboard with workout progress on left, nutrition meal plan on right
-  - **NEW**: Comprehensive wellness trends chart showing multi-line progress (weight, cardio, strength) for holistic view
+  - **DASHBOARD**: Clean split-layout dashboard with workout metrics on left, nutrition meal plan on right
   - **DESIGN**: Colorful workout metric cards (blue, green, purple, orange) matching fitness app aesthetic
   - **DESIGN**: Purple gradient nutrition section matching user screenshot with macro tracking (calories, protein, carbs, fat)
   - **FOUNDATION**: Three-tab interface: Dashboard, Log Workout, Progress tracking
-  - **CLICKABLE**: "Enter Workout Section" button navigates to dedicated workout interface with detailed progress charts
+  - **SEPARATED**: Comprehensive wellness trends chart moved to dedicated workout section (Log Workout tab)
+  - **CLICKABLE**: "Enter Workout Section" button navigates to dedicated workout interface with wellness trends and workout logging
   - **CLICKABLE**: Both workout and nutrition sections designed as separate clickable entities for future expansion
-  - Health dashboard provides quick glance at overall wellness trends plus easy access to detailed workout and nutrition tracking
+  - Clean main dashboard provides quick metric overview, detailed progress charts accessible via workout section
 - July 3, 2025: Removed Navigation Tiles + Enhanced Rules with Category Tiles
   - **REMOVED**: Navigation tiles (Goals, Habits, Read, Vision) from You page dashboard per user request
   - **ENHANCED**: Rules section with clearer failure buttons - changed from small warning icon to prominent red "BROKE RULE" button

@@ -91,72 +91,7 @@ export default function HealthPage() {
                     </div>
                   </div>
 
-                  {/* Comprehensive Wellness Trends Chart */}
-                  <div className="bg-gray-50 rounded-lg p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-sm font-medium text-gray-700">Wellness Trends</h4>
-                      <div className="flex space-x-4 text-xs">
-                        <div className="flex items-center">
-                          <div className="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
-                          <span className="text-gray-600">Weight</span>
-                        </div>
-                        <div className="flex items-center">
-                          <div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
-                          <span className="text-gray-600">Cardio</span>
-                        </div>
-                        <div className="flex items-center">
-                          <div className="w-3 h-3 bg-purple-500 rounded-full mr-1"></div>
-                          <span className="text-gray-600">Strength</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Mock Multi-line Chart */}
-                    <div className="relative h-32 bg-white rounded border">
-                      <svg viewBox="0 0 300 100" className="w-full h-full">
-                        {/* Grid lines */}
-                        <defs>
-                          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f3f4f6" strokeWidth="1"/>
-                          </pattern>
-                        </defs>
-                        <rect width="100%" height="100%" fill="url(#grid)" />
-                        
-                        {/* Weight trend line (blue) */}
-                        <polyline
-                          fill="none"
-                          stroke="#3b82f6"
-                          strokeWidth="2"
-                          points="20,80 60,75 100,70 140,65 180,60 220,58 260,55"
-                        />
-                        
-                        {/* Cardio trend line (green) */}
-                        <polyline
-                          fill="none"
-                          stroke="#10b981"
-                          strokeWidth="2"
-                          points="20,90 60,85 100,75 140,70 180,65 220,60 260,50"
-                        />
-                        
-                        {/* Strength trend line (purple) */}
-                        <polyline
-                          fill="none"
-                          stroke="#8b5cf6"
-                          strokeWidth="2"
-                          points="20,85 60,80 100,75 140,65 180,55 220,45 260,40"
-                        />
-                        
-                        {/* Data points */}
-                        <circle cx="260" cy="55" r="3" fill="#3b82f6" />
-                        <circle cx="260" cy="50" r="3" fill="#10b981" />
-                        <circle cx="260" cy="40" r="3" fill="#8b5cf6" />
-                      </svg>
-                    </div>
-                    
-                    <div className="text-center mt-3">
-                      <p className="text-xs text-gray-500">30-day wellness progress overview</p>
-                    </div>
-                  </div>
+
                 </div>
 
                 <Button 
@@ -220,12 +155,92 @@ export default function HealthPage() {
           </TabsContent>
 
           <TabsContent value="log-workout" className="mt-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Log New Workout</h3>
-              <div className="text-center py-8">
-                <Dumbbell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">Workout logging interface coming soon</p>
-                <p className="text-sm text-gray-500">Track exercises, sets, reps, and weights</p>
+            <div className="space-y-6">
+              {/* Wellness Trends Chart */}
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                  <TrendingUp className="h-5 w-5 mr-2 text-blue-600" />
+                  Workout Progress Charts
+                </h3>
+                
+                <div className="bg-gray-50 rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-sm font-medium text-gray-700">Wellness Trends</h4>
+                    <div className="flex space-x-4 text-xs">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
+                        <span className="text-gray-600">Weight</span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
+                        <span className="text-gray-600">Cardio</span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-purple-500 rounded-full mr-1"></div>
+                        <span className="text-gray-600">Strength</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Mock Multi-line Chart */}
+                  <div className="relative h-32 bg-white rounded border">
+                    <svg viewBox="0 0 300 100" className="w-full h-full">
+                      {/* Grid lines */}
+                      <defs>
+                        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f3f4f6" strokeWidth="1"/>
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill="url(#grid)" />
+                      
+                      {/* Weight trend line (blue) */}
+                      <polyline
+                        fill="none"
+                        stroke="#3b82f6"
+                        strokeWidth="2"
+                        points="20,80 60,75 100,70 140,65 180,60 220,58 260,55"
+                      />
+                      
+                      {/* Cardio trend line (green) */}
+                      <polyline
+                        fill="none"
+                        stroke="#10b981"
+                        strokeWidth="2"
+                        points="20,90 60,85 100,75 140,70 180,65 220,60 260,50"
+                      />
+                      
+                      {/* Strength trend line (purple) */}
+                      <polyline
+                        fill="none"
+                        stroke="#8b5cf6"
+                        strokeWidth="2"
+                        points="20,85 60,80 100,75 140,65 180,55 220,45 260,40"
+                      />
+                      
+                      {/* Data points */}
+                      <circle cx="260" cy="55" r="3" fill="#3b82f6" />
+                      <circle cx="260" cy="50" r="3" fill="#10b981" />
+                      <circle cx="260" cy="40" r="3" fill="#8b5cf6" />
+                    </svg>
+                  </div>
+                  
+                  <div className="text-center mt-3">
+                    <p className="text-xs text-gray-500">30-day wellness progress overview</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Workout Logger */}
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                  <Dumbbell className="h-5 w-5 mr-2 text-blue-600" />
+                  Log New Workout
+                </h3>
+                <div className="text-center py-8">
+                  <Dumbbell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">Workout logging interface coming soon</p>
+                  <p className="text-sm text-gray-500">Track exercises, sets, reps, and weights</p>
+                </div>
               </div>
             </div>
           </TabsContent>
