@@ -323,10 +323,15 @@ export default function HealthPage() {
       return response.json();
     },
     onSuccess: (newExercise) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/exercises"] });
+      // Update the cache directly with the new exercise
+      queryClient.setQueryData(["/api/exercises"], (oldData: any) => {
+        const updatedData = oldData ? [...oldData, newExercise] : [newExercise];
+        return updatedData.sort((a: any, b: any) => a.name.localeCompare(b.name));
+      });
+      
       toast({
         title: "Exercise added",
-        description: "New exercise has been added to the database.",
+        description: `"${newExercise.name}" has been added and selected.`,
       });
       
       // Auto-select the new exercise in the workout form
