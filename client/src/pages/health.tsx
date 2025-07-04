@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,9 +11,96 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Calendar, TrendingUp, Dumbbell, Weight, Trophy, Activity } from "lucide-react";
+import { Plus, Calendar, TrendingUp, Dumbbell, Weight, Trophy, Activity, Search } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
+// Common exercises database
+const COMMON_EXERCISES = [
+  // Strength - Lower Body
+  { name: "Back Squat", category: "strength" },
+  { name: "Front Squat", category: "strength" },
+  { name: "Goblet Squat", category: "strength" },
+  { name: "Bulgarian Split Squat", category: "strength" },
+  { name: "Front Foot Elevated Split Squat", category: "strength" },
+  { name: "Reverse Lunge", category: "strength" },
+  { name: "Walking Lunge", category: "strength" },
+  { name: "Romanian Deadlift", category: "strength" },
+  { name: "Conventional Deadlift", category: "strength" },
+  { name: "Sumo Deadlift", category: "strength" },
+  { name: "Single Leg Deadlift", category: "strength" },
+  { name: "Hip Thrust", category: "strength" },
+  { name: "Calf Raise", category: "strength" },
+  { name: "Leg Press", category: "strength" },
+  { name: "Leg Extension", category: "strength" },
+  { name: "Leg Curl", category: "strength" },
+
+  // Strength - Upper Body Push
+  { name: "Bench Press", category: "strength" },
+  { name: "Incline Bench Press", category: "strength" },
+  { name: "Decline Bench Press", category: "strength" },
+  { name: "Dumbbell Press", category: "strength" },
+  { name: "Overhead Press", category: "strength" },
+  { name: "Push Press", category: "strength" },
+  { name: "Dips", category: "strength" },
+  { name: "Push-ups", category: "strength" },
+  { name: "Pike Push-ups", category: "strength" },
+  { name: "Diamond Push-ups", category: "strength" },
+  { name: "Lateral Raise", category: "strength" },
+  { name: "Front Raise", category: "strength" },
+  { name: "Rear Delt Fly", category: "strength" },
+
+  // Strength - Upper Body Pull
+  { name: "Pull-ups", category: "strength" },
+  { name: "Chin-ups", category: "strength" },
+  { name: "Lat Pulldown", category: "strength" },
+  { name: "Bent Over Row", category: "strength" },
+  { name: "T-Bar Row", category: "strength" },
+  { name: "Seated Cable Row", category: "strength" },
+  { name: "Single Arm Row", category: "strength" },
+  { name: "Face Pull", category: "strength" },
+  { name: "Shrugs", category: "strength" },
+
+  // Strength - Arms
+  { name: "Bicep Curl", category: "strength" },
+  { name: "Hammer Curl", category: "strength" },
+  { name: "Preacher Curl", category: "strength" },
+  { name: "Tricep Dip", category: "strength" },
+  { name: "Tricep Extension", category: "strength" },
+  { name: "Close Grip Bench Press", category: "strength" },
+  { name: "Skull Crushers", category: "strength" },
+
+  // Strength - Core
+  { name: "Plank", category: "strength" },
+  { name: "Side Plank", category: "strength" },
+  { name: "Russian Twist", category: "strength" },
+  { name: "Mountain Climbers", category: "strength" },
+  { name: "Dead Bug", category: "strength" },
+  { name: "Bird Dog", category: "strength" },
+
+  // Cardio
+  { name: "Running", category: "cardio" },
+  { name: "Cycling", category: "cardio" },
+  { name: "Swimming", category: "cardio" },
+  { name: "Rowing", category: "cardio" },
+  { name: "Elliptical", category: "cardio" },
+  { name: "Stair Climber", category: "cardio" },
+  { name: "Jump Rope", category: "cardio" },
+  { name: "Burpees", category: "cardio" },
+
+  // Functional
+  { name: "Thrusters", category: "functional" },
+  { name: "Wall Balls", category: "functional" },
+  { name: "Box Jumps", category: "functional" },
+  { name: "Kettlebell Swings", category: "functional" },
+  { name: "Turkish Get-up", category: "functional" },
+  { name: "Farmers Walk", category: "functional" },
+  { name: "Bear Crawl", category: "functional" },
+  { name: "Battle Ropes", category: "functional" },
+];
 
 // Form schemas
 const createExerciseSchema = z.object({
@@ -72,6 +159,27 @@ export default function HealthPage() {
   const [workoutTab, setWorkoutTab] = useState("dashboard");
   const [workoutSession, setWorkoutSession] = useState<any[]>([]);
   const [workoutDate, setWorkoutDate] = useState(new Date().toISOString().split('T')[0]);
+  
+  // Exercise search state
+  const [exerciseSearchOpen, setExerciseSearchOpen] = useState(false);
+  const [exerciseSearchValue, setExerciseSearchValue] = useState("");
+  const [showAddExerciseDialog, setShowAddExerciseDialog] = useState(false);
+
+  // Combine common exercises with database exercises
+  const allExercises = useMemo(() => {
+    const dbExercises = exercises as any[];
+    const dbExerciseNames = new Set(dbExercises.map((ex: any) => ex.name));
+    const commonExercisesNotInDb = COMMON_EXERCISES.filter(ex => !dbExerciseNames.has(ex.name));
+    return [...dbExercises, ...commonExercisesNotInDb];
+  }, [exercises]);
+
+  // Filter exercises based on search
+  const filteredExercises = useMemo(() => {
+    if (!exerciseSearchValue) return allExercises;
+    return allExercises.filter(exercise =>
+      exercise.name.toLowerCase().includes(exerciseSearchValue.toLowerCase())
+    );
+  }, [allExercises, exerciseSearchValue]);
 
 
 
@@ -187,7 +295,39 @@ export default function HealthPage() {
     },
   });
 
+  // Create exercise mutation
+  const createExerciseMutation = useMutation({
+    mutationFn: async (exerciseData: z.infer<typeof createExerciseSchema>) => {
+      const response = await fetch("/api/exercises", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(exerciseData),
+      });
+      if (!response.ok) throw new Error("Failed to create exercise");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/exercises"] });
+      toast({
+        title: "Exercise added",
+        description: "New exercise has been added to the database.",
+      });
+      setShowAddExerciseDialog(false);
+      newExerciseForm.reset();
+    },
+  });
 
+  // Form for adding new exercises
+  const newExerciseForm = useForm<z.infer<typeof createExerciseSchema>>({
+    resolver: zodResolver(createExerciseSchema),
+    defaultValues: {
+      name: "",
+      category: "",
+      description: "",
+    },
+  });
 
   const onAddExerciseToSession = (data: z.infer<typeof workoutLogSchema>) => {
     // Clean up the data to remove undefined values and ensure proper types
@@ -389,9 +529,83 @@ export default function HealthPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Exercise Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="e.g., Front foot heel elevated squat" {...field} />
-                          </FormControl>
+                          <Popover open={exerciseSearchOpen} onOpenChange={setExerciseSearchOpen}>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  aria-expanded={exerciseSearchOpen}
+                                  className="w-full justify-between text-left font-normal"
+                                >
+                                  {field.value || "Search exercises..."}
+                                  <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0" align="start">
+                              <Command>
+                                <CommandInput
+                                  placeholder="Search exercises..."
+                                  value={exerciseSearchValue}
+                                  onValueChange={setExerciseSearchValue}
+                                />
+                                <CommandList>
+                                  <CommandEmpty className="py-6 text-center text-sm">
+                                    <div className="space-y-3">
+                                      <p>No exercises found.</p>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => {
+                                          setShowAddExerciseDialog(true);
+                                          setExerciseSearchOpen(false);
+                                        }}
+                                      >
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Add New Exercise
+                                      </Button>
+                                    </div>
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    {filteredExercises.map((exercise: any) => (
+                                      <CommandItem
+                                        key={exercise.name}
+                                        value={exercise.name}
+                                        onSelect={(currentValue) => {
+                                          field.onChange(currentValue);
+                                          workoutForm.setValue("category", exercise.category);
+                                          setExerciseSearchOpen(false);
+                                          setExerciseSearchValue("");
+                                        }}
+                                      >
+                                        <div className="flex flex-col">
+                                          <span>{exercise.name}</span>
+                                          <span className="text-xs text-muted-foreground capitalize">
+                                            {exercise.category}
+                                          </span>
+                                        </div>
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                  <div className="border-t p-2">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="w-full justify-start"
+                                      onClick={() => {
+                                        setShowAddExerciseDialog(true);
+                                        setExerciseSearchOpen(false);
+                                      }}
+                                    >
+                                      <Plus className="mr-2 h-4 w-4" />
+                                      Add New Exercise
+                                    </Button>
+                                  </div>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -931,6 +1145,82 @@ export default function HealthPage() {
           </div>
         </div>
       </div>
+
+      {/* Add New Exercise Dialog */}
+      <Dialog open={showAddExerciseDialog} onOpenChange={setShowAddExerciseDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add New Exercise</DialogTitle>
+          </DialogHeader>
+          <Form {...newExerciseForm}>
+            <form onSubmit={newExerciseForm.handleSubmit((data) => createExerciseMutation.mutate(data))} className="space-y-4">
+              <FormField
+                control={newExerciseForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Exercise Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Bulgarian Split Squat" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={newExerciseForm.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="strength">Strength</SelectItem>
+                        <SelectItem value="cardio">Cardio</SelectItem>
+                        <SelectItem value="functional">Functional</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={newExerciseForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Brief description of the exercise" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAddExerciseDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={createExerciseMutation.isPending}>
+                  {createExerciseMutation.isPending ? "Adding..." : "Add Exercise"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
