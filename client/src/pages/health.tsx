@@ -318,12 +318,17 @@ export default function HealthPage() {
       if (!response.ok) throw new Error("Failed to create exercise");
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (newExercise) => {
       queryClient.invalidateQueries({ queryKey: ["/api/exercises"] });
       toast({
         title: "Exercise added",
         description: "New exercise has been added to the database.",
       });
+      
+      // Auto-select the new exercise in the workout form
+      workoutForm.setValue("exerciseName", newExercise.name);
+      workoutForm.setValue("category", newExercise.category);
+      
       setShowAddExerciseDialog(false);
       newExerciseForm.reset();
     },
