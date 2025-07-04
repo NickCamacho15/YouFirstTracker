@@ -563,15 +563,21 @@ export default function HealthPage() {
                                         variant="outline"
                                         size="sm"
                                         onClick={() => {
-                                          // Pre-populate the form with the search text
-                                          newExerciseForm.setValue("name", exerciseSearchValue);
-                                          newExerciseForm.setValue("category", "functional"); // Default category
-                                          setShowAddExerciseDialog(true);
-                                          setExerciseSearchOpen(false);
+                                          // Create the exercise immediately and add to workout
+                                          const exerciseName = exerciseSearchValue.trim();
+                                          if (exerciseName) {
+                                            createExerciseMutation.mutate({
+                                              name: exerciseName,
+                                              category: "functional", // Default category
+                                              description: "",
+                                            });
+                                            setExerciseSearchOpen(false);
+                                            setExerciseSearchValue("");
+                                          }
                                         }}
                                       >
                                         <Plus className="mr-2 h-4 w-4" />
-                                        Add New Exercise
+                                        Add "{exerciseSearchValue}" Exercise
                                       </Button>
                                     </div>
                                   </CommandEmpty>
