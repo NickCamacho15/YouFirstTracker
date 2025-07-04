@@ -295,6 +295,16 @@ export default function HealthPage() {
     },
   });
 
+  // Form for adding new exercises
+  const newExerciseForm = useForm<z.infer<typeof createExerciseSchema>>({
+    resolver: zodResolver(createExerciseSchema),
+    defaultValues: {
+      name: "",
+      category: "",
+      description: "",
+    },
+  });
+
   // Create exercise mutation
   const createExerciseMutation = useMutation({
     mutationFn: async (exerciseData: z.infer<typeof createExerciseSchema>) => {
@@ -316,16 +326,6 @@ export default function HealthPage() {
       });
       setShowAddExerciseDialog(false);
       newExerciseForm.reset();
-    },
-  });
-
-  // Form for adding new exercises
-  const newExerciseForm = useForm<z.infer<typeof createExerciseSchema>>({
-    resolver: zodResolver(createExerciseSchema),
-    defaultValues: {
-      name: "",
-      category: "",
-      description: "",
     },
   });
 
