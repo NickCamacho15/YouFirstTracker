@@ -356,19 +356,19 @@ export default function HealthPage() {
                               <SelectItem value="strength">
                                 <div className="flex flex-col">
                                   <span>Strength</span>
-                                  <span className="text-xs text-gray-500">Focused on building muscle and increasing load capacity</span>
+                                  <span className="text-xs text-white/80 data-[highlighted]:text-white">Focused on building muscle and increasing load capacity</span>
                                 </div>
                               </SelectItem>
                               <SelectItem value="cardio">
                                 <div className="flex flex-col">
                                   <span>Cardio</span>
-                                  <span className="text-xs text-gray-500">Focused on endurance, heart rate, and aerobic capacity</span>
+                                  <span className="text-xs text-white/80 data-[highlighted]:text-white">Focused on endurance, heart rate, and aerobic capacity</span>
                                 </div>
                               </SelectItem>
                               <SelectItem value="functional">
                                 <div className="flex flex-col">
                                   <span>Functional</span>
-                                  <span className="text-xs text-gray-500">Blends strength, mobility, and conditioning for real-world movement</span>
+                                  <span className="text-xs text-white/80 data-[highlighted]:text-white">Blends strength, mobility, and conditioning for real-world movement</span>
                                 </div>
                               </SelectItem>
                             </SelectContent>
