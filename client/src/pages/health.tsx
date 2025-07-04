@@ -673,7 +673,7 @@ export default function HealthPage() {
                             }
                           }} value={field.value}>
                             <FormControl>
-                              <SelectTrigger className="h-10 flex items-center">
+                              <SelectTrigger className="h-10 flex items-center justify-center px-3 [&>span]:flex [&>span]:items-center [&>span]:justify-start [&>span]:w-full">
                                 <SelectValue placeholder="Select category" />
                               </SelectTrigger>
                             </FormControl>
