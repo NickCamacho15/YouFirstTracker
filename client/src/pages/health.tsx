@@ -26,23 +26,23 @@ const workoutLogSchema = z.object({
   exerciseName: z.string().min(1, "Exercise name is required"),
   category: z.string().min(1, "Please select a category"),
   // Strength fields
-  weight: z.number().min(0, "Weight must be positive").default(0),
-  reps: z.number().min(0, "Reps must be positive").default(0),
-  sets: z.number().min(0, "Sets must be positive").default(0),
+  weight: z.number().min(0, "Weight must be positive").optional(),
+  reps: z.number().min(0, "Reps must be positive").optional(),
+  sets: z.number().min(0, "Sets must be positive").optional(),
   // Cardio fields
-  distance: z.string().default(""),
-  time: z.string().default(""),
-  pace: z.string().default(""),
-  heartRate: z.number().min(0, "Heart rate must be positive").default(0),
-  cardioType: z.string().default(""),
+  distance: z.string().optional(),
+  time: z.string().optional(),
+  pace: z.string().optional(),
+  heartRate: z.number().min(0, "Heart rate must be positive").optional(),
+  cardioType: z.string().optional(),
   // Functional fields
-  workoutName: z.string().default(""),
-  timeDomain: z.string().default(""),
-  roundsCompleted: z.number().min(0, "Rounds must be positive").default(0),
-  repsPerRound: z.number().min(0, "Reps per round must be positive").default(0),
-  rpe: z.number().min(1).max(10).default(1),
-  functionalType: z.string().default(""),
-  notes: z.string().default(""),
+  workoutName: z.string().optional(),
+  timeDomain: z.string().optional(),
+  roundsCompleted: z.number().min(0, "Rounds must be positive").optional(),
+  repsPerRound: z.number().min(0, "Reps per round must be positive").optional(),
+  rpe: z.number().min(1).max(10).optional(),
+  functionalType: z.string().optional(),
+  notes: z.string().optional(),
 });
 
 export default function HealthPage() {
@@ -82,19 +82,19 @@ export default function HealthPage() {
     defaultValues: {
       exerciseName: "",
       category: "",
-      weight: 0,
-      reps: 0,
-      sets: 0,
+      weight: undefined,
+      reps: undefined,
+      sets: undefined,
       distance: "",
       time: "",
       pace: "",
-      heartRate: 0,
+      heartRate: undefined,
       cardioType: "",
       workoutName: "",
       timeDomain: "",
-      roundsCompleted: 0,
-      repsPerRound: 0,
-      rpe: 1,
+      roundsCompleted: undefined,
+      repsPerRound: undefined,
+      rpe: undefined,
       functionalType: "",
       notes: "",
     },
@@ -392,8 +392,8 @@ export default function HealthPage() {
                                   type="number" 
                                   min="0"
                                   placeholder="e.g., 135"
-                                  {...field}
-                                  onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : 0)}
+                                  value={field.value ?? ""}
+                                  onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -412,8 +412,8 @@ export default function HealthPage() {
                                   type="number" 
                                   min="0"
                                   placeholder="e.g., 12"
-                                  {...field}
-                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : 0)}
+                                  value={field.value ?? ""}
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -432,8 +432,8 @@ export default function HealthPage() {
                                   type="number" 
                                   min="0"
                                   placeholder="e.g., 3"
-                                  {...field}
-                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : 0)}
+                                  value={field.value ?? ""}
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -501,8 +501,8 @@ export default function HealthPage() {
                                     type="number" 
                                     min="0"
                                     placeholder="Avg or max BPM"
-                                    {...field}
-                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : 0)}
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -609,8 +609,8 @@ export default function HealthPage() {
                                     type="number" 
                                     min="0"
                                     placeholder="e.g., 5"
-                                    {...field}
-                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : 0)}
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -629,8 +629,8 @@ export default function HealthPage() {
                                     type="number" 
                                     min="0"
                                     placeholder="e.g., 10"
-                                    {...field}
-                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : 0)}
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -650,8 +650,8 @@ export default function HealthPage() {
                                     min="1" 
                                     max="10"
                                     placeholder="Rate of Perceived Exertion"
-                                    {...field}
-                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : 1)}
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                                   />
                                 </FormControl>
                                 <FormMessage />
