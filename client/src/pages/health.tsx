@@ -836,9 +836,7 @@ export default function HealthPage() {
   });
 
   const deleteWorkout = (workoutId: number) => {
-    if (confirm('Are you sure you want to delete this workout? This action cannot be undone.')) {
-      deleteWorkoutMutation.mutate(workoutId);
-    }
+    deleteWorkoutMutation.mutate(workoutId);
   };
 
   const onAddExerciseToSession = (data: z.infer<typeof workoutLogSchema>) => {
