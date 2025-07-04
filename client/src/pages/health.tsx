@@ -673,7 +673,7 @@ export default function HealthPage() {
                             }
                           }} value={field.value}>
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className="py-0 h-10 items-center">
                                 <SelectValue placeholder="Select category" />
                               </SelectTrigger>
                             </FormControl>
