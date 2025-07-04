@@ -132,6 +132,294 @@ const workoutLogSchema = z.object({
   notes: z.string().optional(),
 });
 
+// Exercise Progress View Component
+function ExerciseProgressView({ 
+  workouts, 
+  selectedExercise, 
+  setSelectedExercise, 
+  chartMetric, 
+  setChartMetric 
+}: {
+  workouts: any[];
+  selectedExercise: string;
+  setSelectedExercise: (exercise: string) => void;
+  chartMetric: "e1rm" | "volume";
+  setChartMetric: (metric: "e1rm" | "volume") => void;
+}) {
+  // Process workout data to extract exercise progress
+  const exerciseProgress: { [key: string]: Array<{ date: string, volume: number, session: number }> } = {};
+  
+  // Process all workouts to build exercise history
+  (workouts as any[]).forEach((workout: any) => {
+    if (workout.workoutExercises) {
+      workout.workoutExercises.forEach((we: any) => {
+        const exerciseName = we.exercise?.name || 'Unknown Exercise';
+        if (!exerciseProgress[exerciseName]) {
+          exerciseProgress[exerciseName] = [];
+        }
+        
+        // Calculate total volume: weight × reps × sets
+        const weight = parseFloat(we.weight) || 0;
+        const reps = parseInt(we.reps) || 0;
+        const sets = parseInt(we.sets) || 1;
+        const totalVolume = weight * reps * sets;
+        
+        exerciseProgress[exerciseName].push({
+          date: workout.date,
+          volume: totalVolume,
+          session: exerciseProgress[exerciseName].length + 1
+        });
+      });
+    }
+  });
+  
+  // Sort sessions by date for each exercise
+  Object.keys(exerciseProgress).forEach(exerciseName => {
+    exerciseProgress[exerciseName].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+    // Update session numbers after sorting
+    exerciseProgress[exerciseName] = exerciseProgress[exerciseName].map((session, index) => ({
+      ...session,
+      session: index + 1
+    }));
+  });
+  
+  const exerciseNames = Object.keys(exerciseProgress);
+  
+  // Set default exercise if none selected
+  if (!selectedExercise && exerciseNames.length > 0) {
+    setSelectedExercise(exerciseNames[0]);
+  }
+  
+  if (exerciseNames.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-500">No exercise data available yet.</p>
+        <p className="text-sm text-gray-400 mt-2">Start logging strength workouts to track your progress!</p>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="space-y-6">
+      {/* Exercise Selection and Metric Toggle */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div className="flex items-center gap-4">
+          <label className="text-sm font-medium text-gray-700">Exercise:</label>
+          <select 
+            value={selectedExercise} 
+            onChange={(e) => setSelectedExercise(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {exerciseNames.map(name => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <label className="text-sm font-medium text-gray-700">Metric:</label>
+          <div className="flex border border-gray-300 rounded-md overflow-hidden">
+            <button
+              onClick={() => setChartMetric("e1rm")}
+              className={`px-4 py-2 text-sm font-medium ${
+                chartMetric === "e1rm" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              e1RM
+            </button>
+            <button
+              onClick={() => setChartMetric("volume")}
+              className={`px-4 py-2 text-sm font-medium ${
+                chartMetric === "volume" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Volume
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Single Selected Exercise Chart */}
+      {selectedExercise && exerciseProgress[selectedExercise] && (
+        <RenderExerciseChart 
+          exerciseName={selectedExercise}
+          sessions={exerciseProgress[selectedExercise]}
+          workouts={workouts}
+          chartMetric={chartMetric}
+        />
+      )}
+    </div>
+  );
+}
+
+// Exercise Chart Component
+function RenderExerciseChart({ 
+  exerciseName, 
+  sessions, 
+  workouts, 
+  chartMetric 
+}: { 
+  exerciseName: string;
+  sessions: any[];
+  workouts: any[];
+  chartMetric: "e1rm" | "volume";
+}) {
+  if (sessions.length < 1) return null;
+  
+  // Calculate e1RM and volume for each session
+  const progressData = sessions.map(s => {
+    const workout = workouts.find(w => w.date === s.date);
+    const exercise = workout?.workoutExercises?.find((we: any) => we.exercise?.name === exerciseName);
+    
+    const weight = parseFloat(exercise?.weight) || 0;
+    const reps = parseInt(exercise?.reps) || 0;
+    const sets = parseInt(exercise?.sets) || 1;
+    
+    // Calculate Estimated 1-Rep Max using Brzycki formula: weight × (36 / (37 - reps))
+    const e1RM = reps > 1 ? weight * (36 / (37 - reps)) : weight;
+    const volume = weight * reps * sets;
+    
+    return {
+      date: s.date,
+      weight,
+      reps,
+      sets,
+      e1RM: Math.round(e1RM * 10) / 10, // Round to 1 decimal
+      volume
+    };
+  });
+  
+  // Determine chart values based on selected metric
+  const values = chartMetric === "e1rm" 
+    ? progressData.map(d => d.e1RM)
+    : progressData.map(d => d.volume);
+  
+  const maxValue = Math.max(...values);
+  const minValue = Math.min(...values);
+  const range = maxValue - minValue;
+  const padding = Math.max(range * 0.1, chartMetric === "e1rm" ? 5 : 50);
+  const chartMin = Math.max(0, minValue - padding);
+  const chartMax = maxValue + padding;
+  const chartRange = chartMax - chartMin;
+  
+  return (
+    <div className="border rounded-lg p-6">
+      <h4 className="text-lg font-semibold text-gray-900 mb-4">
+        {exerciseName} Progress ({chartMetric === "e1rm" ? "Estimated 1RM" : "Total Volume"})
+      </h4>
+      
+      {/* Chart Container */}
+      <div className="relative h-64 bg-gray-50 rounded-lg p-4">
+        {/* Y-axis labels */}
+        <div className="absolute left-0 top-0 bottom-0 w-16 flex flex-col justify-between text-xs text-gray-600 py-4">
+          <span>{Math.round(chartMax)} lbs</span>
+          <span>{Math.round(chartMax - chartRange * 0.25)} lbs</span>
+          <span>{Math.round(chartMax - chartRange * 0.5)} lbs</span>
+          <span>{Math.round(chartMax - chartRange * 0.75)} lbs</span>
+          <span>{Math.round(chartMin)} lbs</span>
+        </div>
+        
+        {/* Chart area */}
+        <div className="ml-16 h-full relative">
+          {/* Grid lines */}
+          <div className="absolute inset-0">
+            {[0, 0.25, 0.5, 0.75, 1].map((ratio) => (
+              <div
+                key={ratio}
+                className="absolute w-full border-t border-gray-200"
+                style={{ top: `${ratio * 100}%` }}
+              />
+            ))}
+          </div>
+          
+          {/* Progress line */}
+          <svg className="absolute inset-0 w-full h-full">
+            <defs>
+              <linearGradient id={`gradient-${exerciseName}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#e0f2fe" stopOpacity="0.3" />
+              </linearGradient>
+            </defs>
+            
+            {/* Light blue area under the curve */}
+            <path
+              d={`M 0 100 ${values.map((value, index) => {
+                const x = (index / (values.length - 1)) * 100;
+                const y = 100 - ((value - chartMin) / chartRange) * 100;
+                return `L ${x} ${y}`;
+              }).join(' ')} L 100 100 Z`}
+              fill={`url(#gradient-${exerciseName})`}
+            />
+            
+            {/* Progress line */}
+            <polyline
+              points={values.map((value, index) => {
+                const x = (index / (values.length - 1)) * 100;
+                const y = 100 - ((value - chartMin) / chartRange) * 100;
+                return `${x},${y}`;
+              }).join(' ')}
+              fill="none"
+              stroke="#3b82f6"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            
+            {/* Data points with tooltips */}
+            {values.map((value, index) => {
+              const x = (index / (values.length - 1)) * 100;
+              const y = 100 - ((value - chartMin) / chartRange) * 100;
+              const data = progressData[index];
+              return (
+                <g key={index}>
+                  <circle
+                    cx={`${x}%`}
+                    cy={`${y}%`}
+                    r="4"
+                    fill="#3b82f6"
+                    stroke="white"
+                    strokeWidth="2"
+                  />
+                  <title>
+                    {`Date: ${new Date(data.date).toLocaleDateString()}\nWeight: ${data.weight} lbs\nReps: ${data.reps}\nSets: ${data.sets}\ne1RM: ${data.e1RM} lbs\nVolume: ${data.volume} lbs`}
+                  </title>
+                </g>
+              );
+            })}
+          </svg>
+          
+          {/* X-axis labels with dates */}
+          <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-gray-600 pt-2">
+            {progressData.map((data, index) => (
+              <span key={index} className="text-center">
+                {new Date(data.date).toLocaleDateString('en-US', { 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      {/* Progress summary */}
+      <div className="mt-4 flex justify-between text-sm">
+        <span className="text-gray-600">
+          Latest: {chartMetric === "e1rm" 
+            ? `${progressData[progressData.length - 1].e1RM} lbs e1RM`
+            : `${progressData[progressData.length - 1].volume} lbs volume`
+          }
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function HealthPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -159,6 +447,10 @@ export default function HealthPage() {
   const [workoutTab, setWorkoutTab] = useState("log-workout");
   const [workoutSession, setWorkoutSession] = useState<any[]>([]);
   const [workoutDate, setWorkoutDate] = useState(new Date().toISOString().split('T')[0]);
+  
+  // Progress chart controls
+  const [selectedExercise, setSelectedExercise] = useState<string>("");
+  const [chartMetric, setChartMetric] = useState<"e1rm" | "volume">("e1rm");
   
   // Exercise search state
   const [exerciseSearchOpen, setExerciseSearchOpen] = useState(false);
@@ -1156,188 +1448,15 @@ export default function HealthPage() {
                     <div className="text-center py-8">
                       <p className="text-gray-500">Loading progress data...</p>
                     </div>
-                  ) : (() => {
-                    // Process workout data to extract exercise progress
-                    const exerciseProgress: { [key: string]: Array<{ date: string, volume: number, session: number }> } = {};
-                    
-                    // Process all workouts to build exercise history
-                    (workouts as any[]).forEach((workout: any) => {
-                      if (workout.workoutExercises) {
-                        workout.workoutExercises.forEach((we: any) => {
-                          const exerciseName = we.exercise?.name || 'Unknown Exercise';
-                          if (!exerciseProgress[exerciseName]) {
-                            exerciseProgress[exerciseName] = [];
-                          }
-                          
-                          // Calculate total volume: weight × reps × sets
-                          const weight = parseFloat(we.weight) || 0;
-                          const reps = parseInt(we.reps) || 0;
-                          const sets = parseInt(we.sets) || 1;
-                          const volume = weight * reps * sets;
-                          
-                          exerciseProgress[exerciseName].push({
-                            date: workout.date,
-                            volume: volume,
-                            session: exerciseProgress[exerciseName].length + 1
-                          });
-                        });
-                      }
-                    });
-                    
-                    // Sort each exercise's sessions by date
-                    Object.keys(exerciseProgress).forEach(exercise => {
-                      exerciseProgress[exercise].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-                      // Update session numbers after sorting
-                      exerciseProgress[exercise] = exerciseProgress[exercise].map((session, index) => ({
-                        ...session,
-                        session: index + 1
-                      }));
-                    });
-                    
-                    const exerciseNames = Object.keys(exerciseProgress);
-                    
-                    if (exerciseNames.length === 0) {
-                      return (
-                        <div className="text-center py-8">
-                          <p className="text-gray-500">No exercise data available yet.</p>
-                          <p className="text-sm text-gray-400 mt-2">Start logging strength workouts to track your progress!</p>
-                        </div>
-                      );
-                    }
-                    
-                    return (
-                      <div className="space-y-8">
-                        {exerciseNames.map((exerciseName) => {
-                          const sessions = exerciseProgress[exerciseName];
-                          if (sessions.length < 1) return null; // Show progress even with single session
-                          
-                          // Use weight-based progression instead of total volume for cleaner charts
-                          const weights = sessions.map(s => {
-                            const workout = (workouts as any[]).find(w => w.date === s.date);
-                            const exercise = workout?.workoutExercises?.find((we: any) => we.exercise?.name === exerciseName);
-                            // Debug the data structure
-                            console.log('Debug chart data:', { 
-                              exerciseName, 
-                              workout: workout?.name, 
-                              exercise: exercise,
-                              weight: exercise?.weight 
-                            });
-                            return parseFloat(exercise?.weight) || 0;
-                          });
-                          
-                          const maxWeight = Math.max(...weights);
-                          const minWeight = Math.min(...weights);
-                          const range = maxWeight - minWeight;
-                          const padding = Math.max(range * 0.1, 5); // At least 5 lbs padding
-                          const chartMin = Math.max(0, minWeight - padding);
-                          const chartMax = maxWeight + padding;
-                          const chartRange = chartMax - chartMin;
-                          
-                          return (
-                            <div key={exerciseName} className="border rounded-lg p-6">
-                              <h4 className="text-lg font-semibold text-gray-900 mb-4">{exerciseName} Progress</h4>
-                              
-                              {/* Chart Container */}
-                              <div className="relative h-64 bg-gray-50 rounded-lg p-4">
-                                {/* Y-axis labels */}
-                                <div className="absolute left-0 top-0 bottom-0 w-16 flex flex-col justify-between text-xs text-gray-600 py-4">
-                                  <span>{Math.round(chartMax)} lbs</span>
-                                  <span>{Math.round(chartMax - chartRange * 0.25)} lbs</span>
-                                  <span>{Math.round(chartMax - chartRange * 0.5)} lbs</span>
-                                  <span>{Math.round(chartMax - chartRange * 0.75)} lbs</span>
-                                  <span>{Math.round(chartMin)} lbs</span>
-                                </div>
-                                
-                                {/* Chart area */}
-                                <div className="ml-16 h-full relative">
-                                  {/* Grid lines */}
-                                  <div className="absolute inset-0">
-                                    {[0, 0.25, 0.5, 0.75, 1].map((ratio) => (
-                                      <div
-                                        key={ratio}
-                                        className="absolute w-full border-t border-gray-200"
-                                        style={{ top: `${ratio * 100}%` }}
-                                      />
-                                    ))}
-                                  </div>
-                                  
-                                  {/* Progress line */}
-                                  <svg className="absolute inset-0 w-full h-full">
-                                    <defs>
-                                      <linearGradient id={`gradient-${exerciseName}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.8" />
-                                        <stop offset="100%" stopColor="#e0f2fe" stopOpacity="0.3" />
-                                      </linearGradient>
-                                    </defs>
-                                    
-                                    {/* Light blue area under the curve */}
-                                    <path
-                                      d={`M 0 100 ${weights.map((weight, index) => {
-                                        const x = (index / (weights.length - 1)) * 100;
-                                        const y = 100 - ((weight - chartMin) / chartRange) * 100;
-                                        return `L ${x} ${y}`;
-                                      }).join(' ')} L 100 100 Z`}
-                                      fill={`url(#gradient-${exerciseName})`}
-                                    />
-                                    
-                                    {/* Progress line */}
-                                    <polyline
-                                      points={weights.map((weight, index) => {
-                                        const x = (index / (weights.length - 1)) * 100;
-                                        const y = 100 - ((weight - chartMin) / chartRange) * 100;
-                                        return `${x},${y}`;
-                                      }).join(' ')}
-                                      fill="none"
-                                      stroke="#3b82f6"
-                                      strokeWidth="3"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                    
-                                    {/* Data points */}
-                                    {weights.map((weight, index) => {
-                                      const x = (index / (weights.length - 1)) * 100;
-                                      const y = 100 - ((weight - chartMin) / chartRange) * 100;
-                                      return (
-                                        <circle
-                                          key={index}
-                                          cx={`${x}%`}
-                                          cy={`${y}%`}
-                                          r="4"
-                                          fill="#3b82f6"
-                                          stroke="white"
-                                          strokeWidth="2"
-                                        />
-                                      );
-                                    })}
-                                  </svg>
-                                  
-                                  {/* X-axis labels with dates */}
-                                  <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-gray-600 pt-2">
-                                    {sessions.map((session, index) => (
-                                      <span key={index} className="text-center">
-                                        {new Date(session.date).toLocaleDateString('en-US', { 
-                                          month: 'short', 
-                                          day: 'numeric' 
-                                        })}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              {/* Progress summary */}
-                              <div className="mt-4 flex justify-between text-sm">
-                                <span className="text-gray-600">
-                                  Latest: {Math.round(weights[weights.length - 1])} lbs
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        }).filter(Boolean)}
-                      </div>
-                    );
-                  })()}
+                  ) : (
+                    <ExerciseProgressView 
+                      workouts={workouts as any[]}
+                      selectedExercise={selectedExercise}
+                      setSelectedExercise={setSelectedExercise}
+                      chartMetric={chartMetric}
+                      setChartMetric={setChartMetric}
+                    />
+                  )}
                 </div>
               </div>
             </TabsContent>
