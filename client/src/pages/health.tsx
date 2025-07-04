@@ -589,19 +589,19 @@ export default function HealthPage() {
                                     <span className="font-medium text-gray-900">{we.exercise?.name || 'Unknown Exercise'}</span>
                                     <div className="flex gap-3 text-gray-600">
                                       {we.weight && (
-                                        <span className="text-blue-600">{we.weight} lbs</span>
+                                        <span className="text-black">{we.weight} lbs</span>
                                       )}
                                       {we.reps && (
-                                        <span className="text-green-600">{we.reps} reps</span>
+                                        <span className="text-black">{we.reps} reps</span>
                                       )}
                                       {we.sets && (
-                                        <span className="text-purple-600">{we.sets} sets</span>
+                                        <span className="text-black">{we.sets} sets</span>
                                       )}
                                       {we.distance && (
-                                        <span className="text-orange-600">{we.distance}m</span>
+                                        <span className="text-black">{we.distance}m</span>
                                       )}
                                       {we.duration && (
-                                        <span className="text-red-600">{we.duration} min</span>
+                                        <span className="text-black">{we.duration} min</span>
                                       )}
                                     </div>
                                   </div>
@@ -612,19 +612,19 @@ export default function HealthPage() {
                           
                           {/* Workout Notes */}
                           {workout.notes && (
-                            <div className="mt-3 p-3 bg-blue-50 rounded-md">
-                              <p className="text-sm text-gray-700"><strong>Workout Notes:</strong> {workout.notes}</p>
+                            <div className="mt-3 p-3 bg-gray-50 rounded-md">
+                              <p className="text-sm text-black"><strong>Workout Notes:</strong> {workout.notes}</p>
                             </div>
                           )}
                           
                           {/* Exercise Notes */}
                           {workout.workoutExercises && workout.workoutExercises.some((we: any) => we.notes) && (
                             <div className="mt-3 space-y-2">
-                              <h5 className="text-sm font-medium text-gray-700">Exercise Notes:</h5>
+                              <h5 className="text-sm font-medium text-black">Exercise Notes:</h5>
                               {workout.workoutExercises.filter((we: any) => we.notes).map((we: any) => (
-                                <div key={we.id} className="p-2 bg-yellow-50 rounded text-sm">
-                                  <span className="font-medium text-yellow-800">{we.exercise?.name}:</span> 
-                                  <span className="text-yellow-700 ml-1">{we.notes}</span>
+                                <div key={we.id} className="p-2 bg-gray-50 rounded text-sm">
+                                  <span className="font-medium text-black">{we.exercise?.name}:</span> 
+                                  <span className="text-black ml-1">{we.notes}</span>
                                 </div>
                               ))}
                             </div>
@@ -1323,10 +1323,6 @@ export default function HealthPage() {
                               <div className="mt-4 flex justify-between text-sm">
                                 <span className="text-gray-600">
                                   Latest: {Math.round(weights[weights.length - 1])} lbs
-                                </span>
-                                <span className={`font-medium ${weights[weights.length - 1] > weights[0] ? 'text-green-600' : 'text-red-600'}`}>
-                                  {weights[weights.length - 1] > weights[0] ? '+' : ''}
-                                  {Math.round(weights[weights.length - 1] - weights[0])} lbs from start
                                 </span>
                               </div>
                             </div>
