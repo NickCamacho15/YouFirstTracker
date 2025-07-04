@@ -129,10 +129,13 @@ Build scripts include:
   - **NEW**: Workout database schema (workouts, exercises, workout_exercises, body_weight_logs tables)
   - **NEW**: Comprehensive workout storage layer with full CRUD operations
   - **NEW**: Workout API routes for data management
-  - **FOUNDATION**: Dashboard shows workout metrics (This Week, Total Workouts, Current Weight, Last Workout)
+  - **NEW**: Nutrition database schema (nutrition_plans, meals tables) for meal planning
+  - **DASHBOARD**: Split-layout dashboard with workout progress charts on left, nutrition meal plan on right
+  - **DESIGN**: Colorful workout metric cards (blue, green, purple, orange) matching fitness app aesthetic
+  - **DESIGN**: Purple gradient nutrition section matching user screenshot with macro tracking (calories, protein, carbs, fat)
   - **FOUNDATION**: Three-tab interface: Dashboard, Log Workout, Progress tracking
-  - **DESIGN**: Colorful metric cards matching fitness app aesthetic from user screenshots
-  - Health section designed to expand with nutrition tracking and comprehensive fitness analytics
+  - **CLICKABLE**: Both workout and nutrition sections designed as separate clickable entities for future expansion
+  - Health section provides quick glance at both fitness progress and daily meal plan overview
 - July 3, 2025: Removed Navigation Tiles + Enhanced Rules with Category Tiles
   - **REMOVED**: Navigation tiles (Goals, Habits, Read, Vision) from You page dashboard per user request
   - **ENHANCED**: Rules section with clearer failure buttons - changed from small warning icon to prominent red "BROKE RULE" button

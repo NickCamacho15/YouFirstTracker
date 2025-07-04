@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, date, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, date, uuid, varchar, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -222,6 +222,37 @@ export const bodyWeightLogs = pgTable("body_weight_logs", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Nutrition Plan
+export const nutritionPlans = pgTable("nutrition_plans", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  dailyCalories: integer("daily_calories").notNull(),
+  proteinGrams: integer("protein_grams").notNull(),
+  carbsGrams: integer("carbs_grams").notNull(),
+  fatGrams: integer("fat_grams").notNull(),
+  isActive: boolean("is_active").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Meals
+export const meals = pgTable("meals", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  nutritionPlanId: integer("nutrition_plan_id").references(() => nutritionPlans.id),
+  name: varchar("name", { length: 255 }).notNull(),
+  mealType: varchar("meal_type", { length: 50 }).notNull(), // breakfast, lunch, dinner, snack
+  calories: integer("calories").notNull(),
+  proteinGrams: decimal("protein_grams", { precision: 6, scale: 2 }).notNull(),
+  carbsGrams: decimal("carbs_grams", { precision: 6, scale: 2 }).notNull(),
+  fatGrams: decimal("fat_grams", { precision: 6, scale: 2 }).notNull(),
+  ingredients: text("ingredients").array(),
+  instructions: text("instructions"),
+  date: date("date").notNull(),
+  isCompleted: boolean("is_completed").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -343,6 +374,18 @@ export const insertBodyWeightLogSchema = createInsertSchema(bodyWeightLogs).omit
   date: z.string().transform((val) => val),
 });
 
+export const insertNutritionPlanSchema = createInsertSchema(nutritionPlans).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertMealSchema = createInsertSchema(meals).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  date: z.string().transform((val) => val),
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -384,3 +427,7 @@ export type WorkoutExercise = typeof workoutExercises.$inferSelect;
 export type InsertWorkoutExercise = z.infer<typeof insertWorkoutExerciseSchema>;
 export type BodyWeightLog = typeof bodyWeightLogs.$inferSelect;
 export type InsertBodyWeightLog = z.infer<typeof insertBodyWeightLogSchema>;
+export type NutritionPlan = typeof nutritionPlans.$inferSelect;
+export type InsertNutritionPlan = z.infer<typeof insertNutritionPlanSchema>;
+export type Meal = typeof meals.$inferSelect;
+export type InsertMeal = z.infer<typeof insertMealSchema>;
