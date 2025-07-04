@@ -70,17 +70,9 @@ export default function HealthPage() {
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [workoutTab, setWorkoutTab] = useState("dashboard");
-  const [isAddingNewExercise, setIsAddingNewExercise] = useState(false);
 
-  // Form for creating new exercises
-  const exerciseForm = useForm<z.infer<typeof createExerciseSchema>>({
-    resolver: zodResolver(createExerciseSchema),
-    defaultValues: {
-      name: "",
-      category: "strength",
-      description: "",
-    },
-  });
+
+
 
   // Form for logging workouts
   const workoutForm = useForm<z.infer<typeof workoutLogSchema>>({
@@ -109,36 +101,7 @@ export default function HealthPage() {
   // Get selected category to determine which fields to show
   const selectedCategory = workoutForm.watch("category");
 
-  // Create exercise mutation
-  const createExerciseMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof createExerciseSchema>) => {
-      const response = await fetch("/api/exercises", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error("Failed to create exercise");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/exercises"] });
-      toast({
-        title: "Exercise created",
-        description: "Your new exercise has been added to the dropdown.",
-      });
-      exerciseForm.reset();
-      setIsAddingNewExercise(false);
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to create exercise. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
+
 
   // Create workout log mutation
   const createWorkoutMutation = useMutation({
@@ -198,9 +161,7 @@ export default function HealthPage() {
     },
   });
 
-  const onCreateExercise = (data: z.infer<typeof createExerciseSchema>) => {
-    createExerciseMutation.mutate(data);
-  };
+
 
   const onLogWorkout = (data: z.infer<typeof workoutLogSchema>) => {
     createWorkoutMutation.mutate(data);
@@ -266,94 +227,7 @@ export default function HealthPage() {
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-6">Log New Workout</h3>
                 
-                {/* Add New Exercise Section */}
-                {isAddingNewExercise ? (
-                  <div className="mb-6 p-4 border rounded-lg bg-blue-50">
-                    <Form {...exerciseForm}>
-                      <form onSubmit={exerciseForm.handleSubmit(onCreateExercise)} className="space-y-4">
-                        <FormField
-                          control={exerciseForm.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Exercise Name</FormLabel>
-                              <FormControl>
-                                <Input placeholder="e.g., Front foot heel elevated squat" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={exerciseForm.control}
-                          name="category"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Category</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select category" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="strength">
-                                    <div className="flex flex-col">
-                                      <span>Strength</span>
-                                      <span className="text-xs text-gray-500">Focused on building muscle and increasing load capacity</span>
-                                    </div>
-                                  </SelectItem>
-                                  <SelectItem value="cardio">
-                                    <div className="flex flex-col">
-                                      <span>Cardio</span>
-                                      <span className="text-xs text-gray-500">Focused on endurance, heart rate, and aerobic capacity</span>
-                                    </div>
-                                  </SelectItem>
-                                  <SelectItem value="functional">
-                                    <div className="flex flex-col">
-                                      <span>Functional</span>
-                                      <span className="text-xs text-gray-500">Blends strength, mobility, and conditioning for real-world movement</span>
-                                    </div>
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
 
-                        <div className="flex gap-2">
-                          <Button 
-                            type="submit" 
-                            disabled={createExerciseMutation.isPending}
-                            className="bg-blue-600 hover:bg-blue-700"
-                          >
-                            {createExerciseMutation.isPending ? "Adding..." : "Add Exercise"}
-                          </Button>
-                          <Button 
-                            type="button" 
-                            variant="outline" 
-                            onClick={() => setIsAddingNewExercise(false)}
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </div>
-                ) : (
-                  <div className="mb-6">
-                    <Button 
-                      onClick={() => setIsAddingNewExercise(true)}
-                      variant="outline"
-                      className="w-full border-dashed border-2 border-gray-300 hover:border-blue-500"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add New Exercise
-                    </Button>
-                  </div>
-                )}
 
                 {/* Workout Logging Form */}
                 <Form {...workoutForm}>
@@ -409,13 +283,6 @@ export default function HealthPage() {
                         </FormItem>
                       )}
                     />
-
-                    {/* Debug: Show current category */}
-                    {selectedCategory && (
-                      <div className="text-sm text-gray-600 mb-4">
-                        Selected category: {selectedCategory}
-                      </div>
-                    )}
 
                     {/* Conditional fields based on selected category */}
                     {selectedCategory === "strength" && (
