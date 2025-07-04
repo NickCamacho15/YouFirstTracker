@@ -184,12 +184,53 @@ export default function HealthPage() {
 
 
   const onAddExerciseToSession = (data: z.infer<typeof workoutLogSchema>) => {
+    // Clean up the data to remove undefined values and ensure proper types
+    const cleanedData = {
+      exerciseName: data.exerciseName,
+      category: data.category,
+      // Convert undefined to null for numeric fields
+      weight: data.weight || null,
+      reps: data.reps || null,
+      sets: data.sets || null,
+      heartRate: data.heartRate || null,
+      roundsCompleted: data.roundsCompleted || null,
+      repsPerRound: data.repsPerRound || null,
+      rpe: data.rpe || null,
+      // Keep string fields as empty strings if undefined
+      distance: data.distance || "",
+      time: data.time || "",
+      pace: data.pace || "",
+      cardioType: data.cardioType || "",
+      workoutName: data.workoutName || "",
+      timeDomain: data.timeDomain || "",
+      functionalType: data.functionalType || "",
+      notes: data.notes || "",
+    };
+
     const newExercise = {
       id: Date.now(), // temporary ID for session
-      ...data
+      ...cleanedData
     };
     setWorkoutSession(prev => [...prev, newExercise]);
-    workoutForm.reset();
+    workoutForm.reset({
+      exerciseName: "",
+      category: "",
+      weight: undefined,
+      reps: undefined,
+      sets: undefined,
+      distance: "",
+      time: "",
+      pace: "",
+      heartRate: undefined,
+      cardioType: "",
+      workoutName: "",
+      timeDomain: "",
+      roundsCompleted: undefined,
+      repsPerRound: undefined,
+      rpe: undefined,
+      functionalType: "",
+      notes: "",
+    });
     toast({
       title: "Exercise added",
       description: `${data.exerciseName} added to today's workout`,
@@ -305,8 +346,18 @@ export default function HealthPage() {
                           <div>
                             <span className="font-medium">{exercise.exerciseName}</span>
                             <span className="text-sm text-gray-500 ml-2">({exercise.category})</span>
-                            {exercise.weight && <span className="text-sm text-gray-600 ml-2">{exercise.weight}lbs × {exercise.reps} × {exercise.sets}</span>}
-                            {exercise.distance && <span className="text-sm text-gray-600 ml-2">{exercise.distance}, {exercise.time}</span>}
+                            {(exercise.weight || exercise.reps || exercise.sets) && (
+                              <span className="text-sm text-gray-600 ml-2">
+                                {exercise.weight ? `${exercise.weight}lbs` : ''} 
+                                {exercise.reps ? ` × ${exercise.reps}` : ''}
+                                {exercise.sets ? ` × ${exercise.sets}` : ''}
+                              </span>
+                            )}
+                            {(exercise.distance || exercise.time) && (
+                              <span className="text-sm text-gray-600 ml-2">
+                                {exercise.distance || ''}{exercise.distance && exercise.time ? ', ' : ''}{exercise.time || ''}
+                              </span>
+                            )}
                             {exercise.workoutName && <span className="text-sm text-gray-600 ml-2">{exercise.workoutName}</span>}
                           </div>
                           <Button
