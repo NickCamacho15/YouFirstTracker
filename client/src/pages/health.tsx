@@ -282,10 +282,7 @@ function CompactExerciseChart({
       {/* Progress summary */}
       <div className="mt-2 flex justify-between text-xs text-gray-600">
         <span>
-          Latest: {chartMetric === "e1rm" 
-            ? `${progressData[progressData.length - 1].e1RM} lbs`
-            : `${progressData[progressData.length - 1].volume} lbs`
-          }
+          Latest: {progressData[progressData.length - 1].weight} lbs
         </span>
         <span>{progressData.length} sessions</span>
       </div>
@@ -299,13 +296,19 @@ function ExerciseProgressView({
   selectedExercise, 
   setSelectedExercise, 
   chartMetric, 
-  setChartMetric 
+  setChartMetric,
+  exerciseFilter,
+  setExerciseFilter,
+  exercises
 }: {
   workouts: any[];
   selectedExercise: string;
   setSelectedExercise: (exercise: string) => void;
   chartMetric: "e1rm" | "volume";
   setChartMetric: (metric: "e1rm" | "volume") => void;
+  exerciseFilter: "all" | "strength" | "cardio" | "functional";
+  setExerciseFilter: (filter: "all" | "strength" | "cardio" | "functional") => void;
+  exercises: any[];
 }) {
   // Process workout data to extract exercise progress
   const exerciseProgress: { [key: string]: Array<{ date: string, volume: number, session: number }> } = {};
@@ -345,43 +348,115 @@ function ExerciseProgressView({
     }));
   });
   
-  const exerciseNames = Object.keys(exerciseProgress);
+  // Filter exercises by category
+  const filteredExerciseProgress: { [key: string]: Array<{ date: string, volume: number, session: number }> } = {};
+  
+  Object.keys(exerciseProgress).forEach(exerciseName => {
+    const exercise = exercises?.find(ex => ex.name === exerciseName);
+    const exerciseCategory = exercise?.category || 'strength';
+    
+    const shouldInclude = exerciseFilter === 'all' || 
+      (exerciseFilter === 'strength' && exerciseCategory === 'strength') ||
+      (exerciseFilter === 'cardio' && exerciseCategory === 'cardio') ||
+      (exerciseFilter === 'functional' && exerciseCategory === 'functional');
+    
+    if (shouldInclude) {
+      filteredExerciseProgress[exerciseName] = exerciseProgress[exerciseName];
+    }
+  });
+  
+  const exerciseNames = Object.keys(filteredExerciseProgress);
   
   if (exerciseNames.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">No exercise data available yet.</p>
-        <p className="text-sm text-gray-400 mt-2">Start logging strength workouts to track your progress!</p>
+        <p className="text-gray-500">
+          {exerciseFilter === 'all' 
+            ? 'No exercise data available yet.' 
+            : `No ${exerciseFilter} exercises logged yet.`
+          }
+        </p>
+        <p className="text-sm text-gray-400 mt-2">Start logging workouts to track your progress!</p>
       </div>
     );
   }
   
   return (
     <div className="space-y-6">
-      {/* Metric Toggle */}
-      <div className="flex items-center justify-center gap-4">
-        <label className="text-sm font-medium text-gray-700">Metric:</label>
-        <div className="flex border border-gray-300 rounded-md overflow-hidden">
-          <button
-            onClick={() => setChartMetric("e1rm")}
-            className={`px-4 py-2 text-sm font-medium ${
-              chartMetric === "e1rm" 
-                ? "bg-blue-600 text-white" 
-                : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            e1RM
-          </button>
-          <button
-            onClick={() => setChartMetric("volume")}
-            className={`px-4 py-2 text-sm font-medium ${
-              chartMetric === "volume" 
-                ? "bg-blue-600 text-white" 
-                : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            Volume
-          </button>
+      {/* Category Filter and Metric Toggle */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        {/* Category Filter */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">Category:</label>
+          <div className="flex border border-gray-300 rounded-md overflow-hidden">
+            <button
+              onClick={() => setExerciseFilter("all")}
+              className={`px-3 py-2 text-sm font-medium ${
+                exerciseFilter === "all" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setExerciseFilter("strength")}
+              className={`px-3 py-2 text-sm font-medium ${
+                exerciseFilter === "strength" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Strength
+            </button>
+            <button
+              onClick={() => setExerciseFilter("cardio")}
+              className={`px-3 py-2 text-sm font-medium ${
+                exerciseFilter === "cardio" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Cardio
+            </button>
+            <button
+              onClick={() => setExerciseFilter("functional")}
+              className={`px-3 py-2 text-sm font-medium ${
+                exerciseFilter === "functional" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Functional
+            </button>
+          </div>
+        </div>
+        
+        {/* Metric Toggle */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">Metric:</label>
+          <div className="flex border border-gray-300 rounded-md overflow-hidden">
+            <button
+              onClick={() => setChartMetric("e1rm")}
+              className={`px-4 py-2 text-sm font-medium ${
+                chartMetric === "e1rm" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              e1RM
+            </button>
+            <button
+              onClick={() => setChartMetric("volume")}
+              className={`px-4 py-2 text-sm font-medium ${
+                chartMetric === "volume" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Volume
+            </button>
+          </div>
         </div>
       </div>
       
@@ -391,7 +466,7 @@ function ExerciseProgressView({
           <CompactExerciseChart 
             key={exerciseName}
             exerciseName={exerciseName}
-            sessions={exerciseProgress[exerciseName]}
+            sessions={filteredExerciseProgress[exerciseName]}
             workouts={workouts}
             chartMetric={chartMetric}
           />
@@ -595,6 +670,7 @@ export default function HealthPage() {
   // Progress chart controls
   const [selectedExercise, setSelectedExercise] = useState<string>("");
   const [chartMetric, setChartMetric] = useState<"e1rm" | "volume">("e1rm");
+  const [exerciseFilter, setExerciseFilter] = useState<"all" | "strength" | "cardio" | "functional">("all");
   
   // Exercise search state
   const [exerciseSearchOpen, setExerciseSearchOpen] = useState(false);
@@ -1586,7 +1662,7 @@ export default function HealthPage() {
                 <div className="bg-white rounded-lg shadow-sm p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-6">Exercise Progress</h3>
                   
-                  {workoutsLoading ? (
+                  {workoutsLoading || exercisesLoading ? (
                     <div className="text-center py-8">
                       <p className="text-gray-500">Loading progress data...</p>
                     </div>
@@ -1597,6 +1673,9 @@ export default function HealthPage() {
                       setSelectedExercise={setSelectedExercise}
                       chartMetric={chartMetric}
                       setChartMetric={setChartMetric}
+                      exerciseFilter={exerciseFilter}
+                      setExerciseFilter={setExerciseFilter}
+                      exercises={exercises as any[]}
                     />
                   )}
                 </div>

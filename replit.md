@@ -123,6 +123,14 @@ Build scripts include:
 
 ## Changelog
 
+- July 4, 2025: Enhanced Exercise Progress Tracking with Category Filtering and Latest Weight Display  
+  - **FIXED**: "Latest" weight now displays actual last weight entered instead of calculated metrics (e.g., "150 lbs" for last bench press)
+  - **ENHANCED**: Added category filtering system with buttons: All, Strength, Cardio, and Functional
+  - **IMPROVED**: Exercise progress charts now filter by category, showing only relevant exercises
+  - **STREAMLINED**: Removed browser confirmation dialog for workout deletion - now direct one-click deletion
+  - **UI**: Category and metric toggle buttons positioned side-by-side for better usability
+  - **SAFETY**: Added loading states and null checks to prevent errors during data loading
+  - Progress view now shows filtered exercises based on selected category with proper loading states
 - July 4, 2025: Enhanced Workout Tracking with Category-Specific Metrics and Tooltips
   - **ENHANCED**: Exercise categories updated with detailed tooltips: Strength (muscle/load capacity), Cardio (endurance/aerobic), Functional (real-world movement)
   - **NEW**: Category-specific tracking metrics for comprehensive workout logging
