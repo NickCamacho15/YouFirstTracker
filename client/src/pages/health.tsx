@@ -132,6 +132,167 @@ const workoutLogSchema = z.object({
   notes: z.string().optional(),
 });
 
+// Compact Exercise Chart Component for Grid Display
+function CompactExerciseChart({ 
+  exerciseName, 
+  sessions, 
+  workouts, 
+  chartMetric 
+}: { 
+  exerciseName: string;
+  sessions: any[];
+  workouts: any[];
+  chartMetric: "e1rm" | "volume";
+}) {
+  if (sessions.length < 1) return null;
+  
+  // Calculate e1RM and volume for each session
+  const progressData = sessions.map(s => {
+    const workout = workouts.find(w => w.date === s.date);
+    const exercise = workout?.workoutExercises?.find((we: any) => we.exercise?.name === exerciseName);
+    
+    const weight = parseFloat(exercise?.weight) || 0;
+    const reps = parseInt(exercise?.reps) || 0;
+    const sets = parseInt(exercise?.sets) || 1;
+    
+    // Calculate Estimated 1-Rep Max using Brzycki formula: weight × (36 / (37 - reps))
+    const e1RM = reps > 1 ? weight * (36 / (37 - reps)) : weight;
+    const volume = weight * reps * sets;
+    
+    return {
+      date: s.date,
+      weight,
+      reps,
+      sets,
+      e1RM: Math.round(e1RM * 10) / 10, // Round to 1 decimal
+      volume
+    };
+  });
+  
+  // Determine chart values based on selected metric
+  const values = chartMetric === "e1rm" 
+    ? progressData.map(d => d.e1RM)
+    : progressData.map(d => d.volume);
+  
+  const maxValue = Math.max(...values);
+  const minValue = Math.min(...values);
+  const range = maxValue - minValue;
+  const padding = Math.max(range * 0.1, chartMetric === "e1rm" ? 5 : 50);
+  const chartMin = Math.max(0, minValue - padding);
+  const chartMax = maxValue + padding;
+  const chartRange = chartMax - chartMin;
+  
+  // Generate unique colors for each exercise
+  const colors = [
+    { line: "#3b82f6", gradient: "#e0f2fe" }, // blue
+    { line: "#10b981", gradient: "#d1fae5" }, // green
+    { line: "#f59e0b", gradient: "#fef3c7" }, // yellow
+    { line: "#ef4444", gradient: "#fee2e2" }, // red
+    { line: "#8b5cf6", gradient: "#ede9fe" }, // purple
+    { line: "#06b6d4", gradient: "#cffafe" }, // cyan
+  ];
+  const colorIndex = exerciseName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+  const color = colors[colorIndex];
+  
+  return (
+    <div className="border rounded-lg p-4 bg-white">
+      <h4 className="text-sm font-semibold text-gray-900 mb-3">
+        {exerciseName} Progress
+      </h4>
+      
+      {/* Compact Chart Container */}
+      <div className="relative h-32 bg-gray-50 rounded p-2">
+        {/* Y-axis labels */}
+        <div className="absolute left-0 top-0 bottom-0 w-8 flex flex-col justify-between text-xs text-gray-600 py-1">
+          <span className="text-xs">{Math.round(chartMax)}</span>
+          <span className="text-xs">{Math.round(chartMin)}</span>
+        </div>
+        
+        {/* Chart area */}
+        <div className="ml-8 h-full relative">
+          {/* Grid lines */}
+          <div className="absolute inset-0">
+            {[0, 0.5, 1].map((ratio) => (
+              <div
+                key={ratio}
+                className="absolute w-full border-t border-gray-200"
+                style={{ top: `${ratio * 100}%` }}
+              />
+            ))}
+          </div>
+          
+          {/* Progress line */}
+          <svg className="absolute inset-0 w-full h-full">
+            <defs>
+              <linearGradient id={`gradient-${exerciseName}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor={color.gradient} stopOpacity="0.8" />
+                <stop offset="100%" stopColor={color.gradient} stopOpacity="0.3" />
+              </linearGradient>
+            </defs>
+            
+            {/* Area under the curve */}
+            <path
+              d={`M 0 100 ${values.map((value, index) => {
+                const x = (index / (values.length - 1)) * 100;
+                const y = 100 - ((value - chartMin) / chartRange) * 100;
+                return `L ${x} ${y}`;
+              }).join(' ')} L 100 100 Z`}
+              fill={`url(#gradient-${exerciseName})`}
+            />
+            
+            {/* Progress line */}
+            <polyline
+              points={values.map((value, index) => {
+                const x = (index / (values.length - 1)) * 100;
+                const y = 100 - ((value - chartMin) / chartRange) * 100;
+                return `${x},${y}`;
+              }).join(' ')}
+              fill="none"
+              stroke={color.line}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            
+            {/* Data points */}
+            {values.map((value, index) => {
+              const x = (index / (values.length - 1)) * 100;
+              const y = 100 - ((value - chartMin) / chartRange) * 100;
+              const data = progressData[index];
+              return (
+                <g key={index}>
+                  <circle
+                    cx={`${x}%`}
+                    cy={`${y}%`}
+                    r="2"
+                    fill={color.line}
+                    stroke="white"
+                    strokeWidth="1"
+                  />
+                  <title>
+                    {`${new Date(data.date).toLocaleDateString()}: ${chartMetric === "e1rm" ? `${data.e1RM} lbs e1RM` : `${data.volume} lbs volume`}`}
+                  </title>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+      </div>
+      
+      {/* Progress summary */}
+      <div className="mt-2 flex justify-between text-xs text-gray-600">
+        <span>
+          Latest: {chartMetric === "e1rm" 
+            ? `${progressData[progressData.length - 1].e1RM} lbs`
+            : `${progressData[progressData.length - 1].volume} lbs`
+          }
+        </span>
+        <span>{progressData.length} sessions</span>
+      </div>
+    </div>
+  );
+}
+
 // Exercise Progress View Component
 function ExerciseProgressView({ 
   workouts, 
@@ -186,11 +347,6 @@ function ExerciseProgressView({
   
   const exerciseNames = Object.keys(exerciseProgress);
   
-  // Set default exercise if none selected
-  if (!selectedExercise && exerciseNames.length > 0) {
-    setSelectedExercise(exerciseNames[0]);
-  }
-  
   if (exerciseNames.length === 0) {
     return (
       <div className="text-center py-8">
@@ -202,57 +358,45 @@ function ExerciseProgressView({
   
   return (
     <div className="space-y-6">
-      {/* Exercise Selection and Metric Toggle */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-gray-700">Exercise:</label>
-          <select 
-            value={selectedExercise} 
-            onChange={(e) => setSelectedExercise(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      {/* Metric Toggle */}
+      <div className="flex items-center justify-center gap-4">
+        <label className="text-sm font-medium text-gray-700">Metric:</label>
+        <div className="flex border border-gray-300 rounded-md overflow-hidden">
+          <button
+            onClick={() => setChartMetric("e1rm")}
+            className={`px-4 py-2 text-sm font-medium ${
+              chartMetric === "e1rm" 
+                ? "bg-blue-600 text-white" 
+                : "bg-white text-gray-700 hover:bg-gray-50"
+            }`}
           >
-            {exerciseNames.map(name => (
-              <option key={name} value={name}>{name}</option>
-            ))}
-          </select>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-gray-700">Metric:</label>
-          <div className="flex border border-gray-300 rounded-md overflow-hidden">
-            <button
-              onClick={() => setChartMetric("e1rm")}
-              className={`px-4 py-2 text-sm font-medium ${
-                chartMetric === "e1rm" 
-                  ? "bg-blue-600 text-white" 
-                  : "bg-white text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              e1RM
-            </button>
-            <button
-              onClick={() => setChartMetric("volume")}
-              className={`px-4 py-2 text-sm font-medium ${
-                chartMetric === "volume" 
-                  ? "bg-blue-600 text-white" 
-                  : "bg-white text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              Volume
-            </button>
-          </div>
+            e1RM
+          </button>
+          <button
+            onClick={() => setChartMetric("volume")}
+            className={`px-4 py-2 text-sm font-medium ${
+              chartMetric === "volume" 
+                ? "bg-blue-600 text-white" 
+                : "bg-white text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            Volume
+          </button>
         </div>
       </div>
       
-      {/* Single Selected Exercise Chart */}
-      {selectedExercise && exerciseProgress[selectedExercise] && (
-        <RenderExerciseChart 
-          exerciseName={selectedExercise}
-          sessions={exerciseProgress[selectedExercise]}
-          workouts={workouts}
-          chartMetric={chartMetric}
-        />
-      )}
+      {/* All Exercise Charts Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {exerciseNames.map((exerciseName) => (
+          <CompactExerciseChart 
+            key={exerciseName}
+            exerciseName={exerciseName}
+            sessions={exerciseProgress[exerciseName]}
+            workouts={workouts}
+            chartMetric={chartMetric}
+          />
+        ))}
+      </div>
     </div>
   );
 }
