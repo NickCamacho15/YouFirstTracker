@@ -1,14 +1,39 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useToast } from "@/hooks/use-toast";
 import { Plus, Calendar, TrendingUp, Dumbbell, Weight, Trophy, Activity } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { apiRequest } from "@/lib/queryClient";
+
+// Form schemas
+const createExerciseSchema = z.object({
+  name: z.string().min(1, "Exercise name is required"),
+  category: z.string().min(1, "Category is required"),
+  description: z.string().optional(),
+});
+
+const workoutLogSchema = z.object({
+  exerciseId: z.string().min(1, "Please select an exercise"),
+  weight: z.number().min(0, "Weight must be positive").optional(),
+  reps: z.number().min(1, "Reps must be at least 1").optional(),
+  sets: z.number().min(1, "Sets must be at least 1").optional(),
+  notes: z.string().optional(),
+});
 
 export default function HealthPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Fetch workouts
   const { data: workouts = [], isLoading: workoutsLoading } = useQuery({
@@ -22,7 +47,120 @@ export default function HealthPage() {
     enabled: !!user,
   });
 
+  // Fetch exercises for dropdown
+  const { data: exercises = [], isLoading: exercisesLoading } = useQuery({
+    queryKey: ["/api/exercises"],
+    enabled: !!user,
+  });
+
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [workoutTab, setWorkoutTab] = useState("dashboard");
+  const [isAddingNewExercise, setIsAddingNewExercise] = useState(false);
+
+  // Form for creating new exercises
+  const exerciseForm = useForm<z.infer<typeof createExerciseSchema>>({
+    resolver: zodResolver(createExerciseSchema),
+    defaultValues: {
+      name: "",
+      category: "strength",
+      description: "",
+    },
+  });
+
+  // Form for logging workouts
+  const workoutForm = useForm<z.infer<typeof workoutLogSchema>>({
+    resolver: zodResolver(workoutLogSchema),
+    defaultValues: {
+      exerciseId: "",
+      weight: undefined,
+      reps: undefined,
+      sets: undefined,
+      notes: "",
+    },
+  });
+
+  // Create exercise mutation
+  const createExerciseMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof createExerciseSchema>) => {
+      const response = await fetch("/api/exercises", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Failed to create exercise");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/exercises"] });
+      toast({
+        title: "Exercise created",
+        description: "Your new exercise has been added to the dropdown.",
+      });
+      exerciseForm.reset();
+      setIsAddingNewExercise(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create exercise. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Create workout log mutation
+  const createWorkoutMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof workoutLogSchema>) => {
+      const exerciseList = exercises as any[];
+      const selectedExercise = exerciseList.find((e: any) => e.id.toString() === data.exerciseId);
+      if (!selectedExercise) throw new Error("Exercise not found");
+
+      const response = await fetch("/api/workouts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: `${selectedExercise.name} Workout`,
+          description: data.notes || "",
+          exercises: [{
+            exerciseId: parseInt(data.exerciseId),
+            weight: data.weight,
+            reps: data.reps,
+            sets: data.sets,
+          }],
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to create workout");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
+      toast({
+        title: "Workout logged",
+        description: "Your workout has been successfully recorded.",
+      });
+      workoutForm.reset();
+      setWorkoutTab("dashboard");
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to log workout. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onCreateExercise = (data: z.infer<typeof createExerciseSchema>) => {
+    createExerciseMutation.mutate(data);
+  };
+
+  const onLogWorkout = (data: z.infer<typeof workoutLogSchema>) => {
+    createWorkoutMutation.mutate(data);
+  };
 
   if (!user) {
     return (
@@ -63,7 +201,7 @@ export default function HealthPage() {
 
         {/* Workout Section Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Tabs defaultValue="dashboard">
+          <Tabs value={workoutTab} onValueChange={setWorkoutTab}>
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="log-workout">Log Workout</TabsTrigger>
@@ -82,8 +220,193 @@ export default function HealthPage() {
 
             <TabsContent value="log-workout" className="mt-6">
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Log New Workout</h3>
-                <p className="text-gray-600">Coming soon - workout logging interface</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-6">Log New Workout</h3>
+                
+                {/* Add New Exercise Section */}
+                {isAddingNewExercise ? (
+                  <div className="mb-6 p-4 border rounded-lg bg-blue-50">
+                    <Form {...exerciseForm}>
+                      <form onSubmit={exerciseForm.handleSubmit(onCreateExercise)} className="space-y-4">
+                        <FormField
+                          control={exerciseForm.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Exercise Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g., Front foot heel elevated squat" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={exerciseForm.control}
+                          name="category"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Category</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select category" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="strength">Strength</SelectItem>
+                                  <SelectItem value="cardio">Cardio</SelectItem>
+                                  <SelectItem value="flexibility">Flexibility</SelectItem>
+                                  <SelectItem value="balance">Balance</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="flex gap-2">
+                          <Button 
+                            type="submit" 
+                            disabled={createExerciseMutation.isPending}
+                            className="bg-blue-600 hover:bg-blue-700"
+                          >
+                            {createExerciseMutation.isPending ? "Adding..." : "Add Exercise"}
+                          </Button>
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            onClick={() => setIsAddingNewExercise(false)}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </form>
+                    </Form>
+                  </div>
+                ) : (
+                  <div className="mb-6">
+                    <Button 
+                      onClick={() => setIsAddingNewExercise(true)}
+                      variant="outline"
+                      className="w-full border-dashed border-2 border-gray-300 hover:border-blue-500"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add New Exercise
+                    </Button>
+                  </div>
+                )}
+
+                {/* Workout Logging Form */}
+                <Form {...workoutForm}>
+                  <form onSubmit={workoutForm.handleSubmit(onLogWorkout)} className="space-y-6">
+                    <FormField
+                      control={workoutForm.control}
+                      name="exerciseId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Select Exercise</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Choose from your exercises" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {(exercises as any[]).map((exercise: any) => (
+                                <SelectItem key={exercise.id} value={exercise.id.toString()}>
+                                  {exercise.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FormField
+                        control={workoutForm.control}
+                        name="weight"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Weight (lbs)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                placeholder="e.g., 135"
+                                {...field}
+                                onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={workoutForm.control}
+                        name="reps"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Reps</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                placeholder="e.g., 12"
+                                {...field}
+                                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={workoutForm.control}
+                        name="sets"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Sets</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                placeholder="e.g., 3"
+                                {...field}
+                                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={workoutForm.control}
+                      name="notes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Notes (Optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Any additional notes about this workout" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      disabled={createWorkoutMutation.isPending}
+                    >
+                      {createWorkoutMutation.isPending ? "Logging Workout..." : "Log Workout"}
+                    </Button>
+                  </form>
+                </Form>
               </div>
             </TabsContent>
 
@@ -220,7 +543,7 @@ export default function HealthPage() {
               onClick={() => setActiveTab("workout-section")}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Enter Workout Section
+              Enter Workout
             </Button>
           </div>
 
