@@ -360,20 +360,6 @@ function ExerciseProgressView({
   
   const exerciseNames = Object.keys(filteredExerciseProgress);
   
-  if (exerciseNames.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-500">
-          {exerciseFilter === 'all' 
-            ? 'No exercise data available yet.' 
-            : `No ${exerciseFilter} exercises logged yet.`
-          }
-        </p>
-        <p className="text-sm text-gray-400 mt-2">Start logging workouts to track your progress!</p>
-      </div>
-    );
-  }
-  
   return (
     <div className="space-y-6">
       {/* Category Filter and Metric Toggle */}
@@ -454,17 +440,29 @@ function ExerciseProgressView({
       </div>
       
       {/* All Exercise Charts Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {exerciseNames.map((exerciseName) => (
-          <CompactExerciseChart 
-            key={exerciseName}
-            exerciseName={exerciseName}
-            sessions={filteredExerciseProgress[exerciseName]}
-            workouts={workouts}
-            chartMetric={chartMetric}
-          />
-        ))}
-      </div>
+      {exerciseNames.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500">
+            {exerciseFilter === 'all' 
+              ? 'No exercise data available yet.' 
+              : `No ${exerciseFilter} exercises logged yet.`
+            }
+          </p>
+          <p className="text-sm text-gray-400 mt-2">Start logging workouts to track your progress!</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {exerciseNames.map((exerciseName) => (
+            <CompactExerciseChart 
+              key={exerciseName}
+              exerciseName={exerciseName}
+              sessions={filteredExerciseProgress[exerciseName]}
+              workouts={workouts}
+              chartMetric={chartMetric}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -650,7 +648,13 @@ export default function HealthPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [workoutTab, setWorkoutTab] = useState("log-workout");
   const [workoutSession, setWorkoutSession] = useState<any[]>([]);
-  const [workoutDate, setWorkoutDate] = useState(new Date().toISOString().split('T')[0]);
+  const [workoutDate, setWorkoutDate] = useState(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  });
   
   // Progress chart controls
   const [selectedExercise, setSelectedExercise] = useState<string>("");
@@ -785,6 +789,12 @@ export default function HealthPage() {
         description: `Complete workout with ${workoutSession.length} exercises recorded.`,
       });
       setWorkoutSession([]);
+      // Reset workout date to today for next workout
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      setWorkoutDate(`${year}-${month}-${day}`);
       setWorkoutTab("dashboard");
     },
     onError: (error) => {

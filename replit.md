@@ -130,7 +130,10 @@ Build scripts include:
   - **STREAMLINED**: Removed browser confirmation dialog for workout deletion - now direct one-click deletion
   - **UI**: Category and metric toggle buttons positioned side-by-side for better usability
   - **SAFETY**: Added loading states and null checks to prevent errors during data loading
-  - Progress view now shows filtered exercises based on selected category with proper loading states
+  - **FIXED**: Category filter buttons now remain visible even when no exercises match the selected category
+  - **FIXED**: Date handling issues where workout dates were shifting (7/4→7/3, 7/1→6/30) due to timezone conflicts
+  - **IMPROVED**: Chart styling - removed black filled areas under progress lines, now clean thin lines only
+  - Progress view shows filtered exercises with proper empty states and persistent filter controls
 - July 4, 2025: Enhanced Workout Tracking with Category-Specific Metrics and Tooltips
   - **ENHANCED**: Exercise categories updated with detailed tooltips: Strength (muscle/load capacity), Cardio (endurance/aerobic), Functional (real-world movement)
   - **NEW**: Category-specific tracking metrics for comprehensive workout logging
