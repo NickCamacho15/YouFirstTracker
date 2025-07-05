@@ -136,6 +136,10 @@ Build scripts include:
   - **FIXED**: Chart progression direction - exercise progress now correctly displays upward trends by properly sorting workout data by date
   - **FIXED**: Bodyweight exercise tracking - Pull-ups and other bodyweight exercises now show progression using total reps instead of weight-based calculations
   - **IMPROVED**: Chart tooltips and "Latest" display now show appropriate units (reps for bodyweight exercises, lbs for weighted exercises)
+  - **ENHANCED**: Health dashboard now displays real workout data instead of mock metrics
+  - **REMOVED**: "Current Weight" section per user request, switched to 3-column layout
+  - **NEW**: Category Trends chart showing real exercise distribution across Strength, Cardio, and Functional categories
+  - **IMPROVED**: Workout metrics now calculate from actual data: This Week, Total Workouts, Last Workout timing
   - Progress view shows filtered exercises with proper empty states and persistent filter controls
 - July 4, 2025: Enhanced Workout Tracking with Category-Specific Metrics and Tooltips
   - **ENHANCED**: Exercise categories updated with detailed tooltips: Strength (muscle/load capacity), Cardio (endurance/aerobic), Functional (real-world movement)

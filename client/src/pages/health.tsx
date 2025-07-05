@@ -1717,89 +1717,145 @@ export default function HealthPage() {
               </h3>
               
               {/* Workout Metrics */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="bg-blue-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-blue-600">12</div>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {(() => {
+                      const oneWeekAgo = new Date();
+                      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                      return (workouts as any[]).filter(w => new Date(w.date) >= oneWeekAgo).length;
+                    })()}
+                  </div>
                   <div className="text-sm text-blue-700">This Week</div>
                 </div>
                 <div className="bg-green-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-green-600">156</div>
+                  <div className="text-2xl font-bold text-green-600">{(workouts as any[]).length}</div>
                   <div className="text-sm text-green-700">Total Workouts</div>
                 </div>
-                <div className="bg-purple-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-purple-600">185</div>
-                  <div className="text-sm text-purple-700">Current Weight</div>
-                </div>
                 <div className="bg-orange-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-orange-600">Yesterday</div>
+                  <div className="text-2xl font-bold text-orange-600">
+                    {(() => {
+                      const sortedWorkouts = [...(workouts as any[])].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                      if (sortedWorkouts.length > 0) {
+                        const lastWorkoutDate = new Date(sortedWorkouts[0].date);
+                        const today = new Date();
+                        const diffTime = today.getTime() - lastWorkoutDate.getTime();
+                        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                        if (diffDays === 0) return "Today";
+                        if (diffDays === 1) return "Yesterday";
+                        return `${diffDays} days ago`;
+                      }
+                      return "None";
+                    })()}
+                  </div>
                   <div className="text-sm text-orange-700">Last Workout</div>
                 </div>
               </div>
 
-              {/* Wellness Trends Chart */}
+              {/* Category Trends Chart */}
               <div className="bg-gray-50 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-sm font-medium text-gray-700">Wellness Trends</h4>
+                  <h4 className="text-sm font-medium text-gray-700">Category Trends</h4>
                   <div className="flex space-x-4 text-xs">
                     <div className="flex items-center">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
-                      <span className="text-gray-600">Weight</span>
+                      <div className="w-3 h-3 bg-purple-500 rounded-full mr-1"></div>
+                      <span className="text-gray-600">Strength</span>
                     </div>
                     <div className="flex items-center">
                       <div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
                       <span className="text-gray-600">Cardio</span>
                     </div>
                     <div className="flex items-center">
-                      <div className="w-3 h-3 bg-purple-500 rounded-full mr-1"></div>
-                      <span className="text-gray-600">Strength</span>
+                      <div className="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
+                      <span className="text-gray-600">Functional</span>
                     </div>
                   </div>
                 </div>
                 
-                {/* Mock Multi-line Chart */}
+                {/* Real Category Progress Chart */}
                 <div className="relative h-32 bg-white rounded border">
-                  <svg viewBox="0 0 300 100" className="w-full h-full">
-                    {/* Grid lines */}
-                    <defs>
-                      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f3f4f6" strokeWidth="1"/>
-                      </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#grid)" />
+                  {(() => {
+                    // Process workout data to get category trends
+                    const categoryData = { strength: [], cardio: [], functional: [] };
+                    const sortedWorkouts = [...(workouts as any[])].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
                     
-                    {/* Weight trend line (blue) */}
-                    <polyline
-                      fill="none"
-                      stroke="#3b82f6"
-                      strokeWidth="2"
-                      points="20,80 60,75 100,70 140,65 180,60 220,58 260,55"
-                    />
+                    sortedWorkouts.forEach(workout => {
+                      if (workout.workoutExercises) {
+                        const strengthExercises = workout.workoutExercises.filter((we: any) => 
+                          exercises.find((ex: any) => ex.id === we.exerciseId)?.category === 'strength'
+                        ).length;
+                        const cardioExercises = workout.workoutExercises.filter((we: any) => 
+                          exercises.find((ex: any) => ex.id === we.exerciseId)?.category === 'cardio'
+                        ).length;
+                        const functionalExercises = workout.workoutExercises.filter((we: any) => 
+                          exercises.find((ex: any) => ex.id === we.exerciseId)?.category === 'functional'
+                        ).length;
+                        
+                        categoryData.strength.push({ date: workout.date, count: strengthExercises });
+                        categoryData.cardio.push({ date: workout.date, count: cardioExercises });
+                        categoryData.functional.push({ date: workout.date, count: functionalExercises });
+                      }
+                    });
                     
-                    {/* Cardio trend line (green) */}
-                    <polyline
-                      fill="none"
-                      stroke="#10b981"
-                      strokeWidth="2"
-                      points="20,90 60,85 100,75 140,70 180,65 220,60 260,50"
-                    />
+                    if (sortedWorkouts.length === 0) {
+                      return (
+                        <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+                          No workout data available yet
+                        </div>
+                      );
+                    }
                     
-                    {/* Strength trend line (purple) */}
-                    <polyline
-                      fill="none"
-                      stroke="#8b5cf6"
-                      strokeWidth="2"
-                      points="20,85 60,80 100,75 140,65 180,55 220,45 260,40"
-                    />
+                    // Generate SVG points for each category
+                    const chartWidth = 280;
+                    const chartHeight = 80;
+                    const maxCount = Math.max(
+                      ...categoryData.strength.map(d => d.count),
+                      ...categoryData.cardio.map(d => d.count),
+                      ...categoryData.functional.map(d => d.count),
+                      1
+                    );
                     
-                    {/* Data points */}
-                    <circle cx="260" cy="55" r="3" fill="#3b82f6" />
-                    <circle cx="260" cy="50" r="3" fill="#10b981" />
-                    <circle cx="260" cy="40" r="3" fill="#8b5cf6" />
-                  </svg>
+                    const generatePoints = (data: any[], color: string) => {
+                      if (data.length === 0) return null;
+                      const points = data.map((d, i) => {
+                        const x = 20 + (i / Math.max(data.length - 1, 1)) * chartWidth;
+                        const y = chartHeight - (d.count / maxCount) * (chartHeight - 20) + 10;
+                        return `${x},${y}`;
+                      }).join(' ');
+                      
+                      return (
+                        <polyline
+                          key={color}
+                          fill="none"
+                          stroke={color}
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          points={points}
+                        />
+                      );
+                    };
+                    
+                    return (
+                      <svg viewBox="0 0 320 100" className="w-full h-full">
+                        {/* Grid lines */}
+                        <defs>
+                          <pattern id="dashGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f3f4f6" strokeWidth="1"/>
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#dashGrid)" />
+                        
+                        {generatePoints(categoryData.strength, "#8b5cf6")}
+                        {generatePoints(categoryData.cardio, "#10b981")}
+                        {generatePoints(categoryData.functional, "#3b82f6")}
+                      </svg>
+                    );
+                  })()}
                 </div>
                 
                 <div className="text-center mt-3">
-                  <p className="text-xs text-gray-500">30-day wellness progress overview</p>
+                  <p className="text-xs text-gray-500">Exercise category trends across workouts</p>
                 </div>
               </div>
             </div>
