@@ -230,15 +230,7 @@ function CompactExerciseChart({
               </linearGradient>
             </defs>
             
-            {/* Area under the curve */}
-            <path
-              d={`M 0 100 ${values.map((value, index) => {
-                const x = (index / (values.length - 1)) * 100;
-                const y = 100 - ((value - chartMin) / chartRange) * 100;
-                return `L ${x} ${y}`;
-              }).join(' ')} L 100 100 Z`}
-              fill={`url(#gradient-${exerciseName})`}
-            />
+
             
             {/* Progress line */}
             <polyline
@@ -311,7 +303,7 @@ function ExerciseProgressView({
   exercises: any[];
 }) {
   // Process workout data to extract exercise progress
-  const exerciseProgress: { [key: string]: Array<{ date: string, volume: number, session: number }> } = {};
+  const exerciseProgress: { [key: string]: Array<{ date: string, volume: number, session: number, weight: number }> } = {};
   
   // Process all workouts to build exercise history
   (workouts as any[]).forEach((workout: any) => {
@@ -331,6 +323,7 @@ function ExerciseProgressView({
         exerciseProgress[exerciseName].push({
           date: workout.date,
           volume: totalVolume,
+          weight: weight, // Add the actual weight for "Latest" display
           session: exerciseProgress[exerciseName].length + 1
         });
       });
@@ -349,7 +342,7 @@ function ExerciseProgressView({
   });
   
   // Filter exercises by category
-  const filteredExerciseProgress: { [key: string]: Array<{ date: string, volume: number, session: number }> } = {};
+  const filteredExerciseProgress: { [key: string]: Array<{ date: string, volume: number, session: number, weight: number }> } = {};
   
   Object.keys(exerciseProgress).forEach(exerciseName => {
     const exercise = exercises?.find(ex => ex.name === exerciseName);
@@ -565,15 +558,7 @@ function RenderExerciseChart({
               </linearGradient>
             </defs>
             
-            {/* Light blue area under the curve */}
-            <path
-              d={`M 0 100 ${values.map((value, index) => {
-                const x = (index / (values.length - 1)) * 100;
-                const y = 100 - ((value - chartMin) / chartRange) * 100;
-                return `L ${x} ${y}`;
-              }).join(' ')} L 100 100 Z`}
-              fill={`url(#gradient-${exerciseName})`}
-            />
+
             
             {/* Progress line */}
             <polyline
