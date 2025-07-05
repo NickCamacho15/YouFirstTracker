@@ -134,6 +134,8 @@ Build scripts include:
   - **FIXED**: Date handling issues where workout dates were shifting (7/4→7/3, 7/1→6/30) due to timezone conflicts
   - **IMPROVED**: Chart styling - removed black filled areas under progress lines, now clean thin lines only
   - **FIXED**: Chart progression direction - exercise progress now correctly displays upward trends by properly sorting workout data by date
+  - **FIXED**: Bodyweight exercise tracking - Pull-ups and other bodyweight exercises now show progression using total reps instead of weight-based calculations
+  - **IMPROVED**: Chart tooltips and "Latest" display now show appropriate units (reps for bodyweight exercises, lbs for weighted exercises)
   - Progress view shows filtered exercises with proper empty states and persistent filter controls
 - July 4, 2025: Enhanced Workout Tracking with Category-Specific Metrics and Tooltips
   - **ENHANCED**: Exercise categories updated with detailed tooltips: Strength (muscle/load capacity), Cardio (endurance/aerobic), Functional (real-world movement)

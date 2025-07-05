@@ -156,8 +156,8 @@ function CompactExerciseChart({
     const sets = parseInt(exercise?.sets) || 1;
     
     // Calculate Estimated 1-Rep Max using Brzycki formula: weight × (36 / (37 - reps))
-    const e1RM = reps > 1 ? weight * (36 / (37 - reps)) : weight;
-    const volume = weight * reps * sets;
+    const e1RM = weight > 0 ? (reps > 1 ? weight * (36 / (37 - reps)) : weight) : reps * sets;
+    const volume = weight > 0 ? weight * reps * sets : reps * sets;
     
     return {
       date: s.date,
@@ -262,7 +262,11 @@ function CompactExerciseChart({
                     strokeWidth="1"
                   />
                   <title>
-                    {`${new Date(data.date).toLocaleDateString()}: ${chartMetric === "e1rm" ? `${data.e1RM} lbs e1RM` : `${data.volume} lbs volume`}`}
+                    {`${new Date(data.date).toLocaleDateString()}: ${
+                      chartMetric === "e1rm" 
+                        ? (data.weight > 0 ? `${data.e1RM} lbs e1RM` : `${data.e1RM} total reps`)
+                        : (data.weight > 0 ? `${data.volume} lbs volume` : `${data.volume} total reps`)
+                    }`}
                   </title>
                 </g>
               );
@@ -274,7 +278,9 @@ function CompactExerciseChart({
       {/* Progress summary */}
       <div className="mt-2 flex justify-between text-xs text-gray-600">
         <span>
-          Latest: {progressData[progressData.length - 1].weight} lbs
+          Latest: {progressData[progressData.length - 1].weight > 0 
+            ? `${progressData[progressData.length - 1].weight} lbs` 
+            : `${progressData[progressData.length - 1].reps} reps`}
         </span>
         <span>{progressData.length} sessions</span>
       </div>
