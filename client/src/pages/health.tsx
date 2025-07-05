@@ -1775,25 +1775,49 @@ export default function HealthPage() {
                 {/* Real Category Progress Chart */}
                 <div className="relative h-32 bg-white rounded border">
                   {(() => {
-                    // Process workout data to get category trends
-                    const categoryData = { strength: [], cardio: [], functional: [] };
+                    // Process workout data to get category performance trends
+                    const categoryData: Record<string, { date: string; performance: number }[]> = { 
+                      strength: [], 
+                      cardio: [], 
+                      functional: [] 
+                    };
                     const sortedWorkouts = [...(workouts as any[])].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
                     
                     sortedWorkouts.forEach(workout => {
                       if (workout.workoutExercises) {
-                        const strengthExercises = workout.workoutExercises.filter((we: any) => 
-                          exercises.find((ex: any) => ex.id === we.exerciseId)?.category === 'strength'
-                        ).length;
-                        const cardioExercises = workout.workoutExercises.filter((we: any) => 
-                          exercises.find((ex: any) => ex.id === we.exerciseId)?.category === 'cardio'
-                        ).length;
-                        const functionalExercises = workout.workoutExercises.filter((we: any) => 
-                          exercises.find((ex: any) => ex.id === we.exerciseId)?.category === 'functional'
-                        ).length;
+                        const categoryPerformance = { strength: 0, cardio: 0, functional: 0 };
                         
-                        categoryData.strength.push({ date: workout.date, count: strengthExercises });
-                        categoryData.cardio.push({ date: workout.date, count: cardioExercises });
-                        categoryData.functional.push({ date: workout.date, count: functionalExercises });
+                        workout.workoutExercises.forEach((we: any) => {
+                          const exercise = (exercises as any[]).find((ex: any) => ex.id === we.exerciseId);
+                          if (exercise) {
+                            // Calculate e1RM for this exercise
+                            const weight = we.weight || 0;
+                            const reps = we.reps || 0;
+                            let e1rm = 0;
+                            
+                            if (weight > 0 && reps > 0) {
+                              // Weighted exercise
+                              e1rm = weight * 36 / (37 - reps);
+                            } else if (reps > 0) {
+                              // Bodyweight exercise
+                              e1rm = reps;
+                            }
+                            
+                            // Add to appropriate category
+                            if (exercise.category === 'strength') {
+                              categoryPerformance.strength += e1rm;
+                            } else if (exercise.category === 'cardio') {
+                              categoryPerformance.cardio += e1rm;
+                            } else if (exercise.category === 'functional') {
+                              categoryPerformance.functional += e1rm;
+                            }
+                          }
+                        });
+                        
+                        // Add data points for each category
+                        categoryData.strength.push({ date: workout.date, performance: categoryPerformance.strength });
+                        categoryData.cardio.push({ date: workout.date, performance: categoryPerformance.cardio });
+                        categoryData.functional.push({ date: workout.date, performance: categoryPerformance.functional });
                       }
                     });
                     
@@ -1808,18 +1832,19 @@ export default function HealthPage() {
                     // Generate SVG points for each category
                     const chartWidth = 280;
                     const chartHeight = 80;
-                    const maxCount = Math.max(
-                      ...categoryData.strength.map(d => d.count),
-                      ...categoryData.cardio.map(d => d.count),
-                      ...categoryData.functional.map(d => d.count),
+                    const maxPerformance = Math.max(
+                      ...categoryData.strength.map(d => d.performance),
+                      ...categoryData.cardio.map(d => d.performance),
+                      ...categoryData.functional.map(d => d.performance),
                       1
                     );
                     
-                    const generatePoints = (data: any[], color: string) => {
-                      if (data.length === 0) return null;
+                    const generatePoints = (data: { date: string; performance: number }[], color: string) => {
+                      if (data.length === 0 || data.every(d => d.performance === 0)) return null;
+                      
                       const points = data.map((d, i) => {
                         const x = 20 + (i / Math.max(data.length - 1, 1)) * chartWidth;
-                        const y = chartHeight - (d.count / maxCount) * (chartHeight - 20) + 10;
+                        const y = chartHeight - (d.performance / maxPerformance) * (chartHeight - 20) + 10;
                         return `${x},${y}`;
                       }).join(' ');
                       

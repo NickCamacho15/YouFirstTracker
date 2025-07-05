@@ -140,6 +140,8 @@ Build scripts include:
   - **REMOVED**: "Current Weight" section per user request, switched to 3-column layout
   - **NEW**: Category Trends chart showing real exercise distribution across Strength, Cardio, and Functional categories
   - **IMPROVED**: Workout metrics now calculate from actual data: This Week, Total Workouts, Last Workout timing
+  - **ENHANCED**: Category trends chart now aggregates total performance (e1RM) per category instead of exercise count
+  - **IMPROVED**: Combined all exercises within each category into single trend line showing cumulative performance progression
   - Progress view shows filtered exercises with proper empty states and persistent filter controls
 - July 4, 2025: Enhanced Workout Tracking with Category-Specific Metrics and Tooltips
   - **ENHANCED**: Exercise categories updated with detailed tooltips: Strength (muscle/load capacity), Cardio (endurance/aerobic), Functional (real-world movement)
