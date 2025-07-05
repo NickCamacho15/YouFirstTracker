@@ -167,7 +167,7 @@ function CompactExerciseChart({
       e1RM: Math.round(e1RM * 10) / 10, // Round to 1 decimal
       volume
     };
-  });
+  }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   
   // Determine chart values based on selected metric
   const values = chartMetric === "e1rm" 
