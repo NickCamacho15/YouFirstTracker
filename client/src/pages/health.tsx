@@ -156,7 +156,7 @@ function CompactExerciseChart({
     const sets = parseInt(exercise?.sets) || 1;
     
     // Calculate Estimated 1-Rep Max using Brzycki formula: weight × (36 / (37 - reps))
-    const e1RM = weight > 0 ? (reps > 1 ? weight * (36 / (37 - reps)) : weight) : reps * sets;
+    const e1RM = weight > 0 ? (reps > 1 ? weight * (36 / (37 - reps)) : weight) : reps;
     const volume = weight > 0 ? weight * reps * sets : reps * sets;
     
     return {
@@ -264,7 +264,7 @@ function CompactExerciseChart({
                   <title>
                     {`${new Date(data.date).toLocaleDateString()}: ${
                       chartMetric === "e1rm" 
-                        ? (data.weight > 0 ? `${data.e1RM} lbs e1RM` : `${data.e1RM} total reps`)
+                        ? (data.weight > 0 ? `${data.e1RM} lbs e1RM` : `${data.e1RM} reps/set`)
                         : (data.weight > 0 ? `${data.volume} lbs volume` : `${data.volume} total reps`)
                     }`}
                   </title>
