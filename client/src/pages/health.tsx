@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Calendar, TrendingUp, Dumbbell, Weight, Trophy, Activity, Search } from "lucide-react";
+import { Plus, Calendar, TrendingUp, Dumbbell, Weight, Trophy, Activity, Search, Target, BarChart3 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -671,6 +671,10 @@ export default function HealthPage() {
   const [exerciseSearchOpen, setExerciseSearchOpen] = useState(false);
   const [exerciseSearchValue, setExerciseSearchValue] = useState("");
   const [showAddExerciseDialog, setShowAddExerciseDialog] = useState(false);
+  
+  // Program generator state
+  const [showFitnessProfileDialog, setShowFitnessProfileDialog] = useState(false);
+  const [showProgramDialog, setShowProgramDialog] = useState(false);
 
   // Combine common exercises with database exercises
   const allExercises = useMemo(() => {
@@ -1890,55 +1894,61 @@ export default function HealthPage() {
               onClick={() => setActiveTab("workout-section")}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Enter Workout
+              Manual Workout
             </Button>
           </div>
 
-          {/* Nutrition Section */}
+          {/* Premium Workout Program Generator */}
           <div className="space-y-6">
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
-              <h3 className="text-lg font-medium mb-4">Your Personalized Plan</h3>
+            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 text-white">
+              <div className="flex items-center mb-4">
+                <Target className="h-5 w-5 mr-2" />
+                <h3 className="text-lg font-medium">Premium Program Generator</h3>
+              </div>
               
-              {/* Nutrition Metrics */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-white bg-opacity-20 rounded-lg p-4">
-                  <div className="text-2xl font-bold">3330</div>
-                  <div className="text-sm opacity-90">Daily Calories</div>
-                </div>
-                <div className="bg-white bg-opacity-20 rounded-lg p-4">
-                  <div className="text-2xl font-bold">216g</div>
-                  <div className="text-sm opacity-90">Protein</div>
-                </div>
-                <div className="bg-white bg-opacity-20 rounded-lg p-4">
-                  <div className="text-2xl font-bold">484g</div>
-                  <div className="text-sm opacity-90">Carbs</div>
-                </div>
-                <div className="bg-white bg-opacity-20 rounded-lg p-4">
-                  <div className="text-2xl font-bold">59g</div>
-                  <div className="text-sm opacity-90">Fat</div>
+              {/* Program Status */}
+              <div className="bg-white bg-opacity-20 rounded-lg p-4 mb-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm opacity-90">Current Program</div>
+                    <div className="text-lg font-bold">Create Your First Program</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm opacity-90">Progress</div>
+                    <div className="text-lg font-bold">0%</div>
+                  </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="space-y-3">
                 <Button 
-                  className="w-full bg-white text-purple-600 hover:bg-gray-50"
+                  className="w-full bg-white text-blue-600 hover:bg-gray-50"
                   variant="secondary"
+                  onClick={() => setShowFitnessProfileDialog(true)}
                 >
-                  View Details
+                  <Plus className="h-4 w-4 mr-2" />
+                  Generate Program
                 </Button>
                 <Button 
-                  className="w-full bg-white text-purple-600 hover:bg-gray-50"
-                  variant="secondary"
+                  className="w-full bg-white bg-opacity-20 text-white hover:bg-opacity-30 border-white border"
+                  variant="outline"
                 >
-                  Meal Plan
+                  <Calendar className="h-4 w-4 mr-2" />
+                  View Training Schedule
                 </Button>
                 <Button 
-                  className="w-full bg-white text-purple-600 hover:bg-gray-50"
-                  variant="secondary"
+                  className="w-full bg-white bg-opacity-20 text-white hover:bg-opacity-30 border-white border"
+                  variant="outline"
                 >
-                  Edit My Info
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Progress Analytics
                 </Button>
+              </div>
+              
+              <div className="mt-4 p-3 bg-white bg-opacity-10 rounded-lg">
+                <div className="text-xs opacity-90 mb-1">✨ Premium Feature</div>
+                <div className="text-sm">AI-generated 4-week programs based on your fitness profile, training level, and goals.</div>
               </div>
             </div>
           </div>
@@ -2018,6 +2028,276 @@ export default function HealthPage() {
               </div>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Fitness Profile Dialog */}
+      <Dialog open={showFitnessProfileDialog} onOpenChange={setShowFitnessProfileDialog}>
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <Target className="h-5 w-5 mr-2 text-blue-600" />
+              Create Your Fitness Profile
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Age & Gender */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="age">Age</Label>
+                <Input 
+                  id="age" 
+                  type="number" 
+                  placeholder="25" 
+                  min="16" 
+                  max="80"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="gender">Gender</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Training Level */}
+            <div className="space-y-2">
+              <Label htmlFor="fitness-level">Training Level</Label>
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your training level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="beginner">Beginner (0-1 year)</SelectItem>
+                  <SelectItem value="intermediate">Intermediate (1-3 years)</SelectItem>
+                  <SelectItem value="advanced">Advanced (3+ years)</SelectItem>
+                  <SelectItem value="elite">Elite/Collegiate (5+ years)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Primary Goal */}
+            <div className="space-y-2">
+              <Label htmlFor="fitness-goal">Primary Fitness Goal</Label>
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your primary goal" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="strength">Strength & Power</SelectItem>
+                  <SelectItem value="muscle_mass">Muscle Mass & Hypertrophy</SelectItem>
+                  <SelectItem value="athletic_performance">Athletic Performance</SelectItem>
+                  <SelectItem value="endurance">Endurance & Conditioning</SelectItem>
+                  <SelectItem value="fat_loss">Fat Loss & Body Composition</SelectItem>
+                  <SelectItem value="general_fitness">General Fitness & Health</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Injury History */}
+            <div className="space-y-2">
+              <Label htmlFor="injury-history">Injury History (Optional)</Label>
+              <div className="text-xs text-gray-600 mb-2">
+                Select any areas with previous injuries or limitations
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {["knee", "shoulder", "back", "ankle", "wrist", "hip", "neck", "elbow", "none"].map((injury) => (
+                  <label key={injury} className="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                    <input type="checkbox" className="rounded" />
+                    <span className="text-sm capitalize">{injury}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Training Schedule */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="workout-days">Workout Days/Week</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Days per week" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="3">3 days</SelectItem>
+                    <SelectItem value="4">4 days</SelectItem>
+                    <SelectItem value="5">5 days</SelectItem>
+                    <SelectItem value="6">6 days</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="workout-duration">Session Duration</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Minutes" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="45">45 minutes</SelectItem>
+                    <SelectItem value="60">60 minutes</SelectItem>
+                    <SelectItem value="75">75 minutes</SelectItem>
+                    <SelectItem value="90">90 minutes</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Equipment */}
+            <div className="space-y-2">
+              <Label>Available Equipment</Label>
+              <div className="text-xs text-gray-600 mb-2">
+                Select all equipment you have access to
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {["barbells", "dumbbells", "machines", "cables", "bodyweight", "kettlebells", "resistance bands", "pull-up bar"].map((equipment) => (
+                  <label key={equipment} className="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                    <input type="checkbox" className="rounded" defaultChecked={["barbells", "dumbbells", "bodyweight"].includes(equipment)} />
+                    <span className="text-sm capitalize">{equipment.replace('_', ' ')}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-3 pt-4 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowFitnessProfileDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                className="bg-blue-600 hover:bg-blue-700"
+                onClick={() => {
+                  setShowFitnessProfileDialog(false);
+                  setShowProgramDialog(true);
+                }}
+              >
+                <Target className="h-4 w-4 mr-2" />
+                Generate My Program
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Generated Program Dialog */}
+      <Dialog open={showProgramDialog} onOpenChange={setShowProgramDialog}>
+        <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <Trophy className="h-5 w-5 mr-2 text-blue-600" />
+              Your 4-Week Strength Program
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Program Overview */}
+            <div className="bg-blue-50 rounded-lg p-4">
+              <h4 className="font-medium text-blue-900 mb-2">Program: Advanced Push/Pull/Legs Split</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm text-blue-800">
+                <div>• 4 weeks, progressive overload</div>
+                <div>• 5 days/week training</div>
+                <div>• Focus: Strength & Muscle Mass</div>
+                <div>• Elite-level intensity</div>
+              </div>
+            </div>
+
+            {/* Weekly Schedule */}
+            <div className="space-y-4">
+              <h4 className="font-medium">Weekly Schedule</h4>
+              <div className="grid grid-cols-7 gap-2 text-center">
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, index) => {
+                  const workouts = ["Push", "Pull", "Legs", "Push", "Pull", "Rest", "Rest"];
+                  return (
+                    <div key={day} className={`p-2 rounded text-sm ${workouts[index] !== "Rest" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-600"}`}>
+                      <div className="font-medium">{day}</div>
+                      <div className="text-xs mt-1">{workouts[index]}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Training Sheet Preview */}
+            <div className="space-y-4">
+              <h4 className="font-medium">Week 1 Preview - Monday (Push)</h4>
+              <div className="overflow-x-auto">
+                <table className="w-full border border-gray-200 rounded-lg text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="p-3 text-left border-b">Exercise</th>
+                      <th className="p-3 text-center border-b">Sets</th>
+                      <th className="p-3 text-center border-b">Reps</th>
+                      <th className="p-3 text-center border-b">Weight (lbs)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="p-3 border-b">Bench Press</td>
+                      <td className="p-3 text-center border-b">4</td>
+                      <td className="p-3 text-center border-b">6</td>
+                      <td className="p-3 text-center border-b">225</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 border-b">Incline Dumbbell Press</td>
+                      <td className="p-3 text-center border-b">3</td>
+                      <td className="p-3 text-center border-b">8</td>
+                      <td className="p-3 text-center border-b">80</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 border-b">Overhead Press</td>
+                      <td className="p-3 text-center border-b">4</td>
+                      <td className="p-3 text-center border-b">5</td>
+                      <td className="p-3 text-center border-b">155</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 border-b">Weighted Dips</td>
+                      <td className="p-3 text-center border-b">3</td>
+                      <td className="p-3 text-center border-b">10</td>
+                      <td className="p-3 text-center border-b">45</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3">Close-Grip Bench Press</td>
+                      <td className="p-3 text-center">3</td>
+                      <td className="p-3 text-center">8</td>
+                      <td className="p-3 text-center">185</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-between items-center pt-4 border-t">
+              <div className="text-sm text-gray-600">
+                Complete program includes all 4 weeks with progressive loading
+              </div>
+              <div className="flex space-x-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowProgramDialog(false)}
+                >
+                  Close Preview
+                </Button>
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Start Program
+                </Button>
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

@@ -191,10 +191,86 @@ export const workouts = pgTable("workouts", {
 export const exercises = pgTable("exercises", {
   id: serial("id").primaryKey(),
   name: text("name").notNull().unique(),
-  category: text("category", { enum: ["strength", "cardio", "flexibility", "balance", "sports"] }).default("strength").notNull(),
+  category: text("category", { enum: ["strength", "cardio", "functional"] }).default("strength").notNull(),
   muscleGroups: text("muscle_groups").array(), // e.g., ["chest", "triceps", "shoulders"]
   equipment: text("equipment"), // e.g., "barbell", "dumbbells", "bodyweight"
   instructions: text("instructions"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Fitness Profile for workout program generation
+export const fitnessProfiles = pgTable("fitness_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull().unique(),
+  age: integer("age").notNull(),
+  gender: text("gender", { enum: ["male", "female", "other"] }).notNull(),
+  fitnessLevel: text("fitness_level", { enum: ["beginner", "intermediate", "advanced", "elite"] }).notNull(),
+  fitnessGoal: text("fitness_goal", { enum: ["strength", "muscle_mass", "endurance", "fat_loss", "general_fitness", "athletic_performance"] }).notNull(),
+  injuryHistory: text("injury_history").array(), // e.g., ["knee", "shoulder", "back"]
+  workoutDaysPerWeek: integer("workout_days_per_week").default(3).notNull(),
+  workoutDuration: integer("workout_duration").default(60).notNull(), // in minutes
+  equipment: text("equipment").array(), // available equipment
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Generated workout programs
+export const workoutPrograms = pgTable("workout_programs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  duration: integer("duration").default(4).notNull(), // weeks
+  weeklySchedule: text("weekly_schedule").array(), // e.g., ["legs", "push", "pull", "rest"]
+  fitnessLevel: text("fitness_level", { enum: ["beginner", "intermediate", "advanced", "elite"] }).notNull(),
+  fitnessGoal: text("fitness_goal", { enum: ["strength", "muscle_mass", "endurance", "fat_loss", "general_fitness", "athletic_performance"] }).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Weekly workout templates within programs
+export const programWeeks = pgTable("program_weeks", {
+  id: serial("id").primaryKey(),
+  programId: integer("program_id").references(() => workoutPrograms.id, { onDelete: "cascade" }).notNull(),
+  weekNumber: integer("week_number").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Daily workout templates within weeks
+export const programDays = pgTable("program_days", {
+  id: serial("id").primaryKey(),
+  programWeekId: integer("program_week_id").references(() => programWeeks.id, { onDelete: "cascade" }).notNull(),
+  dayNumber: integer("day_number").notNull(), // 1-7 for days of week
+  name: text("name").notNull(), // e.g., "Legs", "Push", "Pull", "Rest"
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Exercises within daily workouts
+export const programExercises = pgTable("program_exercises", {
+  id: serial("id").primaryKey(),
+  programDayId: integer("program_day_id").references(() => programDays.id, { onDelete: "cascade" }).notNull(),
+  exerciseId: integer("exercise_id").references(() => exercises.id).notNull(),
+  sets: integer("sets").notNull(),
+  reps: integer("reps"),
+  weight: integer("weight"), // suggested starting weight
+  orderIndex: integer("order_index").default(0).notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// User progress tracking for program exercises
+export const programProgress = pgTable("program_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  programExerciseId: integer("program_exercise_id").references(() => programExercises.id, { onDelete: "cascade" }).notNull(),
+  date: date("date").notNull(),
+  actualSets: integer("actual_sets"),
+  actualReps: integer("actual_reps"),
+  actualWeight: integer("actual_weight"),
+  completed: boolean("completed").default(false).notNull(),
+  notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -386,6 +462,40 @@ export const insertMealSchema = createInsertSchema(meals).omit({
   date: z.string().transform((val) => val),
 });
 
+export const insertFitnessProfileSchema = createInsertSchema(fitnessProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertWorkoutProgramSchema = createInsertSchema(workoutPrograms).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertProgramWeekSchema = createInsertSchema(programWeeks).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertProgramDaySchema = createInsertSchema(programDays).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertProgramExerciseSchema = createInsertSchema(programExercises).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertProgramProgressSchema = createInsertSchema(programProgress).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  date: z.string().transform((val) => val),
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -431,3 +541,15 @@ export type NutritionPlan = typeof nutritionPlans.$inferSelect;
 export type InsertNutritionPlan = z.infer<typeof insertNutritionPlanSchema>;
 export type Meal = typeof meals.$inferSelect;
 export type InsertMeal = z.infer<typeof insertMealSchema>;
+export type FitnessProfile = typeof fitnessProfiles.$inferSelect;
+export type InsertFitnessProfile = z.infer<typeof insertFitnessProfileSchema>;
+export type WorkoutProgram = typeof workoutPrograms.$inferSelect;
+export type InsertWorkoutProgram = z.infer<typeof insertWorkoutProgramSchema>;
+export type ProgramWeek = typeof programWeeks.$inferSelect;
+export type InsertProgramWeek = z.infer<typeof insertProgramWeekSchema>;
+export type ProgramDay = typeof programDays.$inferSelect;
+export type InsertProgramDay = z.infer<typeof insertProgramDaySchema>;
+export type ProgramExercise = typeof programExercises.$inferSelect;
+export type InsertProgramExercise = z.infer<typeof insertProgramExerciseSchema>;
+export type ProgramProgress = typeof programProgress.$inferSelect;
+export type InsertProgramProgress = z.infer<typeof insertProgramProgressSchema>;
