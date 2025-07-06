@@ -206,7 +206,8 @@ export const fitnessProfiles = pgTable("fitness_profiles", {
   gender: text("gender", { enum: ["male", "female", "other"] }).notNull(),
   fitnessLevel: text("fitness_level", { enum: ["beginner", "intermediate", "advanced", "elite"] }).notNull(),
   fitnessGoal: text("fitness_goal", { enum: ["strength", "muscle_mass", "endurance", "fat_loss", "general_fitness", "athletic_performance"] }).notNull(),
-  injuryHistory: text("injury_history").array(), // e.g., ["knee", "shoulder", "back"]
+  trainingGoal: text("training_goal", { enum: ["explosiveness", "strength", "hybrid", "weight_loss"] }).notNull(),
+  injuriesPains: text("injuries_pains").array(), // e.g., ["knee", "shoulder", "back"]
   workoutDaysPerWeek: integer("workout_days_per_week").default(3).notNull(),
   workoutDuration: integer("workout_duration").default(60).notNull(), // in minutes
   equipment: text("equipment").array(), // available equipment
@@ -247,14 +248,26 @@ export const programDays = pgTable("program_days", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// Exercises within daily workouts
-export const programExercises = pgTable("program_exercises", {
+// Workout blocks within daily workouts (warmup, main_a, main_b, finisher)
+export const programBlocks = pgTable("program_blocks", {
   id: serial("id").primaryKey(),
   programDayId: integer("program_day_id").references(() => programDays.id, { onDelete: "cascade" }).notNull(),
-  exerciseId: integer("exercise_id").references(() => exercises.id).notNull(),
+  blockType: text("block_type", { enum: ["warmup", "main_a", "main_b", "finisher"] }).notNull(),
+  name: text("name").notNull(), // e.g., "Warm-up", "Main Block A", "Finisher"
+  description: text("description"),
+  orderIndex: integer("order_index").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Exercises within blocks
+export const programExercises = pgTable("program_exercises", {
+  id: serial("id").primaryKey(),
+  programBlockId: integer("program_block_id").references(() => programBlocks.id, { onDelete: "cascade" }).notNull(),
+  exerciseName: text("exercise_name").notNull(), // Store name directly for flexibility
   sets: integer("sets").notNull(),
-  reps: integer("reps"),
-  weight: integer("weight"), // suggested starting weight
+  reps: text("reps").notNull(), // Can be "8-12", "10", "AMRAP", etc.
+  weight: text("weight"), // Can be "135 lbs", "bodyweight", "challenging", etc.
+  restPeriod: text("rest_period"), // e.g., "60s", "2-3min"
   orderIndex: integer("order_index").default(0).notNull(),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

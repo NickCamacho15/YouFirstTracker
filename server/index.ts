@@ -1,6 +1,10 @@
+import express from "express";
+import { generatePlan } from "./ai"; // adjust path if needed
+
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { generatePlan } from "./ai"; // already done ✅
 
 const app = express();
 app.use(express.json());
@@ -36,6 +40,23 @@ app.use((req, res, next) => {
   next();
 });
 
+// 🚀 AI Route to generate a goal plan
+app.post("/api/generate-plan", async (req, res) => {
+  const { goal } = req.body;
+
+  if (!goal || typeof goal !== "string") {
+    return res.status(400).json({ error: "Invalid goal input." });
+  }
+
+  try {
+    const plan = await generatePlan(goal);
+    res.json(plan);
+  } catch (error) {
+    console.error("AI error:", error);
+    res.status(500).json({ error: "Failed to generate plan." });
+  }
+});
+
 (async () => {
   const server = await registerRoutes(app);
 
@@ -60,11 +81,14 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
+  server.listen(
+    {
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    },
+    () => {
+      log(`serving on port ${port}`);
+    },
+  );
 })();

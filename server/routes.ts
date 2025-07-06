@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
 import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema } from "@shared/schema";
+import { generateWorkoutProgram } from "./ai";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -687,6 +688,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Update exercise error:", error);
       res.status(500).json({ message: "Failed to update exercise" });
+    }
+  });
+
+  // Generate workout program using AI
+  app.post("/api/workout-programs/generate", requireAuth, async (req, res) => {
+    try {
+      const fitnessProfile = req.body;
+      
+      // Generate program using AI
+      const program = await generateWorkoutProgram(fitnessProfile);
+      
+      res.json(program);
+    } catch (error) {
+      console.error("Generate workout program error:", error);
+      res.status(500).json({ message: "Failed to generate workout program. Please try again." });
     }
   });
 

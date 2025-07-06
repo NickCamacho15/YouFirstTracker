@@ -675,6 +675,65 @@ export default function HealthPage() {
   // Program generator state
   const [showFitnessProfileDialog, setShowFitnessProfileDialog] = useState(false);
   const [showProgramDialog, setShowProgramDialog] = useState(false);
+  const [fitnessProfile, setFitnessProfile] = useState<any>(null);
+  const [generatedProgram, setGeneratedProgram] = useState<any>(null);
+  const [selectedWeek, setSelectedWeek] = useState(1);
+  const [selectedDay, setSelectedDay] = useState(1);
+  const [isGeneratingProgram, setIsGeneratingProgram] = useState(false);
+
+  // Form state for fitness profile
+  const [profileForm, setProfileForm] = useState({
+    age: "",
+    gender: "",
+    fitnessLevel: "",
+    fitnessGoal: "",
+    trainingGoal: "",
+    injuriesPains: [] as string[],
+    workoutDaysPerWeek: "",
+    workoutDuration: "",
+    equipment: ["barbells", "dumbbells", "bodyweight"] as string[] // Default equipment
+  });
+
+  // Generate workout program function
+  const generateWorkoutProgram = async () => {
+    if (!profileForm.age || !profileForm.gender || !profileForm.fitnessLevel || 
+        !profileForm.fitnessGoal || !profileForm.trainingGoal || 
+        !profileForm.workoutDaysPerWeek || !profileForm.workoutDuration) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGeneratingProgram(true);
+    
+    try {
+      const response = await fetch("/api/workout-programs/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profileForm)
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate program");
+      }
+
+      const program = await response.json();
+      setGeneratedProgram(program);
+      setShowFitnessProfileDialog(false);
+      setShowProgramDialog(true);
+    } catch (error) {
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate workout program. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingProgram(false);
+    }
+  };
 
   // Combine common exercises with database exercises
   const allExercises = useMemo(() => {
@@ -2052,11 +2111,13 @@ export default function HealthPage() {
                   placeholder="25" 
                   min="16" 
                   max="80"
+                  value={profileForm.age}
+                  onChange={(e) => setProfileForm({...profileForm, age: e.target.value})}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="gender">Gender</Label>
-                <Select>
+                <Select value={profileForm.gender} onValueChange={(value) => setProfileForm({...profileForm, gender: value})}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
@@ -2072,7 +2133,7 @@ export default function HealthPage() {
             {/* Training Level */}
             <div className="space-y-2">
               <Label htmlFor="fitness-level">Training Level</Label>
-              <Select>
+              <Select value={profileForm.fitnessLevel} onValueChange={(value) => setProfileForm({...profileForm, fitnessLevel: value})}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select your training level" />
                 </SelectTrigger>
@@ -2088,7 +2149,7 @@ export default function HealthPage() {
             {/* Primary Goal */}
             <div className="space-y-2">
               <Label htmlFor="fitness-goal">Primary Fitness Goal</Label>
-              <Select>
+              <Select value={profileForm.fitnessGoal} onValueChange={(value) => setProfileForm({...profileForm, fitnessGoal: value})}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select your primary goal" />
                 </SelectTrigger>
@@ -2103,16 +2164,43 @@ export default function HealthPage() {
               </Select>
             </div>
 
-            {/* Injury History */}
+            {/* Training Goal */}
             <div className="space-y-2">
-              <Label htmlFor="injury-history">Injury History (Optional)</Label>
+              <Label htmlFor="training-goal">Training Goal</Label>
+              <Select value={profileForm.trainingGoal} onValueChange={(value) => setProfileForm({...profileForm, trainingGoal: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your training focus" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="explosiveness">Explosiveness</SelectItem>
+                  <SelectItem value="strength">Strength</SelectItem>
+                  <SelectItem value="hybrid">Hybrid</SelectItem>
+                  <SelectItem value="weight_loss">Weight Loss</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Injuries/Pains */}
+            <div className="space-y-2">
+              <Label htmlFor="injuries-pains">Injuries/Pains (Optional)</Label>
               <div className="text-xs text-gray-600 mb-2">
-                Select any areas with previous injuries or limitations
+                Select any areas with previous injuries or current pain
               </div>
               <div className="grid grid-cols-3 gap-2">
                 {["knee", "shoulder", "back", "ankle", "wrist", "hip", "neck", "elbow", "none"].map((injury) => (
                   <label key={injury} className="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
-                    <input type="checkbox" className="rounded" />
+                    <input 
+                      type="checkbox" 
+                      className="rounded" 
+                      checked={profileForm.injuriesPains.includes(injury)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setProfileForm({...profileForm, injuriesPains: [...profileForm.injuriesPains, injury]});
+                        } else {
+                          setProfileForm({...profileForm, injuriesPains: profileForm.injuriesPains.filter(i => i !== injury)});
+                        }
+                      }}
+                    />
                     <span className="text-sm capitalize">{injury}</span>
                   </label>
                 ))}
@@ -2123,7 +2211,7 @@ export default function HealthPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="workout-days">Workout Days/Week</Label>
-                <Select>
+                <Select value={profileForm.workoutDaysPerWeek} onValueChange={(value) => setProfileForm({...profileForm, workoutDaysPerWeek: value})}>
                   <SelectTrigger>
                     <SelectValue placeholder="Days per week" />
                   </SelectTrigger>
@@ -2137,7 +2225,7 @@ export default function HealthPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="workout-duration">Session Duration</Label>
-                <Select>
+                <Select value={profileForm.workoutDuration} onValueChange={(value) => setProfileForm({...profileForm, workoutDuration: value})}>
                   <SelectTrigger>
                     <SelectValue placeholder="Minutes" />
                   </SelectTrigger>
@@ -2160,7 +2248,18 @@ export default function HealthPage() {
               <div className="grid grid-cols-2 gap-2">
                 {["barbells", "dumbbells", "machines", "cables", "bodyweight", "kettlebells", "resistance bands", "pull-up bar"].map((equipment) => (
                   <label key={equipment} className="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
-                    <input type="checkbox" className="rounded" defaultChecked={["barbells", "dumbbells", "bodyweight"].includes(equipment)} />
+                    <input 
+                      type="checkbox" 
+                      className="rounded" 
+                      checked={profileForm.equipment.includes(equipment)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setProfileForm({...profileForm, equipment: [...profileForm.equipment, equipment]});
+                        } else {
+                          setProfileForm({...profileForm, equipment: profileForm.equipment.filter(eq => eq !== equipment)});
+                        }
+                      }}
+                    />
                     <span className="text-sm capitalize">{equipment.replace('_', ' ')}</span>
                   </label>
                 ))}
@@ -2178,13 +2277,11 @@ export default function HealthPage() {
               </Button>
               <Button 
                 className="bg-blue-600 hover:bg-blue-700"
-                onClick={() => {
-                  setShowFitnessProfileDialog(false);
-                  setShowProgramDialog(true);
-                }}
+                onClick={generateWorkoutProgram}
+                disabled={isGeneratingProgram}
               >
                 <Target className="h-4 w-4 mr-2" />
-                Generate My Program
+                {isGeneratingProgram ? "Generating..." : "Generate My Program"}
               </Button>
             </div>
           </div>
@@ -2197,107 +2294,153 @@ export default function HealthPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center">
               <Trophy className="h-5 w-5 mr-2 text-blue-600" />
-              Your 4-Week Strength Program
+              {generatedProgram?.program?.name || "Your Workout Program"}
             </DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-6 py-4">
-            {/* Program Overview */}
-            <div className="bg-blue-50 rounded-lg p-4">
-              <h4 className="font-medium text-blue-900 mb-2">Program: Advanced Push/Pull/Legs Split</h4>
-              <div className="grid grid-cols-2 gap-4 text-sm text-blue-800">
-                <div>• 4 weeks, progressive overload</div>
-                <div>• 5 days/week training</div>
-                <div>• Focus: Strength & Muscle Mass</div>
-                <div>• Elite-level intensity</div>
+          {generatedProgram && (
+            <div className="space-y-6 py-4">
+              {/* Program Overview */}
+              <div className="bg-blue-50 rounded-lg p-4">
+                <h4 className="font-medium text-blue-900 mb-2">{generatedProgram.program.name}</h4>
+                <p className="text-sm text-blue-800 mb-3">{generatedProgram.program.description}</p>
+                <div className="grid grid-cols-2 gap-4 text-sm text-blue-800">
+                  <div>• {generatedProgram.program.duration} weeks</div>
+                  <div>• Progressive overload</div>
+                  <div>• Training goal: {profileForm.trainingGoal}</div>
+                  <div>• {profileForm.workoutDaysPerWeek} days/week</div>
+                </div>
               </div>
-            </div>
 
-            {/* Weekly Schedule */}
-            <div className="space-y-4">
-              <h4 className="font-medium">Weekly Schedule</h4>
-              <div className="grid grid-cols-7 gap-2 text-center">
-                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, index) => {
-                  const workouts = ["Push", "Pull", "Legs", "Push", "Pull", "Rest", "Rest"];
+              {/* Week Selector */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium">Select Week</h4>
+                  <div className="flex space-x-2">
+                    {[1, 2, 3, 4].map((week) => (
+                      <Button
+                        key={week}
+                        variant={selectedWeek === week ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedWeek(week)}
+                        className="w-12"
+                      >
+                        W{week}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Weekly Schedule */}
+                <div className="grid grid-cols-7 gap-2 text-center">
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, index) => {
+                    const dayNumber = index + 1;
+                    const weekData = generatedProgram.weeks.find(w => w.weekNumber === selectedWeek);
+                    const dayData = weekData?.days?.find(d => d.dayNumber === dayNumber);
+                    const workoutName = dayData?.name || (generatedProgram.program.weeklySchedule?.[index] || "Rest");
+                    
+                    return (
+                      <div 
+                        key={day} 
+                        className={`p-2 rounded text-sm cursor-pointer transition-colors ${
+                          workoutName !== "Rest" && workoutName !== "rest" 
+                            ? selectedDay === dayNumber 
+                              ? "bg-blue-600 text-white" 
+                              : "bg-blue-100 text-blue-800 hover:bg-blue-200"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                        onClick={() => workoutName !== "Rest" && workoutName !== "rest" && setSelectedDay(dayNumber)}
+                      >
+                        <div className="font-medium">{day}</div>
+                        <div className="text-xs mt-1">{workoutName}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Daily Workout Details */}
+              {(() => {
+                const weekData = generatedProgram.weeks.find(w => w.weekNumber === selectedWeek);
+                const dayData = weekData?.days?.find(d => d.dayNumber === selectedDay);
+                
+                if (!dayData || !dayData.blocks) {
                   return (
-                    <div key={day} className={`p-2 rounded text-sm ${workouts[index] !== "Rest" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-600"}`}>
-                      <div className="font-medium">{day}</div>
-                      <div className="text-xs mt-1">{workouts[index]}</div>
+                    <div className="text-center py-8 text-gray-500">
+                      Select a workout day to view details
                     </div>
                   );
-                })}
-              </div>
-            </div>
+                }
 
-            {/* Training Sheet Preview */}
-            <div className="space-y-4">
-              <h4 className="font-medium">Week 1 Preview - Monday (Push)</h4>
-              <div className="overflow-x-auto">
-                <table className="w-full border border-gray-200 rounded-lg text-sm">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="p-3 text-left border-b">Exercise</th>
-                      <th className="p-3 text-center border-b">Sets</th>
-                      <th className="p-3 text-center border-b">Reps</th>
-                      <th className="p-3 text-center border-b">Weight (lbs)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="p-3 border-b">Bench Press</td>
-                      <td className="p-3 text-center border-b">4</td>
-                      <td className="p-3 text-center border-b">6</td>
-                      <td className="p-3 text-center border-b">225</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 border-b">Incline Dumbbell Press</td>
-                      <td className="p-3 text-center border-b">3</td>
-                      <td className="p-3 text-center border-b">8</td>
-                      <td className="p-3 text-center border-b">80</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 border-b">Overhead Press</td>
-                      <td className="p-3 text-center border-b">4</td>
-                      <td className="p-3 text-center border-b">5</td>
-                      <td className="p-3 text-center border-b">155</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 border-b">Weighted Dips</td>
-                      <td className="p-3 text-center border-b">3</td>
-                      <td className="p-3 text-center border-b">10</td>
-                      <td className="p-3 text-center border-b">45</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3">Close-Grip Bench Press</td>
-                      <td className="p-3 text-center">3</td>
-                      <td className="p-3 text-center">8</td>
-                      <td className="p-3 text-center">185</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                return (
+                  <div className="space-y-6">
+                    <h4 className="font-medium">
+                      Week {selectedWeek} - {dayData.name}
+                      {dayData.description && <span className="text-sm text-gray-600 ml-2">({dayData.description})</span>}
+                    </h4>
+                    
+                    {dayData.blocks.map((block, blockIndex) => (
+                      <div key={blockIndex} className="space-y-3">
+                        <h5 className={`font-medium text-sm uppercase tracking-wide ${
+                          block.blockType === 'warmup' ? 'text-orange-600' :
+                          block.blockType === 'main_a' ? 'text-red-600' :
+                          block.blockType === 'main_b' ? 'text-blue-600' :
+                          'text-green-600'
+                        }`}>
+                          {block.name}
+                        </h5>
+                        
+                        <div className="overflow-x-auto">
+                          <table className="w-full border border-gray-200 rounded-lg text-sm">
+                            <thead className="bg-gray-50">
+                              <tr>
+                                <th className="p-3 text-left border-b">Exercise</th>
+                                <th className="p-3 text-center border-b">Sets</th>
+                                <th className="p-3 text-center border-b">Reps</th>
+                                <th className="p-3 text-center border-b">Weight</th>
+                                <th className="p-3 text-center border-b">Rest</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {block.exercises.map((exercise, exerciseIndex) => (
+                                <tr key={exerciseIndex}>
+                                  <td className="p-3 border-b font-medium">{exercise.exerciseName}</td>
+                                  <td className="p-3 text-center border-b">{exercise.sets}</td>
+                                  <td className="p-3 text-center border-b">{exercise.reps}</td>
+                                  <td className="p-3 text-center border-b">{exercise.weight}</td>
+                                  <td className="p-3 text-center border-b">{exercise.restPeriod}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
 
-            {/* Action Buttons */}
-            <div className="flex justify-between items-center pt-4 border-t">
-              <div className="text-sm text-gray-600">
-                Complete program includes all 4 weeks with progressive loading
-              </div>
-              <div className="flex space-x-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowProgramDialog(false)}
-                >
-                  Close Preview
-                </Button>
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Start Program
-                </Button>
+              {/* Action Buttons */}
+              <div className="flex justify-between items-center pt-4 border-t">
+                <div className="text-sm text-gray-600">
+                  Complete program with progressive overload and injury accommodations
+                </div>
+                <div className="flex space-x-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowProgramDialog(false)}
+                  >
+                    Close Preview
+                  </Button>
+                  <Button className="bg-blue-600 hover:bg-blue-700">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Start Program
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
