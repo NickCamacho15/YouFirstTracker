@@ -13,25 +13,8 @@ Your job is to take a user’s raw goal input and reverse-engineer it into a cle
 2. Suggest 3–5 habits (Trigger → Action → Reward, with explanation and benefits).
 3. Suggest morning and evening routine steps.
 4. Suggest 2–4 weekly tasks to move the goal forward.
-Return it in this exact JSON format:
-  const userMessage = `My goal is: ${goal}`;
-  const response = await openai.chat.completions.create({
-    model: "gpt-4", // or "gpt-3.5-turbo" if you're not using GPT-4
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userMessage },
-    ],
-    temperature: 0.7,
-  });
 
-  try {
-    const json = JSON.parse(response.choices[0].message.content || "");
-    return json;
-   } catch (err) {
-    console.error("❌ OpenAI Error:", err);
-    return { error: "Failed to generate plan." };
-  }
-}
+Return it in this exact JSON format:
 {
   "smart_goal": "string",
   "habits": [
@@ -200,3 +183,4 @@ Create a program that accommodates any injuries and matches the training goal in
 
   const result = chat.choices[0].message.content!;
   return JSON.parse(result);
+}
