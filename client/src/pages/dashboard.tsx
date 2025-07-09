@@ -334,444 +334,122 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Personal Excellence Analytics Dashboard */}
-        <div className="mb-8">
-          <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-3xl p-8 shadow-2xl border border-indigo-100 overflow-hidden">
-            {/* Animated Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full blur-3xl animate-pulse"></div>
-              <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full blur-3xl animate-pulse delay-1000"></div>
-              <div className="absolute top-1/2 left-1/2 w-28 h-28 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-full blur-3xl animate-pulse delay-2000"></div>
-            </div>
-
-            <div className="relative z-10">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Personal Excellence Analytics</h2>
-              
-              {/* Side-by-Side Bar Graph Analytics */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                
-                {/* Left: Habit Ecosystem Visual */}
-                <div className="relative">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-6 text-center">Category Performance</h3>
-                  <div className="space-y-6">
-                    {/* Mind Category */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium text-blue-600">Mind</span>
-                        <span className="text-sm font-bold text-blue-800">75%</span>
-                      </div>
-                      <div className="w-full bg-blue-100 rounded-full h-4 overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-1000 ease-out"
-                          style={{ width: '75%' }}
-                        ></div>
-                      </div>
-                    </div>
-                    
-                    {/* Body Category */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium text-orange-600">Body</span>
-                        <span className="text-sm font-bold text-orange-800">60%</span>
-                      </div>
-                      <div className="w-full bg-orange-100 rounded-full h-4 overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full transition-all duration-1000 ease-out"
-                          style={{ width: '60%' }}
-                        ></div>
-                      </div>
-                    </div>
-                    
-                    {/* Soul Category */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium text-purple-600">Soul</span>
-                        <span className="text-sm font-bold text-purple-800">85%</span>
-                      </div>
-                      <div className="w-full bg-purple-100 rounded-full h-4 overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full transition-all duration-1000 ease-out"
-                          style={{ width: '85%' }}
-                        ></div>
-                      </div>
-                    </div>
-                    
-                    {/* Overall Performance */}
-                    <div className="space-y-2 pt-4 border-t border-gray-200">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium text-gray-700">Overall Excellence</span>
-                        <span className="text-sm font-bold text-gray-900">73%</span>
-                      </div>
-                      <div className="w-full bg-gray-100 rounded-full h-5 overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500 rounded-full transition-all duration-1000 ease-out"
-                          style={{ width: '73%' }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Center: Performance Radar */}
-                <div className="relative">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Performance Matrix</h3>
-                  <div className="relative w-48 h-48 mx-auto">
-                    {/* Hexagonal Radar Background */}
-                    <svg viewBox="0 0 200 200" className="w-full h-full">
-                      {/* Grid Lines */}
-                      <defs>
-                        <radialGradient id="radarGradient" cx="50%" cy="50%" r="50%">
-                          <stop offset="0%" stopColor="#f0f9ff" />
-                          <stop offset="100%" stopColor="#e0e7ff" />
-                        </radialGradient>
-                      </defs>
-                      
-                      {/* Background Rings */}
-                      {[0.2, 0.4, 0.6, 0.8, 1.0].map((scale, i) => (
-                        <polygon
-                          key={i}
-                          points="100,20 173,50 173,150 100,180 27,150 27,50"
-                          fill="none"
-                          stroke="#e2e8f0"
-                          strokeWidth="1"
-                          transform={`scale(${scale})`}
-                          style={{ transformOrigin: '100px 100px' }}
-                        />
-                      ))}
-                      
-                      {/* Data Polygon - Colorful Fill */}
-                      <polygon
-                        points="100,35 156,55 156,135 100,165 44,135 44,55"
-                        fill="url(#performanceGradient)"
-                        stroke="#4f46e5"
-                        strokeWidth="3"
-                        opacity="0.8"
-                      />
-                      
-                      {/* Gradient Definition */}
-                      <defs>
-                        <linearGradient id="performanceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#6366f1" stopOpacity="0.6" />
-                          <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.4" />
-                          <stop offset="100%" stopColor="#ec4899" stopOpacity="0.6" />
-                        </linearGradient>
-                      </defs>
-                      
-                      {/* Data Points */}
-                      <circle cx="100" cy="35" r="4" fill="#4f46e5" />
-                      <circle cx="156" cy="55" r="4" fill="#7c3aed" />
-                      <circle cx="156" cy="135" r="4" fill="#ec4899" />
-                      <circle cx="100" cy="165" r="4" fill="#f59e0b" />
-                      <circle cx="44" cy="135" r="4" fill="#10b981" />
-                      <circle cx="44" cy="55" r="4" fill="#3b82f6" />
-                    </svg>
-                    
-                    {/* Performance Labels */}
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-indigo-600">Consistency</div>
-                    <div className="absolute top-8 -right-8 text-xs font-semibold text-purple-600">Momentum</div>
-                    <div className="absolute bottom-8 -right-8 text-xs font-semibold text-pink-600">Growth</div>
-                    <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-amber-600">Balance</div>
-                    <div className="absolute bottom-8 -left-8 text-xs font-semibold text-emerald-600">Focus</div>
-                    <div className="absolute top-8 -left-8 text-xs font-semibold text-blue-600">Excellence</div>
-                  </div>
-                  
-                  {/* Overall Score */}
-                  <div className="text-center mt-4">
-                    <div className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">A-</div>
-                    <div className="text-sm text-gray-600">Overall Performance</div>
-                  </div>
-                </div>
-
-                {/* Right: Task Analytics */}
-                <div className="relative">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Task Analytics</h3>
-                  <div className="space-y-4">
-                    {/* Task Completion Meter */}
-                    <div className="relative">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium text-gray-700">Today's Tasks</span>
-                        <span className="text-sm font-bold text-blue-600">8/12</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500" style={{width: '67%'}}></div>
-                      </div>
-                    </div>
-                    
-                    {/* Goal Progress Bars */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600"></div>
-                        <div className="flex-1">
-                          <div className="flex justify-between text-xs mb-1">
-                            <span>Business</span>
-                            <span>234 tasks</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-blue-400 to-indigo-500 h-2 rounded-full" style={{width: '85%'}}></div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-600"></div>
-                        <div className="flex-1">
-                          <div className="flex justify-between text-xs mb-1">
-                            <span>Leadership</span>
-                            <span>187 tasks</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-purple-400 to-pink-500 h-2 rounded-full" style={{width: '72%'}}></div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600"></div>
-                        <div className="flex-1">
-                          <div className="flex justify-between text-xs mb-1">
-                            <span>Personal</span>
-                            <span>456 tasks</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-emerald-400 to-teal-500 h-2 rounded-full" style={{width: '93%'}}></div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 rounded-full bg-gradient-to-r from-orange-500 to-red-600"></div>
-                        <div className="flex-1">
-                          <div className="flex justify-between text-xs mb-1">
-                            <span>Home</span>
-                            <span>98 tasks</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-orange-400 to-red-500 h-2 rounded-full" style={{width: '45%'}}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Weekly Stats */}
-                    <div className="mt-6 grid grid-cols-2 gap-3 text-center">
-                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3">
-                        <div className="text-lg font-bold text-blue-600">147</div>
-                        <div className="text-xs text-blue-700">Total Complete</div>
-                      </div>
-                      <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg p-3">
-                        <div className="text-lg font-bold text-emerald-600">73%</div>
-                        <div className="text-xs text-emerald-700">This Week</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-
-        {/* Morning Priming */}
-        <Card className="border-0 shadow-lg mb-6">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Coffee className="w-5 h-5 text-amber-600" />
-              Morning Priming
-            </CardTitle>
-            <p className="text-sm text-gray-600 mt-1">
-              Start your day with purposeful habits
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {morningRoutines.map((routine) => (
-                <div 
-                  key={routine.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
-                    routine.completed ? 'bg-amber-50 border-amber-200' : 'border-gray-200 hover:bg-amber-50'
-                  }`}
-                >
-                  <input 
-                    type="checkbox" 
-                    checked={routine.completed}
-                    onChange={() => handleMorningRoutineToggle(routine.id)}
-                    className="w-5 h-5 text-amber-600 rounded cursor-pointer"
-                  />
-                  <span className={`flex-1 transition-all duration-300 ${
-                    routine.completed 
-                      ? 'line-through text-gray-500' 
-                      : 'text-gray-900'
-                  }`}>
-                    {routine.text}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Weekly Tasks with Day Tabs */}
-        <Card className="border-0 shadow-lg mb-6">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-blue-600" />
-                  Weekly Tasks
-                </CardTitle>
-                <p className="text-sm text-gray-600 mt-1">
-                  Plan your week for maximum productivity
-                </p>
-              </div>
-              
-              <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl px-4 py-3">
-                <div className="flex items-center gap-2 mb-1">
-                  <Trophy className="w-4 h-4 text-blue-600" />
-                  <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Tasks Completed</span>
-                </div>
-                <div className="text-2xl font-black text-blue-700">{criticalTasksCompleted}</div>
-                <div className="text-xs text-blue-600">lifetime total</div>
-              </div>
-            </div>
-
-            {/* Day Selection Tabs */}
-            <div className="flex flex-wrap gap-1 mt-4 bg-gray-100 rounded-lg p-1">
-              {[1, 2, 3, 4, 5, 6, 0].map((day) => {
-                const dayName = dayNames[day];
-                const isSelected = selectedDay === day;
-                const isToday = currentDay === day;
-                
-                return (
-                  <button
-                    key={day}
-                    onClick={() => setSelectedDay(day)}
-                    className={`px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 ${
-                      isSelected 
-                        ? 'bg-blue-600 text-white shadow-sm' 
-                        : isToday
-                        ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                        : 'text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    {dayName.slice(0, 3)}
-                    {isToday && <span className="ml-1 text-xs">•</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="mb-4">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                {dayNames[selectedDay]} Tasks
-                {selectedDay === currentDay && <span className="text-blue-600 ml-2">(Today)</span>}
-              </h3>
-            </div>
-            <div className="space-y-3">
-              {currentDayTasks.map((task, index) => {
-                const goal = getGoalById(task.goalId);
-                
-                return (
+        {/* Three-Column Layout: Morning Routine, Today's Tasks, Evening Routine */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {/* Morning Routine */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Coffee className="w-5 h-5 text-amber-600" />
+                Morning Routine
+              </CardTitle>
+              <p className="text-sm text-gray-600 mt-1">
+                Start your day with purpose
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {morningRoutines.map((routine) => (
                   <div 
-                    key={task.id}
-                    className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-200 ${
-                      task.completed ? 'bg-green-50 border-green-200' : 'bg-blue-50 border-blue-200 hover:bg-blue-100'
+                    key={routine.id}
+                    className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
+                      routine.completed ? 'bg-amber-50 border-amber-200' : 'border-gray-200 hover:bg-amber-50'
                     }`}
                   >
                     <input 
                       type="checkbox" 
-                      checked={task.completed}
-                      onChange={() => handleWeeklyTaskToggle(task.id)}
-                      className="w-5 h-5 text-blue-600 rounded cursor-pointer"
+                      checked={routine.completed}
+                      onChange={() => handleMorningRoutineToggle(routine.id)}
+                      className="w-5 h-5 text-amber-600 rounded cursor-pointer"
                     />
+                    <span className={`flex-1 text-sm ${routine.completed ? 'text-amber-800 font-medium' : 'text-gray-700'}`}>
+                      {routine.text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-1">
-                        <span className={`font-semibold transition-all duration-300 ${
-                          task.completed 
-                            ? 'line-through text-gray-500' 
-                            : 'text-gray-900'
-                        }`}>
+          {/* Today's Tasks */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                Today's Tasks
+              </CardTitle>
+              <p className="text-sm text-gray-600 mt-1">
+                {dayNames[selectedDay]}'s priorities
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {currentDayTasks.map((task) => {
+                  const goal = getGoalById(task.goalId);
+                  return (
+                    <div 
+                      key={task.id}
+                      className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
+                        task.completed ? 'bg-blue-50 border-blue-200' : 'border-gray-200 hover:bg-blue-50'
+                      }`}
+                    >
+                      <input 
+                        type="checkbox" 
+                        checked={task.completed}
+                        onChange={() => handleWeeklyTaskToggle(task.id)}
+                        className="w-5 h-5 text-blue-600 rounded cursor-pointer"
+                      />
+                      <div className="flex-1">
+                        <span className={`text-sm ${task.completed ? 'text-blue-800 font-medium' : 'text-gray-700'}`}>
                           {task.text}
                         </span>
                         {task.time && (
-                          <Badge variant="outline" className="text-xs text-blue-700 border-blue-300 bg-blue-100">
-                            <Clock className="w-3 h-3 mr-1" />
-                            {task.time}
-                          </Badge>
+                          <p className="text-xs text-gray-500 mt-1">{task.time}</p>
                         )}
                       </div>
-                      {goal && (
-                        <div className="flex items-center gap-2">
-                          <div className={`w-3 h-3 rounded-full ${goal.color}`}></div>
-                          <span className="text-sm text-gray-600">{goal.title}</span>
-                        </div>
-                      )}
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-
-
-        {/* Evening Routines */}
-        <Card className="border-0 shadow-lg mb-6">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Moon className="w-5 h-5 text-indigo-600" />
-              Evening Routines
-            </CardTitle>
-            <p className="text-sm text-gray-600 mt-1">
-              End your day with reflection and preparation
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {eveningRoutines.map((routine) => (
-                <div 
-                  key={routine.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
-                    routine.completed ? 'bg-indigo-50 border-indigo-200' : 'border-gray-200 hover:bg-indigo-50'
-                  }`}
-                >
-                  <input 
-                    type="checkbox" 
-                    checked={routine.completed}
-                    onChange={() => handleEveningRoutineToggle(routine.id)}
-                    className="w-5 h-5 text-indigo-600 rounded cursor-pointer"
-                  />
-                  <span className={`flex-1 transition-all duration-300 ${
-                    routine.completed 
-                      ? 'line-through text-gray-500' 
-                      : 'text-gray-900'
-                  }`}>
-                    {routine.text}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Calendar placeholder */}
-        <Card className="border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-lg">Today's Performance</CardTitle>
-            <p className="text-sm text-gray-600">Track your daily progress and momentum</p>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-4xl mb-4">📅</div>
-                <p className="text-gray-600">Calendar view coming soon</p>
+                  );
+                })}
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          {/* Evening Routine */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Moon className="w-5 h-5 text-indigo-600" />
+                Evening Routine
+              </CardTitle>
+              <p className="text-sm text-gray-600 mt-1">
+                End your day with reflection
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {eveningRoutines.map((routine) => (
+                  <div 
+                    key={routine.id}
+                    className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
+                      routine.completed ? 'bg-indigo-50 border-indigo-200' : 'border-gray-200 hover:bg-indigo-50'
+                    }`}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={routine.completed}
+                      onChange={() => handleEveningRoutineToggle(routine.id)}
+                      className="w-5 h-5 text-indigo-600 rounded cursor-pointer"
+                    />
+                    <span className={`flex-1 text-sm ${routine.completed ? 'text-indigo-800 font-medium' : 'text-gray-700'}`}>
+                      {routine.text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
       </main>
 
       <NewGoalModal 

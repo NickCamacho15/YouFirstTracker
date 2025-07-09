@@ -123,6 +123,14 @@ Build scripts include:
 
 ## Changelog
 
+- July 9, 2025: Simplified Dashboard with Three-Column Layout
+  - **SIMPLIFIED**: Removed complex analytics sections for cleaner, more focused dashboard design
+  - **NEW**: Three-column layout: Morning Routine, Today's Tasks, Evening Routine for streamlined daily planning
+  - **IMPROVED**: Four progress circles across top (Habits, Tasks, Goals, Reading) with compact mobile-friendly design
+  - **MAINTAINED**: Active Goals section with task completion counters and commitment tracking
+  - **CLEANED**: Eliminated personal excellence analytics, radar charts, and visual data sections per user request
+  - **FOCUSED**: Dashboard now emphasizes core daily activities: morning routines, task completion, evening reflection
+  - Dashboard serves as central hub pulling essential data from all other platform sections
 - July 7, 2025: Restructured Navigation - You. Dashboard is Now Home Page
   - **MAJOR**: You. dashboard page is now the main landing page (/) instead of home timeline
   - **REMOVED**: Home page with social timeline removed from routing
