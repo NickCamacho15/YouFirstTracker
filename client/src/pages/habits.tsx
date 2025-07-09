@@ -243,15 +243,11 @@ export default function HabitsPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
           </div>
         ) : (
-          <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-8">
-              <TabsTrigger value="overview" className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4" />
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="formation" className="flex items-center gap-2">
+          <Tabs defaultValue="new-habits" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-8">
+              <TabsTrigger value="new-habits" className="flex items-center gap-2">
                 <Star className="w-4 h-4" />
-                New habits
+                New Habits
               </TabsTrigger>
               <TabsTrigger value="foundations" className="flex items-center gap-2">
                 <Flame className="w-4 h-4" />
@@ -263,250 +259,309 @@ export default function HabitsPage() {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview" className="space-y-6">
-              {/* Main Habits Overview Dashboard */}
-              <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-black rounded-3xl p-8 text-white mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h1 className="text-3xl font-black mb-2">HABIT MASTERY</h1>
-                    <p className="text-gray-300">Complete wellness & personal growth analytics</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-green-400 text-sm font-bold tracking-wide">OVERALL SCORE</div>
-                    <div className="text-5xl font-black text-white">
-                      {habits.length > 0 ? Math.round(((habits as Habit[]).filter(h => h.completedToday).length / habits.length) * 100) : 0}
-                    </div>
-                    <div className="text-green-400 text-sm">EXCELLENT</div>
-                  </div>
-                </div>
+            <TabsContent value="new-habits" className="space-y-6">
+              {/* New Habits Section with Mind/Body/Soul Categories */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                 
-                {/* Comprehensive Metrics Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-                    <div className="text-blue-400 text-2xl font-black">{habits.length}</div>
-                    <div className="text-gray-300 text-xs font-medium">TOTAL HABITS</div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-                    <div className="text-green-400 text-2xl font-black">
-                      {(habits as Habit[]).filter(h => h.completedToday).length}
-                    </div>
-                    <div className="text-gray-300 text-xs font-medium">TODAY</div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-                    <div className="text-yellow-400 text-2xl font-black">
-                      {habits.length > 0 ? Math.round((habits as Habit[]).reduce((sum, h) => sum + h.streak, 0) / habits.length) : 0}
-                    </div>
-                    <div className="text-gray-300 text-xs font-medium">AVG STREAK</div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-                    <div className="text-red-400 text-2xl font-black">
-                      {habits.length > 0 ? Math.max(...(habits as Habit[]).map(h => h.streak)) : 0}
-                    </div>
-                    <div className="text-gray-300 text-xs font-medium">LONGEST</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Visual Data Layout - Engaging Habit Display */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                {/* Habit Health Radar Chart */}
-                <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
-                  <h3 className="text-xl font-bold mb-4 text-gray-900">Habit Health Score</h3>
-                  <HabitRadarChart habits={habits as Habit[]} rules={[]} />
-                </div>
-
-                {/* Category Breakdown Circles */}
-                <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
-                  <h3 className="text-xl font-bold mb-4 text-gray-900">Category Performance</h3>
-                  <div className="grid grid-cols-3 gap-4">
-                    {['mind', 'body', 'soul'].map((category) => {
-                      const categoryHabits = (habits as Habit[]).filter(h => h.category === category);
-                      const completionRate = categoryHabits.length > 0 
-                        ? Math.round((categoryHabits.filter(h => h.completedToday).length / categoryHabits.length) * 100)
-                        : 0;
-                      
-                      const colors = {
-                        mind: { bg: 'bg-purple-500', text: 'text-purple-600', icon: '🧠' },
-                        body: { bg: 'bg-orange-500', text: 'text-orange-600', icon: '💪' },
-                        soul: { bg: 'bg-emerald-500', text: 'text-emerald-600', icon: '✨' }
-                      }[category];
-                      
-                      return (
-                        <div key={category} className="text-center">
-                          <div className="relative w-20 h-20 mx-auto mb-3">
-                            <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 100 100">
-                              <circle
-                                cx="50"
-                                cy="50"
-                                r="40"
-                                stroke="currentColor"
-                                strokeWidth="8"
-                                fill="transparent"
-                                className="text-gray-200"
-                              />
-                              <circle
-                                cx="50"
-                                cy="50"
-                                r="40"
-                                stroke="currentColor"
-                                strokeWidth="8"
-                                fill="transparent"
-                                strokeDasharray={`${2 * Math.PI * 40}`}
-                                strokeDashoffset={`${2 * Math.PI * 40 * (1 - completionRate / 100)}`}
-                                className={colors.text.replace('text-', 'text-')}
-                                strokeLinecap="round"
-                              />
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <span className="text-2xl mb-1">{colors.icon}</span>
-                              <span className="text-sm font-bold text-gray-900">{completionRate}%</span>
-                            </div>
-                          </div>
-                          <h4 className="font-semibold text-gray-900 capitalize">{category}</h4>
-                          <p className="text-xs text-gray-600">{categoryHabits.length} habits</p>
+                {/* Mind Category */}
+                <Card className="border-0 shadow-lg relative">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
+                          <span className="text-white text-xs">🧠</span>
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-
-
-
-
-              {/* Clean Check-Off Sections */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                
-                {/* New Habits */}
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Plus className="w-5 h-5 text-blue-600" />
+                        <CardTitle className="text-base sm:text-lg">Mind Habits</CardTitle>
                       </div>
-                      <div>
-                        <CardTitle className="text-lg">New Habits</CardTitle>
-                        <p className="text-sm text-muted-foreground">67-day formation tracking</p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50"
+                        onClick={() => {/* Add mind habit */}}
+                      >
+                        <Plus className="w-3 h-3" />
+                      </Button>
+                    </div>
+                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                      Strengthen mental clarity and focus
+                    </p>
+                    
+                    {/* Progress Bar */}
+                    <div className="bg-blue-50 rounded-lg p-3 mt-3 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-medium text-blue-800">67-Day Formation</span>
+                        <span className="text-xs font-bold text-blue-800">
+                          {Math.round(((habits as Habit[]).filter(h => h.category === 'mind' && h.completedToday).length / Math.max(1, (habits as Habit[]).filter(h => h.category === 'mind').length)) * 100)}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-blue-200 rounded-full h-2">
+                        <div 
+                          className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-300"
+                          style={{ 
+                            width: `${Math.round(((habits as Habit[]).filter(h => h.category === 'mind' && h.completedToday).length / Math.max(1, (habits as Habit[]).filter(h => h.category === 'mind').length)) * 100)}%` 
+                          }}
+                        ></div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="text-center">
+                          <div className="font-bold text-green-600">
+                            {(habits as Habit[]).filter(h => h.category === 'mind' && h.streak >= 7).length}
+                          </div>
+                          <div className="text-gray-600">Forming</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-bold text-blue-600">
+                            {(habits as Habit[]).filter(h => h.category === 'mind').length > 0 
+                              ? Math.round((habits as Habit[]).filter(h => h.category === 'mind').reduce((acc, h) => acc + h.streak, 0) / (habits as Habit[]).filter(h => h.category === 'mind').length) 
+                              : 0}
+                          </div>
+                          <div className="text-gray-600">Avg Days</div>
+                        </div>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {(habits as Habit[]).filter(h => h.category === 'mind').slice(0, 3).map((habit) => (
-                        <div key={habit.id} className="flex items-center justify-between p-4 bg-white rounded-lg border hover:border-blue-300 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                            <div>
-                              <span className="text-sm font-medium">{habit.title}</span>
-                              <p className="text-xs text-gray-500">Day {habit.streak}</p>
+                  <CardContent className="pt-0">
+                    <div className="space-y-2">
+                      {(habits as Habit[]).filter(h => h.category === 'mind').map((habit) => (
+                        <div 
+                          key={habit.id}
+                          className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
+                            habit.completedToday ? 'bg-blue-50 border-blue-200' : 'border-gray-200 hover:bg-blue-50'
+                          }`}
+                        >
+                          <input 
+                            type="checkbox" 
+                            checked={habit.completedToday}
+                            onChange={() => handleToggleHabit(habit.id)}
+                            className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded cursor-pointer"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <span className={`text-xs sm:text-sm ${habit.completedToday ? 'text-blue-800 font-medium' : 'text-gray-700'}`}>
+                              {habit.title}
+                            </span>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                habit.streak >= 67
+                                  ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' 
+                                  : habit.streak >= 30
+                                  ? 'bg-green-100 text-green-700' 
+                                  : 'bg-blue-100 text-blue-700'
+                              }`}>
+                                {habit.streak}/67 days
+                              </span>
                             </div>
                           </div>
-                          <button
-                            onClick={() => toggleHabit.mutate({ habitId: habit.id, completed: !habit.completedToday })}
-                            className={`w-12 h-12 rounded-full transition-all ${
-                              habit.completedToday 
-                                ? 'bg-blue-500 text-white border-2 border-blue-400' 
-                                : 'border-2 border-gray-300 hover:border-blue-500 bg-white'
-                            }`}
-                          >
-                            {habit.completedToday && <CheckCircle2 className="w-6 h-6 mx-auto" />}
-                          </button>
                         </div>
                       ))}
                       {(habits as Habit[]).filter(h => h.category === 'mind').length === 0 && (
-                        <p className="text-sm text-gray-500 text-center py-4">No new habits yet</p>
+                        <div className="text-center py-4 text-gray-500 text-sm">
+                          No mind habits yet. Add one to start building mental clarity!
+                        </div>
                       )}
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Foundations */}
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-teal-50">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-emerald-100 rounded-lg">
-                        <Layers className="w-5 h-5 text-emerald-600" />
+                {/* Body Category */}
+                <Card className="border-0 shadow-lg relative">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center">
+                          <span className="text-white text-xs">💪</span>
+                        </div>
+                        <CardTitle className="text-base sm:text-lg">Body Habits</CardTitle>
                       </div>
-                      <div>
-                        <CardTitle className="text-lg">Foundations</CardTitle>
-                        <p className="text-sm text-muted-foreground">Long-term consistency</p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 text-orange-600 hover:bg-orange-50"
+                        onClick={() => {/* Add body habit */}}
+                      >
+                        <Plus className="w-3 h-3" />
+                      </Button>
+                    </div>
+                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                      Build physical strength and vitality
+                    </p>
+                    
+                    {/* Progress Bar */}
+                    <div className="bg-orange-50 rounded-lg p-3 mt-3 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-medium text-orange-800">67-Day Formation</span>
+                        <span className="text-xs font-bold text-orange-800">
+                          {Math.round(((habits as Habit[]).filter(h => h.category === 'body' && h.completedToday).length / Math.max(1, (habits as Habit[]).filter(h => h.category === 'body').length)) * 100)}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-orange-200 rounded-full h-2">
+                        <div 
+                          className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full transition-all duration-300"
+                          style={{ 
+                            width: `${Math.round(((habits as Habit[]).filter(h => h.category === 'body' && h.completedToday).length / Math.max(1, (habits as Habit[]).filter(h => h.category === 'body').length)) * 100)}%` 
+                          }}
+                        ></div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="text-center">
+                          <div className="font-bold text-green-600">
+                            {(habits as Habit[]).filter(h => h.category === 'body' && h.streak >= 7).length}
+                          </div>
+                          <div className="text-gray-600">Forming</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-bold text-orange-600">
+                            {(habits as Habit[]).filter(h => h.category === 'body').length > 0 
+                              ? Math.round((habits as Habit[]).filter(h => h.category === 'body').reduce((acc, h) => acc + h.streak, 0) / (habits as Habit[]).filter(h => h.category === 'body').length) 
+                              : 0}
+                          </div>
+                          <div className="text-gray-600">Avg Days</div>
+                        </div>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {(habits as Habit[]).filter(h => h.category === 'body').slice(0, 3).map((habit) => (
-                        <div key={habit.id} className="flex items-center justify-between p-4 bg-white rounded-lg border hover:border-emerald-300 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                            <div>
-                              <span className="text-sm font-medium">{habit.title}</span>
-                              <p className="text-xs text-gray-500">{habit.streak} days</p>
+                  <CardContent className="pt-0">
+                    <div className="space-y-2">
+                      {(habits as Habit[]).filter(h => h.category === 'body').map((habit) => (
+                        <div 
+                          key={habit.id}
+                          className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
+                            habit.completedToday ? 'bg-orange-50 border-orange-200' : 'border-gray-200 hover:bg-orange-50'
+                          }`}
+                        >
+                          <input 
+                            type="checkbox" 
+                            checked={habit.completedToday}
+                            onChange={() => handleToggleHabit(habit.id)}
+                            className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 rounded cursor-pointer"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <span className={`text-xs sm:text-sm ${habit.completedToday ? 'text-orange-800 font-medium' : 'text-gray-700'}`}>
+                              {habit.title}
+                            </span>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                habit.streak >= 67
+                                  ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' 
+                                  : habit.streak >= 30
+                                  ? 'bg-green-100 text-green-700' 
+                                  : 'bg-orange-100 text-orange-700'
+                              }`}>
+                                {habit.streak}/67 days
+                              </span>
                             </div>
                           </div>
-                          <button
-                            onClick={() => toggleHabit.mutate({ habitId: habit.id, completed: !habit.completedToday })}
-                            className={`w-12 h-12 rounded-full transition-all ${
-                              habit.completedToday 
-                                ? 'bg-emerald-500 text-white border-2 border-emerald-400' 
-                                : 'border-2 border-gray-300 hover:border-emerald-500 bg-white'
-                            }`}
-                          >
-                            {habit.completedToday && <CheckCircle2 className="w-6 h-6 mx-auto" />}
-                          </button>
                         </div>
                       ))}
                       {(habits as Habit[]).filter(h => h.category === 'body').length === 0 && (
-                        <p className="text-sm text-gray-500 text-center py-4">No foundations yet</p>
+                        <div className="text-center py-4 text-gray-500 text-sm">
+                          No body habits yet. Add one to start building physical strength!
+                        </div>
                       )}
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Rules */}
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-pink-50">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-purple-100 rounded-lg">
-                        <Shield className="w-5 h-5 text-purple-600" />
+                {/* Soul Category */}
+                <Card className="border-0 shadow-lg relative">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 flex items-center justify-center">
+                          <span className="text-white text-xs">✨</span>
+                        </div>
+                        <CardTitle className="text-base sm:text-lg">Soul Habits</CardTitle>
                       </div>
-                      <div>
-                        <CardTitle className="text-lg">Rules</CardTitle>
-                        <p className="text-sm text-muted-foreground">Behavioral optimization</p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 text-emerald-600 hover:bg-emerald-50"
+                        onClick={() => {/* Add soul habit */}}
+                      >
+                        <Plus className="w-3 h-3" />
+                      </Button>
+                    </div>
+                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                      Nurture spiritual growth and purpose
+                    </p>
+                    
+                    {/* Progress Bar */}
+                    <div className="bg-emerald-50 rounded-lg p-3 mt-3 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-medium text-emerald-800">67-Day Formation</span>
+                        <span className="text-xs font-bold text-emerald-800">
+                          {Math.round(((habits as Habit[]).filter(h => h.category === 'soul' && h.completedToday).length / Math.max(1, (habits as Habit[]).filter(h => h.category === 'soul').length)) * 100)}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-emerald-200 rounded-full h-2">
+                        <div 
+                          className="bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full transition-all duration-300"
+                          style={{ 
+                            width: `${Math.round(((habits as Habit[]).filter(h => h.category === 'soul' && h.completedToday).length / Math.max(1, (habits as Habit[]).filter(h => h.category === 'soul').length)) * 100)}%` 
+                          }}
+                        ></div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="text-center">
+                          <div className="font-bold text-green-600">
+                            {(habits as Habit[]).filter(h => h.category === 'soul' && h.streak >= 7).length}
+                          </div>
+                          <div className="text-gray-600">Forming</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-bold text-emerald-600">
+                            {(habits as Habit[]).filter(h => h.category === 'soul').length > 0 
+                              ? Math.round((habits as Habit[]).filter(h => h.category === 'soul').reduce((acc, h) => acc + h.streak, 0) / (habits as Habit[]).filter(h => h.category === 'soul').length) 
+                              : 0}
+                          </div>
+                          <div className="text-gray-600">Avg Days</div>
+                        </div>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {(habits as Habit[]).filter(h => h.category === 'soul').slice(0, 3).map((habit) => (
-                        <div key={habit.id} className="flex items-center justify-between p-4 bg-white rounded-lg border hover:border-purple-300 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                            <div>
-                              <span className="text-sm font-medium">{habit.title}</span>
-                              <p className="text-xs text-gray-500">Active</p>
+                  <CardContent className="pt-0">
+                    <div className="space-y-2">
+                      {(habits as Habit[]).filter(h => h.category === 'soul').map((habit) => (
+                        <div 
+                          key={habit.id}
+                          className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
+                            habit.completedToday ? 'bg-emerald-50 border-emerald-200' : 'border-gray-200 hover:bg-emerald-50'
+                          }`}
+                        >
+                          <input 
+                            type="checkbox" 
+                            checked={habit.completedToday}
+                            onChange={() => handleToggleHabit(habit.id)}
+                            className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 rounded cursor-pointer"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <span className={`text-xs sm:text-sm ${habit.completedToday ? 'text-emerald-800 font-medium' : 'text-gray-700'}`}>
+                              {habit.title}
+                            </span>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                habit.streak >= 67
+                                  ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' 
+                                  : habit.streak >= 30
+                                  ? 'bg-green-100 text-green-700' 
+                                  : 'bg-emerald-100 text-emerald-700'
+                              }`}>
+                                {habit.streak}/67 days
+                              </span>
                             </div>
                           </div>
-                          <button
-                            onClick={() => toggleHabit.mutate({ habitId: habit.id, completed: !habit.completedToday })}
-                            className={`w-12 h-12 rounded-full transition-all ${
-                              habit.completedToday 
-                                ? 'bg-purple-500 text-white border-2 border-purple-400' 
-                                : 'border-2 border-gray-300 hover:border-purple-500 bg-white'
-                            }`}
-                          >
-                            {habit.completedToday && <CheckCircle2 className="w-6 h-6 mx-auto" />}
-                          </button>
                         </div>
                       ))}
                       {(habits as Habit[]).filter(h => h.category === 'soul').length === 0 && (
-                        <p className="text-sm text-gray-500 text-center py-4">No rules yet</p>
+                        <div className="text-center py-4 text-gray-500 text-sm">
+                          No soul habits yet. Add one to start nurturing your spiritual growth!
+                        </div>
                       )}
                     </div>
                   </CardContent>
                 </Card>
               </div>
+
+
             </TabsContent>
 
             <TabsContent value="formation" className="space-y-6">

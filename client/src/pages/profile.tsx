@@ -131,6 +131,7 @@ export default function ProfilePage() {
   }
 
   const getInitials = (name: string) => {
+    if (!name) return "U";
     return name
       .split(" ")
       .map((part) => part.charAt(0))
