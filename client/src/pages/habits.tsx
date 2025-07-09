@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Settings, CheckCircle2, Circle, Flame, Star, Zap, BarChart3, Shield, X, Layers } from "lucide-react";
+import { Plus, Settings, CheckCircle2, Circle, Flame, Star, Zap, BarChart3, Shield, X, Layers, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,8 @@ import { EditHabitModal } from "@/components/habits/edit-habit-modal";
 import { SlideToComplete } from "@/components/habits/slide-to-complete";
 import { HabitRadarChart } from "@/components/habits/habit-radar-chart";
 import { SlideToBreak } from "@/components/habits/slide-to-break";
+import { NewHabitModal } from "@/components/habits/new-habit-modal";
+import { HabitProgressBar } from "@/components/habits/habit-progress-bar";
 
 interface Habit {
   id: number;
@@ -260,6 +262,9 @@ export default function HabitsPage() {
             </TabsList>
 
             <TabsContent value="new-habits" className="space-y-6">
+              {/* 67-Day Progress Bar Graph */}
+              <HabitProgressBar habits={habits as Habit[]} />
+
               {/* New Habits Section with Mind/Body/Soul Categories */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                 
@@ -273,14 +278,18 @@ export default function HabitsPage() {
                         </div>
                         <CardTitle className="text-base sm:text-lg">Mind Habits</CardTitle>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50"
-                        onClick={() => {/* Add mind habit */}}
-                      >
-                        <Plus className="w-3 h-3" />
-                      </Button>
+                      <NewHabitModal 
+                        category="mind"
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                        }
+                      />
                     </div>
                     <p className="text-xs sm:text-sm text-gray-600 mt-1">
                       Strengthen mental clarity and focus
@@ -372,14 +381,18 @@ export default function HabitsPage() {
                         </div>
                         <CardTitle className="text-base sm:text-lg">Body Habits</CardTitle>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 w-7 p-0 text-orange-600 hover:bg-orange-50"
-                        onClick={() => {/* Add body habit */}}
-                      >
-                        <Plus className="w-3 h-3" />
-                      </Button>
+                      <NewHabitModal 
+                        category="body"
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0 text-orange-600 hover:bg-orange-50"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                        }
+                      />
                     </div>
                     <p className="text-xs sm:text-sm text-gray-600 mt-1">
                       Build physical strength and vitality
@@ -471,14 +484,18 @@ export default function HabitsPage() {
                         </div>
                         <CardTitle className="text-base sm:text-lg">Soul Habits</CardTitle>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 w-7 p-0 text-emerald-600 hover:bg-emerald-50"
-                        onClick={() => {/* Add soul habit */}}
-                      >
-                        <Plus className="w-3 h-3" />
-                      </Button>
+                      <NewHabitModal 
+                        category="soul"
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0 text-emerald-600 hover:bg-emerald-50"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                        }
+                      />
                     </div>
                     <p className="text-xs sm:text-sm text-gray-600 mt-1">
                       Nurture spiritual growth and purpose
@@ -561,6 +578,77 @@ export default function HabitsPage() {
                 </Card>
               </div>
 
+              {/* Mastered Habits Section (67+ days) */}
+              {(habits as Habit[]).some(h => h.streak >= 67) && (
+                <Card className="border-0 shadow-lg bg-gradient-to-br from-yellow-50 to-orange-50">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-yellow-100 rounded-lg">
+                          <Trophy className="w-5 h-5 text-yellow-600" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg text-yellow-800">Mastered Habits</CardTitle>
+                          <p className="text-sm text-yellow-700">Congratulations! These habits are now automatic</p>
+                        </div>
+                      </div>
+                      <Badge className="bg-yellow-200 text-yellow-800 border-yellow-300">
+                        {(habits as Habit[]).filter(h => h.streak >= 67).length} mastered
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {(habits as Habit[]).filter(h => h.streak >= 67).map((habit) => {
+                        const categoryColors = {
+                          mind: 'bg-blue-100 text-blue-800 border-blue-300',
+                          body: 'bg-orange-100 text-orange-800 border-orange-300',
+                          soul: 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                        };
+                        
+                        const categoryIcons = {
+                          mind: '🧠',
+                          body: '💪',
+                          soul: '✨'
+                        };
+                        
+                        return (
+                          <div 
+                            key={habit.id}
+                            className="bg-white rounded-lg p-4 border-2 border-yellow-200 hover:border-yellow-300 transition-all duration-200"
+                          >
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg">
+                                  {categoryIcons[habit.category as keyof typeof categoryIcons]}
+                                </span>
+                                <span className="font-medium text-gray-900">{habit.title}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Trophy className="w-4 h-4 text-yellow-600" />
+                                <span className="text-xs font-bold text-yellow-700">{habit.streak} days</span>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                              <Badge 
+                                className={`text-xs ${categoryColors[habit.category as keyof typeof categoryColors]}`}
+                              >
+                                {habit.category?.charAt(0).toUpperCase()}{habit.category?.slice(1)}
+                              </Badge>
+                              
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-600">Mastered</span>
+                                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
             </TabsContent>
 

@@ -43,6 +43,9 @@ export const habits = pgTable("habits", {
   reasons: text("reasons").array(),
   category: text("category", { enum: ["mind", "body", "soul"] }).default("mind").notNull(),
   timeOfDay: text("time_of_day", { enum: ["morning", "afternoon", "evening", "anytime"] }).default("anytime").notNull(),
+  reminder: text("reminder").notNull(),
+  routine: text("routine").notNull(),
+  reward: text("reward").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -370,6 +373,9 @@ export const insertHabitSchema = createInsertSchema(habits).omit({
   streak: true,
 }).extend({
   reasons: z.array(z.string().min(1, "Reason cannot be empty")).min(3, "Please provide exactly 3 reasons").max(3, "Please provide exactly 3 reasons"),
+  reminder: z.string().min(1, "Reminder is required"),
+  routine: z.string().min(1, "Routine is required"),
+  reward: z.string().min(1, "Reward is required"),
 });
 
 export const insertHabitLogSchema = createInsertSchema(habitLogs).omit({
