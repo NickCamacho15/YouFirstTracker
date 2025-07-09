@@ -128,7 +128,7 @@ export default function VisionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-24">
       <Navigation />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
