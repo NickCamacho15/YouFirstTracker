@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Bell, Home, Target, Repeat, BookOpen, ImageIcon, User, Sparkles, Activity } from "lucide-react";
+import uoyLogo from "@assets/Change (You.) Clothing-3_1752098241017.png";
 
 export function Navigation() {
   const [location] = useLocation();
@@ -55,62 +56,74 @@ export function Navigation() {
       </nav>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
-        <div className="flex justify-around items-center h-16 px-4">
-          <Link href="/">
-            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
-              location === "/"
-                ? "text-accent bg-accent/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <User className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">You</span>
-            </div>
-          </Link>
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+        <div className="flex items-center justify-between h-20 px-6 relative">
+          {/* Left Side - Habits & Goals */}
+          <div className="flex items-center space-x-8">
+            <Link href="/habits">
+              <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
+                isActive("/habits")
+                  ? "text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}>
+                <Repeat className="w-6 h-6 mb-1" />
+                <span className="text-xs font-medium">Habits</span>
+              </div>
+            </Link>
 
-          <Link href="/habits">
-            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
-              isActive("/habits")
-                ? "text-accent bg-accent/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <Repeat className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">Habits</span>
-            </div>
-          </Link>
+            <Link href="/goals">
+              <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
+                isActive("/goals")
+                  ? "text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}>
+                <Target className="w-6 h-6 mb-1" />
+                <span className="text-xs font-medium">Goals</span>
+              </div>
+            </Link>
+          </div>
 
-          <Link href="/goals">
-            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
-              isActive("/goals")
-                ? "text-accent bg-accent/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <Target className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">Goals</span>
-            </div>
-          </Link>
-          
-          <Link href="/read">
-            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
-              isActive("/read")
-                ? "text-accent bg-accent/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <BookOpen className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">Read</span>
-            </div>
-          </Link>
+          {/* Center - You. Button with Black Circle */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 -top-3">
+            <Link href="/">
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-all cursor-pointer ${
+                location === "/"
+                  ? "bg-black scale-110"
+                  : "bg-black hover:scale-105"
+              }`}>
+                <img 
+                  src={uoyLogo} 
+                  alt=".uoY" 
+                  className="w-8 h-8 invert"
+                />
+              </div>
+            </Link>
+          </div>
 
-          <Link href="/health">
-            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
-              isActive("/health")
-                ? "text-accent bg-accent/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <Activity className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">Health</span>
-            </div>
-          </Link>
+          {/* Right Side - Read & Health */}
+          <div className="flex items-center space-x-8">
+            <Link href="/read">
+              <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
+                isActive("/read")
+                  ? "text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}>
+                <BookOpen className="w-6 h-6 mb-1" />
+                <span className="text-xs font-medium">Read</span>
+              </div>
+            </Link>
+
+            <Link href="/health">
+              <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
+                isActive("/health")
+                  ? "text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}>
+                <Activity className="w-6 h-6 mb-1" />
+                <span className="text-xs font-medium">Health</span>
+              </div>
+            </Link>
+          </div>
 
         </div>
       </div>

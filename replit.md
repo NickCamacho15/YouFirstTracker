@@ -123,6 +123,14 @@ Build scripts include:
 
 ## Changelog
 
+- July 9, 2025: Redesigned Navigation Bar with Prominent Center Button
+  - **REDESIGNED**: Bottom navigation bar now follows 1st Phorm app design with prominent black circle for You. button in center
+  - **BRANDING**: Center button features .uoY logo with black circular background and subtle scaling animations
+  - **LAYOUT**: Four-item layout - Habits/Goals on left, Read/Health on right, centered You. button elevated above bar
+  - **VISUAL**: Clean white background with increased height (h-20) and better spacing for elevated center button
+  - **IMPROVED**: Larger touch targets (w-6 h-6) and better visual hierarchy with blue active states
+  - **MOBILE**: Added bottom padding (pb-24) to dashboard for new taller navigation bar
+  - Navigation creates focal point on dashboard access while maintaining clean aesthetic
 - July 9, 2025: Mobile-Optimized Dashboard with Enhanced Routine Tracking
   - **MOBILE**: Added mobile day selector with arrow navigation for easy day switching on small screens
   - **ENHANCED**: Discipline metrics bars added to Morning/Evening routines with colorful progress tracking and streak data

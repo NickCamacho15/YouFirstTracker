@@ -174,7 +174,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <main className="p-4 pb-20">
+      <main className="p-4 pb-24">
         {/* Mobile Day Selector - Only visible on mobile */}
         <div className="md:hidden mb-4">
           <div className="flex items-center justify-between bg-gray-100 rounded-lg p-2">
