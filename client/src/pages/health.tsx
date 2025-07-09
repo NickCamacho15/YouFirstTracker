@@ -1092,11 +1092,145 @@ export default function HealthPage() {
         {/* Workout Section Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Tabs value={workoutTab} onValueChange={setWorkoutTab}>
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="training-schedule">Training Schedule</TabsTrigger>
               <TabsTrigger value="log-workout">Log Workout</TabsTrigger>
               <TabsTrigger value="progress">Progress</TabsTrigger>
-              <TabsTrigger value="workout-history">Workout History</TabsTrigger>
+              <TabsTrigger value="workout-history">History</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="training-schedule" className="mt-6">
+              <div className="space-y-6">
+                {/* Generated Program Display */}
+                {generatedProgram ? (
+                  <div className="space-y-6">
+                    {/* Program Header */}
+                    <div className="bg-white rounded-lg shadow-sm p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h3 className="text-xl font-semibold text-gray-900 flex items-center">
+                            <Trophy className="h-5 w-5 mr-2 text-blue-600" />
+                            {generatedProgram.program?.name || "4-Week Training Program"}
+                          </h3>
+                          <p className="text-sm text-gray-600 mt-1">{generatedProgram.program?.description}</p>
+                        </div>
+                        <Button variant="outline" size="sm" onClick={() => setShowProgramDialog(true)}>
+                          <Calendar className="h-4 w-4 mr-2" />
+                          Edit Program
+                        </Button>
+                      </div>
+                      
+                      {/* Phase Overview */}
+                      <div className="grid grid-cols-4 gap-4">
+                        {[1, 2, 3, 4].map((week) => {
+                          const weekData = generatedProgram.weeks?.find(w => w.weekNumber === week);
+                          const phase = week <= 2 ? "Load" : week === 3 ? "Peak" : "Deload";
+                          const phaseColor = week <= 2 ? "blue" : week === 3 ? "red" : "green";
+                          
+                          return (
+                            <div key={week} className={`rounded-lg p-4 border-2 ${
+                              phase === "Load" ? "border-blue-200 bg-blue-50" :
+                              phase === "Peak" ? "border-red-200 bg-red-50" :
+                              "border-green-200 bg-green-50"
+                            }`}>
+                              <div className="text-center">
+                                <div className="text-sm font-medium text-gray-700">Week {week}</div>
+                                <div className={`text-lg font-bold ${
+                                  phase === "Load" ? "text-blue-600" :
+                                  phase === "Peak" ? "text-red-600" :
+                                  "text-green-600"
+                                }`}>{phase} Phase</div>
+                                <div className="text-xs text-gray-600 mt-1">
+                                  {weekData?.phaseDescription || 
+                                    (phase === "Load" ? "Building volume" :
+                                     phase === "Peak" ? "Maximum intensity" :
+                                     "Active recovery")}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Week-by-Week Schedule */}
+                    {generatedProgram.weeks?.map((week) => (
+                      <div key={week.weekNumber} className="bg-white rounded-lg shadow-sm p-6">
+                        <div className="mb-4">
+                          <h4 className="text-lg font-medium text-gray-900">
+                            Week {week.weekNumber} - {week.phase} Phase
+                          </h4>
+                          <p className="text-sm text-gray-600">{week.phaseDescription}</p>
+                        </div>
+                        
+                        {/* Daily Workouts Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {week.days?.map((day) => (
+                            <div key={day.dayNumber} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                              <div className="flex justify-between items-center mb-3">
+                                <h5 className="font-medium text-gray-900">
+                                  Day {day.dayNumber}: {day.name}
+                                </h5>
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost"
+                                  onClick={() => {
+                                    setSelectedWeek(week.weekNumber);
+                                    setSelectedDay(day.dayNumber);
+                                    setShowProgramDialog(true);
+                                  }}
+                                >
+                                  View
+                                </Button>
+                              </div>
+                              
+                              {/* Workout Summary */}
+                              <div className="space-y-2 text-sm">
+                                {day.blocks?.map((block, idx) => (
+                                  <div key={idx} className="flex items-center text-gray-600">
+                                    <div className={`w-2 h-2 rounded-full mr-2 ${
+                                      block.blockType === 'warmup' ? 'bg-orange-400' :
+                                      block.blockType === 'main_a' ? 'bg-red-400' :
+                                      block.blockType === 'main_b' ? 'bg-blue-400' :
+                                      'bg-green-400'
+                                    }`}></div>
+                                    <span className="truncate">{block.name}</span>
+                                  </div>
+                                ))}
+                              </div>
+                              
+                              {/* Completion Status */}
+                              <div className="mt-3 pt-3 border-t">
+                                <div className="flex items-center justify-between text-sm">
+                                  <span className="text-gray-500">Status</span>
+                                  <span className="text-gray-700 font-medium">Not Started</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+                    <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Training Program Generated</h3>
+                    <p className="text-gray-600 mb-6">Generate a personalized 4-week program based on your fitness profile</p>
+                    <Button 
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={() => {
+                        setActiveTab("dashboard");
+                        setShowFitnessProfileDialog(true);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Generate Program
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
 
             <TabsContent value="workout-history" className="mt-6">
               <div className="space-y-6">
@@ -1992,6 +2126,10 @@ export default function HealthPage() {
                 <Button 
                   className="w-full bg-white bg-opacity-20 text-white hover:bg-opacity-30 border-white border"
                   variant="outline"
+                  onClick={() => {
+                    setActiveTab("workout-section");
+                    setWorkoutTab("training-schedule");
+                  }}
                 >
                   <Calendar className="h-4 w-4 mr-2" />
                   View Training Schedule
