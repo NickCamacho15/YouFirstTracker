@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { NewGoalModal } from "@/components/goals/new-goal-modal";
-import { NewHabitModal } from "@/components/habits/new-habit-modal";
+
 import { HabitStoryBar } from "@/components/habits/habit-story-bar";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ import {
 export default function DashboardPage() {
   const { user } = useAuth();
   const [showNewGoalModal, setShowNewGoalModal] = useState(false);
-  const [showNewHabitModal, setShowNewHabitModal] = useState(false);
+
   
   // Critical tasks completion counter - tracks lifetime achievements
   const [criticalTasksCompleted, setCriticalTasksCompleted] = useState(147);
@@ -592,11 +592,7 @@ export default function DashboardPage() {
         onSuccess={() => {}}
       />
       
-      <NewHabitModal 
-        open={showNewHabitModal} 
-        onOpenChange={setShowNewHabitModal}
-        onSuccess={() => {}}
-      />
+
     </div>
   );
 }
