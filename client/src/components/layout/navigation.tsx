@@ -63,8 +63,8 @@ export function Navigation() {
                 ? "text-accent bg-accent/10"
                 : "text-muted-foreground hover:text-foreground"
             }`}>
-              <Home className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">Home</span>
+              <User className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">You</span>
             </div>
           </Link>
 
@@ -76,17 +76,6 @@ export function Navigation() {
             }`}>
               <Repeat className="w-5 h-5 mb-1" />
               <span className="text-xs font-medium">Habits</span>
-            </div>
-          </Link>
-
-          <Link href="/you">
-            <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
-              isActive("/you")
-                ? "text-accent bg-accent/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}>
-              <User className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">You</span>
             </div>
           </Link>
 

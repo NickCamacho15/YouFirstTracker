@@ -168,12 +168,12 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white">
       <main className="p-4 pb-20">
-        {/* Progress Circles Overview - Restored */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        {/* Progress Circles Overview - Four Across */}
+        <div className="grid grid-cols-4 gap-3 mb-8">
           {/* Habits Progress */}
           <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-3">
-              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+            <div className="relative w-16 h-16 mx-auto mb-2">
+              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
                 <path
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
@@ -190,17 +190,17 @@ export default function DashboardPage() {
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl font-bold text-gray-900">75%</span>
+                <span className="text-sm font-bold text-gray-900">75%</span>
               </div>
             </div>
-            <h3 className="font-semibold text-gray-900">Habits</h3>
-            <p className="text-xs text-gray-500">Daily completion</p>
+            <h3 className="text-sm font-semibold text-gray-900">Habits</h3>
+            <p className="text-xs text-gray-500">Daily</p>
           </div>
 
           {/* Tasks Progress */}
           <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-3">
-              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+            <div className="relative w-16 h-16 mx-auto mb-2">
+              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
                 <path
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
@@ -217,17 +217,17 @@ export default function DashboardPage() {
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl font-bold text-gray-900">40%</span>
+                <span className="text-sm font-bold text-gray-900">40%</span>
               </div>
             </div>
-            <h3 className="font-semibold text-gray-900">Tasks</h3>
-            <p className="text-xs text-gray-500">Today's progress</p>
+            <h3 className="text-sm font-semibold text-gray-900">Tasks</h3>
+            <p className="text-xs text-gray-500">Today</p>
           </div>
 
           {/* Goals Progress */}
           <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-3">
-              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+            <div className="relative w-16 h-16 mx-auto mb-2">
+              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
                 <path
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
@@ -244,17 +244,17 @@ export default function DashboardPage() {
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl font-bold text-gray-900">65%</span>
+                <span className="text-sm font-bold text-gray-900">65%</span>
               </div>
             </div>
-            <h3 className="font-semibold text-gray-900">Goals</h3>
-            <p className="text-xs text-gray-500">Weekly targets</p>
+            <h3 className="text-sm font-semibold text-gray-900">Goals</h3>
+            <p className="text-xs text-gray-500">Weekly</p>
           </div>
 
           {/* Reading Progress */}
           <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-3">
-              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+            <div className="relative w-16 h-16 mx-auto mb-2">
+              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
                 <path
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
@@ -271,11 +271,11 @@ export default function DashboardPage() {
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl font-bold text-gray-900">80%</span>
+                <span className="text-sm font-bold text-gray-900">80%</span>
               </div>
             </div>
-            <h3 className="font-semibold text-gray-900">Reading</h3>
-            <p className="text-xs text-gray-500">Weekly goal</p>
+            <h3 className="text-sm font-semibold text-gray-900">Reading</h3>
+            <p className="text-xs text-gray-500">Weekly</p>
           </div>
         </div>
 

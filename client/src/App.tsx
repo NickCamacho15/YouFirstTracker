@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/use-auth";
 
 import LoginPage from "@/pages/login";
-import HomePage from "@/pages/home";
 import DashboardPage from "@/pages/dashboard";
 import GoalsPage from "@/pages/goals";
 import HabitsPage from "@/pages/habits";
@@ -22,8 +21,7 @@ function AuthenticatedApp() {
     <>
       <Navigation />
       <Switch>
-        <Route path="/" component={HomePage} />
-        <Route path="/you" component={DashboardPage} />
+        <Route path="/" component={DashboardPage} />
         <Route path="/goals" component={GoalsPage} />
         <Route path="/habits" component={HabitsPage} />
         <Route path="/read" component={ReadPage} />

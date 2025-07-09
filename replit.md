@@ -123,6 +123,14 @@ Build scripts include:
 
 ## Changelog
 
+- July 7, 2025: Restructured Navigation - You. Dashboard is Now Home Page
+  - **MAJOR**: You. dashboard page is now the main landing page (/) instead of home timeline
+  - **REMOVED**: Home page with social timeline removed from routing
+  - **UPDATED**: Bottom navigation now shows "You" as home instead of separate "Home" and "You" tabs
+  - **IMPROVED**: Progress circles layout changed to four across (grid-cols-4) instead of responsive 2/4 layout
+  - **ENHANCED**: Progress circles made more compact (w-16 h-16 instead of w-20 h-20) for better mobile display
+  - **STREAMLINED**: Text labels shortened for mobile-friendly display (Daily, Today, Weekly instead of full descriptions)
+  - Navigation now focuses on core productivity sections: You (dashboard), Habits, Goals, Read, Health, Vision
 - July 4, 2025: Enhanced Exercise Progress Tracking with Category Filtering and Latest Weight Display  
   - **FIXED**: "Latest" weight now displays actual last weight entered instead of calculated metrics (e.g., "150 lbs" for last bench press)
   - **ENHANCED**: Added category filtering system with buttons: All, Strength, Cardio, and Functional
