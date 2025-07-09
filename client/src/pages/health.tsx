@@ -696,6 +696,9 @@ export default function HealthPage() {
 
   // Generate workout program function
   const generateWorkoutProgram = async () => {
+    console.log("Generate workout program clicked");
+    console.log("Profile form data:", profileForm);
+    
     if (!profileForm.age || !profileForm.gender || !profileForm.fitnessLevel || 
         !profileForm.fitnessGoal || !profileForm.trainingGoal || 
         !profileForm.workoutDaysPerWeek || !profileForm.workoutDuration) {
@@ -708,6 +711,7 @@ export default function HealthPage() {
     }
 
     setIsGeneratingProgram(true);
+    console.log("Starting generation request...");
     
     try {
       const response = await fetch("/api/workout-programs/generate", {
@@ -716,21 +720,33 @@ export default function HealthPage() {
         body: JSON.stringify(profileForm)
       });
 
+      console.log("Response received:", response.status);
+      
       if (!response.ok) {
-        throw new Error("Failed to generate program");
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
+        throw new Error(errorData.message || "Failed to generate program");
       }
 
       const program = await response.json();
+      console.log("Program generated successfully:", program);
       setGeneratedProgram(program);
       setShowFitnessProfileDialog(false);
       setShowProgramDialog(true);
-    } catch (error) {
+      
+      toast({
+        title: "Program Generated!",
+        description: "Your 4-week workout program has been created successfully.",
+      });
+    } catch (error: any) {
+      console.error("Generation error:", error);
       toast({
         title: "Generation Failed",
-        description: "Failed to generate workout program. Please try again.",
+        description: error.message || "Failed to generate workout program. Please try again.",
         variant: "destructive"
       });
     } finally {
+      console.log("Generation process completed");
       setIsGeneratingProgram(false);
     }
   };

@@ -695,14 +695,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/workout-programs/generate", requireAuth, async (req, res) => {
     try {
       const fitnessProfile = req.body;
+      console.log("Generating workout program for profile:", fitnessProfile);
+      
+      // Set a longer timeout for this endpoint (60 seconds)
+      res.setTimeout(60000, () => {
+        console.error("Workout generation timed out");
+        res.status(504).json({ message: "Generation timed out. Please try again." });
+      });
       
       // Generate program using AI
       const program = await generateWorkoutProgram(fitnessProfile);
+      console.log("Workout program generated successfully");
       
       res.json(program);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Generate workout program error:", error);
-      res.status(500).json({ message: "Failed to generate workout program. Please try again." });
+      
+      // Check for specific OpenAI errors
+      if (error.code === 'insufficient_quota') {
+        res.status(503).json({ 
+          message: "OpenAI API quota exceeded. Please check your API key and billing." 
+        });
+      } else if (error.code === 'rate_limit_exceeded') {
+        res.status(429).json({ 
+          message: "Rate limit exceeded. Please wait a moment and try again." 
+        });
+      } else {
+        res.status(500).json({ 
+          message: error.message || "Failed to generate workout program. Please try again." 
+        });
+      }
     }
   });
 
