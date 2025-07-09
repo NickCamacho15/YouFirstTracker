@@ -24,7 +24,9 @@ import {
   ChevronUp,
   ChevronDown,
   Coffee,
-  Moon
+  Moon,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -115,21 +117,26 @@ export default function DashboardPage() {
 
   const currentDayTasks = weeklyTasks[selectedDay] || [];
 
-  // Morning routines
+  // Morning routines with streak tracking
   const [morningRoutines, setMorningRoutines] = useState([
-    { id: 'morning-1', text: 'Meditation (10 min)', completed: true, priority: 1 },
-    { id: 'morning-2', text: 'Exercise', completed: false, priority: 2 },
-    { id: 'morning-3', text: 'Healthy breakfast', completed: false, priority: 3 },
-    { id: 'morning-4', text: 'Review daily priorities', completed: false, priority: 4 }
+    { id: 'morning-1', text: 'Meditation (10 min)', completed: true, priority: 1, streak: 12, weeklyTarget: 7 },
+    { id: 'morning-2', text: 'Exercise', completed: false, priority: 2, streak: 8, weeklyTarget: 5 },
+    { id: 'morning-3', text: 'Healthy breakfast', completed: false, priority: 3, streak: 15, weeklyTarget: 7 },
+    { id: 'morning-4', text: 'Review daily priorities', completed: false, priority: 4, streak: 6, weeklyTarget: 7 }
   ]);
 
-  // Evening routines
+  // Evening routines with streak tracking
   const [eveningRoutines, setEveningRoutines] = useState([
-    { id: 'evening-1', text: 'Daily reflection', completed: false, priority: 1 },
-    { id: 'evening-2', text: 'Reading (30 min)', completed: false, priority: 2 },
-    { id: 'evening-3', text: 'Prepare tomorrow', completed: false, priority: 3 },
-    { id: 'evening-4', text: 'Gratitude practice', completed: false, priority: 4 }
+    { id: 'evening-1', text: 'Daily reflection', completed: false, priority: 1, streak: 9, weeklyTarget: 7 },
+    { id: 'evening-2', text: 'Reading (30 min)', completed: false, priority: 2, streak: 11, weeklyTarget: 5 },
+    { id: 'evening-3', text: 'Prepare tomorrow', completed: false, priority: 3, streak: 4, weeklyTarget: 7 },
+    { id: 'evening-4', text: 'Gratitude practice', completed: false, priority: 4, streak: 14, weeklyTarget: 7 }
   ]);
+
+  // Calculate routine completion percentages
+  const morningCompletionRate = Math.round((morningRoutines.filter(r => r.completed).length / morningRoutines.length) * 100);
+  const eveningCompletionRate = Math.round((eveningRoutines.filter(r => r.completed).length / eveningRoutines.length) * 100);
+  const routineOverallRate = Math.round(((morningRoutines.filter(r => r.completed).length + eveningRoutines.filter(r => r.completed).length) / (morningRoutines.length + eveningRoutines.length)) * 100);
 
   const handleWeeklyTaskToggle = (taskId: string) => {
     setWeeklyTasks(prev => ({
@@ -168,12 +175,38 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white">
       <main className="p-4 pb-20">
+        {/* Mobile Day Selector - Only visible on mobile */}
+        <div className="md:hidden mb-4">
+          <div className="flex items-center justify-between bg-gray-100 rounded-lg p-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedDay(selectedDay === 1 ? 0 : selectedDay - 1)}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <div className="text-center">
+              <div className="text-sm font-semibold text-gray-900">{dayNames[selectedDay]}</div>
+              <div className="text-xs text-gray-500">Today's Focus</div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedDay(selectedDay === 0 ? 1 : (selectedDay + 1) % 7)}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
         {/* Progress Circles Overview - Four Across */}
-        <div className="grid grid-cols-4 gap-3 mb-8">
+        <div className="grid grid-cols-4 gap-2 mb-6">
           {/* Habits Progress */}
           <div className="text-center">
-            <div className="relative w-16 h-16 mx-auto mb-2">
-              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
+            <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-2">
+              <svg className="w-14 h-14 sm:w-16 sm:h-16 transform -rotate-90" viewBox="0 0 36 36">
                 <path
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
@@ -190,17 +223,17 @@ export default function DashboardPage() {
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-sm font-bold text-gray-900">75%</span>
+                <span className="text-xs sm:text-sm font-bold text-gray-900">75%</span>
               </div>
             </div>
-            <h3 className="text-sm font-semibold text-gray-900">Habits</h3>
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900">Habits</h3>
             <p className="text-xs text-gray-500">Daily</p>
           </div>
 
           {/* Tasks Progress */}
           <div className="text-center">
-            <div className="relative w-16 h-16 mx-auto mb-2">
-              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
+            <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-2">
+              <svg className="w-14 h-14 sm:w-16 sm:h-16 transform -rotate-90" viewBox="0 0 36 36">
                 <path
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
@@ -212,22 +245,49 @@ export default function DashboardPage() {
                   fill="none"
                   stroke="#3b82f6"
                   strokeWidth="3"
-                  strokeDasharray={`${40}, 100`}
+                  strokeDasharray={`${Math.round((currentDayTasks.filter(t => t.completed).length / Math.max(currentDayTasks.length, 1)) * 100)}, 100`}
                   className="drop-shadow-sm"
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-sm font-bold text-gray-900">40%</span>
+                <span className="text-xs sm:text-sm font-bold text-gray-900">{Math.round((currentDayTasks.filter(t => t.completed).length / Math.max(currentDayTasks.length, 1)) * 100)}%</span>
               </div>
             </div>
-            <h3 className="text-sm font-semibold text-gray-900">Tasks</h3>
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900">Tasks</h3>
             <p className="text-xs text-gray-500">Today</p>
+          </div>
+
+          {/* Routines Progress */}
+          <div className="text-center">
+            <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-2">
+              <svg className="w-14 h-14 sm:w-16 sm:h-16 transform -rotate-90" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#f3f4f6"
+                  strokeWidth="3"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#f59e0b"
+                  strokeWidth="3"
+                  strokeDasharray={`${routineOverallRate}, 100`}
+                  className="drop-shadow-sm"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xs sm:text-sm font-bold text-gray-900">{routineOverallRate}%</span>
+              </div>
+            </div>
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900">Routines</h3>
+            <p className="text-xs text-gray-500">Daily</p>
           </div>
 
           {/* Goals Progress */}
           <div className="text-center">
-            <div className="relative w-16 h-16 mx-auto mb-2">
-              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
+            <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-2">
+              <svg className="w-14 h-14 sm:w-16 sm:h-16 transform -rotate-90" viewBox="0 0 36 36">
                 <path
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
@@ -244,88 +304,62 @@ export default function DashboardPage() {
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-sm font-bold text-gray-900">65%</span>
+                <span className="text-xs sm:text-sm font-bold text-gray-900">65%</span>
               </div>
             </div>
-            <h3 className="text-sm font-semibold text-gray-900">Goals</h3>
-            <p className="text-xs text-gray-500">Weekly</p>
-          </div>
-
-          {/* Reading Progress */}
-          <div className="text-center">
-            <div className="relative w-16 h-16 mx-auto mb-2">
-              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f3f4f6"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f59e0b"
-                  strokeWidth="3"
-                  strokeDasharray={`${80}, 100`}
-                  className="drop-shadow-sm"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-sm font-bold text-gray-900">80%</span>
-              </div>
-            </div>
-            <h3 className="text-sm font-semibold text-gray-900">Reading</h3>
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900">Goals</h3>
             <p className="text-xs text-gray-500">Weekly</p>
           </div>
         </div>
 
         {/* Goals Grid with Task Counters */}
-        <Card className="border-0 shadow-lg mb-6">
+        <Card className="border-0 shadow-lg mb-4 sm:mb-6">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Target className="w-5 h-5 text-gray-600" />
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+              <Target className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
               Active Goals
             </CardTitle>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">
               Track task completion progress for each goal
             </p>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
               {goals.map((goal) => {
                 return (
-                  <div key={goal.id} className={`${goal.color} p-6 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold mb-2">{goal.title}</h3>
-                        <p className="text-white/90 text-sm">{goal.description}</p>
+                  <div key={goal.id} className={`${goal.color} p-4 sm:p-6 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}>
+                    <div className="flex items-start justify-between mb-3 sm:mb-4">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2 truncate">{goal.title}</h3>
+                        <p className="text-white/90 text-xs sm:text-sm line-clamp-2">{goal.description}</p>
                       </div>
-                      <div className="text-right">
-                        <div className="text-4xl font-black">{goal.tasksCompleted}</div>
-                        <div className="text-sm text-white/80">tasks completed</div>
+                      <div className="text-right ml-3">
+                        <div className="text-2xl sm:text-4xl font-black">{goal.tasksCompleted}</div>
+                        <div className="text-xs sm:text-sm text-white/80">tasks</div>
                       </div>
                     </div>
                     
                     {/* Commitment Stats */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-white/20 rounded-lg px-3 py-2">
-                          <div className="text-lg font-bold">{goal.daysWorking}</div>
-                          <div className="text-xs text-white/80">days working</div>
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="bg-white/20 rounded-lg px-2 sm:px-3 py-1 sm:py-2">
+                          <div className="text-sm sm:text-lg font-bold">{goal.daysWorking}</div>
+                          <div className="text-xs text-white/80">days</div>
                         </div>
-                        <div className="bg-white/20 rounded-lg px-3 py-2">
-                          <div className="text-lg font-bold">{Math.round(goal.tasksCompleted / goal.daysWorking)}</div>
+                        <div className="bg-white/20 rounded-lg px-2 sm:px-3 py-1 sm:py-2">
+                          <div className="text-sm sm:text-lg font-bold">{Math.round(goal.tasksCompleted / goal.daysWorking)}</div>
                           <div className="text-xs text-white/80">avg/day</div>
                         </div>
                       </div>
-                      <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                      <Badge variant="secondary" className="bg-white/20 text-white border-0 text-xs">
                         <Trophy className="w-3 h-3 mr-1" />
-                        Persistent
+                        <span className="hidden sm:inline">Persistent</span>
+                        <span className="sm:hidden">🏆</span>
                       </Badge>
                     </div>
                     
-                    <div className="text-sm text-white/90">
-                      <strong>Commitment Score:</strong> {goal.tasksCompleted} tasks over {goal.daysWorking} days
+                    <div className="text-xs sm:text-sm text-white/90">
+                      <strong>Score:</strong> {goal.tasksCompleted} tasks / {goal.daysWorking} days
                     </div>
                   </div>
                 );
@@ -335,24 +369,58 @@ export default function DashboardPage() {
         </Card>
 
         {/* Three-Column Layout: Morning Routine, Today's Tasks, Evening Routine */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
           {/* Morning Routine */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border-0 shadow-lg relative">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Coffee className="w-5 h-5 text-amber-600" />
-                Morning Routine
-              </CardTitle>
-              <p className="text-sm text-gray-600 mt-1">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Coffee className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
+                  <CardTitle className="text-base sm:text-lg">Morning Routine</CardTitle>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 text-amber-600 hover:bg-amber-50"
+                  onClick={() => {/* Add morning routine item */}}
+                >
+                  <Plus className="w-3 h-3" />
+                </Button>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
                 Start your day with purpose
               </p>
+              
+              {/* Discipline Metrics Bar */}
+              <div className="bg-amber-50 rounded-lg p-3 mt-3 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-medium text-amber-800">Today's Progress</span>
+                  <span className="text-xs font-bold text-amber-800">{morningCompletionRate}%</span>
+                </div>
+                <div className="w-full bg-amber-200 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${morningCompletionRate}%` }}
+                  ></div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="text-center">
+                    <div className="font-bold text-green-600">{morningRoutines.filter(r => r.streak >= r.weeklyTarget).length}</div>
+                    <div className="text-gray-600">On Track</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-blue-600">{Math.round(morningRoutines.reduce((acc, r) => acc + r.streak, 0) / morningRoutines.length)}</div>
+                    <div className="text-gray-600">Avg Streak</div>
+                  </div>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <div className="space-y-2">
                 {morningRoutines.map((routine) => (
                   <div 
                     key={routine.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
+                    className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
                       routine.completed ? 'bg-amber-50 border-amber-200' : 'border-gray-200 hover:bg-amber-50'
                     }`}
                   >
@@ -360,11 +428,22 @@ export default function DashboardPage() {
                       type="checkbox" 
                       checked={routine.completed}
                       onChange={() => handleMorningRoutineToggle(routine.id)}
-                      className="w-5 h-5 text-amber-600 rounded cursor-pointer"
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 rounded cursor-pointer"
                     />
-                    <span className={`flex-1 text-sm ${routine.completed ? 'text-amber-800 font-medium' : 'text-gray-700'}`}>
-                      {routine.text}
-                    </span>
+                    <div className="flex-1 min-w-0">
+                      <span className={`text-xs sm:text-sm ${routine.completed ? 'text-amber-800 font-medium' : 'text-gray-700'}`}>
+                        {routine.text}
+                      </span>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          routine.streak >= routine.weeklyTarget 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-orange-100 text-orange-700'
+                        }`}>
+                          {routine.streak} day streak
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -372,13 +451,23 @@ export default function DashboardPage() {
           </Card>
 
           {/* Today's Tasks */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border-0 shadow-lg relative">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-blue-600" />
-                Today's Tasks
-              </CardTitle>
-              <p className="text-sm text-gray-600 mt-1">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                  <CardTitle className="text-base sm:text-lg">Today's Tasks</CardTitle>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50"
+                  onClick={() => {/* Add task */}}
+                >
+                  <Plus className="w-3 h-3" />
+                </Button>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
                 {dayNames[selectedDay]}'s priorities
               </p>
             </CardHeader>
@@ -389,7 +478,7 @@ export default function DashboardPage() {
                   return (
                     <div 
                       key={task.id}
-                      className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
+                      className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
                         task.completed ? 'bg-blue-50 border-blue-200' : 'border-gray-200 hover:bg-blue-50'
                       }`}
                     >
@@ -397,10 +486,10 @@ export default function DashboardPage() {
                         type="checkbox" 
                         checked={task.completed}
                         onChange={() => handleWeeklyTaskToggle(task.id)}
-                        className="w-5 h-5 text-blue-600 rounded cursor-pointer"
+                        className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded cursor-pointer"
                       />
-                      <div className="flex-1">
-                        <span className={`text-sm ${task.completed ? 'text-blue-800 font-medium' : 'text-gray-700'}`}>
+                      <div className="flex-1 min-w-0">
+                        <span className={`text-xs sm:text-sm ${task.completed ? 'text-blue-800 font-medium' : 'text-gray-700'}`}>
                           {task.text}
                         </span>
                         {task.time && (
@@ -415,22 +504,56 @@ export default function DashboardPage() {
           </Card>
 
           {/* Evening Routine */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border-0 shadow-lg relative">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Moon className="w-5 h-5 text-indigo-600" />
-                Evening Routine
-              </CardTitle>
-              <p className="text-sm text-gray-600 mt-1">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+                  <CardTitle className="text-base sm:text-lg">Evening Routine</CardTitle>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 text-indigo-600 hover:bg-indigo-50"
+                  onClick={() => {/* Add evening routine item */}}
+                >
+                  <Plus className="w-3 h-3" />
+                </Button>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
                 End your day with reflection
               </p>
+              
+              {/* Discipline Metrics Bar */}
+              <div className="bg-indigo-50 rounded-lg p-3 mt-3 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-medium text-indigo-800">Today's Progress</span>
+                  <span className="text-xs font-bold text-indigo-800">{eveningCompletionRate}%</span>
+                </div>
+                <div className="w-full bg-indigo-200 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${eveningCompletionRate}%` }}
+                  ></div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="text-center">
+                    <div className="font-bold text-green-600">{eveningRoutines.filter(r => r.streak >= r.weeklyTarget).length}</div>
+                    <div className="text-gray-600">On Track</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-purple-600">{Math.round(eveningRoutines.reduce((acc, r) => acc + r.streak, 0) / eveningRoutines.length)}</div>
+                    <div className="text-gray-600">Avg Streak</div>
+                  </div>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <div className="space-y-2">
                 {eveningRoutines.map((routine) => (
                   <div 
                     key={routine.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
+                    className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
                       routine.completed ? 'bg-indigo-50 border-indigo-200' : 'border-gray-200 hover:bg-indigo-50'
                     }`}
                   >
@@ -438,11 +561,22 @@ export default function DashboardPage() {
                       type="checkbox" 
                       checked={routine.completed}
                       onChange={() => handleEveningRoutineToggle(routine.id)}
-                      className="w-5 h-5 text-indigo-600 rounded cursor-pointer"
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 rounded cursor-pointer"
                     />
-                    <span className={`flex-1 text-sm ${routine.completed ? 'text-indigo-800 font-medium' : 'text-gray-700'}`}>
-                      {routine.text}
-                    </span>
+                    <div className="flex-1 min-w-0">
+                      <span className={`text-xs sm:text-sm ${routine.completed ? 'text-indigo-800 font-medium' : 'text-gray-700'}`}>
+                        {routine.text}
+                      </span>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          routine.streak >= routine.weeklyTarget 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-orange-100 text-orange-700'
+                        }`}>
+                          {routine.streak} day streak
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
