@@ -126,7 +126,7 @@ export function NewHabitModal({ category, trigger }: NewHabitModalProps) {
     }
   };
 
-  const styles = colorStyles[info.color as keyof typeof colorStyles];
+  const styles = colorStyles[info.color as keyof typeof colorStyles] || colorStyles.blue;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

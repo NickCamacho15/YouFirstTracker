@@ -14,7 +14,7 @@ import { SlideToComplete } from "@/components/habits/slide-to-complete";
 import { HabitRadarChart } from "@/components/habits/habit-radar-chart";
 import { SlideToBreak } from "@/components/habits/slide-to-break";
 import { NewHabitModal } from "@/components/habits/new-habit-modal";
-import { HabitProgressBar } from "@/components/habits/habit-progress-bar";
+import { IndividualHabitProgress } from "@/components/habits/individual-habit-progress";
 
 interface Habit {
   id: number;
@@ -262,8 +262,8 @@ export default function HabitsPage() {
             </TabsList>
 
             <TabsContent value="new-habits" className="space-y-6">
-              {/* 67-Day Progress Bar Graph */}
-              <HabitProgressBar habits={habits as Habit[]} />
+              {/* Individual Habit Progress Bars */}
+              <IndividualHabitProgress habits={habits as Habit[]} />
 
               {/* New Habits Section with Mind/Body/Soul Categories */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
