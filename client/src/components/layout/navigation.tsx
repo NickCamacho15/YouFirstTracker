@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Bell, Home, Target, Repeat, BookOpen, ImageIcon, User, Sparkles, Activity } from "lucide-react";
-import uoyLogo from "@assets/Change (You.) Clothing-3_1752098488378.png";
+import uoyLogo from "@assets/You. Logo-6_1752099024177.png";
 
 export function Navigation() {
   const [location] = useLocation();
@@ -86,15 +86,15 @@ export function Navigation() {
           {/* Center - You. Button with Black Circle */}
           <div className="absolute left-1/2 transform -translate-x-1/2 -top-2">
             <Link href="/">
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all cursor-pointer ${
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
                 location === "/"
-                  ? "bg-gradient-to-br from-gray-900 to-black scale-110 shadow-2xl"
-                  : "bg-gradient-to-br from-gray-800 to-black hover:scale-105 hover:shadow-2xl"
+                  ? "bg-gradient-to-br from-gray-900 to-black scale-110 shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+                  : "bg-gradient-to-br from-gray-800 to-black hover:scale-105 hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
               }`}>
                 <img 
                   src={uoyLogo} 
                   alt=".uoY" 
-                  className="w-7 h-7 invert"
+                  className="w-10 h-10"
                 />
               </div>
             </Link>
