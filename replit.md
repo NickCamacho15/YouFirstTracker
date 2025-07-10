@@ -123,6 +123,15 @@ Build scripts include:
 
 ## Changelog
 
+- July 10, 2025: Redesigned Foundations Sub-page with Calendar-Based Habit Tracking
+  - **REDESIGNED**: Foundations page now features month navigation at top (similar to day navigation on You. page)
+  - **NEW**: Top-level aggregated calendar showing all habits combined with color-coded completion percentages
+  - **NEW**: Individual expandable arrows on each habit that reveal personal 30-day calendar view
+  - **IMPROVED**: Habit tiles now in clean list format matching morning/evening routine style
+  - **ENHANCED**: Calendar legend with completion rate colors (green=100%, yellow=50%+, red=<50%, gray=none)
+  - **REMOVED**: Previous line graph and dropdown category system replaced with expandable individual habit calendars
+  - **ORGANIZED**: Clean category sections (Mind, Body, Soul) with proper color theming and spacing
+  - Foundation consistency tracking now emphasizes visual calendar patterns over analytics metrics
 - July 9, 2025: Enhanced Foundations Sub-page with Multi-Habit Line Graph and Detailed Tracking
   - **REMOVED**: Black foundation consistency analytics dashboard for cleaner layout
   - **NEW**: Multi-habit line graph where each foundation habit has its own colored line showing 30-day consistency trends
