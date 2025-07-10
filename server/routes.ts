@@ -771,6 +771,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Training template routes
+  app.get("/api/training-templates", requireAuth, async (req, res) => {
+    try {
+      const templates = await storage.getTrainingTemplatesByUserId(req.session.userId);
+      res.json(templates);
+    } catch (error) {
+      console.error("Get training templates error:", error);
+      res.status(500).json({ message: "Failed to get training templates" });
+    }
+  });
+
+  app.get("/api/training-templates/active", requireAuth, async (req, res) => {
+    try {
+      const template = await storage.getActiveTrainingTemplate(req.session.userId);
+      res.json(template || null);
+    } catch (error) {
+      console.error("Get active training template error:", error);
+      res.status(500).json({ message: "Failed to get active training template" });
+    }
+  });
+
+  app.post("/api/training-templates", requireAuth, async (req, res) => {
+    try {
+      const templateData = {
+        ...req.body,
+        userId: req.session.userId
+      };
+      const template = await storage.createTrainingTemplate(templateData);
+      res.json(template);
+    } catch (error) {
+      console.error("Create training template error:", error);
+      res.status(500).json({ message: "Failed to create training template" });
+    }
+  });
+
+  app.put("/api/training-templates/:id/activate", requireAuth, async (req, res) => {
+    try {
+      const templateId = parseInt(req.params.id);
+      const template = await storage.setActiveTrainingTemplate(req.session.userId, templateId);
+      if (!template) {
+        return res.status(404).json({ message: "Training template not found" });
+      }
+      res.json(template);
+    } catch (error) {
+      console.error("Activate training template error:", error);
+      res.status(500).json({ message: "Failed to activate training template" });
+    }
+  });
+
+  // Exercise history routes
+  app.get("/api/exercise-history", requireAuth, async (req, res) => {
+    try {
+      const history = await storage.getExerciseHistoryByUserId(req.session.userId);
+      res.json(history);
+    } catch (error) {
+      console.error("Get exercise history error:", error);
+      res.status(500).json({ message: "Failed to get exercise history" });
+    }
+  });
+
+  app.get("/api/exercise-history/search", requireAuth, async (req, res) => {
+    try {
+      const searchTerm = req.query.q as string;
+      if (!searchTerm) {
+        return res.json([]);
+      }
+      const results = await storage.searchExerciseHistory(req.session.userId, searchTerm);
+      res.json(results);
+    } catch (error) {
+      console.error("Search exercise history error:", error);
+      res.status(500).json({ message: "Failed to search exercise history" });
+    }
+  });
+
+  app.post("/api/exercise-history", requireAuth, async (req, res) => {
+    try {
+      const exerciseData = {
+        ...req.body,
+        userId: req.session.userId
+      };
+      const exercise = await storage.addExerciseToHistory(exerciseData);
+      res.json(exercise);
+    } catch (error) {
+      console.error("Add exercise to history error:", error);
+      res.status(500).json({ message: "Failed to add exercise to history" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

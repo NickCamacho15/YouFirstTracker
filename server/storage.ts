@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import { 
   users, goals, microGoals, habits, habitLogs, readingSessions, posts, visionBoard, tasks, rules,
   followers, postReactions, postComments, workouts, exercises, workoutExercises, bodyWeightLogs,
+  trainingTemplates, exerciseHistory,
   type User, type InsertUser, type Goal, type InsertGoal, type MicroGoal, type InsertMicroGoal,
   type Habit, type InsertHabit, type HabitLog, type InsertHabitLog,
   type ReadingSession, type InsertReadingSession, type Post, type InsertPost,
@@ -12,7 +13,8 @@ import {
   type Follower, type InsertFollower, type PostReaction, type InsertPostReaction,
   type PostComment, type InsertPostComment, type Workout, type InsertWorkout,
   type Exercise, type InsertExercise, type WorkoutExercise, type InsertWorkoutExercise,
-  type BodyWeightLog, type InsertBodyWeightLog
+  type BodyWeightLog, type InsertBodyWeightLog, type TrainingTemplate, type InsertTrainingTemplate,
+  type ExerciseHistoryItem, type InsertExerciseHistory
 } from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -125,6 +127,18 @@ export interface IStorage {
   getBodyWeightLogsByUserId(userId: number): Promise<BodyWeightLog[]>;
   createBodyWeightLog(log: InsertBodyWeightLog): Promise<BodyWeightLog>;
   getLatestBodyWeightLog(userId: number): Promise<BodyWeightLog | undefined>;
+
+  // Training Templates
+  getTrainingTemplatesByUserId(userId: number): Promise<TrainingTemplate[]>;
+  getActiveTrainingTemplate(userId: number): Promise<TrainingTemplate | undefined>;
+  createTrainingTemplate(template: InsertTrainingTemplate): Promise<TrainingTemplate>;
+  updateTrainingTemplate(id: number, updates: Partial<TrainingTemplate>): Promise<TrainingTemplate | undefined>;
+  setActiveTrainingTemplate(userId: number, templateId: number): Promise<TrainingTemplate | undefined>;
+
+  // Exercise History
+  getExerciseHistoryByUserId(userId: number): Promise<ExerciseHistoryItem[]>;
+  addExerciseToHistory(exercise: InsertExerciseHistory): Promise<ExerciseHistoryItem>;
+  searchExerciseHistory(userId: number, searchTerm: string): Promise<ExerciseHistoryItem[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -613,6 +627,97 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(bodyWeightLogs.date))
       .limit(1);
     return result[0];
+  }
+
+  // Training Templates
+  async getTrainingTemplatesByUserId(userId: number): Promise<TrainingTemplate[]> {
+    return await db.select().from(trainingTemplates).where(eq(trainingTemplates.userId, userId)).orderBy(desc(trainingTemplates.createdAt));
+  }
+
+  async getActiveTrainingTemplate(userId: number): Promise<TrainingTemplate | undefined> {
+    const result = await db.select().from(trainingTemplates)
+      .where(and(eq(trainingTemplates.userId, userId), eq(trainingTemplates.isActive, true)))
+      .limit(1);
+    return result[0];
+  }
+
+  async createTrainingTemplate(template: InsertTrainingTemplate): Promise<TrainingTemplate> {
+    // Set all other templates to inactive first
+    await db.update(trainingTemplates)
+      .set({ isActive: false })
+      .where(eq(trainingTemplates.userId, template.userId));
+
+    const result = await db.insert(trainingTemplates).values({
+      ...template,
+      isActive: true,
+    }).returning();
+    return result[0];
+  }
+
+  async updateTrainingTemplate(id: number, updates: Partial<TrainingTemplate>): Promise<TrainingTemplate | undefined> {
+    const result = await db.update(trainingTemplates).set(updates).where(eq(trainingTemplates.id, id)).returning();
+    return result[0];
+  }
+
+  async setActiveTrainingTemplate(userId: number, templateId: number): Promise<TrainingTemplate | undefined> {
+    // Set all templates to inactive first
+    await db.update(trainingTemplates)
+      .set({ isActive: false })
+      .where(eq(trainingTemplates.userId, userId));
+
+    // Set the specified template to active
+    const result = await db.update(trainingTemplates)
+      .set({ isActive: true })
+      .where(and(eq(trainingTemplates.id, templateId), eq(trainingTemplates.userId, userId)))
+      .returning();
+    return result[0];
+  }
+
+  // Exercise History
+  async getExerciseHistoryByUserId(userId: number): Promise<ExerciseHistoryItem[]> {
+    return await db.select().from(exerciseHistory)
+      .where(eq(exerciseHistory.userId, userId))
+      .orderBy(desc(exerciseHistory.lastUsed));
+  }
+
+  async addExerciseToHistory(exercise: InsertExerciseHistory): Promise<ExerciseHistoryItem> {
+    // Check if exercise already exists for this user
+    const existing = await db.select().from(exerciseHistory)
+      .where(and(
+        eq(exerciseHistory.userId, exercise.userId),
+        eq(exerciseHistory.exerciseName, exercise.exerciseName)
+      ))
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing entry
+      const result = await db.update(exerciseHistory)
+        .set({
+          usageCount: sql`${exerciseHistory.usageCount} + 1`,
+          lastUsed: new Date(),
+          category: exercise.category || existing[0].category,
+        })
+        .where(eq(exerciseHistory.id, existing[0].id))
+        .returning();
+      return result[0];
+    } else {
+      // Create new entry
+      const result = await db.insert(exerciseHistory).values({
+        ...exercise,
+        lastUsed: new Date(),
+      }).returning();
+      return result[0];
+    }
+  }
+
+  async searchExerciseHistory(userId: number, searchTerm: string): Promise<ExerciseHistoryItem[]> {
+    return await db.select().from(exerciseHistory)
+      .where(and(
+        eq(exerciseHistory.userId, userId),
+        sql`LOWER(${exerciseHistory.exerciseName}) LIKE LOWER(${'%' + searchTerm + '%'})`
+      ))
+      .orderBy(desc(exerciseHistory.usageCount), desc(exerciseHistory.lastUsed))
+      .limit(10);
   }
 
   // Rules implementation

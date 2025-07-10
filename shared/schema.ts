@@ -314,6 +314,26 @@ export const bodyWeightLogs = pgTable("body_weight_logs", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const trainingTemplates = pgTable("training_templates", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  templateData: text("template_data").notNull(), // JSON stringified template structure
+  isActive: boolean("is_active").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const exerciseHistory = pgTable("exercise_history", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  exerciseName: text("exercise_name").notNull(),
+  category: text("category"), // warmup, block_a, block_b, block_c
+  usageCount: integer("usage_count").default(1),
+  lastUsed: timestamp("last_used").defaultNow(),
+});
+
 // Nutrition Plan
 export const nutritionPlans = pgTable("nutrition_plans", {
   id: serial("id").primaryKey(),
@@ -515,6 +535,17 @@ export const insertProgramProgressSchema = createInsertSchema(programProgress).o
   date: z.string().transform((val) => val),
 });
 
+export const insertTrainingTemplateSchema = createInsertSchema(trainingTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertExerciseHistorySchema = createInsertSchema(exerciseHistory).omit({
+  id: true,
+  lastUsed: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -572,3 +603,7 @@ export type ProgramExercise = typeof programExercises.$inferSelect;
 export type InsertProgramExercise = z.infer<typeof insertProgramExerciseSchema>;
 export type ProgramProgress = typeof programProgress.$inferSelect;
 export type InsertProgramProgress = z.infer<typeof insertProgramProgressSchema>;
+export type TrainingTemplate = typeof trainingTemplates.$inferSelect;
+export type InsertTrainingTemplate = z.infer<typeof insertTrainingTemplateSchema>;
+export type ExerciseHistoryItem = typeof exerciseHistory.$inferSelect;
+export type InsertExerciseHistory = z.infer<typeof insertExerciseHistorySchema>;
