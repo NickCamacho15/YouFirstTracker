@@ -142,6 +142,7 @@ const TrainingProgramCreator: React.FC = () => {
   const [program, setProgram] = useState<TrainingProgram>({});
   const [templateName, setTemplateName] = useState('');
   const [templateDescription, setTemplateDescription] = useState('');
+  const [showCreator, setShowCreator] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -159,6 +160,7 @@ const TrainingProgramCreator: React.FC = () => {
         setProgram(parsedProgram);
         setTemplateName(activeTemplate.name);
         setTemplateDescription(activeTemplate.description || '');
+        setShowCreator(true);
       } catch (error) {
         console.error('Error parsing template data:', error);
       }
@@ -301,19 +303,19 @@ const TrainingProgramCreator: React.FC = () => {
     );
   }
 
-  // Show create button if no active template exists and no local program
-  if (!activeTemplate && Object.keys(program).length === 0) {
+  // Show create button if creator is not shown
+  if (!showCreator) {
     return (
       <Card className="border-0 shadow-lg h-full">
         <CardContent className="flex items-center justify-center h-full min-h-[400px]">
           <div className="text-center space-y-4">
             <Button 
               onClick={() => {
-                // Create an initial empty template structure
-                const initialProgram: TrainingProgram = {};
-                setProgram(initialProgram);
+                console.log('Button clicked!');
+                setShowCreator(true);
                 setTemplateName('My Training Program');
                 setTemplateDescription('');
+                console.log('Creator activated');
               }}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg"
             >
