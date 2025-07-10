@@ -301,8 +301,8 @@ const TrainingProgramCreator: React.FC = () => {
     );
   }
 
-  // Show create button if no active template exists
-  if (!activeTemplate) {
+  // Show create button if no active template exists and no local program
+  if (!activeTemplate && Object.keys(program).length === 0) {
     return (
       <Card className="border-0 shadow-lg h-full">
         <CardContent className="flex items-center justify-center h-full min-h-[400px]">
