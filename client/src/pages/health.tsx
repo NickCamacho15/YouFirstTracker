@@ -13,6 +13,7 @@ import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Calendar, TrendingUp, Dumbbell, Weight, Trophy, Activity, Search, Target, BarChart3 } from "lucide-react";
 import TrainingProgramCreator from "@/components/health/training-program-creator";
+import TrainingAnalytics from "@/components/health/training-analytics";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -2000,6 +2001,11 @@ export default function HealthPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Training Analytics Section */}
+        <div className="mt-8">
+          <TrainingAnalytics />
         </div>
       </div>
 
