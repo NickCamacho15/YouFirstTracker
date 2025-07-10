@@ -125,269 +125,147 @@ export function RulesDashboard({ rules, onToggleRuleCompletion, onMarkRuleFailur
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Month Navigation */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Rules Adherence</h2>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => navigateMonth('prev')}>
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
-          <span className="text-sm font-medium min-w-[120px] text-center">
-            {formatMonthYear(currentDate)}
-          </span>
-          <Button variant="ghost" size="sm" onClick={() => navigateMonth('next')}>
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
+    <div className="space-y-4">
+
+      {/* Add New Rule */}
+      <div id="add-rule-section" style={{ display: 'none' }}>
+        <Card className="border-0 shadow-lg">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Add New Rule</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                placeholder="What rule will you commit to?"
+                value={newRuleText}
+                onChange={(e) => setNewRuleText(e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                onKeyPress={(e) => e.key === 'Enter' && handleAddRule()}
+              />
+              <select
+                value={newRuleCategory}
+                onChange={(e) => setNewRuleCategory(e.target.value)}
+                className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              >
+                {categories.map(cat => (
+                  <option key={cat.name} value={cat.name}>{cat.emoji} {cat.name}</option>
+                ))}
+              </select>
+              <Button onClick={handleAddRule} size="sm" className="w-full sm:w-auto">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Rule
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Top-level Aggregated Calendar */}
-      <Card className="border-0 shadow-lg bg-white">
+      {/* All Rules in Single Card */}
+      <Card className="border-0 shadow-lg">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">All Rules Combined</CardTitle>
-            <div className="flex items-center gap-4">
-              <div className="text-center">
-                <div className="text-xl font-bold text-blue-600">{avgConsistency}%</div>
-                <div className="text-xs text-gray-500">Avg</div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center">
+                <span className="text-white text-sm">🛡️</span>
               </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-green-600">{longestStreak}</div>
-                <div className="text-xs text-gray-500">Peak</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-orange-600">{completedToday}</div>
-                <div className="text-xs text-gray-500">Today</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-red-600">{totalFailures}</div>
-                <div className="text-xs text-gray-500">Failures</div>
+              <div>
+                <CardTitle className="text-lg">Rules of Negation</CardTitle>
+                <p className="text-sm text-gray-500">Personal discipline standards</p>
               </div>
             </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-8"
+              onClick={() => {
+                // Toggle add rule section visibility
+                const addSection = document.getElementById('add-rule-section');
+                if (addSection) {
+                  addSection.style.display = addSection.style.display === 'none' ? 'block' : 'none';
+                }
+              }}
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          {/* Aggregated 30-day calendar grid */}
-          <div className="grid grid-cols-10 gap-2">
-            {aggregatedCalendarData.map((day, index) => (
-              <div
-                key={index}
-                className={`w-8 h-8 rounded text-xs flex items-center justify-center text-white font-medium ${
-                  getCalendarDayColor(day.completionPercentage)
-                }`}
-                title={`${day.completedCount}/${day.totalRules} rules followed`}
-              >
-                {day.dayOfMonth}
+        <CardContent className="pt-0">
+          <div className="space-y-2">
+            {rules.map((rule) => (
+              <div key={rule.id}>
+                <div className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  {/* Completion Checkbox */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onToggleRuleCompletion(rule.id)}
+                    className={`h-6 w-6 p-0 rounded border-2 ${
+                      rule.completedToday 
+                        ? 'bg-blue-600 border-blue-600 text-white' 
+                        : 'border-gray-300 hover:border-blue-400'
+                    }`}
+                  >
+                    {rule.completedToday && <CheckCircle2 className="w-4 h-4" />}
+                  </Button>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-gray-900">{rule.text}</div>
+                    <div className="text-sm text-blue-600 font-medium">{rule.streak} day streak</div>
+                  </div>
+
+                  {/* Expand Button */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setExpandedRule(expandedRule === rule.id ? null : rule.id)}
+                    className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
+                  >
+                    <ChevronDown className={`w-4 h-4 transition-transform ${expandedRule === rule.id ? 'rotate-180' : ''}`} />
+                  </Button>
+                </div>
+
+                {/* Individual Rule Calendar (Expanded) */}
+                {expandedRule === rule.id && (
+                  <div className="mt-2 p-4 bg-gray-50 rounded-lg">
+                    <h4 className="text-sm font-medium text-gray-800 mb-3">{rule.text} - Last 30 Days</h4>
+                    <div className="grid grid-cols-10 gap-1">
+                      {generateRuleCalendarData(rule).map((day, index) => (
+                        <div
+                          key={index}
+                          className={`w-6 h-6 rounded text-xs flex items-center justify-center text-white font-medium ${
+                            day.completed ? 'bg-green-500' : 'bg-red-400'
+                          }`}
+                        >
+                          {day.dayOfMonth}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onToggleRuleCompletion(rule.id)}
+                        className="text-green-600 border-green-200 hover:bg-green-50"
+                      >
+                        Mark Complete
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onMarkRuleFailure(rule.id)}
+                        className="text-red-600 border-red-200 hover:bg-red-50"
+                      >
+                        Mark Failed
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-4 mt-3 text-xs text-gray-600">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-green-500 rounded"></div>
-              <span>100%</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-yellow-400 rounded"></div>
-              <span>50%+</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-red-300 rounded"></div>
-              <span>&lt;50%</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-gray-200 rounded"></div>
-              <span>None</span>
-            </div>
-          </div>
         </CardContent>
       </Card>
-
-      {/* Add New Rule */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Add New Rule</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <input
-              type="text"
-              placeholder="What rule will you commit to?"
-              value={newRuleText}
-              onChange={(e) => setNewRuleText(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
-              onKeyPress={(e) => e.key === 'Enter' && handleAddRule()}
-            />
-            <select
-              value={newRuleCategory}
-              onChange={(e) => setNewRuleCategory(e.target.value)}
-              className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            >
-              {categories.map(cat => (
-                <option key={cat.name} value={cat.name}>{cat.emoji} {cat.name}</option>
-              ))}
-            </select>
-            <Button onClick={handleAddRule} size="sm" className="w-full sm:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Rule
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Individual Rule Categories */}
-      <div className="space-y-4">
-        {categories.map(category => {
-          const categoryRules = rules.filter(r => r.category === category.name);
-          if (categoryRules.length === 0) return null;
-
-          return (
-            <Card key={category.name} className="border-0 shadow-lg">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                      category.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
-                      category.color === 'green' ? 'bg-gradient-to-r from-green-500 to-green-600' :
-                      category.color === 'purple' ? 'bg-gradient-to-r from-purple-500 to-purple-600' :
-                      category.color === 'indigo' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600' :
-                      category.color === 'orange' ? 'bg-gradient-to-r from-orange-500 to-orange-600' :
-                      'bg-gradient-to-r from-yellow-500 to-yellow-600'
-                    }`}>
-                      <span className="text-white text-xs">{category.emoji}</span>
-                    </div>
-                    <CardTitle className="text-base sm:text-lg">{category.name} Rules</CardTitle>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-gray-600">
-                      {categoryRules.filter(r => r.completedToday).length}/{categoryRules.length}
-                    </div>
-                    <div className="text-xs text-gray-500">Today</div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-2">
-                  {categoryRules.map((rule) => (
-                    <div key={rule.id}>
-                      <div 
-                        className={`flex items-center gap-3 p-2 rounded-lg border transition-all duration-200 ${
-                          rule.completedToday 
-                            ? category.color === 'blue' ? 'bg-blue-50 border-blue-200' :
-                              category.color === 'green' ? 'bg-green-50 border-green-200' :
-                              category.color === 'purple' ? 'bg-purple-50 border-purple-200' :
-                              category.color === 'indigo' ? 'bg-indigo-50 border-indigo-200' :
-                              category.color === 'orange' ? 'bg-orange-50 border-orange-200' :
-                              'bg-yellow-50 border-yellow-200'
-                            : 'border-gray-200 hover:bg-gray-50'
-                        }`}
-                      >
-                        {/* Completion Button */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onToggleRuleCompletion(rule.id)}
-                          className={`h-8 w-8 p-0 rounded-md ${
-                            rule.completedToday 
-                              ? category.color === 'blue' ? 'text-blue-600 hover:bg-blue-100' :
-                                category.color === 'green' ? 'text-green-600 hover:bg-green-100' :
-                                category.color === 'purple' ? 'text-purple-600 hover:bg-purple-100' :
-                                category.color === 'indigo' ? 'text-indigo-600 hover:bg-indigo-100' :
-                                category.color === 'orange' ? 'text-orange-600 hover:bg-orange-100' :
-                                'text-yellow-600 hover:bg-yellow-100'
-                              : 'text-gray-400 hover:text-green-600'
-                          }`}
-                        >
-                          {rule.completedToday ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
-                        </Button>
-
-                        <div className="flex-1 min-w-0">
-                          <span className={`text-sm ${
-                            rule.completedToday 
-                              ? category.color === 'blue' ? 'text-blue-800 font-medium' :
-                                category.color === 'green' ? 'text-green-800 font-medium' :
-                                category.color === 'purple' ? 'text-purple-800 font-medium' :
-                                category.color === 'indigo' ? 'text-indigo-800 font-medium' :
-                                category.color === 'orange' ? 'text-orange-800 font-medium' :
-                                'text-yellow-800 font-medium'
-                              : 'text-gray-700'
-                          }`}>
-                            {rule.text}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <span className={`text-xs font-medium ${
-                              category.color === 'blue' ? 'text-blue-600' :
-                              category.color === 'green' ? 'text-green-600' :
-                              category.color === 'purple' ? 'text-purple-600' :
-                              category.color === 'indigo' ? 'text-indigo-600' :
-                              category.color === 'orange' ? 'text-orange-600' :
-                              'text-yellow-600'
-                            }`}>
-                              {rule.streak} day streak
-                            </span>
-                            {rule.failures > 0 && (
-                              <span className="text-xs text-red-500 font-medium">
-                                {rule.failures} fails
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Failure Button */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onMarkRuleFailure(rule.id)}
-                          className="h-8 px-2 text-xs text-red-600 hover:bg-red-50 border border-red-200 rounded-md"
-                        >
-                          <AlertTriangle className="w-3 h-3 mr-1" />
-                          Failed
-                        </Button>
-
-                        {/* Expand Button */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setExpandedRule(expandedRule === rule.id ? null : rule.id)}
-                          className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600 rounded-md"
-                        >
-                          <ChevronDown className={`w-4 h-4 transition-transform ${expandedRule === rule.id ? 'rotate-180' : ''}`} />
-                        </Button>
-                      </div>
-
-                      {/* Individual Rule Calendar (Expanded) */}
-                      {expandedRule === rule.id && (
-                        <div className={`mt-2 p-4 rounded-lg ${
-                          category.color === 'blue' ? 'bg-blue-50' :
-                          category.color === 'green' ? 'bg-green-50' :
-                          category.color === 'purple' ? 'bg-purple-50' :
-                          category.color === 'indigo' ? 'bg-indigo-50' :
-                          category.color === 'orange' ? 'bg-orange-50' :
-                          'bg-yellow-50'
-                        }`}>
-                          <h4 className="text-sm font-medium text-gray-800 mb-3">{rule.text} - Last 30 Days</h4>
-                          <div className="grid grid-cols-10 gap-1">
-                            {generateRuleCalendarData(rule).map((day, index) => (
-                              <div
-                                key={index}
-                                className={`w-6 h-6 rounded text-xs flex items-center justify-center text-white font-medium ${
-                                  day.completed ? 'bg-green-500' : 'bg-red-400'
-                                }`}
-                              >
-                                {day.dayOfMonth}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
 
       {rules.length === 0 && (
         <Card className="border-0 shadow-lg">
