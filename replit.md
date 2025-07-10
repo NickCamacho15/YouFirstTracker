@@ -123,6 +123,16 @@ Build scripts include:
 
 ## Changelog
 
+- July 9, 2025: Enhanced Foundations Sub-page with Multi-Habit Line Graph and Detailed Tracking
+  - **REMOVED**: Black foundation consistency analytics dashboard for cleaner layout
+  - **NEW**: Multi-habit line graph where each foundation habit has its own colored line showing 30-day consistency trends
+  - **ENHANCED**: Individual habit tiles now show streak count and completed/total days (e.g., "15 day streak" and "15/16 days")
+  - **NEW**: Numbers tracked above dot graph showing Avg, Peak, and Today metrics in header
+  - **IMPROVED**: Color-coded legend below graph for up to 8 habits with truncated names for space efficiency
+  - **STREAMLINED**: Removed excessive vertical scrolling by compressing analytics into single graph component
+  - **VISUAL**: Live data visualization with active dots and smooth lines for each habit's consistency pattern
+  - **GAMIFIED**: Focus on long-term consistency percentages rather than daily completion metrics
+  - Foundations page now emphasizes individual habit tracking with comprehensive visual analytics
 - July 9, 2025: Redesigned Navigation Bar with Prominent Center Button
   - **REDESIGNED**: Bottom navigation bar now follows 1st Phorm app design with prominent black circle for You. button in center
   - **BRANDING**: Center button features .uoY logo with black circular background and subtle scaling animations

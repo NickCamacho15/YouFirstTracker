@@ -25,104 +25,121 @@ interface FoundationsDashboardProps {
 
 export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoading }: FoundationsDashboardProps) {
   const completedToday = habits.filter(h => h.completedToday).length;
-  const completionRate = Math.round((completedToday / Math.max(1, habits.length)) * 100);
-  
-  // Calculate long-term consistency metrics
-  const totalHabits = habits.length;
   const avgConsistency = habits.length > 0 ? Math.round(habits.reduce((sum, h) => sum + Math.min(h.streak / 365, 1), 0) / habits.length * 100) : 0;
   const longestStreak = habits.length > 0 ? Math.max(...habits.map(h => h.streak)) : 0;
 
-  // Generate mock 30-day consistency data for live graph
-  const generateConsistencyData = () => {
+  // Generate individual habit data for multi-line graph
+  const generateHabitData = (habit: Habit) => {
     return Array.from({ length: 30 }, (_, i) => {
-      const baseConsistency = avgConsistency;
-      const variance = Math.random() * 40 - 20; // ±20% variance
+      const baseConsistency = Math.min(habit.streak / 365, 1) * 100;
+      const variance = Math.random() * 30 - 15; // ±15% variance
       return Math.max(0, Math.min(100, baseConsistency + variance));
     });
   };
 
-  const consistencyData = generateConsistencyData();
+  const habitColors = [
+    '#3b82f6', // Blue
+    '#ef4444', // Red
+    '#10b981', // Green
+    '#f59e0b', // Yellow
+    '#8b5cf6', // Purple
+    '#f97316', // Orange
+    '#06b6d4', // Cyan
+    '#84cc16', // Lime
+  ];
 
   return (
     <div className="space-y-6">
-      {/* Consistency Analytics - Compressed */}
-      <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-black rounded-2xl p-6 text-white">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-black mb-1">FOUNDATION CONSISTENCY</h1>
-            <p className="text-gray-300 text-sm">Long-term commitment tracking</p>
-          </div>
-          <div className="text-right">
-            <div className="text-green-400 text-xs font-bold tracking-wide">ADHERENCE</div>
-            <div className="text-3xl font-black text-white">{avgConsistency}%</div>
-            <div className="text-green-400 text-xs">LIFETIME</div>
-          </div>
-        </div>
-        
-        {/* Compressed Metrics */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
-            <div className="text-yellow-400 text-xl font-black">{longestStreak}</div>
-            <div className="text-gray-300 text-xs">PEAK STREAK</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
-            <div className="text-blue-400 text-xl font-black">{completedToday}</div>
-            <div className="text-gray-300 text-xs">TODAY</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
-            <div className="text-purple-400 text-xl font-black">{habits.filter(h => h.streak >= 100).length}</div>
-            <div className="text-gray-300 text-xs">100+ DAYS</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Live Consistency Graph - Minimalist */}
+      {/* Live Multi-Habit Consistency Graph */}
       <Card className="border-0 shadow-lg bg-white">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">30-Day Consistency</CardTitle>
-            <div className="flex items-center gap-2">
-              <div className="text-2xl font-bold text-blue-600">{consistencyData[consistencyData.length - 1].toFixed(0)}%</div>
-              <TrendingUp className="w-4 h-4 text-green-500" />
+            <CardTitle className="text-lg">Foundation Consistency Tracking</CardTitle>
+            <div className="flex items-center gap-4">
+              <div className="text-center">
+                <div className="text-xl font-bold text-blue-600">{avgConsistency}%</div>
+                <div className="text-xs text-gray-500">Avg</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold text-green-600">{longestStreak}</div>
+                <div className="text-xs text-gray-500">Peak</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold text-orange-600">{completedToday}</div>
+                <div className="text-xs text-gray-500">Today</div>
+              </div>
             </div>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="relative h-24">
-            <svg className="w-full h-full" viewBox="0 0 400 96">
-              {/* Grid lines */}
-              {[0, 24, 48, 72, 96].map((y) => (
-                <line key={y} x1="0" y1={y} x2="400" y2={y} stroke="#f3f4f6" strokeWidth="1"/>
-              ))}
+          {habits.length > 0 ? (
+            <>
+              <div className="relative h-32">
+                <svg className="w-full h-full" viewBox="0 0 400 128">
+                  {/* Grid lines */}
+                  {[0, 32, 64, 96, 128].map((y) => (
+                    <line key={y} x1="0" y1={y} x2="400" y2={y} stroke="#f3f4f6" strokeWidth="1"/>
+                  ))}
+                  
+                  {/* Individual habit lines */}
+                  {habits.slice(0, 8).map((habit, habitIndex) => {
+                    const habitData = generateHabitData(habit);
+                    const color = habitColors[habitIndex % habitColors.length];
+                    
+                    return (
+                      <g key={habit.id}>
+                        {/* Habit line */}
+                        <polyline
+                          points={habitData.map((value, index) => 
+                            `${(index * 400) / (habitData.length - 1)},${128 - (value * 128) / 100}`
+                          ).join(' ')}
+                          fill="none"
+                          stroke={color}
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          opacity="0.8"
+                        />
+                        
+                        {/* Data points */}
+                        {habitData.map((value, index) => (
+                          <circle
+                            key={index}
+                            cx={(index * 400) / (habitData.length - 1)}
+                            cy={128 - (value * 128) / 100}
+                            r="1.5"
+                            fill={color}
+                          />
+                        ))}
+                      </g>
+                    );
+                  })}
+                </svg>
+              </div>
               
-              {/* Consistency line */}
-              <polyline
-                points={consistencyData.map((value, index) => 
-                  `${(index * 400) / (consistencyData.length - 1)},${96 - (value * 96) / 100}`
-                ).join(' ')}
-                fill="none"
-                stroke="#3b82f6"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              {/* Legend */}
+              <div className="flex flex-wrap gap-3 mt-3">
+                {habits.slice(0, 8).map((habit, index) => (
+                  <div key={habit.id} className="flex items-center gap-2">
+                    <div 
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: habitColors[index % habitColors.length] }}
+                    />
+                    <span className="text-xs text-gray-600 truncate max-w-24">{habit.title}</span>
+                  </div>
+                ))}
+              </div>
               
-              {/* Data points */}
-              {consistencyData.map((value, index) => (
-                <circle
-                  key={index}
-                  cx={(index * 400) / (consistencyData.length - 1)}
-                  cy={96 - (value * 96) / 100}
-                  r="2"
-                  fill="#3b82f6"
-                />
-              ))}
-            </svg>
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-2">
-            <span>30 days ago</span>
-            <span>Today</span>
-          </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-2">
+                <span>30 days ago</span>
+                <span>Today</span>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <p>No foundation habits yet. Add habits to see consistency tracking.</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -203,14 +220,11 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
                       {habit.title}
                     </span>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        habit.streak >= 365
-                          ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' 
-                          : habit.streak >= 100
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-blue-100 text-blue-700'
-                      }`}>
-                        {Math.round((habit.streak / 365) * 100)}% year
+                      <span className="text-xs text-blue-600 font-medium">
+                        {habit.streak} day streak
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {habit.streak}/{habit.streak + (habit.completedToday ? 0 : 1)} days
                       </span>
                     </div>
                   </div>
@@ -300,14 +314,11 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
                       {habit.title}
                     </span>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        habit.streak >= 365
-                          ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' 
-                          : habit.streak >= 100
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-orange-100 text-orange-700'
-                      }`}>
-                        {Math.round((habit.streak / 365) * 100)}% year
+                      <span className="text-xs text-orange-600 font-medium">
+                        {habit.streak} day streak
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {habit.streak}/{habit.streak + (habit.completedToday ? 0 : 1)} days
                       </span>
                     </div>
                   </div>
@@ -397,14 +408,11 @@ export function FoundationsDashboard({ habits, onToggleHabit, onEditHabit, isLoa
                       {habit.title}
                     </span>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        habit.streak >= 365
-                          ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' 
-                          : habit.streak >= 100
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-emerald-100 text-emerald-700'
-                      }`}>
-                        {Math.round((habit.streak / 365) * 100)}% year
+                      <span className="text-xs text-emerald-600 font-medium">
+                        {habit.streak} day streak
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {habit.streak}/{habit.streak + (habit.completedToday ? 0 : 1)} days
                       </span>
                     </div>
                   </div>
