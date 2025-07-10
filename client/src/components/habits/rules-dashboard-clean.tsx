@@ -125,7 +125,83 @@ export function RulesDashboard({ rules, onToggleRuleCompletion, onMarkRuleFailur
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Month Navigation */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Rules Adherence</h2>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={() => navigateMonth('prev')}>
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <span className="text-sm font-medium min-w-[120px] text-center">
+            {formatMonthYear(currentDate)}
+          </span>
+          <Button variant="ghost" size="sm" onClick={() => navigateMonth('next')}>
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Top-level Aggregated Calendar with Metrics */}
+      <Card className="border-0 shadow-lg bg-white">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">All Rules Combined</CardTitle>
+            <div className="flex items-center gap-4">
+              <div className="text-center">
+                <div className="text-xl font-bold text-blue-600">{avgConsistency}%</div>
+                <div className="text-xs text-gray-500">Avg</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold text-green-600">{longestStreak}</div>
+                <div className="text-xs text-gray-500">Peak</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold text-orange-600">{completedToday}</div>
+                <div className="text-xs text-gray-500">Today</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold text-red-600">{totalFailures}</div>
+                <div className="text-xs text-gray-500">Failures</div>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {/* Aggregated 30-day calendar grid */}
+          <div className="grid grid-cols-10 gap-2">
+            {aggregatedCalendarData.map((day, index) => (
+              <div
+                key={index}
+                className={`w-8 h-8 rounded text-xs flex items-center justify-center text-white font-medium ${
+                  getCalendarDayColor(day.completionPercentage)
+                }`}
+                title={`${day.completedCount}/${day.totalRules} rules followed`}
+              >
+                {day.dayOfMonth}
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-4 mt-3 text-xs text-gray-600">
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-green-500 rounded"></div>
+              <span>100%</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-yellow-400 rounded"></div>
+              <span>50%+</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-red-300 rounded"></div>
+              <span>&lt;50%</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-gray-200 rounded"></div>
+              <span>None</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Add New Rule */}
       <div id="add-rule-section" style={{ display: 'none' }}>
