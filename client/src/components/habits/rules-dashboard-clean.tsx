@@ -209,7 +209,7 @@ export function RulesDashboard({ rules, onToggleRuleCompletion, onMarkRuleFailur
           <CardTitle className="text-lg">Add New Rule</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               placeholder="What rule will you commit to?"
@@ -221,14 +221,15 @@ export function RulesDashboard({ rules, onToggleRuleCompletion, onMarkRuleFailur
             <select
               value={newRuleCategory}
               onChange={(e) => setNewRuleCategory(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg text-sm"
             >
               {categories.map(cat => (
                 <option key={cat.name} value={cat.name}>{cat.emoji} {cat.name}</option>
               ))}
             </select>
-            <Button onClick={handleAddRule} size="sm">
-              <Plus className="w-4 h-4" />
+            <Button onClick={handleAddRule} size="sm" className="w-full sm:w-auto">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Rule
             </Button>
           </div>
         </CardContent>
@@ -270,7 +271,7 @@ export function RulesDashboard({ rules, onToggleRuleCompletion, onMarkRuleFailur
                   {categoryRules.map((rule) => (
                     <div key={rule.id}>
                       <div 
-                        className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
+                        className={`flex items-center gap-3 p-2 rounded-lg border transition-all duration-200 ${
                           rule.completedToday 
                             ? category.color === 'blue' ? 'bg-blue-50 border-blue-200' :
                               category.color === 'green' ? 'bg-green-50 border-green-200' :
@@ -286,7 +287,7 @@ export function RulesDashboard({ rules, onToggleRuleCompletion, onMarkRuleFailur
                           variant="ghost"
                           size="sm"
                           onClick={() => onToggleRuleCompletion(rule.id)}
-                          className={`h-8 w-8 p-0 rounded-full ${
+                          className={`h-8 w-8 p-0 rounded-md ${
                             rule.completedToday 
                               ? category.color === 'blue' ? 'text-blue-600 hover:bg-blue-100' :
                                 category.color === 'green' ? 'text-green-600 hover:bg-green-100' :
@@ -301,7 +302,7 @@ export function RulesDashboard({ rules, onToggleRuleCompletion, onMarkRuleFailur
                         </Button>
 
                         <div className="flex-1 min-w-0">
-                          <span className={`text-xs sm:text-sm ${
+                          <span className={`text-sm ${
                             rule.completedToday 
                               ? category.color === 'blue' ? 'text-blue-800 font-medium' :
                                 category.color === 'green' ? 'text-green-800 font-medium' :
@@ -313,7 +314,7 @@ export function RulesDashboard({ rules, onToggleRuleCompletion, onMarkRuleFailur
                           }`}>
                             {rule.text}
                           </span>
-                          <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center gap-2">
                             <span className={`text-xs font-medium ${
                               category.color === 'blue' ? 'text-blue-600' :
                               category.color === 'green' ? 'text-green-600' :
@@ -326,7 +327,7 @@ export function RulesDashboard({ rules, onToggleRuleCompletion, onMarkRuleFailur
                             </span>
                             {rule.failures > 0 && (
                               <span className="text-xs text-red-500 font-medium">
-                                {rule.failures} failures
+                                {rule.failures} fails
                               </span>
                             )}
                           </div>
@@ -337,7 +338,7 @@ export function RulesDashboard({ rules, onToggleRuleCompletion, onMarkRuleFailur
                           variant="ghost"
                           size="sm"
                           onClick={() => onMarkRuleFailure(rule.id)}
-                          className="h-8 px-3 text-xs text-red-600 hover:bg-red-50 border border-red-200"
+                          className="h-8 px-2 text-xs text-red-600 hover:bg-red-50 border border-red-200 rounded-md"
                         >
                           <AlertTriangle className="w-3 h-3 mr-1" />
                           Failed
@@ -348,7 +349,7 @@ export function RulesDashboard({ rules, onToggleRuleCompletion, onMarkRuleFailur
                           variant="ghost"
                           size="sm"
                           onClick={() => setExpandedRule(expandedRule === rule.id ? null : rule.id)}
-                          className="h-7 w-7 p-0 text-gray-400 hover:text-gray-600"
+                          className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600 rounded-md"
                         >
                           <ChevronDown className={`w-4 h-4 transition-transform ${expandedRule === rule.id ? 'rotate-180' : ''}`} />
                         </Button>
