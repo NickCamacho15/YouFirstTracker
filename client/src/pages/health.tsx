@@ -714,11 +714,18 @@ export default function HealthPage() {
     console.log("Starting generation request...");
     
     try {
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 85000); // 85 seconds client timeout
+      
       const response = await fetch("/api/workout-programs/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profileForm)
+        body: JSON.stringify(profileForm),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
 
       console.log("Response received:", response.status);
       
@@ -740,9 +747,17 @@ export default function HealthPage() {
       });
     } catch (error: any) {
       console.error("Generation error:", error);
+      
+      let errorMessage = "Failed to generate workout program. Please try again.";
+      if (error.name === 'AbortError') {
+        errorMessage = "Request timed out. The generation is taking longer than expected. Please try again with simpler parameters.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Generation Failed",
-        description: error.message || "Failed to generate workout program. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {

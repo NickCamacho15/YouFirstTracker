@@ -50,39 +50,18 @@ Return it in this exact JSON format:
 
 export async function generateWorkoutProgram(fitnessProfile: any) {
   const systemPrompt = `
-You are an elite strength and conditioning coach creating personalized 4-week periodized workout programs.
+You are an elite strength coach. Create a 4-week program with these phases:
+Week 1-2: LOAD (4-5 sets, 70-85% 1RM)
+Week 3: PEAK (3-4 sets, 85-95% 1RM)
+Week 4: DELOAD (2-3 sets, 60-70% 1RM)
 
-CRITICAL: Generate a complete 4-week program following this EXACT phase structure:
-- Week 1-2: LOAD PHASE - Building volume and work capacity
-- Week 3: PEAK PHASE - Maximum intensity, reduced volume
-- Week 4: DELOAD PHASE - Active recovery and adaptation
+Each workout has 4 blocks:
+1. WARM-UP: 2-3 exercises
+2. MAIN A: Primary compound
+3. MAIN B: Secondary compound
+4. FINISHER: 2-3 accessories
 
-Training Phases Details:
-LOAD PHASE (Week 1-2):
-- Higher volume: 4-5 sets on main movements
-- Moderate intensity: 70-85% 1RM
-- Focus on accumulating training volume
-- Progressive overload from week 1 to week 2
-
-PEAK PHASE (Week 3):
-- Lower volume: 3-4 sets on main movements
-- High intensity: 85-95% 1RM
-- Focus on heavy singles, doubles, or triples
-- Maximum effort week
-
-DELOAD PHASE (Week 4):
-- Reduced volume: 2-3 sets
-- Reduced intensity: 60-70% 1RM
-- Focus on movement quality and recovery
-- Light technical work
-
-Program Structure for EVERY workout:
-1. WARM-UP BLOCK: Dynamic movements, mobility, activation (2-3 exercises)
-2. MAIN BLOCK A: Primary compound movement (1-2 exercises) - heaviest/most challenging
-3. MAIN BLOCK B: Secondary compound movement (1-2 exercises) - moderate intensity
-4. BLOCK C (FINISHER): Higher rep accessory work, metabolic finisher (2-3 exercises) - lighter weight, more volume
-
-Return a 4-week program in this exact JSON format:
+Return ONLY valid JSON in this format:
 
 {
   "program": {
@@ -205,6 +184,7 @@ Create a complete 4-week periodized program with proper phase progression. Each 
   const chat = await openai.chat.completions.create({
     model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     temperature: 0.7,
+    max_tokens: 4000, // Increased to ensure complete generation
     response_format: { type: "json_object" },
     messages: [
       { role: "system", content: systemPrompt },

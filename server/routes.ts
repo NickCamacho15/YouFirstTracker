@@ -693,37 +693,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Generate workout program using AI
   app.post("/api/workout-programs/generate", requireAuth, async (req, res) => {
+    let timeoutHandle: NodeJS.Timeout | null = null;
+    let hasResponded = false;
+    
     try {
       const fitnessProfile = req.body;
       console.log("Generating workout program for profile:", fitnessProfile);
       
-      // Set a longer timeout for this endpoint (60 seconds)
-      res.setTimeout(60000, () => {
-        console.error("Workout generation timed out");
-        res.status(504).json({ message: "Generation timed out. Please try again." });
-      });
+      // Set a longer timeout for this endpoint (90 seconds)
+      timeoutHandle = setTimeout(() => {
+        if (!hasResponded) {
+          hasResponded = true;
+          console.error("Workout generation timed out");
+          res.status(504).json({ message: "Generation timed out. Please try again." });
+        }
+      }, 90000); // Increased to 90 seconds
       
       // Generate program using AI
       const program = await generateWorkoutProgram(fitnessProfile);
-      console.log("Workout program generated successfully");
       
-      res.json(program);
+      // Clear timeout and send response if not already sent
+      if (timeoutHandle) clearTimeout(timeoutHandle);
+      
+      if (!hasResponded) {
+        hasResponded = true;
+        console.log("Workout program generated successfully");
+        res.json(program);
+      }
     } catch (error: any) {
-      console.error("Generate workout program error:", error);
+      // Clear timeout if it exists
+      if (timeoutHandle) clearTimeout(timeoutHandle);
       
-      // Check for specific OpenAI errors
-      if (error.code === 'insufficient_quota') {
-        res.status(503).json({ 
-          message: "OpenAI API quota exceeded. Please check your API key and billing." 
-        });
-      } else if (error.code === 'rate_limit_exceeded') {
-        res.status(429).json({ 
-          message: "Rate limit exceeded. Please wait a moment and try again." 
-        });
-      } else {
-        res.status(500).json({ 
-          message: error.message || "Failed to generate workout program. Please try again." 
-        });
+      if (!hasResponded) {
+        hasResponded = true;
+        console.error("Generate workout program error:", error);
+        
+        // Check for specific OpenAI errors
+        if (error.code === 'insufficient_quota') {
+          res.status(503).json({ 
+            message: "OpenAI API quota exceeded. Please check your API key and billing." 
+          });
+        } else if (error.code === 'rate_limit_exceeded') {
+          res.status(429).json({ 
+            message: "Rate limit exceeded. Please wait a moment and try again." 
+          });
+        } else {
+          res.status(500).json({ 
+            message: error.message || "Failed to generate workout program. Please try again." 
+          });
+        }
       }
     }
   });
