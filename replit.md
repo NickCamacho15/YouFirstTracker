@@ -123,6 +123,16 @@ Build scripts include:
 
 ## Changelog
 
+- July 11, 2025: Dashboard Progress Circles Redesigned with Weekly Time Metrics
+  - **TRANSFORMED**: Progress circles replaced with weekly time tracking tiles for personal investments/distractions
+  - **NEW**: Reading time tracking (12.5h weekly, with month/total aggregates)
+  - **NEW**: Meditation time tracking (3.2h weekly, with month/total aggregates)  
+  - **NEW**: Screen time tracking (28h weekly, distraction monitoring)
+  - **NEW**: Workout time tracking (6.8h weekly, fitness investment)
+  - **REDESIGNED**: Active Goals section with reduced padding and individual tiles matching Body page style
+  - **IMPROVED**: Goal tiles now use compact spacing (p-3/p-4) and smaller text for mobile optimization
+  - **FOCUSED**: Clear distinction between personal investments (reading, meditation, workouts) and distractions (screen time)
+  - Dashboard emphasizes weekly time allocation with comprehensive month/total context for meaningful progress tracking
 - July 11, 2025: Body Profile Page Enhanced with Editable Personal Records and Percentage Calculator
   - **NEW**: Edit button on profile tab allowing modification of personal records and body metrics
   - **NEW**: 1 Rep Max percentage calculator showing 60% to 90% in 5% increments for easy workout planning

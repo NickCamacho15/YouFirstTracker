@@ -201,172 +201,101 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Progress Circles Overview - Four Across */}
+        {/* Weekly Time Metrics - Four Across */}
         <div className="grid grid-cols-4 gap-2 mb-6">
-          {/* Habits Progress */}
-          <div className="text-center">
-            <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-2">
-              <svg className="w-14 h-14 sm:w-16 sm:h-16 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f3f4f6"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#10b981"
-                  strokeWidth="3"
-                  strokeDasharray={`${75}, 100`}
-                  className="drop-shadow-sm"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xs sm:text-sm font-bold text-gray-900">75%</span>
-              </div>
-            </div>
-            <h3 className="text-xs sm:text-sm font-semibold text-gray-900">Habits</h3>
-            <p className="text-xs text-gray-500">Daily</p>
+          {/* Reading Time */}
+          <div className="text-center bg-white rounded-lg p-3 shadow-md border border-blue-200">
+            <BookOpen className="w-6 h-6 mx-auto mb-2 text-blue-600" />
+            <div className="text-lg font-bold text-gray-900">12.5h</div>
+            <div className="text-xs text-gray-600">Weekly</div>
+            <div className="text-xs text-gray-500">52h month • 185h total</div>
+            <h3 className="text-xs font-semibold text-gray-700 mt-1">Reading</h3>
           </div>
 
-          {/* Tasks Progress */}
-          <div className="text-center">
-            <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-2">
-              <svg className="w-14 h-14 sm:w-16 sm:h-16 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f3f4f6"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#3b82f6"
-                  strokeWidth="3"
-                  strokeDasharray={`${Math.round((currentDayTasks.filter(t => t.completed).length / Math.max(currentDayTasks.length, 1)) * 100)}, 100`}
-                  className="drop-shadow-sm"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xs sm:text-sm font-bold text-gray-900">{Math.round((currentDayTasks.filter(t => t.completed).length / Math.max(currentDayTasks.length, 1)) * 100)}%</span>
-              </div>
+          {/* Meditation Time */}
+          <div className="text-center bg-white rounded-lg p-3 shadow-md border border-green-200">
+            <div className="w-6 h-6 mx-auto mb-2 bg-green-600 rounded-full flex items-center justify-center">
+              <div className="w-2 h-2 bg-white rounded-full"></div>
             </div>
-            <h3 className="text-xs sm:text-sm font-semibold text-gray-900">Tasks</h3>
-            <p className="text-xs text-gray-500">Today</p>
+            <div className="text-lg font-bold text-gray-900">3.2h</div>
+            <div className="text-xs text-gray-600">Weekly</div>
+            <div className="text-xs text-gray-500">14h month • 67h total</div>
+            <h3 className="text-xs font-semibold text-gray-700 mt-1">Meditation</h3>
           </div>
 
-          {/* Routines Progress */}
-          <div className="text-center">
-            <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-2">
-              <svg className="w-14 h-14 sm:w-16 sm:h-16 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f3f4f6"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f59e0b"
-                  strokeWidth="3"
-                  strokeDasharray={`${routineOverallRate}, 100`}
-                  className="drop-shadow-sm"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xs sm:text-sm font-bold text-gray-900">{routineOverallRate}%</span>
-              </div>
+          {/* Screen Time (Distraction) */}
+          <div className="text-center bg-white rounded-lg p-3 shadow-md border border-red-200">
+            <div className="w-6 h-6 mx-auto mb-2 bg-red-600 rounded flex items-center justify-center">
+              <div className="w-3 h-3 bg-white rounded-sm"></div>
             </div>
-            <h3 className="text-xs sm:text-sm font-semibold text-gray-900">Routines</h3>
-            <p className="text-xs text-gray-500">Daily</p>
+            <div className="text-lg font-bold text-gray-900">28h</div>
+            <div className="text-xs text-gray-600">Weekly</div>
+            <div className="text-xs text-gray-500">98h month • 412h total</div>
+            <h3 className="text-xs font-semibold text-gray-700 mt-1">Screen Time</h3>
           </div>
 
-          {/* Goals Progress */}
-          <div className="text-center">
-            <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-2">
-              <svg className="w-14 h-14 sm:w-16 sm:h-16 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f3f4f6"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#8b5cf6"
-                  strokeWidth="3"
-                  strokeDasharray={`${65}, 100`}
-                  className="drop-shadow-sm"
-                />
+          {/* Workout Time */}
+          <div className="text-center bg-white rounded-lg p-3 shadow-md border border-orange-200">
+            <div className="w-6 h-6 mx-auto mb-2 text-orange-600">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/>
               </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xs sm:text-sm font-bold text-gray-900">65%</span>
-              </div>
             </div>
-            <h3 className="text-xs sm:text-sm font-semibold text-gray-900">Goals</h3>
-            <p className="text-xs text-gray-500">Weekly</p>
+            <div className="text-lg font-bold text-gray-900">6.8h</div>
+            <div className="text-xs text-gray-600">Weekly</div>
+            <div className="text-xs text-gray-500">27h month • 142h total</div>
+            <h3 className="text-xs font-semibold text-gray-700 mt-1">Workouts</h3>
           </div>
         </div>
 
-        {/* Goals Grid with Task Counters */}
-        <Card className="border-0 shadow-lg mb-4 sm:mb-6">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-              <Target className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-              Active Goals
-            </CardTitle>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1">
-              Track task completion progress for each goal
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-              {goals.map((goal) => {
-                return (
-                  <div key={goal.id} className={`${goal.color} p-4 sm:p-6 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}>
-                    <div className="flex items-start justify-between mb-3 sm:mb-4">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2 truncate">{goal.title}</h3>
-                        <p className="text-white/90 text-xs sm:text-sm line-clamp-2">{goal.description}</p>
-                      </div>
-                      <div className="text-right ml-3">
-                        <div className="text-2xl sm:text-4xl font-black">{goal.tasksCompleted}</div>
-                        <div className="text-xs sm:text-sm text-white/80">tasks</div>
-                      </div>
+        {/* Active Goals Section */}
+        <div className="mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <Target className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Active Goals</h2>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3">
+            {goals.map((goal) => {
+              return (
+                <div key={goal.id} className={`${goal.color} p-3 sm:p-4 rounded-lg text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.01]`}>
+                  <div className="flex items-start justify-between mb-2 sm:mb-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm sm:text-lg font-bold mb-1 truncate">{goal.title}</h3>
+                      <p className="text-white/90 text-xs line-clamp-2">{goal.description}</p>
                     </div>
-                    
-                    {/* Commitment Stats */}
-                    <div className="flex items-center justify-between mb-3 sm:mb-4">
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <div className="bg-white/20 rounded-lg px-2 sm:px-3 py-1 sm:py-2">
-                          <div className="text-sm sm:text-lg font-bold">{goal.daysWorking}</div>
-                          <div className="text-xs text-white/80">days</div>
-                        </div>
-                        <div className="bg-white/20 rounded-lg px-2 sm:px-3 py-1 sm:py-2">
-                          <div className="text-sm sm:text-lg font-bold">{Math.round(goal.tasksCompleted / goal.daysWorking)}</div>
-                          <div className="text-xs text-white/80">avg/day</div>
-                        </div>
-                      </div>
-                      <Badge variant="secondary" className="bg-white/20 text-white border-0 text-xs">
-                        <Trophy className="w-3 h-3 mr-1" />
-                        <span className="hidden sm:inline">Persistent</span>
-                        <span className="sm:hidden">🏆</span>
-                      </Badge>
-                    </div>
-                    
-                    <div className="text-xs sm:text-sm text-white/90">
-                      <strong>Score:</strong> {goal.tasksCompleted} tasks / {goal.daysWorking} days
+                    <div className="text-right ml-2">
+                      <div className="text-xl sm:text-3xl font-black">{goal.tasksCompleted}</div>
+                      <div className="text-xs text-white/80">tasks</div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                  
+                  {/* Commitment Stats */}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-white/20 rounded px-2 py-1">
+                        <div className="text-xs sm:text-sm font-bold">{goal.daysWorking}</div>
+                        <div className="text-xs text-white/80">days</div>
+                      </div>
+                      <div className="bg-white/20 rounded px-2 py-1">
+                        <div className="text-xs sm:text-sm font-bold">{Math.round(goal.tasksCompleted / goal.daysWorking)}</div>
+                        <div className="text-xs text-white/80">avg/day</div>
+                      </div>
+                    </div>
+                    <Badge variant="secondary" className="bg-white/20 text-white border-0 text-xs">
+                      <Trophy className="w-3 h-3 mr-1" />
+                      <span className="hidden sm:inline">Persistent</span>
+                      <span className="sm:hidden">🏆</span>
+                    </Badge>
+                  </div>
+                  
+                  <div className="text-xs text-white/90">
+                    <strong>Score:</strong> {goal.tasksCompleted} tasks / {goal.daysWorking} days
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Three-Column Layout: Morning Routine, Today's Tasks, Evening Routine */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
