@@ -1,10 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Activity, Trophy, Play } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronDown, Activity, Trophy, Play, User, Dumbbell, TrendingUp, Target, Zap, Timer } from "lucide-react";
 
 export default function HealthPage() {
   const [expandedWeeks, setExpandedWeeks] = useState<Set<number>>(new Set());
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState("workout");
+  const [workoutTimer, setWorkoutTimer] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+  // Timer effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isTimerRunning) {
+      interval = setInterval(() => {
+        setWorkoutTimer(prev => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning]);
+
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const startWorkout = () => {
+    setIsTimerRunning(true);
+    setWorkoutTimer(0);
+  };
+
+  const stopWorkout = () => {
+    setIsTimerRunning(false);
+  };
 
   const toggleWeek = (weekNumber: number) => {
     const newExpanded = new Set(expandedWeeks);
@@ -188,20 +219,126 @@ export default function HealthPage() {
                 <p className="text-xs text-gray-600">Elite Training Program</p>
               </div>
             </div>
-            <Button 
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-xs shadow-md"
-            >
-              <Play className="h-3 w-3 mr-1" />
-              Start Workout
-            </Button>
+            {isTimerRunning ? (
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1 bg-red-100 px-2 py-1 rounded">
+                  <Timer className="h-3 w-3 text-red-600" />
+                  <span className="text-xs font-mono text-red-600">{formatTime(workoutTimer)}</span>
+                </div>
+                <Button 
+                  size="sm"
+                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 text-xs shadow-md"
+                  onClick={stopWorkout}
+                >
+                  Stop
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-xs shadow-md"
+                onClick={startWorkout}
+              >
+                <Play className="h-3 w-3 mr-1" />
+                Start Workout
+              </Button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Mobile-Optimized Content */}
-      <div className="px-2 py-3">
-        <div className="space-y-2">
+      {/* Tabs Navigation */}
+      <div className="px-2 pt-3">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-2 h-10 bg-white shadow-md">
+            <TabsTrigger value="profile" className="text-xs font-medium">
+              <User className="h-3 w-3 mr-1" />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="workout" className="text-xs font-medium">
+              <Dumbbell className="h-3 w-3 mr-1" />
+              Workout
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Profile Tab Content */}
+          <TabsContent value="profile" className="mt-3 space-y-2">
+            {/* 1RM Section */}
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                <Trophy className="h-4 w-4 mr-2 text-blue-600" />
+                Personal Records (1RM)
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { exercise: "Bench Press", weight: "315 lbs", date: "Jan 5" },
+                  { exercise: "Squat", weight: "405 lbs", date: "Jan 2" },
+                  { exercise: "Deadlift", weight: "455 lbs", date: "Dec 28" },
+                  { exercise: "Overhead Press", weight: "185 lbs", date: "Jan 8" }
+                ].map((pr) => (
+                  <div key={pr.exercise} className="bg-gray-50 rounded p-2 border border-gray-200">
+                    <div className="text-xs font-medium text-gray-700">{pr.exercise}</div>
+                    <div className="text-sm font-bold text-blue-600">{pr.weight}</div>
+                    <div className="text-xs text-gray-500">{pr.date}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Training Stats */}
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                <Target className="h-4 w-4 mr-2 text-blue-600" />
+                Training Stats
+              </h3>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                  <span className="text-xs text-gray-600">Total Workouts</span>
+                  <span className="text-sm font-medium text-gray-900">247</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                  <span className="text-xs text-gray-600">Avg. Workout Duration</span>
+                  <span className="text-sm font-medium text-gray-900">52 mins</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                  <span className="text-xs text-gray-600">Current Streak</span>
+                  <span className="text-sm font-medium text-green-600">12 days</span>
+                </div>
+                <div className="flex justify-between items-center py-1">
+                  <span className="text-xs text-gray-600">Total Volume This Week</span>
+                  <span className="text-sm font-medium text-gray-900">42,350 lbs</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Body Metrics */}
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                <Zap className="h-4 w-4 mr-2 text-blue-600" />
+                Body Metrics
+              </h3>
+              
+              <div className="grid grid-cols-3 gap-2">
+                <div className="text-center">
+                  <div className="text-xs text-gray-600">Weight</div>
+                  <div className="text-sm font-bold text-gray-900">185 lbs</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xs text-gray-600">Body Fat</div>
+                  <div className="text-sm font-bold text-gray-900">12.5%</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xs text-gray-600">Muscle Mass</div>
+                  <div className="text-sm font-bold text-gray-900">162 lbs</div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Workout Tab Content */}
+          <TabsContent value="workout" className="mt-3 space-y-2">
           {/* Program Overview */}
           <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
             <h3 className="text-sm font-semibold text-gray-900 mb-1 flex items-center">
@@ -331,7 +468,80 @@ export default function HealthPage() {
               );
             })}
           </div>
-        </div>
+
+          {/* Analytics Section */}
+          <div className="mt-4 space-y-2">
+            <h3 className="text-sm font-semibold text-gray-900 px-1 flex items-center">
+              <TrendingUp className="h-4 w-4 mr-2 text-blue-600" />
+              Progress Analytics
+            </h3>
+
+            {/* Weekly Volume Chart */}
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+              <h4 className="text-xs font-medium text-gray-700 mb-2">Weekly Volume (lbs)</h4>
+              <div className="h-24 flex items-end justify-between space-x-1">
+                {[
+                  { week: "W1", volume: 38000 },
+                  { week: "W2", volume: 42000 },
+                  { week: "W3", volume: 45000 },
+                  { week: "W4", volume: 32000 }
+                ].map((data) => {
+                  const height = (data.volume / 45000) * 100;
+                  return (
+                    <div key={data.week} className="flex-1 flex flex-col items-center">
+                      <div className="w-full bg-blue-200 rounded-t relative" style={{ height: `${height}%` }}>
+                        <span className="absolute -top-5 left-0 right-0 text-center text-xs font-medium text-gray-700">
+                          {(data.volume / 1000).toFixed(0)}k
+                        </span>
+                      </div>
+                      <span className="text-xs text-gray-600 mt-1">{data.week}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Exercise Distribution */}
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+              <h4 className="text-xs font-medium text-gray-700 mb-2">Exercise Distribution</h4>
+              <div className="space-y-2">
+                {[
+                  { category: "Strength", percentage: 60, color: "bg-blue-500" },
+                  { category: "Cardio", percentage: 25, color: "bg-green-500" },
+                  { category: "Functional", percentage: 15, color: "bg-orange-500" }
+                ].map((cat) => (
+                  <div key={cat.category}>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-gray-600">{cat.category}</span>
+                      <span className="font-medium">{cat.percentage}%</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full ${cat.color} transition-all duration-500`}
+                        style={{ width: `${cat.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+                <div className="text-xs text-gray-600">Avg. Intensity</div>
+                <div className="text-lg font-bold text-blue-600">82%</div>
+                <div className="text-xs text-green-600">↑ 5% from last week</div>
+              </div>
+              <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+                <div className="text-xs text-gray-600">Recovery Score</div>
+                <div className="text-lg font-bold text-green-600">8.5/10</div>
+                <div className="text-xs text-gray-600">Ready to train</div>
+              </div>
+            </div>
+          </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
