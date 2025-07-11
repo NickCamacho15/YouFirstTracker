@@ -477,16 +477,16 @@ export default function HealthPage() {
             </h3>
 
             {/* Volume Progress Over Time */}
-            <div className="bg-gray-900 rounded-lg shadow-md p-3 text-white">
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200 animate-fadeIn opacity-0 animation-delay-200">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-xs font-medium">Weekly Volume Progress</h4>
-                <span className="text-xs text-gray-400">Last 8 weeks</span>
+                <h4 className="text-xs font-medium text-gray-700">Weekly Volume Progress</h4>
+                <span className="text-xs text-gray-500">Last 8 weeks</span>
               </div>
               
               {/* Line Graph */}
               <div className="h-32 relative">
                 {/* Y-axis labels */}
-                <div className="absolute left-0 top-0 bottom-0 w-8 flex flex-col justify-between text-xs text-gray-400">
+                <div className="absolute left-0 top-0 bottom-0 w-8 flex flex-col justify-between text-xs text-gray-500">
                   <span>50k</span>
                   <span>40k</span>
                   <span>30k</span>
@@ -499,18 +499,26 @@ export default function HealthPage() {
                 <div className="ml-10 h-full relative">
                   <svg className="w-full h-full" preserveAspectRatio="none">
                     {/* Grid lines */}
-                    <line x1="0" y1="0" x2="100%" y2="0" stroke="#374151" strokeWidth="1" />
-                    <line x1="0" y1="25%" x2="100%" y2="25%" stroke="#374151" strokeWidth="1" />
-                    <line x1="0" y1="50%" x2="100%" y2="50%" stroke="#374151" strokeWidth="1" />
-                    <line x1="0" y1="75%" x2="100%" y2="75%" stroke="#374151" strokeWidth="1" />
-                    <line x1="0" y1="100%" x2="100%" y2="100%" stroke="#374151" strokeWidth="1" />
+                    <line x1="0" y1="0" x2="100%" y2="0" stroke="#E5E7EB" strokeWidth="1" />
+                    <line x1="0" y1="25%" x2="100%" y2="25%" stroke="#E5E7EB" strokeWidth="1" />
+                    <line x1="0" y1="50%" x2="100%" y2="50%" stroke="#E5E7EB" strokeWidth="1" />
+                    <line x1="0" y1="75%" x2="100%" y2="75%" stroke="#E5E7EB" strokeWidth="1" />
+                    <line x1="0" y1="100%" x2="100%" y2="100%" stroke="#E5E7EB" strokeWidth="1" />
                     
-                    {/* Progress line */}
+                    {/* Progress line with gradient */}
+                    <defs>
+                      <linearGradient id="volumeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#60A5FA" />
+                        <stop offset="100%" stopColor="#2563EB" />
+                      </linearGradient>
+                    </defs>
+                    
                     <polyline 
                       points="0,90 14.3,80 28.6,75 42.9,65 57.1,50 71.4,40 85.7,35 100,20"
                       fill="none" 
-                      stroke="#3B82F6" 
-                      strokeWidth="2"
+                      stroke="url(#volumeGradient)" 
+                      strokeWidth="3"
+                      className="animate-drawLine"
                     />
                     
                     {/* Data points */}
@@ -524,13 +532,14 @@ export default function HealthPage() {
                       { x: 85.7, y: 35, value: "44k", pct: "88%" },
                       { x: 100, y: 20, value: "48k", pct: "96%" }
                     ].map((point, idx) => (
-                      <g key={idx}>
-                        <circle cx={`${point.x}%`} cy={`${point.y}%`} r="3" fill="#3B82F6" />
+                      <g key={idx} className="animate-fadeIn opacity-0" style={{ animationDelay: `${400 + idx * 100}ms` }}>
+                        <circle cx={`${point.x}%`} cy={`${point.y}%`} r="4" fill="#2563EB" />
+                        <circle cx={`${point.x}%`} cy={`${point.y}%`} r="6" fill="#2563EB" opacity="0.3" />
                         <text 
                           x={`${point.x}%`} 
-                          y={`${point.y - 5}%`} 
-                          className="text-[10px]" 
-                          fill={idx === 7 ? "#10B981" : "#9CA3AF"}
+                          y={`${point.y - 8}%`} 
+                          className="text-[10px] font-medium" 
+                          fill={idx === 7 ? "#059669" : "#6B7280"}
                           textAnchor="middle"
                         >
                           {point.pct}
@@ -540,7 +549,7 @@ export default function HealthPage() {
                   </svg>
                   
                   {/* X-axis labels */}
-                  <div className="flex justify-between mt-1 text-xs text-gray-400">
+                  <div className="flex justify-between mt-1 text-xs text-gray-500">
                     <span>W1</span>
                     <span>W2</span>
                     <span>W3</span>
@@ -553,39 +562,47 @@ export default function HealthPage() {
                 </div>
               </div>
               
-              <div className="mt-2 text-xs text-gray-400">
-                Your volume has increased by <span className="text-green-500 font-medium">118%</span> over 8 weeks
+              <div className="mt-2 text-xs text-gray-600">
+                Your volume has increased by <span className="text-green-600 font-medium">118%</span> over 8 weeks
               </div>
             </div>
 
             {/* Strength Progress */}
-            <div className="bg-gray-900 rounded-lg shadow-md p-3 text-white">
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200 animate-fadeIn opacity-0 animation-delay-400">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-xs font-medium">Strength Progress (1RM)</h4>
-                <span className="text-xs text-gray-400">Last 12 weeks</span>
+                <h4 className="text-xs font-medium text-gray-700">Strength Progress (1RM)</h4>
+                <span className="text-xs text-gray-500">Last 12 weeks</span>
               </div>
               
               {/* Bar Chart */}
               <div className="h-24 flex items-end justify-between space-x-1">
                 {[
-                  { week: "W1", value: 58, color: "bg-yellow-600" },
-                  { week: "W2", value: 62, color: "bg-yellow-600" },
-                  { week: "W3", value: 64, color: "bg-yellow-600" },
-                  { week: "W4", value: 68, color: "bg-yellow-600" },
-                  { week: "W5", value: 70, color: "bg-green-600" },
-                  { week: "W6", value: 75, color: "bg-green-600" },
-                  { week: "W7", value: 78, color: "bg-green-600" },
-                  { week: "W8", value: 82, color: "bg-green-600" },
-                  { week: "W9", value: 85, color: "bg-green-600" },
-                  { week: "W10", value: 87, color: "bg-green-600" },
-                  { week: "W11", value: 90, color: "bg-green-600" },
-                  { week: "W12", value: 96, color: "bg-green-600" }
-                ].map((data) => (
+                  { week: "W1", value: 58, color: "bg-blue-300" },
+                  { week: "W2", value: 62, color: "bg-blue-300" },
+                  { week: "W3", value: 64, color: "bg-blue-300" },
+                  { week: "W4", value: 68, color: "bg-blue-400" },
+                  { week: "W5", value: 70, color: "bg-blue-400" },
+                  { week: "W6", value: 75, color: "bg-blue-400" },
+                  { week: "W7", value: 78, color: "bg-blue-500" },
+                  { week: "W8", value: 82, color: "bg-blue-500" },
+                  { week: "W9", value: 85, color: "bg-blue-500" },
+                  { week: "W10", value: 87, color: "bg-blue-600" },
+                  { week: "W11", value: 90, color: "bg-blue-600" },
+                  { week: "W12", value: 96, color: "bg-blue-700" }
+                ].map((data, idx) => (
                   <div key={data.week} className="flex-1 flex flex-col items-center justify-end">
-                    <span className="text-[10px] text-gray-300 mb-1">{data.value}%</span>
+                    <span 
+                      className="text-[10px] text-gray-700 font-medium mb-1 animate-fadeIn opacity-0" 
+                      style={{ animationDelay: `${600 + idx * 50}ms` }}
+                    >
+                      {data.value}%
+                    </span>
                     <div 
-                      className={`w-full ${data.color} rounded-t relative`} 
-                      style={{ height: `${data.value}%` }}
+                      className={`w-full ${data.color} rounded-t relative animate-growUp`} 
+                      style={{ 
+                        height: `${data.value}%`,
+                        animationDelay: `${600 + idx * 50}ms` 
+                      }}
                     />
                   </div>
                 ))}
@@ -599,13 +616,13 @@ export default function HealthPage() {
                 ))}
               </div>
               
-              <div className="mt-2 text-xs text-gray-400">
-                Bench Press 1RM increased from <span className="text-yellow-500">285 lbs</span> to <span className="text-green-500">315 lbs</span>
+              <div className="mt-2 text-xs text-gray-600">
+                Bench Press 1RM increased from <span className="text-blue-500 font-medium">285 lbs</span> to <span className="text-blue-700 font-medium">315 lbs</span>
               </div>
             </div>
 
             {/* Performance Trends */}
-            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200 animate-fadeIn opacity-0 animation-delay-600">
               <h4 className="text-xs font-medium text-gray-700 mb-2">Performance Trends</h4>
               <div className="space-y-3">
                 {/* Intensity Trend */}
@@ -616,7 +633,14 @@ export default function HealthPage() {
                   </div>
                   <div className="h-8 flex items-end space-x-0.5">
                     {[65, 68, 70, 72, 74, 76, 78, 82].map((val, idx) => (
-                      <div key={idx} className="flex-1 bg-blue-300 rounded-t" style={{ height: `${val}%` }} />
+                      <div 
+                        key={idx} 
+                        className="flex-1 bg-blue-400 rounded-t animate-growUp" 
+                        style={{ 
+                          height: `${val}%`,
+                          animationDelay: `${800 + idx * 50}ms` 
+                        }} 
+                      />
                     ))}
                   </div>
                 </div>
@@ -629,7 +653,14 @@ export default function HealthPage() {
                   </div>
                   <div className="h-8 flex items-end space-x-0.5">
                     {[60, 65, 70, 75, 78, 80, 83, 85].map((val, idx) => (
-                      <div key={idx} className="flex-1 bg-green-300 rounded-t" style={{ height: `${val}%` }} />
+                      <div 
+                        key={idx} 
+                        className="flex-1 bg-green-400 rounded-t animate-growUp" 
+                        style={{ 
+                          height: `${val}%`,
+                          animationDelay: `${1200 + idx * 50}ms` 
+                        }} 
+                      />
                     ))}
                   </div>
                 </div>
@@ -638,11 +669,18 @@ export default function HealthPage() {
                 <div>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-gray-600">Workout Consistency</span>
-                    <span className="font-medium">92%</span>
+                    <span className="font-medium text-blue-600">92%</span>
                   </div>
                   <div className="h-8 flex items-end space-x-0.5">
                     {[85, 88, 86, 90, 92, 94, 91, 92].map((val, idx) => (
-                      <div key={idx} className="flex-1 bg-purple-300 rounded-t" style={{ height: `${val}%` }} />
+                      <div 
+                        key={idx} 
+                        className="flex-1 bg-purple-400 rounded-t animate-growUp" 
+                        style={{ 
+                          height: `${val}%`,
+                          animationDelay: `${1600 + idx * 50}ms` 
+                        }} 
+                      />
                     ))}
                   </div>
                 </div>
@@ -651,15 +689,15 @@ export default function HealthPage() {
 
             {/* Exercise Distribution & Summary */}
             <div className="grid grid-cols-2 gap-2">
-              <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+              <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200 animate-fadeIn opacity-0 animation-delay-800">
                 <h4 className="text-xs font-medium text-gray-700 mb-2">This Week Focus</h4>
                 <div className="space-y-1">
                   {[
                     { category: "Strength", percentage: 60, color: "bg-blue-500" },
                     { category: "Cardio", percentage: 25, color: "bg-green-500" },
                     { category: "Functional", percentage: 15, color: "bg-orange-500" }
-                  ].map((cat) => (
-                    <div key={cat.category} className="flex items-center space-x-2">
+                  ].map((cat, idx) => (
+                    <div key={cat.category} className="flex items-center space-x-2 animate-slideInLeft opacity-0" style={{ animationDelay: `${1000 + idx * 100}ms` }}>
                       <div className={`w-2 h-2 rounded-full ${cat.color}`} />
                       <span className="text-xs text-gray-600 flex-1">{cat.category}</span>
                       <span className="text-xs font-medium">{cat.percentage}%</span>
@@ -668,20 +706,20 @@ export default function HealthPage() {
                 </div>
               </div>
               
-              <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+              <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200 animate-fadeIn opacity-0 animation-delay-800">
                 <h4 className="text-xs font-medium text-gray-700 mb-2">Progress Summary</h4>
                 <div className="space-y-1">
-                  <div className="flex justify-between text-xs">
+                  <div className="flex justify-between text-xs animate-slideInRight opacity-0" style={{ animationDelay: '1000ms' }}>
                     <span className="text-gray-600">Total Progress</span>
                     <span className="font-medium text-green-600">↑ 24%</span>
                   </div>
-                  <div className="flex justify-between text-xs">
+                  <div className="flex justify-between text-xs animate-slideInRight opacity-0" style={{ animationDelay: '1100ms' }}>
                     <span className="text-gray-600">Current Phase</span>
-                    <span className="font-medium">Peak</span>
+                    <span className="font-medium text-blue-600">Peak</span>
                   </div>
-                  <div className="flex justify-between text-xs">
+                  <div className="flex justify-between text-xs animate-slideInRight opacity-0" style={{ animationDelay: '1200ms' }}>
                     <span className="text-gray-600">Next Goal</span>
-                    <span className="font-medium">500lb DL</span>
+                    <span className="font-medium text-blue-600">500lb DL</span>
                   </div>
                 </div>
               </div>
