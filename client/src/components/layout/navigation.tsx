@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Bell, Home, Target, Repeat, BookOpen, ImageIcon, User, Sparkles, Activity } from "lucide-react";
+import { Bell, Home, Target, Repeat, Brain, ImageIcon, User, Sparkles, Dumbbell } from "lucide-react";
 import uoyLogo from "@assets/You. Logo-6_1752099024177.png";
 
 export function Navigation() {
@@ -108,7 +108,7 @@ export function Navigation() {
                   ? "text-blue-600"
                   : "text-gray-500 hover:text-gray-700"
               }`}>
-                <BookOpen className="w-6 h-6 mb-1" />
+                <Brain className="w-6 h-6 mb-1" />
                 <span className="text-xs font-medium">Mind</span>
               </div>
             </Link>
@@ -119,7 +119,7 @@ export function Navigation() {
                   ? "text-blue-600"
                   : "text-gray-500 hover:text-gray-700"
               }`}>
-                <Activity className="w-6 h-6 mb-1" />
+                <Dumbbell className="w-6 h-6 mb-1" />
                 <span className="text-xs font-medium">Body</span>
               </div>
             </Link>

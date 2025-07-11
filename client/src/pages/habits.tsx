@@ -247,7 +247,7 @@ export default function HabitsPage() {
           </div>
         ) : (
           <Tabs defaultValue="rituals" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="rituals" className="flex items-center gap-2">
                 <Star className="w-4 h-4" />
                 Rituals
@@ -255,6 +255,10 @@ export default function HabitsPage() {
               <TabsTrigger value="rules" className="flex items-center gap-2">
                 <Shield className="w-4 h-4" />
                 Rules
+              </TabsTrigger>
+              <TabsTrigger value="challenge" className="flex items-center gap-2">
+                <Trophy className="w-4 h-4" />
+                Challenge
               </TabsTrigger>
             </TabsList>
 
@@ -836,6 +840,154 @@ export default function HabitsPage() {
                 onAddRule={handleAddRule}
                 isLoading={false}
               />
+            </TabsContent>
+
+            <TabsContent value="challenge" className="space-y-6">
+              {/* Active Challenges */}
+              <div className="space-y-4">
+                {/* Challenge Header */}
+                <Card className="border-0 shadow-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-2xl font-bold">75-100 Day Challenges</CardTitle>
+                        <p className="text-purple-100 mt-1">Push your limits with extended commitment challenges</p>
+                      </div>
+                      <Button 
+                        variant="secondary"
+                        className="bg-white text-purple-600 hover:bg-purple-50"
+                        onClick={() => {/* Add new challenge */}}
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        New Challenge
+                      </Button>
+                    </div>
+                  </CardHeader>
+                </Card>
+
+                {/* Example Challenge - 75 Hard */}
+                <Card className="border-0 shadow-lg">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-xl">75 Hard Challenge</CardTitle>
+                        <p className="text-sm text-gray-600 mt-1">Mental toughness program • Day 23 of 75</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-purple-600">30%</div>
+                        <p className="text-xs text-gray-500">Complete</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Daily Tasks */}
+                    <div className="space-y-3 mb-6">
+                      <h4 className="font-medium text-gray-900 mb-2">Today's Requirements:</h4>
+                      <div className="space-y-2">
+                        {[
+                          { task: "Workout #1 (45 min)", completed: true },
+                          { task: "Workout #2 (45 min outdoor)", completed: false },
+                          { task: "Follow diet plan", completed: true },
+                          { task: "Drink 1 gallon of water", completed: true },
+                          { task: "Read 10 pages", completed: false },
+                          { task: "Take progress photo", completed: true }
+                        ].map((item, index) => (
+                          <div key={index} className="flex items-center gap-3">
+                            <input
+                              type="checkbox"
+                              checked={item.completed}
+                              onChange={() => {}}
+                              className="w-5 h-5 text-purple-600 rounded cursor-pointer"
+                            />
+                            <span className={`text-sm ${item.completed ? 'line-through text-gray-500' : 'text-gray-700'}`}>
+                              {item.task}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Progress Grid */}
+                    <div className="border-t pt-4">
+                      <h4 className="font-medium text-gray-900 mb-3">Progress Tracker:</h4>
+                      <div className="grid grid-cols-10 gap-1">
+                        {Array.from({ length: 75 }, (_, i) => {
+                          const dayNumber = i + 1;
+                          const isCompleted = dayNumber <= 22;
+                          const isToday = dayNumber === 23;
+                          const isFuture = dayNumber > 23;
+                          
+                          return (
+                            <div
+                              key={i}
+                              className={`
+                                aspect-square rounded flex items-center justify-center text-xs font-medium
+                                ${isCompleted ? 'bg-green-500 text-white' : ''}
+                                ${isToday ? 'bg-purple-500 text-white ring-2 ring-purple-300' : ''}
+                                ${isFuture ? 'bg-gray-100 text-gray-400' : ''}
+                              `}
+                            >
+                              {dayNumber}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Example Challenge - 100 Days of Code */}
+                <Card className="border-0 shadow-lg">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-xl">100 Days of Code</CardTitle>
+                        <p className="text-sm text-gray-600 mt-1">Code for at least 1 hour daily • Day 45 of 100</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-blue-600">45%</div>
+                        <p className="text-xs text-gray-500">Complete</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Daily Task */}
+                    <div className="mb-6">
+                      <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={false}
+                            onChange={() => {}}
+                            className="w-6 h-6 text-blue-600 rounded cursor-pointer"
+                          />
+                          <div>
+                            <p className="font-medium text-gray-900">Code for 1+ hours</p>
+                            <p className="text-sm text-gray-600">Work on personal project or tutorials</p>
+                          </div>
+                        </div>
+                        <Button variant="outline" size="sm">
+                          Log Progress
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Progress</span>
+                        <span className="font-medium">45 / 100 days</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div 
+                          className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300"
+                          style={{ width: '45%' }}
+                        ></div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         )}
