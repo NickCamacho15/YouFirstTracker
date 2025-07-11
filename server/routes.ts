@@ -246,6 +246,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rules routes
+  app.get("/api/rules", requireAuth, async (req, res) => {
+    try {
+      // Return empty array for now as rules aren't implemented in the database yet
+      res.json([]);
+    } catch (error) {
+      console.error("Get rules error:", error);
+      res.status(500).json({ message: "Failed to get rules" });
+    }
+  });
+
   // Habits routes
   app.get("/api/habits", requireAuth, async (req, res) => {
     try {

@@ -123,6 +123,15 @@ Build scripts include:
 
 ## Changelog
 
+- July 11, 2025: Challenge Page Refined - New Challenge Button Below Title with Clean Design
+  - **MOVED**: "New Challenge" button now positioned below the title tile as a prominent centered button
+  - **ENHANCED**: Challenge cards with progress bars and optimized progress calendar showing all days at once
+  - **IMPROVED**: Progress calendar with color-coded states: green (completed), purple (today), white (missed), gray (future)
+  - **REMOVED**: Any log progress options - all tracking done through simple checkbox interactions
+  - **REDESIGNED**: Create challenge form with cleaner layout matching platform aesthetic
+  - **FIXED**: Added missing /api/rules endpoint to resolve discipline page errors
+  - **STREAMLINED**: Challenge tracking focuses on visual progress with percentage bars and calendar grids
+  - Challenge page now provides intuitive checkbox-only tracking with prominent visual progress indicators
 - July 11, 2025: Rituals Tab Restructured - Removed Mind/Body/Soul Categories for Morning/Evening Routines Only
   - **REMOVED**: Mind, Body, Soul category cards from Rituals tab
   - **SIMPLIFIED**: Rituals tab now contains only Morning and Evening routines with active data display

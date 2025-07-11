@@ -594,176 +594,261 @@ export default function HabitsPage() {
             {/* Challenge Header */}
             <Card className="border-0 shadow-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-2xl font-bold">75-100 Day Challenges</CardTitle>
-                    <p className="text-purple-100 mt-1">Push your limits with extended commitment challenges</p>
-                  </div>
-                  <Button
-                    onClick={() => setIsCreatingChallenge(true)}
-                    className="bg-white text-purple-600 hover:bg-purple-50"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    New Challenge
-                  </Button>
+                <div>
+                  <CardTitle className="text-2xl font-bold">75-100 Day Challenges</CardTitle>
+                  <p className="text-purple-100 mt-1">Push your limits with extended commitment challenges</p>
                 </div>
               </CardHeader>
             </Card>
+            
+            {/* New Challenge Button */}
+            <div className="flex justify-center">
+              <Button
+                onClick={() => setIsCreatingChallenge(true)}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 shadow-lg px-8 py-6 text-lg font-semibold flex items-center gap-3"
+              >
+                <Plus className="w-6 h-6" />
+                Start New Challenge
+              </Button>
+            </div>
 
             {/* Active Challenges List */}
-            {activeChallenges.map((challenge) => (
-              <Card key={challenge.id} className="border-0 shadow-lg">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-xl">{challenge.title}</CardTitle>
-                      <p className="text-sm text-gray-600">{challenge.description}</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-purple-600">
-                        {challenge.currentDay}/{challenge.duration}
+            {activeChallenges.map((challenge) => {
+              const completedPercentage = Math.round((challenge.completedDays.length / challenge.duration) * 100);
+              const today = Math.floor((new Date().getTime() - new Date(challenge.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1;
+              
+              return (
+                <Card key={challenge.id} className="border-0 shadow-lg">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-xl font-bold">{challenge.title}</CardTitle>
+                        {challenge.description && (
+                          <p className="text-sm text-gray-600 mt-1">{challenge.description}</p>
+                        )}
                       </div>
-                      <p className="text-sm text-gray-600">Days</p>
+                      <div className="text-right ml-4">
+                        <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                          Day {Math.min(today, challenge.duration)}
+                        </div>
+                        <p className="text-sm text-gray-600">of {challenge.duration}</p>
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {/* Progress Grid */}
-                  <div className="grid grid-cols-10 gap-2 mb-4">
-                    {Array.from({ length: challenge.duration }, (_, i) => i + 1).map((day) => (
-                      <button
-                        key={day}
-                        onClick={() => handleChallengeCheckOff(challenge.id, day)}
-                        className={`
-                          w-8 h-8 rounded text-xs font-medium border-2 transition-all duration-200
-                          ${challenge.completedDays.includes(day)
-                            ? 'bg-green-500 border-green-500 text-white'
-                            : day <= challenge.currentDay
-                              ? 'bg-gray-100 border-gray-300 hover:bg-green-100 hover:border-green-300'
-                              : 'bg-gray-50 border-gray-200 text-gray-400'
-                          }
-                        `}
-                        disabled={day > challenge.currentDay}
-                      >
-                        {day}
-                      </button>
-                    ))}
-                  </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Progress Bar */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-gray-700">Progress</span>
+                        <span className="text-sm font-bold text-purple-600">{completedPercentage}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div 
+                          className="bg-gradient-to-r from-purple-500 to-indigo-500 h-3 rounded-full transition-all duration-500"
+                          style={{ width: `${completedPercentage}%` }}
+                        ></div>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>{challenge.completedDays.length} days completed</span>
+                        <span>{challenge.duration - challenge.completedDays.length} days remaining</span>
+                      </div>
+                    </div>
 
-                  {/* Challenge Rules */}
-                  {challenge.rules && challenge.rules.length > 0 && (
+                    {/* Progress Calendar - Optimized Grid */}
                     <div className="bg-gray-50 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900 mb-2">Challenge Rules:</h4>
-                      <ul className="space-y-1">
-                        {challenge.rules.map((rule, index) => (
-                          <li key={index} className="text-sm text-gray-700 flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-green-500" />
-                            {rule}
-                          </li>
+                      <h4 className="font-medium text-gray-900 mb-3 text-sm">Progress Calendar</h4>
+                      <div className="grid grid-cols-10 gap-1.5">
+                        {Array.from({ length: challenge.duration }, (_, i) => i + 1).map((day) => (
+                          <button
+                            key={day}
+                            onClick={() => handleChallengeCheckOff(challenge.id, day)}
+                            className={`
+                              aspect-square rounded-md text-xs font-medium border transition-all duration-200 flex items-center justify-center
+                              ${challenge.completedDays.includes(day)
+                                ? 'bg-green-500 border-green-500 text-white shadow-sm'
+                                : day === today
+                                  ? 'bg-purple-100 border-purple-400 text-purple-700 font-bold'
+                                  : day < today
+                                    ? 'bg-white border-gray-300 hover:bg-red-50 hover:border-red-300 text-gray-700'
+                                    : 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+                              }
+                            `}
+                            disabled={day > today}
+                            title={
+                              day === today 
+                                ? "Today" 
+                                : day < today 
+                                  ? challenge.completedDays.includes(day) 
+                                    ? "Completed - Click to uncheck" 
+                                    : "Missed - Click to mark complete"
+                                  : "Future day"
+                            }
+                          >
+                            {challenge.completedDays.includes(day) ? '✓' : day}
+                          </button>
                         ))}
-                      </ul>
+                      </div>
+                      <div className="flex items-center gap-4 mt-3 text-xs">
+                        <div className="flex items-center gap-1">
+                          <div className="w-4 h-4 bg-green-500 rounded"></div>
+                          <span className="text-gray-600">Completed</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className="w-4 h-4 bg-purple-100 border border-purple-400 rounded"></div>
+                          <span className="text-gray-600">Today</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className="w-4 h-4 bg-white border border-gray-300 rounded"></div>
+                          <span className="text-gray-600">Missed</span>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+
+                    {/* Challenge Rules */}
+                    {challenge.rules && challenge.rules.length > 0 && (
+                      <div className="bg-purple-50 rounded-lg p-4">
+                        <h4 className="font-medium text-purple-900 mb-2 text-sm">Daily Requirements</h4>
+                        <ul className="space-y-1.5">
+                          {challenge.rules.map((rule, index) => (
+                            <li key={index} className="text-sm text-purple-700 flex items-start gap-2">
+                              <CheckCircle2 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                              <span>{rule}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
 
             {/* Create Challenge Form */}
             {isCreatingChallenge && (
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle>Create New Challenge</CardTitle>
+              <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-indigo-50">
+                <CardHeader className="pb-6 pt-8">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg">
+                      <Trophy className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold">Create New Challenge</CardTitle>
+                      <p className="text-sm text-gray-600 mt-1">Set up your extended commitment challenge</p>
+                    </div>
+                  </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Challenge Title
-                    </label>
-                    <input
-                      type="text"
-                      value={challengeTitle}
-                      onChange={(e) => setChallengeTitle(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="Enter challenge title..."
-                    />
-                  </div>
+                <CardContent className="space-y-6 pb-8">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-900 mb-2">
+                        Challenge Name
+                      </label>
+                      <input
+                        type="text"
+                        value={challengeTitle}
+                        onChange={(e) => setChallengeTitle(e.target.value)}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-lg"
+                        placeholder="e.g., 75 Hard Challenge"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Description
-                    </label>
-                    <textarea
-                      value={challengeDescription}
-                      onChange={(e) => setChallengeDescription(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      rows={3}
-                      placeholder="Describe your challenge..."
-                    />
-                  </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-900 mb-2">
+                        Description (Optional)
+                      </label>
+                      <textarea
+                        value={challengeDescription}
+                        onChange={(e) => setChallengeDescription(e.target.value)}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        rows={2}
+                        placeholder="What's this challenge about?"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Duration
-                    </label>
-                    <select
-                      value={challengeDuration}
-                      onChange={(e) => setChallengeDuration(Number(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    >
-                      <option value={75}>75 Days</option>
-                      <option value={100}>100 Days</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Challenge Rules
-                    </label>
-                    <div className="space-y-2">
-                      {challengeRules.map((rule, index) => (
-                        <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                          <CheckCircle2 className="w-4 h-4 text-green-500" />
-                          <span className="text-sm">{rule}</span>
-                          <button
-                            onClick={() => setChallengeRules(challengeRules.filter((_, i) => i !== index))}
-                            className="ml-auto text-red-500 hover:text-red-700"
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-900 mb-2">
+                          Duration
+                        </label>
+                        <div className="relative">
+                          <select
+                            value={challengeDuration}
+                            onChange={(e) => setChallengeDuration(Number(e.target.value))}
+                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none bg-white text-lg font-medium"
                           >
-                            <X className="w-4 h-4" />
-                          </button>
+                            <option value={75}>75 Days</option>
+                            <option value={100}>100 Days</option>
+                          </select>
+                          <ChevronUp className="absolute right-3 top-1/2 transform -translate-y-1/2 rotate-180 w-5 h-5 text-gray-500 pointer-events-none" />
                         </div>
-                      ))}
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={newChallengeRule}
-                          onChange={(e) => setNewChallengeRule(e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                          placeholder="Add a rule..."
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter' && newChallengeRule.trim()) {
-                              setChallengeRules([...challengeRules, newChallengeRule.trim()]);
-                              setNewChallengeRule("");
-                            }
-                          }}
-                        />
-                        <Button
-                          onClick={() => {
-                            if (newChallengeRule.trim()) {
-                              setChallengeRules([...challengeRules, newChallengeRule.trim()]);
-                              setNewChallengeRule("");
-                            }
-                          }}
-                          size="sm"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </Button>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-900 mb-2">
+                          Start Date
+                        </label>
+                        <div className="px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-lg font-medium text-gray-900">
+                          Today
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-900 mb-2">
+                        Daily Requirements
+                      </label>
+                      <div className="space-y-2">
+                        {challengeRules.map((rule, index) => (
+                          <div key={index} className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+                            <CheckCircle2 className="w-5 h-5 text-purple-500 flex-shrink-0" />
+                            <span className="text-sm text-gray-800 flex-1">{rule}</span>
+                            <button
+                              onClick={() => setChallengeRules(challengeRules.filter((_, i) => i !== index))}
+                              className="text-gray-400 hover:text-red-500 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={newChallengeRule}
+                            onChange={(e) => setNewChallengeRule(e.target.value)}
+                            className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="Add a daily requirement..."
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter' && newChallengeRule.trim()) {
+                                setChallengeRules([...challengeRules, newChallengeRule.trim()]);
+                                setNewChallengeRule("");
+                              }
+                            }}
+                          />
+                          <Button
+                            onClick={() => {
+                              if (newChallengeRule.trim()) {
+                                setChallengeRules([...challengeRules, newChallengeRule.trim()]);
+                                setNewChallengeRule("");
+                              }
+                            }}
+                            className="px-4 bg-purple-600 hover:bg-purple-700"
+                          >
+                            <Plus className="w-5 h-5" />
+                          </Button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Add specific actions you'll complete every day
+                        </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex gap-3">
-                    <Button onClick={createChallenge} className="bg-purple-600 hover:bg-purple-700">
-                      Create Challenge
+                  <div className="flex gap-3 pt-4">
+                    <Button 
+                      onClick={createChallenge} 
+                      className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold py-3"
+                      disabled={!challengeTitle.trim()}
+                    >
+                      Start Challenge
                     </Button>
                     <Button
                       variant="outline"
@@ -773,6 +858,7 @@ export default function HabitsPage() {
                         setChallengeDescription("");
                         setChallengeRules([]);
                       }}
+                      className="px-8 border-2"
                     >
                       Cancel
                     </Button>
