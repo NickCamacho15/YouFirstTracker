@@ -1,10 +1,16 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReadingTimer } from "@/components/reading/reading-timer";
-import { BookOpen, Clock, TrendingUp, Brain, Smartphone } from "lucide-react";
+import { BookOpen, Clock, TrendingUp, Brain, Smartphone, History, Lightbulb, Plus } from "lucide-react";
 import { ReadingList } from "@/components/reading/reading-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 interface ReadingSession {
   id: number;
@@ -17,6 +23,12 @@ interface ReadingSession {
 
 export default function MindPage() {
   const [activeTab, setActiveTab] = useState("reading");
+  const [readingSubTab, setReadingSubTab] = useState("list");
+  const [showAddInsight, setShowAddInsight] = useState(false);
+  const [newInsight, setNewInsight] = useState("");
+  
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   
   const { data: readingSessions = [], isLoading } = useQuery({
     queryKey: ["/api/reading-sessions"],
@@ -24,6 +36,34 @@ export default function MindPage() {
 
   const { data: readingList = [] } = useQuery({
     queryKey: ["/api/reading-list"],
+  });
+
+  const { data: insights = [] } = useQuery({
+    queryKey: ["/api/insights"],
+  });
+
+  const addInsightMutation = useMutation({
+    mutationFn: async (data: { content: string }) => {
+      const response = await apiRequest("POST", "/api/insights", {
+        title: "Reading Insight",
+        content: data.content,
+        category: "reflection"
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/insights"] });
+      setNewInsight("");
+      setShowAddInsight(false);
+      toast({ title: "Insight added!", description: "Your reading insight has been saved." });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to add insight",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading) {
@@ -139,10 +179,97 @@ export default function MindPage() {
               <ReadingTimer readingSessions={readingSessions as ReadingSession[]} />
             </div>
 
-            {/* Reading List */}
-            <div className="mb-8">
-              <ReadingList />
-            </div>
+            {/* Reading Content Tabs */}
+            <Tabs value={readingSubTab} onValueChange={setReadingSubTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                <TabsTrigger value="list" className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4" />
+                  List
+                </TabsTrigger>
+                <TabsTrigger value="history" className="flex items-center gap-2">
+                  <History className="w-4 h-4" />
+                  History
+                </TabsTrigger>
+                <TabsTrigger value="insights" className="flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4" />
+                  Insights
+                </TabsTrigger>
+              </TabsList>
+
+              {/* List Tab */}
+              <TabsContent value="list" className="mt-4">
+                <ReadingList />
+              </TabsContent>
+
+              {/* History Tab */}
+              <TabsContent value="history" className="mt-4">
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold mb-4">Reading History</h3>
+                  {readingSessions.length === 0 ? (
+                    <Card className="p-6">
+                      <p className="text-center text-muted-foreground">No reading sessions yet. Start reading to build your history!</p>
+                    </Card>
+                  ) : (
+                    readingSessions.map((session: ReadingSession) => {
+                      const duration = Math.floor((new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / 60000);
+                      return (
+                        <Card key={session.id} className="p-4 hover:shadow-md transition-shadow">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h4 className="font-medium text-foreground">{session.bookTitle}</h4>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {new Date(session.startTime).toLocaleDateString()} • {duration} minutes
+                              </p>
+                              {session.reflection && (
+                                <p className="text-sm mt-2 text-foreground italic">"{session.reflection}"</p>
+                              )}
+                            </div>
+                            <Clock className="w-5 h-5 text-muted-foreground" />
+                          </div>
+                        </Card>
+                      );
+                    }).reverse()
+                  )}
+                </div>
+              </TabsContent>
+
+              {/* Insights Tab */}
+              <TabsContent value="insights" className="mt-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">Reading Insights</h3>
+                    <Button 
+                      onClick={() => setShowAddInsight(true)}
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add Insight
+                    </Button>
+                  </div>
+                  
+                  {insights.length === 0 ? (
+                    <Card className="p-6">
+                      <p className="text-center text-muted-foreground">No insights yet. Add your first insight from your reading!</p>
+                    </Card>
+                  ) : (
+                    (insights as any[]).map((insight) => (
+                      <Card key={insight.id} className="p-4 hover:shadow-md transition-shadow">
+                        <div className="flex items-start gap-3">
+                          <Lightbulb className="w-5 h-5 text-yellow-500 mt-0.5" />
+                          <div className="flex-1">
+                            <p className="text-foreground">{insight.content}</p>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              {new Date(insight.createdAt).toLocaleDateString()} at {new Date(insight.createdAt).toLocaleTimeString()}
+                            </p>
+                          </div>
+                        </div>
+                      </Card>
+                    )).reverse()
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
           {/* Meditation Tab */}
@@ -164,6 +291,51 @@ export default function MindPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Add Insight Dialog */}
+      <Dialog open={showAddInsight} onOpenChange={setShowAddInsight}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Reading Insight</DialogTitle>
+            <DialogDescription>
+              Capture a valuable insight or reflection from your reading
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="insight">Insight</Label>
+              <Textarea
+                id="insight"
+                placeholder="What did you learn? What resonated with you?"
+                value={newInsight}
+                onChange={(e) => setNewInsight(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowAddInsight(false);
+                  setNewInsight("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  if (newInsight.trim()) {
+                    addInsightMutation.mutate({ content: newInsight.trim() });
+                  }
+                }}
+                disabled={!newInsight.trim() || addInsightMutation.isPending}
+              >
+                {addInsightMutation.isPending ? "Adding..." : "Add Insight"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

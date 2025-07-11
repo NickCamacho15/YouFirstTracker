@@ -83,6 +83,16 @@ export function ReadingTimer({ readingSessions }: ReadingTimerProps) {
     setShowReflectionModal(true);
   };
 
+  const createInsightMutation = useMutation({
+    mutationFn: async (data: { title: string; content: string; category: string }) => {
+      const response = await apiRequest("POST", "/api/insights", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/insights"] });
+    },
+  });
+
   const handleReflectionSubmit = (reflection: string) => {
     if (!sessionData) return;
 
@@ -92,6 +102,15 @@ export function ReadingTimer({ readingSessions }: ReadingTimerProps) {
       endTime: sessionData.endTime.toISOString(),
       reflection: reflection.trim() || undefined,
     });
+
+    // Also save reflection as an insight if provided
+    if (reflection.trim()) {
+      createInsightMutation.mutate({
+        title: `Reflection: ${sessionData.bookTitle}`,
+        content: reflection.trim(),
+        category: "reflection"
+      });
+    }
 
     // Reset state
     setElapsedTime(0);

@@ -123,6 +123,15 @@ Build scripts include:
 
 ## Changelog
 
+- July 11, 2025: Mind Page Restructured with Three-Tab System for Reading Content
+  - **NEW**: Three-tab structure below reading session timer: List, History, and Insights
+  - **LIST TAB**: Shows current reading list with book management features
+  - **HISTORY TAB**: Displays past reading sessions with duration and reflections
+  - **INSIGHTS TAB**: Stores reflections from reading sessions with ability to manually add insights
+  - **INTEGRATION**: Reflections from "End & Reflect" automatically saved as insights
+  - **ENHANCED**: Each insight shows with yellow lightbulb icon and timestamps
+  - **IMPROVED**: Consistent API endpoint usage (/api/insights) across components
+  - Mind page now provides comprehensive tracking of books, sessions, and reading insights
 - July 11, 2025: Body Page Analytics Redesigned with Brand-Consistent White/Blue Theme & Animations
   - **BRAND UPDATE**: Changed analytics from dark theme to white backgrounds with blue accents
   - **ANIMATIONS**: Added gradual appearance animations for all charts and graphs on page load
