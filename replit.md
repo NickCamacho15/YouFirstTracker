@@ -123,6 +123,14 @@ Build scripts include:
 
 ## Changelog
 
+- July 11, 2025: Renamed Read to Mind - Added Three-Tab Tracking System
+  - **RENAMED**: "Read" navigation renamed to "Mind" for comprehensive mental wellness tracking
+  - **NEW**: Three-tab interface for Mind page: Reading, Meditation, and Distraction (Social Media)
+  - **MAINTAINED**: Original reading timer and session tracking moved to Reading tab
+  - **PREPARED**: Placeholder tabs for Meditation and Distraction tracking (coming soon)
+  - **HEADER**: Updated with Brain icon and "Mind Training" title emphasizing mental optimization
+  - **DESCRIPTION**: New tagline "Optimize your mental well-being through reading, meditation, and mindful technology use"
+  - Mind page now encompasses three key areas of mental wellness and focus management
 - July 10, 2025: Redesigned Foundations Sub-page with Calendar-Based Habit Tracking
   - **REDESIGNED**: Foundations page now features month navigation at top (similar to day navigation on You. page)
   - **NEW**: Top-level aggregated calendar showing all habits combined with color-coded completion percentages
