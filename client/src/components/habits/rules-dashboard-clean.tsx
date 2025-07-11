@@ -286,8 +286,8 @@ export function RulesDashboard({ rules, onToggleRuleCompletion, onMarkRuleFailur
                   </Button>
 
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-gray-900">{rule.text}</div>
-                    <div className="text-sm text-blue-600 font-medium">{rule.streak} day streak</div>
+                    <div className="text-xs sm:text-sm font-medium text-gray-900">{rule.text}</div>
+                    <div className="text-xs text-blue-600 font-medium">{rule.streak} day streak</div>
                   </div>
 
                   {/* Expand Button */}

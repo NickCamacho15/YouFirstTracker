@@ -20,6 +20,7 @@ export const goals = pgTable("goals", {
   type: text("type", { enum: ["physical", "financial", "career", "personal", "health"] }).default("personal").notNull(),
   benefits: text("benefits").array().notNull(), // At least 3 benefits
   consequences: text("consequences").array().notNull(), // What happens if you don't follow through
+  peopleHelped: text("people_helped").array(), // People who will benefit from this goal
   dueDate: timestamp("due_date"),
   completed: boolean("completed").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
