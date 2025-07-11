@@ -136,7 +136,12 @@ const ExerciseAutocomplete: React.FC<AutocompleteProps> = ({
   );
 };
 
-const TrainingProgramCreator: React.FC = () => {
+interface TrainingProgramCreatorProps {
+  onGenerateProgram?: () => void;
+  generatedProgram?: any;
+}
+
+const TrainingProgramCreator: React.FC<TrainingProgramCreatorProps> = ({ onGenerateProgram, generatedProgram }) => {
   const [selectedWeek, setSelectedWeek] = useState(1);
   const [selectedDay, setSelectedDay] = useState(1);
   const [program, setProgram] = useState<TrainingProgram>({});
@@ -166,6 +171,71 @@ const TrainingProgramCreator: React.FC = () => {
       }
     }
   }, [activeTemplate]);
+
+  // Convert generated program to training template format
+  useEffect(() => {
+    if (generatedProgram && generatedProgram.weeks) {
+      console.log('Converting generated program to template format:', generatedProgram);
+      
+      const convertedProgram: TrainingProgram = {};
+      
+      // Convert each week and day
+      generatedProgram.weeks.forEach((week: any) => {
+        convertedProgram[week.weekNumber] = {};
+        
+        week.days?.forEach((day: any) => {
+          const dayWorkout: DayWorkout = {
+            warmup: [],
+            blocks: []
+          };
+          
+          // Process each block
+          day.blocks?.forEach((block: any) => {
+            if (block.blockType === 'warmup') {
+              // Add warmup exercises
+              block.exercises?.forEach((exercise: any) => {
+                dayWorkout.warmup.push({
+                  name: exercise.exerciseName,
+                  load: `${exercise.sets}x${exercise.reps} ${exercise.weight}`,
+                  notes: exercise.notes || ''
+                });
+              });
+            } else {
+              // Add workout blocks (main_a, main_b, finisher)
+              const workoutBlock: WorkoutBlock = {
+                name: block.name,
+                exercises: []
+              };
+              
+              block.exercises?.forEach((exercise: any) => {
+                workoutBlock.exercises.push({
+                  name: exercise.exerciseName,
+                  load: `${exercise.sets}x${exercise.reps} ${exercise.weight}`,
+                  notes: exercise.notes || ''
+                });
+              });
+              
+              dayWorkout.blocks.push(workoutBlock);
+            }
+          });
+          
+          convertedProgram[week.weekNumber][day.dayNumber] = dayWorkout;
+        });
+      });
+      
+      // Update state with converted program
+      setProgram(convertedProgram);
+      setTemplateName(generatedProgram.program?.name || 'AI Generated Program');
+      setTemplateDescription(generatedProgram.program?.description || '4-Week Periodized Training Program');
+      setShowCreator(true);
+      
+      // Show success message
+      toast({ 
+        title: "Program loaded successfully!", 
+        description: "Your AI-generated program has been loaded into the template. You can now customize it further." 
+      });
+    }
+  }, [generatedProgram, toast]);
 
   const saveTemplateMutation = useMutation({
     mutationFn: (templateData: { name: string; description: string; templateData: string }) =>
@@ -472,6 +542,18 @@ const TrainingProgramCreator: React.FC = () => {
             <Plus className="w-4 h-4 mr-2" />
             Add Block
           </Button>
+
+          {/* Generate Program Button */}
+          {onGenerateProgram && (
+            <Button
+              variant="outline"
+              onClick={onGenerateProgram}
+              className="w-full mt-4 bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Don't know where to start? Generate a program!
+            </Button>
+          )}
         </div>
 
         {/* Save Button */}

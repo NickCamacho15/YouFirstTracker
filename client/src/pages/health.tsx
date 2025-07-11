@@ -741,11 +741,11 @@ export default function HealthPage() {
       console.log("Program generated successfully:", program);
       setGeneratedProgram(program);
       setShowFitnessProfileDialog(false);
-      setShowProgramDialog(true);
+      // Don't show program dialog, the data will be passed to TrainingProgramCreator
       
       toast({
         title: "Program Generated!",
-        description: "Your 4-week workout program has been created successfully.",
+        description: "Your 4-week workout program has been created and loaded into the training template.",
       });
     } catch (error: any) {
       console.error("Generation error:", error);
@@ -1937,70 +1937,12 @@ export default function HealthPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Training Program Creator */}
-          <div className="space-y-6">
-            <TrainingProgramCreator />
-          </div>
-
-          {/* Premium Workout Program Generator */}
-          <div className="space-y-6">
-            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 text-white">
-              <div className="flex items-center mb-4">
-                <Target className="h-5 w-5 mr-2" />
-                <h3 className="text-lg font-medium">Premium Program Generator</h3>
-              </div>
-              
-              {/* Program Status */}
-              <div className="bg-white bg-opacity-20 rounded-lg p-4 mb-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm opacity-90">Current Program</div>
-                    <div className="text-lg font-bold">Create Your First Program</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm opacity-90">Progress</div>
-                    <div className="text-lg font-bold">0%</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-3">
-                <Button 
-                  className="w-full bg-white text-blue-600 hover:bg-gray-50"
-                  variant="secondary"
-                  onClick={() => setShowFitnessProfileDialog(true)}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Generate Program
-                </Button>
-                <Button 
-                  className="w-full bg-white bg-opacity-20 text-white hover:bg-opacity-30 border-white border"
-                  variant="outline"
-                  onClick={() => {
-                    setActiveTab("workout-section");
-                    setWorkoutTab("training-schedule");
-                  }}
-                >
-                  <Calendar className="h-4 w-4 mr-2" />
-                  View Training Schedule
-                </Button>
-                <Button 
-                  className="w-full bg-white bg-opacity-20 text-white hover:bg-opacity-30 border-white border"
-                  variant="outline"
-                >
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Progress Analytics
-                </Button>
-              </div>
-              
-              <div className="mt-4 p-3 bg-white bg-opacity-10 rounded-lg">
-                <div className="text-xs opacity-90 mb-1">✨ Premium Feature</div>
-                <div className="text-sm">AI-generated 4-week programs based on your fitness profile, training level, and goals.</div>
-              </div>
-            </div>
-          </div>
+        {/* Training Program Creator - Full Width */}
+        <div className="space-y-6">
+          <TrainingProgramCreator 
+            onGenerateProgram={() => setShowFitnessProfileDialog(true)} 
+            generatedProgram={generatedProgram}
+          />
         </div>
 
         {/* Training Analytics Section */}
