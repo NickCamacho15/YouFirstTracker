@@ -123,16 +123,15 @@ Build scripts include:
 
 ## Changelog
 
-- July 11, 2025: Body Page Enhanced with Profile/Workout Tabs, Timer, and Analytics
-  - **ADDED**: Profile and Workout tabs similar to habits page design
-  - **PROFILE TAB**: Shows 1 rep maxes, training stats, and body metrics
-  - **WORKOUT TAB**: Contains the static 4-week elite training program
-  - **TIMER**: Added workout timer that starts when clicking "Start Workout" button (similar to reading timer)
-  - **ANALYTICS**: Added progress analytics section at bottom with weekly volume chart, exercise distribution, and quick stats
-  - **UI CONSISTENCY**: Used same compact, shadowed card styling throughout all sections
-  - **CHARTS**: Simple bar charts for weekly volume and progress bars for exercise distribution
-  - **METRICS**: Shows avg intensity, recovery score, and training trends
-  - Body page now provides comprehensive workout tracking with profile data, timer functionality, and visual analytics
+- July 11, 2025: Body Page Analytics Enhanced with Progress Tracking Over Time
+  - **ENHANCED**: Analytics now show progress over time with line graphs and trend charts
+  - **VOLUME PROGRESS**: Dark-themed line graph showing 8-week volume progression from 44% to 96%
+  - **STRENGTH PROGRESS**: 12-week bar chart with color-coded progression (yellow to green) showing 1RM improvements
+  - **PERFORMANCE TRENDS**: Mini sparkline charts for Intensity (82%), Recovery (8.5/10), and Consistency (92%)
+  - **DARK THEME**: Major progress charts use dark backgrounds similar to recovery tracking UI
+  - **PERCENTAGES**: Each data point shows percentage progress with green highlighting for current values
+  - **SUMMARY STATS**: Compact cards showing weekly focus distribution and overall progress summary (+24%)
+  - Analytics section now emphasizes progress visualization over static metrics, showing clear improvement trends
 - July 11, 2025: Complete Body Page Redesign - Compact Interface with Dropdown Workout Blocks
   - **RENAMED**: "Health" section renamed to "Body" in bottom navigation
   - **COMPACT**: Dramatically reduced all section sizes - header reduced to h-10, smaller text, tighter spacing
