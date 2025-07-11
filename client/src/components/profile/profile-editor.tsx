@@ -157,9 +157,9 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
             <CardContent className="space-y-4">
               {personalRecords.map((record, index) => (
                 <div key={index} className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center space-x-3 flex-1">
-                      <div className="w-28">
+                  <div className="flex items-end justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-end space-x-3 flex-1">
+                      <div className="w-32">
                         <Label htmlFor={`exercise-${index}`} className="text-sm font-medium">
                           Exercise
                         </Label>
@@ -171,7 +171,7 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
                           placeholder="Exercise name"
                         />
                       </div>
-                      <div className="w-16">
+                      <div className="w-24">
                         <Label htmlFor={`weight-${index}`} className="text-sm font-medium">
                           Max (lbs)
                         </Label>
@@ -190,7 +190,7 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
                         size="sm"
                         variant="outline"
                         onClick={() => togglePercentages(record.exercise)}
-                        className="h-8 px-2"
+                        className="h-8 px-3"
                       >
                         <span>%</span>
                       </Button>
