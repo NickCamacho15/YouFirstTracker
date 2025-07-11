@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Timer, BarChart3, Trophy, Flame, Target, Award, Star, Crown, Gem, Medal, Zap } from "lucide-react";
+import { Timer, BarChart3, Trophy, Flame, Target, Award, Star, Crown, Gem, Medal, Zap, Activity, Calendar } from "lucide-react";
 
 export function MeditationSection() {
   const queryClient = useQueryClient();
@@ -14,13 +14,14 @@ export function MeditationSection() {
   const gongIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Timer states
-  const [preparationTime, setPreparationTime] = useState(5); // in seconds
+  const [preparationTime, setPreparationTime] = useState(30); // in seconds
   const [intervalTime, setIntervalTime] = useState(5); // in minutes
   const [totalTime, setTotalTime] = useState(15); // in minutes
   const [isRunning, setIsRunning] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [currentPhase, setCurrentPhase] = useState<"preparation" | "meditation" | "complete">("preparation");
   const [intervalsCompleted, setIntervalsCompleted] = useState(0);
+  const [isDragging, setIsDragging] = useState<string | null>(null);
 
   // Load meditation stats
   const { data: stats = { sessions: 0, streak: 0, totalTime: 0 } } = useQuery({
@@ -138,6 +139,7 @@ export function MeditationSection() {
     setTimeElapsed(0);
     setCurrentPhase("preparation");
     setIntervalsCompleted(0);
+    playGong(); // Play gong at start
   };
 
   const handleStop = () => {
@@ -180,139 +182,165 @@ export function MeditationSection() {
     { id: 8, title: "100 Sessions", description: "Complete 100 sessions", sessions: 100, icon: Zap, earned: stats.sessions >= 100 },
   ];
 
+  // Handle slider drag
+  const handleMouseDown = (slider: string) => {
+    setIsDragging(slider);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(null);
+  };
+
+  const handleMove = (clientX: number) => {
+    if (!isDragging) return;
+    
+    const slider = document.getElementById(`${isDragging}-slider`);
+    if (!slider) return;
+    
+    const rect = slider.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const percentage = Math.max(0, Math.min(1, x / rect.width));
+    
+    if (isDragging === 'preparation') {
+      setPreparationTime(Math.round(percentage * 60)); // 0-60 seconds
+    } else if (isDragging === 'interval') {
+      setIntervalTime(Math.round(percentage * 30) || 1); // 1-30 minutes
+    } else if (isDragging === 'total') {
+      setTotalTime(Math.round(percentage * 60) || 5); // 5-60 minutes
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => handleMove(e.clientX);
+  const handleTouchMove = (e: TouchEvent) => {
+    if (e.touches.length > 0) {
+      handleMove(e.touches[0].clientX);
+    }
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove);
+      document.addEventListener('touchend', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleMouseUp);
+      };
+    }
+  }, [isDragging]);
+
   return (
-    <div className="space-y-6">
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card className="p-4 bg-white border shadow-sm">
+    <div className="space-y-4">
+      {/* Compressed Stats */}
+      <div className="grid grid-cols-3 gap-3">
+        <Card className="p-3 bg-white border shadow-sm">
           <div className="flex items-center gap-2">
-            <Timer className="w-5 h-5 text-blue-500" />
+            <Activity className="w-4 h-4 text-blue-500" />
             <div>
-              <p className="text-2xl font-bold">{stats.sessions}</p>
+              <p className="text-lg font-bold">{stats.sessions}</p>
               <p className="text-xs text-muted-foreground">Sessions</p>
             </div>
           </div>
         </Card>
         
-        <Card className="p-4 bg-white border shadow-sm">
+        <Card className="p-3 bg-white border shadow-sm">
           <div className="flex items-center gap-2">
-            <Flame className="w-5 h-5 text-orange-500" />
+            <Flame className="w-4 h-4 text-orange-500" />
             <div>
-              <p className="text-2xl font-bold">{stats.streak}</p>
-              <p className="text-xs text-muted-foreground">Day Streak</p>
+              <p className="text-lg font-bold">{stats.streak}</p>
+              <p className="text-xs text-muted-foreground">Streak</p>
             </div>
           </div>
         </Card>
         
-        <Card className="p-4 bg-white border shadow-sm">
+        <Card className="p-3 bg-white border shadow-sm">
           <div className="flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-purple-500" />
+            <Calendar className="w-4 h-4 text-purple-500" />
             <div>
-              <p className="text-2xl font-bold">{Math.floor(stats.totalTime / 60)}h</p>
-              <p className="text-xs text-muted-foreground">Total Time</p>
+              <p className="text-lg font-bold">{Math.floor(stats.totalTime / 60)}h</p>
+              <p className="text-xs text-muted-foreground">Total</p>
             </div>
           </div>
         </Card>
       </div>
 
-      {/* Circular Timer */}
-      <Card className="p-6 bg-slate-900 text-white">
-        <div className="relative w-64 h-64 mx-auto mb-6">
-          {/* Background circles */}
-          <svg className="absolute inset-0 w-full h-full transform -rotate-90">
-            <circle
-              cx="128"
-              cy="128"
-              r="120"
-              stroke="rgba(255,255,255,0.1)"
-              strokeWidth="2"
-              fill="none"
+      {/* Timer Controls */}
+      <Card className="p-6 bg-white border shadow-md">
+        <h3 className="text-lg font-semibold mb-6">Meditation Timer</h3>
+        
+        {/* Preparation Time Slider */}
+        <div className="mb-6">
+          <div className="flex justify-between mb-2">
+            <span className="text-sm font-medium text-blue-600">Preparation</span>
+            <span className="text-sm text-gray-600">{preparationTime}s</span>
+          </div>
+          <div id="preparation-slider" className="relative h-2 bg-gray-200 rounded-full">
+            <div 
+              className="absolute h-2 bg-blue-500 rounded-full"
+              style={{ width: `${(preparationTime / 60) * 100}%` }}
             />
-            <circle
-              cx="128"
-              cy="128"
-              r="90"
-              stroke="rgba(255,255,255,0.1)"
-              strokeWidth="2"
-              fill="none"
+            <div 
+              className="absolute w-5 h-5 bg-blue-600 rounded-full shadow-md cursor-pointer transform -translate-y-1.5"
+              style={{ left: `${(preparationTime / 60) * 100}%`, marginLeft: '-10px' }}
+              onMouseDown={() => handleMouseDown('preparation')}
+              onTouchStart={() => handleMouseDown('preparation')}
             />
-            <circle
-              cx="128"
-              cy="128"
-              r="60"
-              stroke="rgba(255,255,255,0.1)"
-              strokeWidth="2"
-              fill="none"
-            />
-          </svg>
-          
-          {/* Progress circles */}
-          <svg className="absolute inset-0 w-full h-full transform -rotate-90">
-            {/* Total time progress */}
-            <circle
-              cx="128"
-              cy="128"
-              r="120"
-              stroke="#ef4444"
-              strokeWidth="3"
-              fill="none"
-              strokeDasharray={`${2 * Math.PI * 120}`}
-              strokeDashoffset={`${2 * Math.PI * 120 * (1 - getProgress() / 100)}`}
-              className="transition-all duration-1000"
-            />
-          </svg>
-          
-          {/* Timer controls */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="space-y-1 text-center">
-              <div 
-                className="w-12 h-12 rounded-full border-2 border-blue-400 flex items-center justify-center cursor-pointer hover:bg-blue-400/20 transition-colors"
-                onClick={() => !isRunning && setPreparationTime(prev => (prev + 5) % 60 || 5)}
-              >
-                <span className="text-sm">{preparationTime}s</span>
-              </div>
-              <div 
-                className="w-12 h-12 rounded-full border-2 border-teal-400 flex items-center justify-center cursor-pointer hover:bg-teal-400/20 transition-colors"
-                onClick={() => !isRunning && setIntervalTime(prev => (prev + 5) % 30 || 5)}
-              >
-                <span className="text-sm">{intervalTime}</span>
-              </div>
-              <div 
-                className="w-12 h-12 rounded-full border-2 border-red-400 flex items-center justify-center cursor-pointer hover:bg-red-400/20 transition-colors"
-                onClick={() => !isRunning && setTotalTime(prev => (prev + 5) % 60 || 5)}
-              >
-                <span className="text-sm">{totalTime}</span>
-              </div>
-            </div>
           </div>
         </div>
-        
-        {/* Timer info */}
-        <div className="space-y-2 mb-6">
-          <div className="flex justify-between text-sm">
-            <span className="text-red-400">Meditation Time</span>
-            <span>{totalTime}m</span>
+
+        {/* Interval Time Slider */}
+        <div className="mb-6">
+          <div className="flex justify-between mb-2">
+            <span className="text-sm font-medium text-green-600">Interval</span>
+            <span className="text-sm text-gray-600">{intervalTime}m</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-teal-400">Interval</span>
-            <span>{intervalTime}m</span>
+          <div id="interval-slider" className="relative h-2 bg-gray-200 rounded-full">
+            <div 
+              className="absolute h-2 bg-green-500 rounded-full"
+              style={{ width: `${(intervalTime / 30) * 100}%` }}
+            />
+            <div 
+              className="absolute w-5 h-5 bg-green-600 rounded-full shadow-md cursor-pointer transform -translate-y-1.5"
+              style={{ left: `${(intervalTime / 30) * 100}%`, marginLeft: '-10px' }}
+              onMouseDown={() => handleMouseDown('interval')}
+              onTouchStart={() => handleMouseDown('interval')}
+            />
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-blue-400">Preparation Time</span>
-            <span>{preparationTime}s</span>
+        </div>
+
+        {/* Total Time Slider */}
+        <div className="mb-6">
+          <div className="flex justify-between mb-2">
+            <span className="text-sm font-medium text-orange-600">Meditation Time</span>
+            <span className="text-sm text-gray-600">{totalTime}m</span>
+          </div>
+          <div id="total-slider" className="relative h-2 bg-gray-200 rounded-full">
+            <div 
+              className="absolute h-2 bg-orange-500 rounded-full"
+              style={{ width: `${(totalTime / 60) * 100}%` }}
+            />
+            <div 
+              className="absolute w-5 h-5 bg-orange-600 rounded-full shadow-md cursor-pointer transform -translate-y-1.5"
+              style={{ left: `${(totalTime / 60) * 100}%`, marginLeft: '-10px' }}
+              onMouseDown={() => handleMouseDown('total')}
+              onTouchStart={() => handleMouseDown('total')}
+            />
           </div>
         </div>
         
         {/* Current phase display */}
         {isRunning && (
-          <div className="text-center mb-4">
+          <div className="text-center mb-4 p-3 bg-gray-50 rounded-lg">
             <p className="text-lg font-semibold">
               {currentPhase === "preparation" ? "Preparing..." : 
                currentPhase === "meditation" ? `Meditating - ${formatTime(timeElapsed)}` :
                "Complete!"}
             </p>
             {currentPhase === "meditation" && (
-              <p className="text-sm text-gray-400">Interval {intervalsCompleted + 1} of {Math.floor(totalTime / intervalTime)}</p>
+              <p className="text-sm text-gray-500">Interval {intervalsCompleted + 1} of {Math.floor(totalTime / intervalTime)}</p>
             )}
           </div>
         )}
@@ -320,9 +348,9 @@ export function MeditationSection() {
         {/* Control button */}
         <Button
           onClick={isRunning ? handleStop : handleBegin}
-          className={`w-full ${isRunning ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+          className={`w-full ${isRunning ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} text-white font-medium`}
         >
-          {isRunning ? "Stop" : "Begin"}
+          {isRunning ? "Stop Session" : "Start Session"}
         </Button>
       </Card>
 
