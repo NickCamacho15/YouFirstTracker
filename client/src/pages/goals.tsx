@@ -24,12 +24,12 @@ interface Goal {
 
 // Mock achievement data - replace with actual user data
 const achievements = [
-  { id: 1, title: "Completed Marathon", year: "2023", icon: Medal, color: "bg-gradient-to-r from-amber-400 to-orange-500" },
-  { id: 2, title: "Launched Business", year: "2022", icon: Trophy, color: "bg-gradient-to-r from-blue-400 to-indigo-500" },
-  { id: 3, title: "Published Book", year: "2022", icon: Award, color: "bg-gradient-to-r from-purple-400 to-pink-500" },
-  { id: 4, title: "10K Revenue", year: "2021", icon: Star, color: "bg-gradient-to-r from-green-400 to-emerald-500" },
-  { id: 5, title: "Built Mobile App", year: "2021", icon: Zap, color: "bg-gradient-to-r from-yellow-400 to-amber-500" },
-  { id: 6, title: "Team Leadership", year: "2020", icon: Crown, color: "bg-gradient-to-r from-red-400 to-rose-500" },
+  { id: 1, title: "Completed Marathon", year: "2023", icon: Medal, color: "bg-gradient-to-r from-amber-500 to-orange-600" },
+  { id: 2, title: "Launched Business", year: "2022", icon: Trophy, color: "bg-gradient-to-r from-blue-500 to-indigo-600" },
+  { id: 3, title: "Published Book", year: "2022", icon: Award, color: "bg-gradient-to-r from-purple-500 to-pink-600" },
+  { id: 4, title: "10K Revenue", year: "2021", icon: Star, color: "bg-gradient-to-r from-green-500 to-emerald-600" },
+  { id: 5, title: "Built Mobile App", year: "2021", icon: Zap, color: "bg-gradient-to-r from-yellow-500 to-amber-600" },
+  { id: 6, title: "Team Leadership", year: "2020", icon: Crown, color: "bg-gradient-to-r from-red-500 to-rose-600" },
 ];
 
 export default function GoalsPage() {
@@ -112,17 +112,36 @@ export default function GoalsPage() {
             <Trophy className="w-6 h-6 text-amber-500" />
             Your Achievement History
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-            {achievements.map((achievement) => {
+          <div className="space-y-3">
+            {achievements.map((achievement, index) => {
               const Icon = achievement.icon;
               return (
-                <Card key={achievement.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                  <CardContent className="p-4 text-center">
-                    <div className={`w-16 h-16 mx-auto rounded-full ${achievement.color} flex items-center justify-center mb-3`}>
-                      <Icon className="w-8 h-8 text-white" />
+                <Card 
+                  key={achievement.id} 
+                  className={`relative overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 ${achievement.color} text-white animate-fadeIn`}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <CardContent className="p-4 flex items-center gap-4">
+                    {/* Icon Section */}
+                    <div className="flex-shrink-0 w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
+                      <Icon className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="font-semibold text-sm mb-1">{achievement.title}</h3>
-                    <p className="text-xs text-muted-foreground">{achievement.year}</p>
+                    
+                    {/* Content Section */}
+                    <div className="flex-1">
+                      <h3 className="font-bold text-lg">{achievement.title}</h3>
+                      <p className="text-sm text-white/80">Achieved in {achievement.year}</p>
+                    </div>
+                    
+                    {/* Year Badge */}
+                    <div className="flex-shrink-0 bg-white/20 backdrop-blur px-4 py-2 rounded-full">
+                      <span className="font-bold text-sm">{achievement.year}</span>
+                    </div>
+                    
+                    {/* Decorative Background Pattern */}
+                    <div className="absolute inset-y-0 right-0 w-1/3 opacity-10">
+                      <div className="h-full w-full bg-gradient-to-l from-transparent to-white"></div>
+                    </div>
                   </CardContent>
                 </Card>
               );

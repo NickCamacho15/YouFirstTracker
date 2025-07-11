@@ -416,6 +416,9 @@ export const insertHabitLogSchema = createInsertSchema(habitLogs).omit({
 export const insertReadingSessionSchema = createInsertSchema(readingSessions).omit({
   id: true,
   createdAt: true,
+}).extend({
+  startTime: z.string().transform((val) => new Date(val)),
+  endTime: z.string().transform((val) => new Date(val)),
 });
 
 export const insertReadingListSchema = createInsertSchema(readingList).omit({

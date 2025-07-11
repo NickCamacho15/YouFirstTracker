@@ -122,41 +122,31 @@ export function ReadingList() {
   }
 
   return (
-    <Card className="bg-background border shadow-md shadow-emerald-500/10">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between mb-4">
-          <CardTitle className="flex items-center gap-3 text-foreground">
-            <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950">
-              <BookOpen className="w-5 h-5 text-emerald-600" />
-            </div>
-            <span className="text-xl">My Reading Journey</span>
-          </CardTitle>
-        </div>
-        
-        {/* Stats Row */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50">
-            <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900">
-              <Target className="w-4 h-4 text-blue-600" />
-            </div>
+    <div className="space-y-3">
+      {/* Compact Stats */}
+      <div className="grid grid-cols-2 gap-2">
+        <Card className="p-3 bg-white border shadow-sm">
+          <div className="flex items-center gap-2">
+            <Target className="w-4 h-4 text-blue-500" />
             <div>
               <p className="text-lg font-semibold text-foreground">{pendingBooks.length}</p>
-              <p className="text-sm text-muted-foreground">Currently Reading</p>
+              <p className="text-xs text-muted-foreground">Reading</p>
             </div>
           </div>
-          
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50">
-            <div className="p-2 rounded-full bg-green-100 dark:bg-green-900">
-              <Trophy className="w-4 h-4 text-green-600" />
-            </div>
+        </Card>
+        
+        <Card className="p-3 bg-white border shadow-sm">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-4 h-4 text-green-500" />
             <div>
               <p className="text-lg font-semibold text-foreground">{completedBooks.length}</p>
-              <p className="text-sm text-muted-foreground">Books Finished</p>
+              <p className="text-xs text-muted-foreground">Completed</p>
             </div>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        </Card>
+      </div>
+
+      <div className="space-y-2">
         {/* Add New Book */}
         {!isAdding ? (
           <Button
@@ -205,61 +195,65 @@ export function ReadingList() {
         )}
 
         {/* Reading List */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           {/* Pending Books */}
           {pendingBooks.map((book) => (
-            <div
+            <Card
               key={book.id}
-              className="flex items-center gap-3 p-3 bg-white rounded-lg border border-emerald-200 hover:shadow-sm transition-shadow"
+              className="p-2.5 bg-white border shadow-sm hover:shadow-md transition-shadow"
             >
-              <button
-                onClick={() => handleToggleCompleted(book.id, book.isCompleted)}
-                className="flex-shrink-0 w-5 h-5 rounded-full border-2 border-emerald-300 hover:border-emerald-500 transition-colors"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900 truncate">{book.title}</p>
-                {book.author && (
-                  <p className="text-sm text-gray-500 truncate">by {book.author}</p>
-                )}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleToggleCompleted(book.id, book.isCompleted)}
+                  className="flex-shrink-0 w-4 h-4 rounded-full border-2 border-emerald-400 hover:border-emerald-500 transition-colors"
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm text-gray-900 truncate">{book.title}</p>
+                  {book.author && (
+                    <p className="text-xs text-gray-500 truncate">{book.author}</p>
+                  )}
+                </div>
+                <Button
+                  onClick={() => handleDeleteBook(book.id)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-0.5 h-auto"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </Button>
               </div>
-              <Button
-                onClick={() => handleDeleteBook(book.id)}
-                variant="ghost"
-                size="sm"
-                className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
+            </Card>
           ))}
 
           {/* Completed Books */}
           {completedBooks.map((book) => (
-            <div
+            <Card
               key={book.id}
-              className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200 opacity-75"
+              className="p-2.5 bg-emerald-50 border border-emerald-200 shadow-sm opacity-75"
             >
-              <button
-                onClick={() => handleToggleCompleted(book.id, book.isCompleted)}
-                className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center hover:bg-emerald-600 transition-colors"
-              >
-                <Check className="w-3 h-3 text-white" />
-              </button>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-700 truncate line-through">{book.title}</p>
-                {book.author && (
-                  <p className="text-sm text-gray-500 truncate">by {book.author}</p>
-                )}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleToggleCompleted(book.id, book.isCompleted)}
+                  className="flex-shrink-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center hover:bg-emerald-600 transition-colors"
+                >
+                  <Check className="w-2.5 h-2.5 text-white" />
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm text-gray-700 truncate line-through">{book.title}</p>
+                  {book.author && (
+                    <p className="text-xs text-gray-500 truncate">{book.author}</p>
+                  )}
+                </div>
+                <Button
+                  onClick={() => handleDeleteBook(book.id)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-0.5 h-auto"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </Button>
               </div>
-              <Button
-                onClick={() => handleDeleteBook(book.id)}
-                variant="ghost"
-                size="sm"
-                className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
+            </Card>
           ))}
         </div>
 
@@ -271,7 +265,7 @@ export function ReadingList() {
             <p className="text-sm text-emerald-600 mt-1">Add your first book to get started!</p>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

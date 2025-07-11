@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReadingTimer } from "@/components/reading/reading-timer";
-import { BookOpen, Clock, TrendingUp, Brain, Smartphone, History, Lightbulb, Plus } from "lucide-react";
+import { BookOpen, Clock, TrendingUp, Brain, Smartphone, History, Lightbulb, Plus, Trophy } from "lucide-react";
 import { ReadingList } from "@/components/reading/reading-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -203,32 +203,33 @@ export default function MindPage() {
 
               {/* History Tab */}
               <TabsContent value="history" className="mt-4">
-                <div className="space-y-3">
-                  <h3 className="text-lg font-semibold mb-4">Reading History</h3>
-                  {readingSessions.length === 0 ? (
-                    <Card className="p-6">
-                      <p className="text-center text-muted-foreground">No reading sessions yet. Start reading to build your history!</p>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold mb-3 text-gray-600 uppercase tracking-wider">Completed Books</h3>
+                  {(readingList as any[]).filter(book => book.isCompleted).length === 0 ? (
+                    <Card className="p-4 shadow-sm">
+                      <p className="text-center text-muted-foreground text-sm">No completed books yet. Check off books from your list as you finish them!</p>
                     </Card>
                   ) : (
-                    readingSessions.map((session: ReadingSession) => {
-                      const duration = Math.floor((new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / 60000);
-                      return (
-                        <Card key={session.id} className="p-4 hover:shadow-md transition-shadow">
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              <h4 className="font-medium text-foreground">{session.bookTitle}</h4>
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {new Date(session.startTime).toLocaleDateString()} • {duration} minutes
-                              </p>
-                              {session.reflection && (
-                                <p className="text-sm mt-2 text-foreground italic">"{session.reflection}"</p>
-                              )}
+                    <div className="grid gap-2">
+                      {(readingList as any[])
+                        .filter(book => book.isCompleted)
+                        .map((book) => (
+                          <Card key={book.id} className="p-3 hover:shadow-md transition-shadow bg-white border">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <h4 className="font-medium text-sm text-foreground">{book.title}</h4>
+                                {book.author && (
+                                  <p className="text-xs text-muted-foreground mt-0.5">{book.author}</p>
+                                )}
+                                <p className="text-xs text-green-600 mt-1">
+                                  Completed {book.completedAt ? new Date(book.completedAt).toLocaleDateString() : 'recently'}
+                                </p>
+                              </div>
+                              <Trophy className="w-4 h-4 text-green-500" />
                             </div>
-                            <Clock className="w-5 h-5 text-muted-foreground" />
-                          </div>
-                        </Card>
-                      );
-                    }).reverse()
+                          </Card>
+                        ))}
+                    </div>
                   )}
                 </div>
               </TabsContent>
