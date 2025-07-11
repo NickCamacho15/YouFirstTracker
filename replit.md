@@ -123,17 +123,18 @@ Build scripts include:
 
 ## Changelog
 
-- July 11, 2025: Navigation Enhanced - Challenge Tab Added to Foundations with 75-100 Day Tracking
-  - **RENAMED**: "Habits" in navigation changed to "Foundations" to reflect broader personal development focus
-  - **RESTRUCTURED**: Foundations page now has 3 tabs: "Rituals", "Rules", and "Challenge"
+- July 11, 2025: Navigation Refined - Disciplines Page with Improved Grid Layout and Challenge Tracking
+  - **RENAMED**: "Habits" navigation renamed to "Disciplines" for stronger personal development messaging
+  - **RESTRUCTURED**: Disciplines page now has 3 tabs: "Rituals", "Rules", and "Challenge"
   - **NEW**: Challenge tab features 75-100 day commitment challenges with daily check-off functionality
   - **ENHANCED**: Challenge tracking includes progress grids showing completed/current/future days
   - **IMPROVED**: Navigation icons updated - Brain icon for Mind, Dumbbell icon for Body sections
+  - **FIXED**: Navigation bar now uses grid-cols-5 layout for proper spacing and centering
   - **MOVED**: Morning and Evening Routine cards relocated from Dashboard to Rituals tab for better organization
   - **RELOCATED**: To-do list moved to top of Dashboard for immediate task focus
   - **SIMPLIFIED**: Dashboard now contains only To-do list, Time Metrics (2x2 grid), and Active Goals
   - **ENHANCED**: 2x2 grid layout for time metrics with larger, more readable tiles
-  - Foundations page emphasizes daily rituals, personal rules, and extended challenges for comprehensive life structure
+  - Disciplines page emphasizes daily rituals, personal rules, and extended challenges for comprehensive life structure
 - July 11, 2025: Dashboard Progress Circles Redesigned with Weekly Time Metrics
   - **TRANSFORMED**: Progress circles replaced with weekly time tracking tiles for personal investments/distractions
   - **NEW**: Reading time tracking (12.5h weekly, with month/total aggregates)

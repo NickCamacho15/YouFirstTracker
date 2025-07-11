@@ -57,36 +57,35 @@ export function Navigation() {
 
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-        <div className="flex items-center justify-between h-20 px-6 relative">
-          {/* Left Side - Habits & Goals */}
-          <div className="flex items-center space-x-8">
-            <Link href="/habits">
-              <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
-                isActive("/habits")
-                  ? "text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}>
-                <Repeat className="w-6 h-6 mb-1" />
-                <span className="text-xs font-medium">Foundations</span>
-              </div>
-            </Link>
+        <div className="grid grid-cols-5 items-center h-20 px-4 relative">
+          {/* Disciplines */}
+          <Link href="/habits">
+            <div className={`flex flex-col items-center justify-center py-2 transition-colors cursor-pointer ${
+              isActive("/habits")
+                ? "text-blue-600"
+                : "text-gray-500 hover:text-gray-700"
+            }`}>
+              <Repeat className="w-6 h-6 mb-1" />
+              <span className="text-xs font-medium">Disciplines</span>
+            </div>
+          </Link>
 
-            <Link href="/goals">
-              <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
-                isActive("/goals")
-                  ? "text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}>
-                <Target className="w-6 h-6 mb-1" />
-                <span className="text-xs font-medium">Goals</span>
-              </div>
-            </Link>
-          </div>
+          {/* Goals */}
+          <Link href="/goals">
+            <div className={`flex flex-col items-center justify-center py-2 transition-colors cursor-pointer ${
+              isActive("/goals")
+                ? "text-blue-600"
+                : "text-gray-500 hover:text-gray-700"
+            }`}>
+              <Target className="w-6 h-6 mb-1" />
+              <span className="text-xs font-medium">Goals</span>
+            </div>
+          </Link>
 
           {/* Center - You. Button with Black Circle */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 -top-2">
+          <div className="flex justify-center">
             <Link href="/">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+              <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all cursor-pointer relative -top-2 ${
                 location === "/"
                   ? "bg-gradient-to-br from-gray-900 to-black scale-110 shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
                   : "bg-gradient-to-br from-gray-800 to-black hover:scale-105 hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
@@ -94,37 +93,35 @@ export function Navigation() {
                 <img 
                   src={uoyLogo} 
                   alt=".uoY" 
-                  className="w-10 h-10"
+                  className="w-12 h-12"
                 />
               </div>
             </Link>
           </div>
 
-          {/* Right Side - Read & Health */}
-          <div className="flex items-center space-x-8">
-            <Link href="/read">
-              <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
-                isActive("/read")
-                  ? "text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}>
-                <Brain className="w-6 h-6 mb-1" />
-                <span className="text-xs font-medium">Mind</span>
-              </div>
-            </Link>
+          {/* Mind */}
+          <Link href="/read">
+            <div className={`flex flex-col items-center justify-center py-2 transition-colors cursor-pointer ${
+              isActive("/read")
+                ? "text-blue-600"
+                : "text-gray-500 hover:text-gray-700"
+            }`}>
+              <Brain className="w-6 h-6 mb-1" />
+              <span className="text-xs font-medium">Mind</span>
+            </div>
+          </Link>
 
-            <Link href="/health">
-              <div className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors cursor-pointer ${
-                isActive("/health")
-                  ? "text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}>
-                <Dumbbell className="w-6 h-6 mb-1" />
-                <span className="text-xs font-medium">Body</span>
-              </div>
-            </Link>
-          </div>
-
+          {/* Body */}
+          <Link href="/health">
+            <div className={`flex flex-col items-center justify-center py-2 transition-colors cursor-pointer ${
+              isActive("/health")
+                ? "text-blue-600"
+                : "text-gray-500 hover:text-gray-700"
+            }`}>
+              <Dumbbell className="w-6 h-6 mb-1" />
+              <span className="text-xs font-medium">Body</span>
+            </div>
+          </Link>
         </div>
       </div>
     </>
