@@ -123,6 +123,15 @@ Build scripts include:
 
 ## Changelog
 
+- July 11, 2025: Body Analytics Redesigned with Clean Line Graphs and Training Focus Donut Chart
+  - **WEEKLY VOLUME**: Clean line graph without dots showing week-by-week weight progression
+  - **TRAINING FOCUS**: Donut chart visualization showing workout type distribution (Strength 60%, Cardio 25%, Functional 15%)
+  - **PROGRESS SUMMARY**: New section with Phase (Peak), Total Progress (24% with bar), and Weekly Consistency (5/7 days)
+  - **REMOVED**: Eliminated dot markers from line graphs for cleaner visualization
+  - **REPLACED**: Strength progress and performance trends replaced with training focus wheel chart
+  - **ANIMATIONS**: All charts animate on load with staggered delays for visual appeal
+  - **ENHANCED AUDIO**: Improved meditation gong sound - louder (0.7 volume) with authentic frequency decay (150Hz to 80Hz)
+  - Analytics provide clear visual representation of training patterns and progress metrics
 - July 11, 2025: Meditation Page Built with Slider-Based Timer System
   - **NEW**: Meditation tab within Mind page featuring adjustable time sliders
   - **SLIDERS**: Three horizontal sliders for setting preparation (blue), interval (green), and meditation (orange) times

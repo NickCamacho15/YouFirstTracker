@@ -521,31 +521,7 @@ export default function HealthPage() {
                       className="animate-drawLine"
                     />
                     
-                    {/* Data points */}
-                    {[
-                      { x: 0, y: 90, value: "22k", pct: "44%" },
-                      { x: 14.3, y: 80, value: "26k", pct: "52%" },
-                      { x: 28.6, y: 75, value: "28k", pct: "56%" },
-                      { x: 42.9, y: 65, value: "32k", pct: "64%" },
-                      { x: 57.1, y: 50, value: "38k", pct: "76%" },
-                      { x: 71.4, y: 40, value: "42k", pct: "84%" },
-                      { x: 85.7, y: 35, value: "44k", pct: "88%" },
-                      { x: 100, y: 20, value: "48k", pct: "96%" }
-                    ].map((point, idx) => (
-                      <g key={idx} className="animate-fadeIn opacity-0" style={{ animationDelay: `${400 + idx * 100}ms` }}>
-                        <circle cx={`${point.x}%`} cy={`${point.y}%`} r="4" fill="#2563EB" />
-                        <circle cx={`${point.x}%`} cy={`${point.y}%`} r="6" fill="#2563EB" opacity="0.3" />
-                        <text 
-                          x={`${point.x}%`} 
-                          y={`${point.y - 8}%`} 
-                          className="text-[10px] font-medium" 
-                          fill={idx === 7 ? "#059669" : "#6B7280"}
-                          textAnchor="middle"
-                        >
-                          {point.pct}
-                        </text>
-                      </g>
-                    ))}
+                    {/* Remove data points - just clean lines */}
                   </svg>
                   
                   {/* X-axis labels */}
@@ -567,121 +543,147 @@ export default function HealthPage() {
               </div>
             </div>
 
-            {/* Strength Progress */}
+            {/* This Week Focus - Donut Chart */}
             <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200 animate-fadeIn opacity-0 animation-delay-400">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="text-xs font-medium text-gray-700">Strength Progress (1RM)</h4>
-                <span className="text-xs text-gray-500">Last 12 weeks</span>
-              </div>
+              <h4 className="text-xs font-medium text-gray-700 mb-3">This Week Focus</h4>
               
-              {/* Bar Chart */}
-              <div className="h-24 flex items-end justify-between space-x-1">
-                {[
-                  { week: "W1", value: 58, color: "bg-blue-300" },
-                  { week: "W2", value: 62, color: "bg-blue-300" },
-                  { week: "W3", value: 64, color: "bg-blue-300" },
-                  { week: "W4", value: 68, color: "bg-blue-400" },
-                  { week: "W5", value: 70, color: "bg-blue-400" },
-                  { week: "W6", value: 75, color: "bg-blue-400" },
-                  { week: "W7", value: 78, color: "bg-blue-500" },
-                  { week: "W8", value: 82, color: "bg-blue-500" },
-                  { week: "W9", value: 85, color: "bg-blue-500" },
-                  { week: "W10", value: 87, color: "bg-blue-600" },
-                  { week: "W11", value: 90, color: "bg-blue-600" },
-                  { week: "W12", value: 96, color: "bg-blue-700" }
-                ].map((data, idx) => (
-                  <div key={data.week} className="flex-1 flex flex-col items-center justify-end">
-                    <span 
-                      className="text-[10px] text-gray-700 font-medium mb-1 animate-fadeIn opacity-0" 
-                      style={{ animationDelay: `${600 + idx * 50}ms` }}
-                    >
-                      {data.value}%
-                    </span>
-                    <div 
-                      className={`w-full ${data.color} rounded-t relative animate-growUp`} 
-                      style={{ 
-                        height: `${data.value}%`,
-                        animationDelay: `${600 + idx * 50}ms` 
-                      }}
+              {/* Donut Chart */}
+              <div className="flex justify-center mb-3">
+                <div className="relative w-32 h-32">
+                  <svg className="w-full h-full transform -rotate-90">
+                    {/* Background circle */}
+                    <circle
+                      cx="64"
+                      cy="64"
+                      r="48"
+                      fill="none"
+                      stroke="#E5E7EB"
+                      strokeWidth="24"
                     />
+                    
+                    {/* Strength segment (60%) */}
+                    <circle
+                      cx="64"
+                      cy="64"
+                      r="48"
+                      fill="none"
+                      stroke="#6366F1"
+                      strokeWidth="24"
+                      strokeDasharray={`${60 * 3.01} ${100 * 3.01}`}
+                      strokeDashoffset="0"
+                      className="animate-drawCircle"
+                    />
+                    
+                    {/* Cardio segment (25%) */}
+                    <circle
+                      cx="64"
+                      cy="64"
+                      r="48"
+                      fill="none"
+                      stroke="#10B981"
+                      strokeWidth="24"
+                      strokeDasharray={`${25 * 3.01} ${100 * 3.01}`}
+                      strokeDashoffset={`${-60 * 3.01}`}
+                      className="animate-drawCircle"
+                      style={{ animationDelay: '200ms' }}
+                    />
+                    
+                    {/* Functional segment (15%) */}
+                    <circle
+                      cx="64"
+                      cy="64"
+                      r="48"
+                      fill="none"
+                      stroke="#F59E0B"
+                      strokeWidth="24"
+                      strokeDasharray={`${15 * 3.01} ${100 * 3.01}`}
+                      strokeDashoffset={`${-85 * 3.01}`}
+                      className="animate-drawCircle"
+                      style={{ animationDelay: '400ms' }}
+                    />
+                    
+                    {/* Inner white circle */}
+                    <circle
+                      cx="64"
+                      cy="64"
+                      r="36"
+                      fill="white"
+                    />
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Legend */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-indigo-500 rounded-full"></div>
+                    <span className="text-xs text-gray-700">Strength</span>
                   </div>
-                ))}
-              </div>
-              
-              <div className="flex justify-between mt-1">
-                {Array.from({length: 12}, (_, i) => (
-                  <span key={i} className="text-[9px] text-gray-500 flex-1 text-center">
-                    {i % 3 === 0 ? `W${i + 1}` : ''}
-                  </span>
-                ))}
-              </div>
-              
-              <div className="mt-2 text-xs text-gray-600">
-                Bench Press 1RM increased from <span className="text-blue-500 font-medium">285 lbs</span> to <span className="text-blue-700 font-medium">315 lbs</span>
+                  <span className="text-sm font-semibold text-gray-900">60%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-xs text-gray-700">Cardio</span>
+                  </div>
+                  <span className="text-sm font-semibold text-gray-900">25%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
+                    <span className="text-xs text-gray-700">Functional</span>
+                  </div>
+                  <span className="text-sm font-semibold text-gray-900">15%</span>
+                </div>
               </div>
             </div>
 
-            {/* Performance Trends */}
+            {/* Progress Summary */}
             <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200 animate-fadeIn opacity-0 animation-delay-600">
-              <h4 className="text-xs font-medium text-gray-700 mb-2">Performance Trends</h4>
+              <h4 className="text-xs font-medium text-gray-700 mb-3">Progress Summary</h4>
+              
               <div className="space-y-3">
-                {/* Intensity Trend */}
+                {/* Total Progress */}
                 <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-gray-600">Avg. Intensity</span>
-                    <span className="font-medium text-green-600">82% (+5%)</span>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-xs text-gray-600">Total Progress</span>
+                    <span className="text-sm font-semibold text-green-600 flex items-center">
+                      <TrendingUp className="h-3 w-3 mr-1" />
+                      24%
+                    </span>
                   </div>
-                  <div className="h-8 flex items-end space-x-0.5">
-                    {[65, 68, 70, 72, 74, 76, 78, 82].map((val, idx) => (
-                      <div 
-                        key={idx} 
-                        className="flex-1 bg-blue-400 rounded-t animate-growUp" 
-                        style={{ 
-                          height: `${val}%`,
-                          animationDelay: `${800 + idx * 50}ms` 
-                        }} 
-                      />
-                    ))}
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div 
+                      className="bg-green-600 h-1.5 rounded-full animate-slideInLeft"
+                      style={{ width: '24%' }}
+                    ></div>
                   </div>
                 </div>
                 
-                {/* Recovery Trend */}
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-gray-600">Recovery Score</span>
-                    <span className="font-medium text-green-600">8.5/10</span>
-                  </div>
-                  <div className="h-8 flex items-end space-x-0.5">
-                    {[60, 65, 70, 75, 78, 80, 83, 85].map((val, idx) => (
-                      <div 
-                        key={idx} 
-                        className="flex-1 bg-green-400 rounded-t animate-growUp" 
-                        style={{ 
-                          height: `${val}%`,
-                          animationDelay: `${1200 + idx * 50}ms` 
-                        }} 
-                      />
-                    ))}
-                  </div>
+                {/* Current Phase */}
+                <div className="flex justify-between items-center py-2 border-t border-gray-100">
+                  <span className="text-xs text-gray-600">Current Phase</span>
+                  <span className="text-sm font-medium bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
+                    Peak
+                  </span>
                 </div>
                 
                 {/* Consistency */}
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-gray-600">Workout Consistency</span>
-                    <span className="font-medium text-blue-600">92%</span>
-                  </div>
-                  <div className="h-8 flex items-end space-x-0.5">
-                    {[85, 88, 86, 90, 92, 94, 91, 92].map((val, idx) => (
-                      <div 
-                        key={idx} 
-                        className="flex-1 bg-purple-400 rounded-t animate-growUp" 
-                        style={{ 
-                          height: `${val}%`,
-                          animationDelay: `${1600 + idx * 50}ms` 
-                        }} 
-                      />
-                    ))}
+                <div className="flex justify-between items-center py-2 border-t border-gray-100">
+                  <span className="text-xs text-gray-600">Weekly Consistency</span>
+                  <div className="flex items-center">
+                    <div className="flex space-x-1 mr-2">
+                      {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                        <div
+                          key={day}
+                          className={`w-2 h-2 rounded-full ${
+                            day <= 5 ? 'bg-green-500' : 'bg-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">5/7</span>
                   </div>
                 </div>
               </div>
