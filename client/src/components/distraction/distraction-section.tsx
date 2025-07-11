@@ -32,7 +32,8 @@ interface ScreenTimeStats {
 export default function DistractionSection() {
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState("");
-  const [timeMinutes, setTimeMinutes] = useState("");
+  const [hours, setHours] = useState("");
+  const [minutes, setMinutes] = useState("");
   const [entryDate, setEntryDate] = useState(new Date().toISOString().split('T')[0]);
 
   const queryClient = useQueryClient();
@@ -56,7 +57,8 @@ export default function DistractionSection() {
         description: "Your social media usage has been recorded." 
       });
       setShowUploadDialog(false);
-      setTimeMinutes("");
+      setHours("");
+      setMinutes("");
       setSelectedPlatform("");
     },
   });
@@ -94,10 +96,11 @@ export default function DistractionSection() {
   };
 
   const handleSubmit = () => {
-    if (selectedPlatform && timeMinutes && entryDate) {
+    const totalMinutes = (parseInt(hours) || 0) * 60 + (parseInt(minutes) || 0);
+    if (selectedPlatform && totalMinutes > 0 && entryDate) {
       createEntryMutation.mutate({
         platform: selectedPlatform,
-        timeMinutes: parseInt(timeMinutes),
+        timeMinutes: totalMinutes,
         date: entryDate
       });
     }
@@ -150,51 +153,61 @@ export default function DistractionSection() {
           Social Media Platforms
         </h3>
         
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {platforms.map((platform) => {
             const platformStats = stats.platforms.find(p => p.platform === platform.name);
             const Icon = platform.icon;
             
             return (
-              <Card key={platform.name} className={`${platform.bgColor} shadow-md hover:shadow-lg transition-all cursor-pointer`}>
-                <CardHeader className="pb-3">
+              <Card key={platform.name} className={`${platform.bgColor} shadow-lg hover:shadow-xl transition-all cursor-pointer`}>
+                <CardHeader className="pb-4">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${platform.color} flex items-center justify-center`}>
-                        <Icon className="w-5 h-5 text-white" />
+                    <div className="flex items-center gap-4">
+                      <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${platform.color} flex items-center justify-center`}>
+                        <Icon className="w-8 h-8 text-white" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900">{platform.name}</h4>
-                        <p className="text-sm text-gray-600">
+                        <h4 className="font-bold text-xl text-gray-900">{platform.name}</h4>
+                        <p className="text-base text-gray-600 mt-1">
                           {platformStats ? formatTime(platformStats.totalTime) : "No data"}
                         </p>
                       </div>
                     </div>
                     <Button
-                      size="sm"
+                      size="default"
                       variant="outline"
                       onClick={() => handleUpload(platform.name)}
-                      className="flex items-center gap-1 bg-white/80 hover:bg-white border-gray-300"
+                      className="flex items-center gap-2 bg-white/90 hover:bg-white border-gray-300"
                     >
-                      <Upload className="w-3 h-3" />
+                      <Upload className="w-4 h-4" />
                       Upload
                     </Button>
                   </div>
                 </CardHeader>
                 
                 {platformStats && (
-                  <CardContent className="pt-0">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Weekly usage</span>
-                      <span className="font-medium text-gray-900">
-                        {platformStats.percentage.toFixed(1)}% of total
-                      </span>
-                    </div>
-                    <div className="w-full bg-white/50 rounded-full h-2 mt-2">
-                      <div 
-                        className={`h-2 rounded-full bg-gradient-to-r ${platform.color}`}
-                        style={{ width: `${Math.min(platformStats.percentage, 100)}%` }}
-                      />
+                  <CardContent className="pt-0 pb-6">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-base">
+                        <span className="text-gray-700 font-medium">Weekly total</span>
+                        <span className="font-bold text-lg text-gray-900">
+                          {formatTime(platformStats.totalTime)}
+                        </span>
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between text-sm mb-2">
+                          <span className="text-gray-600">Usage share</span>
+                          <span className="font-medium text-gray-800">
+                            {platformStats.percentage.toFixed(1)}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-white/60 rounded-full h-3">
+                          <div 
+                            className={`h-3 rounded-full bg-gradient-to-r ${platform.color} shadow-sm`}
+                            style={{ width: `${Math.min(platformStats.percentage, 100)}%` }}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 )}
@@ -225,18 +238,36 @@ export default function DistractionSection() {
               />
             </div>
             
-            <div>
-              <Label htmlFor="time">Time Spent (minutes)</Label>
-              <Input
-                id="time"
-                type="number"
-                placeholder="e.g., 45"
-                value={timeMinutes}
-                onChange={(e) => setTimeMinutes(e.target.value)}
-                min="0"
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                Enter the total minutes spent on {selectedPlatform} for this day
+            <div className="space-y-3">
+              <Label>Time Spent</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="hours" className="text-sm text-gray-600">Hours</Label>
+                  <Input
+                    id="hours"
+                    type="number"
+                    placeholder="0"
+                    value={hours}
+                    onChange={(e) => setHours(e.target.value)}
+                    min="0"
+                    max="24"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="minutes" className="text-sm text-gray-600">Minutes</Label>
+                  <Input
+                    id="minutes"
+                    type="number"
+                    placeholder="0"
+                    value={minutes}
+                    onChange={(e) => setMinutes(e.target.value)}
+                    min="0"
+                    max="59"
+                  />
+                </div>
+              </div>
+              <p className="text-sm text-gray-500">
+                Enter the time spent on {selectedPlatform} for this day
               </p>
             </div>
             
@@ -245,7 +276,8 @@ export default function DistractionSection() {
                 variant="outline"
                 onClick={() => {
                   setShowUploadDialog(false);
-                  setTimeMinutes("");
+                  setHours("");
+                  setMinutes("");
                   setSelectedPlatform("");
                 }}
               >
@@ -253,7 +285,7 @@ export default function DistractionSection() {
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={!timeMinutes || !selectedPlatform || createEntryMutation.isPending}
+                disabled={(!hours && !minutes) || !selectedPlatform || createEntryMutation.isPending}
               >
                 {createEntryMutation.isPending ? "Uploading..." : "Upload Time"}
               </Button>
