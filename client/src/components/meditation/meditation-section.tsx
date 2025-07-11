@@ -45,22 +45,30 @@ export function MeditationSection() {
     },
   });
 
-  // Play gong sound
+  // Play sharper, louder gong sound
   const playGong = () => {
-    // Create a simple gong sound using Web Audio API
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
+    const filterNode = audioContext.createBiquadFilter();
     
-    oscillator.connect(gainNode);
+    oscillator.connect(filterNode);
+    filterNode.connect(gainNode);
     gainNode.connect(audioContext.destination);
     
-    oscillator.frequency.value = 110; // Low frequency for gong-like sound
+    // Sharper frequency profile for clearer gong
+    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 2.5);
     oscillator.type = "sine";
     
-    // Envelope for gong sound
+    // Filter for sharper, clearer sound
+    filterNode.type = 'bandpass';
+    filterNode.frequency.setValueAtTime(300, audioContext.currentTime);
+    filterNode.Q.setValueAtTime(8, audioContext.currentTime);
+    
+    // Louder volume with sharper attack
     gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.01);
+    gainNode.gain.linearRampToValueAtTime(0.8, audioContext.currentTime + 0.01);
     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 3);
     
     oscillator.start(audioContext.currentTime);
