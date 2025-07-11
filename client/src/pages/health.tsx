@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronDown, Activity, Trophy, Play, User, Dumbbell, TrendingUp, Target, Zap, Timer, Edit3, Calculator } from "lucide-react";
 import WorkoutLogger from "@/components/workout/workout-logger";
 import ProfileEditor from "@/components/profile/profile-editor";
-import ProgressAnalytics from "@/components/analytics/progress-analytics";
 
 export default function HealthPage() {
   const [expandedWeeks, setExpandedWeeks] = useState<Set<number>>(new Set());
@@ -349,10 +348,6 @@ export default function HealthPage() {
 
           {/* Workout Tab Content */}
           <TabsContent value="workout" className="mt-3 space-y-2">
-            {/* Progress Analytics */}
-            <ProgressAnalytics />
-            
-            {/* Workout Program */}
           {/* Program Overview */}
           <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
             <h3 className="text-sm font-semibold text-gray-900 mb-1 flex items-center">
