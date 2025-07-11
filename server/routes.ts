@@ -1014,7 +1014,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: req.session.userId
       });
       
-      const entry = await storage.createScreenTimeEntry(entryData);
+      const entry = await storage.upsertScreenTimeEntry(entryData);
       res.json(entry);
     } catch (error) {
       console.error("Create screen time entry error:", error);

@@ -155,6 +155,7 @@ export interface IStorage {
   // Screen Time
   getScreenTimeEntriesByUserId(userId: number): Promise<ScreenTimeEntry[]>;
   createScreenTimeEntry(entry: InsertScreenTimeEntry): Promise<ScreenTimeEntry>;
+  upsertScreenTimeEntry(entry: InsertScreenTimeEntry): Promise<ScreenTimeEntry>;
   getScreenTimeStats(userId: number): Promise<{
     totalTime: number;
     avgDaily: number;
@@ -852,6 +853,30 @@ export class DatabaseStorage implements IStorage {
   async createScreenTimeEntry(entry: InsertScreenTimeEntry): Promise<ScreenTimeEntry> {
     const result = await db.insert(screenTimeEntries).values(entry).returning();
     return result[0];
+  }
+
+  async upsertScreenTimeEntry(entry: InsertScreenTimeEntry): Promise<ScreenTimeEntry> {
+    // Check if entry exists for this user, platform, and date
+    const existing = await db.select().from(screenTimeEntries)
+      .where(and(
+        eq(screenTimeEntries.userId, entry.userId),
+        eq(screenTimeEntries.platform, entry.platform),
+        eq(screenTimeEntries.date, entry.date)
+      ))
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing entry
+      const result = await db.update(screenTimeEntries)
+        .set({ timeMinutes: entry.timeMinutes })
+        .where(eq(screenTimeEntries.id, existing[0].id))
+        .returning();
+      return result[0];
+    } else {
+      // Create new entry
+      const result = await db.insert(screenTimeEntries).values(entry).returning();
+      return result[0];
+    }
   }
 
   async getScreenTimeStats(userId: number): Promise<{
