@@ -158,8 +158,8 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
               {personalRecords.map((record, index) => (
                 <div key={index} className="space-y-3">
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-24">
+                    <div className="flex items-center space-x-3 flex-1">
+                      <div className="w-28">
                         <Label htmlFor={`exercise-${index}`} className="text-sm font-medium">
                           Exercise
                         </Label>
@@ -167,11 +167,11 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
                           id={`exercise-${index}`}
                           value={record.exercise}
                           onChange={(e) => handleRecordChange(index, "exercise", e.target.value)}
-                          className="mt-1"
+                          className="mt-1 h-8"
                           placeholder="Exercise name"
                         />
                       </div>
-                      <div className="w-20">
+                      <div className="w-16">
                         <Label htmlFor={`weight-${index}`} className="text-sm font-medium">
                           Max (lbs)
                         </Label>
@@ -180,7 +180,7 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
                           type="number"
                           value={record.weight}
                           onChange={(e) => handleRecordChange(index, "weight", e.target.value)}
-                          className="mt-1"
+                          className="mt-1 h-8"
                           placeholder="0"
                         />
                       </div>
@@ -190,16 +190,15 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
                         size="sm"
                         variant="outline"
                         onClick={() => togglePercentages(record.exercise)}
-                        className="flex items-center space-x-1"
+                        className="h-8 px-2"
                       >
-                        <Calculator className="h-4 w-4" />
                         <span>%</span>
                       </Button>
                       <Button
                         size="sm"
                         variant="destructive"
                         onClick={() => removeRecord(index)}
-                        className="flex items-center space-x-1"
+                        className="h-8 px-2"
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>
