@@ -1,0 +1,68 @@
+Objective:
+Revamp the mobile layout of the Health/Body section to reduce vertical scrolling, streamline access to key features, and enhance clarity — drawing inspiration from WHOOP’s UI while keeping our app’s clean white/light brand style.
+
+🧭 General Design Principles:
+Keep our light/white background and card-based structure (brand congruence).
+
+Use Whoop's structure as a guide: segmented blocks, horizontal nav bars, clean data hierarchy.
+
+Prioritize mobile-first responsive design — should be easy to scan at a glance.
+
+🔁 Navigation Layout:
+Add a top horizontal tab selector (sticky or fixed) that switches between:
+
+Overview
+
+Progress
+
+Volume
+
+Workout History
+
+Use visual cues to show the active tab (e.g., underline, bold, slightly raised button).
+
+Each tab should lazy-load its content without page reload.
+
+🧩 Redesign Sections for Compactness:
+1. Overview Tab
+Grid of 2x2 small stat cards (e.g., Completion Rate, Time Spent, Volume Change)
+
+Place "Weekly Progress" and "Muscle Group Focus" in collapsible or swipeable cards
+
+Example: Tap the card to expand into a full-screen modal or slide-up drawer for details
+
+2. Progress + Volume Tabs
+Show a single simple line graph (like WHOOP’s), using toggles to switch Week | Month | Year
+
+Place the toggles above the graph
+
+Graph should:
+
+Be responsive and touch-friendly
+
+Have subtle tooltips on hover/tap
+
+Stick to flat colors with simple point markers (no gradients or shading)
+
+3. Workout History Tab
+Use card rows (like you already have) with program name + date range + “View” button
+
+Add subtle separators between cards to make scanning easier
+
+📱 Additional Mobile Optimizations:
+Use slideable or segmented buttons for Week/Day toggles in the workout builder (to avoid stacking)
+
+Use icon + label combos for navigation (like WHOOP’s bottom nav bar)
+
+Introduce scroll shadows or indicators to hint there’s more off-screen content
+
+Consider collapsing less-used elements (e.g., template descriptions) until tapped
+
+📐 Bonus – Layout Enhancements to Steal from WHOOP:
+Use color-coded feedback (e.g., green = improvement, red = decline) for stat deltas
+
+Use card headers with context like: “+15% since last week” in smaller font
+
+Prioritize bold numbers first, then small labels (e.g., 7.5 hrs then Time Spent This Week)
+
+For multi-metric graphs (like strain vs recovery), give each metric a distinct, readable colo

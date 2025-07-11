@@ -123,6 +123,17 @@ Build scripts include:
 
 ## Changelog
 
+- July 11, 2025: Revamped Health Page with WHOOP-Inspired Mobile-First Design
+  - **REDESIGNED**: Complete mobile-first redesign with horizontal tab navigation (Overview, Progress, Volume, History)
+  - **STICKY TABS**: Top horizontal tab selector with visual indicators for active tab (underline, bold)
+  - **COMPACT LAYOUT**: 2x2 stat cards grid in Overview tab reducing vertical scrolling
+  - **STREAMLINED**: Clean white background maintaining brand consistency with card-based structure
+  - **MOBILE-OPTIMIZED**: Horizontal overflow-x scroll for tab navigation on mobile devices
+  - **ENHANCED HISTORY**: Compact workout history cards with exercise badges and simplified date format
+  - **ORGANIZED CONTENT**: Separated content into focused tabs for better user experience
+  - **ADDED PROGRAM TAB**: Training program creator accessible through dedicated tab
+  - **VISUAL HIERARCHY**: Clear data hierarchy with colored icon backgrounds and consistent spacing
+  - Health page now follows WHOOP's segmented block structure while maintaining .uoY's clean aesthetic
 - July 11, 2025: Renamed Read to Mind - Added Three-Tab Tracking System
   - **RENAMED**: "Read" navigation renamed to "Mind" for comprehensive mental wellness tracking
   - **NEW**: Three-tab interface for Mind page: Reading, Meditation, and Distraction (Social Media)
