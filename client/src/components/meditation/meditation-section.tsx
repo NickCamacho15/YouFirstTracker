@@ -234,38 +234,34 @@ export function MeditationSection() {
 
   return (
     <div className="space-y-4">
-      {/* Compressed Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <Card className="p-3 bg-white border shadow-sm">
+      {/* Horizontal Stats */}
+      <Card className="p-4 bg-white border shadow-sm">
+        <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-blue-500" />
+            <Activity className="w-5 h-5 text-blue-500" />
             <div>
-              <p className="text-lg font-bold">{stats.sessions}</p>
-              <p className="text-xs text-muted-foreground">Sessions</p>
+              <p className="text-xl font-bold">{stats.sessions}</p>
+              <p className="text-sm text-muted-foreground">Sessions</p>
             </div>
           </div>
-        </Card>
-        
-        <Card className="p-3 bg-white border shadow-sm">
+          
           <div className="flex items-center gap-2">
-            <Flame className="w-4 h-4 text-orange-500" />
+            <Flame className="w-5 h-5 text-orange-500" />
             <div>
-              <p className="text-lg font-bold">{stats.streak}</p>
-              <p className="text-xs text-muted-foreground">Streak</p>
+              <p className="text-xl font-bold">{stats.streak}</p>
+              <p className="text-sm text-muted-foreground">Day Streak</p>
             </div>
           </div>
-        </Card>
-        
-        <Card className="p-3 bg-white border shadow-sm">
+          
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-purple-500" />
+            <Calendar className="w-5 h-5 text-purple-500" />
             <div>
-              <p className="text-lg font-bold">{Math.floor(stats.totalTime / 60)}h</p>
-              <p className="text-xs text-muted-foreground">Total</p>
+              <p className="text-xl font-bold">{Math.floor(stats.totalTime / 60)}h</p>
+              <p className="text-sm text-muted-foreground">Total Time</p>
             </div>
           </div>
-        </Card>
-      </div>
+        </div>
+      </Card>
 
       {/* Timer Controls */}
       <Card className="p-6 bg-white border shadow-md">
