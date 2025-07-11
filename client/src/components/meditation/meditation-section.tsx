@@ -234,34 +234,39 @@ export function MeditationSection() {
 
   return (
     <div className="space-y-4">
-      {/* Horizontal Stats */}
+      {/* Total Time - Full Width */}
       <Card className="p-4 bg-white border shadow-sm">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Activity className="w-5 h-5 text-blue-500" />
-            <div>
-              <p className="text-xl font-bold">{stats.sessions}</p>
-              <p className="text-sm text-muted-foreground">Sessions</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Flame className="w-5 h-5 text-orange-500" />
-            <div>
-              <p className="text-xl font-bold">{stats.streak}</p>
-              <p className="text-sm text-muted-foreground">Day Streak</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-purple-500" />
-            <div>
-              <p className="text-xl font-bold">{Math.floor(stats.totalTime / 60)}h</p>
-              <p className="text-sm text-muted-foreground">Total Time</p>
-            </div>
+        <div className="flex items-center gap-3">
+          <Calendar className="w-6 h-6 text-purple-500" />
+          <div>
+            <p className="text-2xl font-bold">{Math.floor(stats.totalTime / 60)}h</p>
+            <p className="text-sm text-muted-foreground">Total Time</p>
           </div>
         </div>
       </Card>
+
+      {/* Sessions & Streak - Side by Side */}
+      <div className="grid grid-cols-2 gap-3">
+        <Card className="p-4 bg-white border shadow-sm">
+          <div className="flex items-center gap-3">
+            <Activity className="w-6 h-6 text-blue-500" />
+            <div>
+              <p className="text-2xl font-bold">{stats.sessions}</p>
+              <p className="text-sm text-muted-foreground">Sessions</p>
+            </div>
+          </div>
+        </Card>
+        
+        <Card className="p-4 bg-white border shadow-sm">
+          <div className="flex items-center gap-3">
+            <Flame className="w-6 h-6 text-orange-500" />
+            <div>
+              <p className="text-2xl font-bold">{stats.streak}</p>
+              <p className="text-sm text-muted-foreground">Day Streak</p>
+            </div>
+          </div>
+        </Card>
+      </div>
 
       {/* Timer Controls */}
       <Card className="p-6 bg-white border shadow-md">
