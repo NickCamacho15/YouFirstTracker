@@ -324,7 +324,7 @@ export default function DistractionSection() {
                                 value={timeData.hours}
                                 onChange={(e) => handleTimeChange(dateStr, platform.name, 'hours', e.target.value)}
                                 onBlur={() => handleBlur(dateStr, platform.name)}
-                                className="w-14 h-8 text-center text-sm"
+                                className="w-16 h-10 text-center text-sm"
                                 min="0"
                                 max="24"
                                 placeholder="0"
@@ -338,7 +338,7 @@ export default function DistractionSection() {
                                 value={timeData.minutes}
                                 onChange={(e) => handleTimeChange(dateStr, platform.name, 'minutes', e.target.value)}
                                 onBlur={() => handleBlur(dateStr, platform.name)}
-                                className="w-14 h-8 text-center text-sm"
+                                className="w-16 h-10 text-center text-sm"
                                 min="0"
                                 max="59"
                                 placeholder="0"
