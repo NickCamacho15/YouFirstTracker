@@ -207,7 +207,7 @@ export default function DistractionSection() {
   return (
     <div className="space-y-6">
       {/* Stats Overview */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-4 mb-6">
         <Card className="shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
@@ -227,20 +227,6 @@ export default function DistractionSection() {
               <div>
                 <p className="text-sm text-gray-600">Daily Average</p>
                 <p className="text-xl font-bold">{formatTime(stats?.avgDaily || 0)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="shadow-md">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Smartphone className="w-5 h-5 text-purple-600" />
-              <div>
-                <p className="text-sm text-gray-600">Top App</p>
-                <p className="text-xl font-bold">
-                  {stats?.platforms?.[0]?.platform || 'None'}
-                </p>
               </div>
             </div>
           </CardContent>
