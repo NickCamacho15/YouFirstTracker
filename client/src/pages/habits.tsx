@@ -126,13 +126,11 @@ export default function HabitsPage() {
 
   const { data: habits = [], isLoading: isLoadingHabits } = useQuery({
     queryKey: ['/api/habits'],
-    queryFn: () => apiRequest('/api/habits'),
     refetchInterval: 5000,
   });
 
   const { data: rules = [], isLoading: isLoadingRules } = useQuery({
     queryKey: ['/api/rules'],
-    queryFn: () => apiRequest('/api/rules'),
     refetchInterval: 5000,
   });
 
