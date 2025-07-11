@@ -123,23 +123,38 @@ export function ReadingList() {
 
   return (
     <Card className="bg-background border shadow-md shadow-emerald-500/10">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between text-foreground">
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-emerald-500" />
-            Reading List
-          </div>
-          <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-1">
-              <Target className="w-4 h-4 text-emerald-500" />
-              <span className="text-muted-foreground">{pendingBooks.length} to read</span>
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between mb-4">
+          <CardTitle className="flex items-center gap-3 text-foreground">
+            <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950">
+              <BookOpen className="w-5 h-5 text-emerald-600" />
             </div>
-            <div className="flex items-center gap-1">
-              <Trophy className="w-4 h-4 text-emerald-500" />
-              <span className="text-muted-foreground">{completedBooks.length} completed</span>
+            <span className="text-xl">My Reading Journey</span>
+          </CardTitle>
+        </div>
+        
+        {/* Stats Row */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50">
+            <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900">
+              <Target className="w-4 h-4 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-lg font-semibold text-foreground">{pendingBooks.length}</p>
+              <p className="text-sm text-muted-foreground">Currently Reading</p>
             </div>
           </div>
-        </CardTitle>
+          
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50">
+            <div className="p-2 rounded-full bg-green-100 dark:bg-green-900">
+              <Trophy className="w-4 h-4 text-green-600" />
+            </div>
+            <div>
+              <p className="text-lg font-semibold text-foreground">{completedBooks.length}</p>
+              <p className="text-sm text-muted-foreground">Books Finished</p>
+            </div>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Add New Book */}
