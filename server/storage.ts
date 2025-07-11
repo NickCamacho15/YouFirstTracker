@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import { 
   users, goals, microGoals, habits, habitLogs, readingSessions, readingList, meditationSessions, posts, visionBoard, tasks, rules,
   followers, postReactions, postComments, workouts, exercises, workoutExercises, bodyWeightLogs,
-  trainingTemplates, exerciseHistory, screenTimeEntries,
+  trainingTemplates, exerciseHistory, screenTimeEntries, workoutEntries,
   type User, type InsertUser, type Goal, type InsertGoal, type MicroGoal, type InsertMicroGoal,
   type Habit, type InsertHabit, type HabitLog, type InsertHabitLog,
   type ReadingSession, type InsertReadingSession, type ReadingListItem, type InsertReadingListItem,
@@ -16,7 +16,8 @@ import {
   type PostComment, type InsertPostComment, type Workout, type InsertWorkout,
   type Exercise, type InsertExercise, type WorkoutExercise, type InsertWorkoutExercise,
   type BodyWeightLog, type InsertBodyWeightLog, type TrainingTemplate, type InsertTrainingTemplate,
-  type ExerciseHistoryItem, type InsertExerciseHistory, type ScreenTimeEntry, type InsertScreenTimeEntry
+  type ExerciseHistoryItem, type InsertExerciseHistory, type ScreenTimeEntry, type InsertScreenTimeEntry,
+  type WorkoutEntry, type InsertWorkoutEntry
 } from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -161,6 +162,13 @@ export interface IStorage {
     avgDaily: number;
     platforms: { platform: string; totalTime: number; percentage: number; }[];
   }>;
+
+  // Workout Entries
+  getWorkoutEntriesByUserId(userId: number): Promise<WorkoutEntry[]>;
+  getWorkoutEntriesByDayBlock(userId: number, weekNumber: number, dayNumber: number, blockLetter: string): Promise<WorkoutEntry[]>;
+  createWorkoutEntry(entry: InsertWorkoutEntry): Promise<WorkoutEntry>;
+  updateWorkoutEntry(id: number, updates: Partial<WorkoutEntry>): Promise<WorkoutEntry | undefined>;
+  deleteWorkoutEntry(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -910,6 +918,42 @@ export class DatabaseStorage implements IStorage {
     }));
 
     return { totalTime, avgDaily, platforms };
+  }
+
+  // Workout Entries
+  async getWorkoutEntriesByUserId(userId: number): Promise<WorkoutEntry[]> {
+    return await db.select().from(workoutEntries)
+      .where(eq(workoutEntries.userId, userId))
+      .orderBy(desc(workoutEntries.createdAt));
+  }
+
+  async getWorkoutEntriesByDayBlock(userId: number, weekNumber: number, dayNumber: number, blockLetter: string): Promise<WorkoutEntry[]> {
+    return await db.select().from(workoutEntries)
+      .where(and(
+        eq(workoutEntries.userId, userId),
+        eq(workoutEntries.weekNumber, weekNumber),
+        eq(workoutEntries.dayNumber, dayNumber),
+        eq(workoutEntries.blockLetter, blockLetter)
+      ))
+      .orderBy(desc(workoutEntries.createdAt));
+  }
+
+  async createWorkoutEntry(entry: InsertWorkoutEntry): Promise<WorkoutEntry> {
+    const result = await db.insert(workoutEntries).values(entry).returning();
+    return result[0];
+  }
+
+  async updateWorkoutEntry(id: number, updates: Partial<WorkoutEntry>): Promise<WorkoutEntry | undefined> {
+    const result = await db.update(workoutEntries)
+      .set(updates)
+      .where(eq(workoutEntries.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteWorkoutEntry(id: number): Promise<boolean> {
+    const result = await db.delete(workoutEntries).where(eq(workoutEntries.id, id)).returning();
+    return result.length > 0;
   }
 }
 

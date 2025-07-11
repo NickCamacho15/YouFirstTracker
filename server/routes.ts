@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
-import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertReadingListSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema, insertScreenTimeEntrySchema } from "@shared/schema";
+import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertReadingListSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema, insertScreenTimeEntrySchema, insertWorkoutEntrySchema } from "@shared/schema";
 import { generateWorkoutProgram } from "./ai";
 import { z } from "zod";
 
@@ -1019,6 +1019,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Create screen time entry error:", error);
       res.status(400).json({ message: "Failed to create screen time entry" });
+    }
+  });
+
+  // Workout entry routes
+  app.get("/api/workouts/entries", requireAuth, async (req, res) => {
+    try {
+      const entries = await storage.getWorkoutEntriesByUserId(req.session.userId);
+      res.json(entries);
+    } catch (error) {
+      console.error("Get workout entries error:", error);
+      res.status(500).json({ message: "Failed to get workout entries" });
+    }
+  });
+
+  app.get("/api/workouts/entries/:weekNumber/:dayNumber/:blockLetter", requireAuth, async (req, res) => {
+    try {
+      const weekNumber = parseInt(req.params.weekNumber);
+      const dayNumber = parseInt(req.params.dayNumber);
+      const blockLetter = req.params.blockLetter;
+      
+      const entries = await storage.getWorkoutEntriesByDayBlock(req.session.userId, weekNumber, dayNumber, blockLetter);
+      res.json(entries);
+    } catch (error) {
+      console.error("Get workout entries by day/block error:", error);
+      res.status(500).json({ message: "Failed to get workout entries" });
+    }
+  });
+
+  app.post("/api/workouts/entries", requireAuth, async (req, res) => {
+    try {
+      const entryData = insertWorkoutEntrySchema.parse({
+        ...req.body,
+        userId: req.session.userId
+      });
+      
+      const entry = await storage.createWorkoutEntry(entryData);
+      res.json(entry);
+    } catch (error) {
+      console.error("Create workout entry error:", error);
+      res.status(400).json({ message: "Failed to create workout entry" });
+    }
+  });
+
+  app.put("/api/workouts/entries/:id", requireAuth, async (req, res) => {
+    try {
+      const entryId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      const entry = await storage.updateWorkoutEntry(entryId, updates);
+      if (!entry) {
+        return res.status(404).json({ message: "Workout entry not found" });
+      }
+      res.json(entry);
+    } catch (error) {
+      console.error("Update workout entry error:", error);
+      res.status(500).json({ message: "Failed to update workout entry" });
+    }
+  });
+
+  app.delete("/api/workouts/entries/:id", requireAuth, async (req, res) => {
+    try {
+      const entryId = parseInt(req.params.id);
+      const deleted = await storage.deleteWorkoutEntry(entryId);
+      if (!deleted) {
+        return res.status(404).json({ message: "Workout entry not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete workout entry error:", error);
+      res.status(500).json({ message: "Failed to delete workout entry" });
     }
   });
 

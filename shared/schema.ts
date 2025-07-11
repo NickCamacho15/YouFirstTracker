@@ -229,6 +229,30 @@ export const screenTimeEntries = pgTable("screen_time_entries", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Workout entries for tracking individual exercises
+export const workoutEntries = pgTable("workout_entries", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  weekNumber: integer("week_number").notNull(),
+  dayNumber: integer("day_number").notNull(),
+  blockLetter: text("block_letter").notNull(), // "A", "B", "C"
+  category: text("category", { enum: ["strength", "cardio", "functional"] }).notNull(),
+  exerciseName: text("exercise_name").notNull(),
+  // Strength fields
+  weight: integer("weight"), // in lbs
+  reps: integer("reps"),
+  // Cardio fields
+  time: integer("time"), // in seconds
+  calories: integer("calories"),
+  effort: integer("effort"), // 1-10 scale
+  // Functional fields
+  duration: integer("duration"), // in seconds
+  // Common fields
+  notes: text("notes"),
+  date: date("date").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Fitness Profile for workout program generation
 export const fitnessProfiles = pgTable("fitness_profiles", {
   id: serial("id").primaryKey(),
@@ -659,3 +683,13 @@ export type InsertExerciseHistory = z.infer<typeof insertExerciseHistorySchema>;
 export const insertScreenTimeEntrySchema = createInsertSchema(screenTimeEntries);
 export type ScreenTimeEntry = typeof screenTimeEntries.$inferSelect;
 export type InsertScreenTimeEntry = z.infer<typeof insertScreenTimeEntrySchema>;
+
+// Workout entry schemas
+export const insertWorkoutEntrySchema = createInsertSchema(workoutEntries).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  date: z.string().transform((val) => val),
+});
+export type WorkoutEntry = typeof workoutEntries.$inferSelect;
+export type InsertWorkoutEntry = z.infer<typeof insertWorkoutEntrySchema>;

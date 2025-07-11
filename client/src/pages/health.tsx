@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronDown, Activity, Trophy, Play, User, Dumbbell, TrendingUp, Target, Zap, Timer } from "lucide-react";
+import WorkoutLogger from "@/components/workout/workout-logger";
 
 export default function HealthPage() {
   const [expandedWeeks, setExpandedWeeks] = useState<Set<number>>(new Set());
@@ -90,120 +92,48 @@ export default function HealthPage() {
     });
   };
 
-  // Static 4-week template
+  // Generate weeks with 6 days each
+  const generateWeeks = () => {
+    const totalWeeks = 4;
+    const weeks = [];
+    
+    for (let weekNum = 1; weekNum <= totalWeeks; weekNum++) {
+      const week = {
+        weekNumber: weekNum,
+        phase: weekNum <= 2 ? "Load" : "Peak",
+        phaseDescription: weekNum <= 2 ? "Building foundation" : "Maximum intensity",
+        days: []
+      };
+      
+      // Generate 6 days for each week
+      for (let dayNum = 1; dayNum <= 6; dayNum++) {
+        const dayNames = ["Upper Power", "Lower Power", "Push Focus", "Pull Focus", "Legs", "Full Body"];
+        
+        const day = {
+          dayNumber: dayNum,
+          name: dayNames[dayNum - 1],
+          blocks: ["A", "B", "C"].map(blockLetter => ({
+            blockLetter,
+            name: `Block ${blockLetter}`,
+            description: `Training block ${blockLetter}`
+          }))
+        };
+        
+        week.days.push(day);
+      }
+      
+      weeks.push(week);
+    }
+    
+    return weeks;
+  };
+
   const staticProgram = {
     program: {
       name: "4-Week Elite Training Program",
       description: "Comprehensive strength and conditioning program designed for maximum results"
     },
-    weeks: [
-      {
-        weekNumber: 1,
-        phase: "Load",
-        phaseDescription: "Building foundation with progressive overload",
-        days: [
-          {
-            dayNumber: 1,
-            name: "Upper Power",
-            blocks: [
-              {
-                name: "Strength Focus",
-                exercises: [
-                  { exerciseName: "Bench Press", sets: "4", reps: "5", weight: "85%" },
-                  { exerciseName: "Weighted Pull-ups", sets: "4", reps: "6", weight: "BW+25" },
-                  { exerciseName: "Overhead Press", sets: "3", reps: "8", weight: "75%" }
-                ]
-              },
-              {
-                name: "Accessory Work",
-                exercises: [
-                  { exerciseName: "Barbell Rows", sets: "3", reps: "10", weight: "70%" },
-                  { exerciseName: "Dips", sets: "3", reps: "12", weight: "BW" },
-                  { exerciseName: "Face Pulls", sets: "3", reps: "15", weight: "Light" }
-                ]
-              }
-            ]
-          },
-          {
-            dayNumber: 2,
-            name: "Lower Power",
-            blocks: [
-              {
-                name: "Strength Focus",
-                exercises: [
-                  { exerciseName: "Back Squat", sets: "4", reps: "5", weight: "85%" },
-                  { exerciseName: "Romanian Deadlift", sets: "3", reps: "8", weight: "75%" },
-                  { exerciseName: "Bulgarian Split Squats", sets: "3", reps: "10", weight: "BW" }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        weekNumber: 2,
-        phase: "Load",
-        phaseDescription: "Increasing intensity and volume",
-        days: [
-          {
-            dayNumber: 1,
-            name: "Upper Power",
-            blocks: [
-              {
-                name: "Strength Focus",
-                exercises: [
-                  { exerciseName: "Bench Press", sets: "4", reps: "4", weight: "87%" },
-                  { exerciseName: "Weighted Pull-ups", sets: "4", reps: "5", weight: "BW+30" },
-                  { exerciseName: "Overhead Press", sets: "3", reps: "7", weight: "77%" }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        weekNumber: 3,
-        phase: "Peak",
-        phaseDescription: "Maximum intensity phase",
-        days: [
-          {
-            dayNumber: 1,
-            name: "Upper Power",
-            blocks: [
-              {
-                name: "Strength Focus",
-                exercises: [
-                  { exerciseName: "Bench Press", sets: "5", reps: "3", weight: "90%" },
-                  { exerciseName: "Weighted Pull-ups", sets: "5", reps: "4", weight: "BW+35" },
-                  { exerciseName: "Overhead Press", sets: "4", reps: "6", weight: "80%" }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        weekNumber: 4,
-        phase: "Deload",
-        phaseDescription: "Recovery and adaptation",
-        days: [
-          {
-            dayNumber: 1,
-            name: "Upper Power",
-            blocks: [
-              {
-                name: "Strength Focus",
-                exercises: [
-                  { exerciseName: "Bench Press", sets: "3", reps: "6", weight: "70%" },
-                  { exerciseName: "Weighted Pull-ups", sets: "3", reps: "8", weight: "BW+15" },
-                  { exerciseName: "Overhead Press", sets: "3", reps: "10", weight: "65%" }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
+    weeks: generateWeeks()
   };
 
   return (
@@ -424,37 +354,14 @@ export default function HealthPage() {
 
                               {/* Day Workout Blocks */}
                               {isDayExpanded && (
-                                <div className="px-3 pb-3 space-y-1 bg-gray-50">
-                                  {day.blocks.map((block, idx) => (
-                                    <div key={idx} className="bg-white rounded p-2 border shadow-sm">
-                                      <div className="flex items-center justify-between mb-1">
-                                        <span className="text-sm font-medium text-blue-600">
-                                          Block {String.fromCharCode(65 + idx)}: {block.name}
-                                        </span>
-                                        <Button 
-                                          size="sm" 
-                                          variant="outline"
-                                          className="text-xs px-2 py-1 h-6"
-                                        >
-                                          Enter
-                                        </Button>
-                                      </div>
-                                      
-                                      {/* Exercise Preview */}
-                                      <div className="space-y-0.5">
-                                        {block.exercises.slice(0, 2).map((exercise, exIdx) => (
-                                          <div key={exIdx} className="text-xs text-gray-600 flex justify-between">
-                                            <span>{exercise.exerciseName}</span>
-                                            <span>{exercise.sets}x{exercise.reps} {exercise.weight}</span>
-                                          </div>
-                                        ))}
-                                        {block.exercises.length > 2 && (
-                                          <div className="text-xs text-gray-500">
-                                            +{block.exercises.length - 2} more
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
+                                <div className="px-3 pb-3 space-y-2 bg-gray-50">
+                                  {day.blocks.map((block) => (
+                                    <WorkoutLogger 
+                                      key={block.blockLetter}
+                                      weekNumber={week.weekNumber}
+                                      dayNumber={day.dayNumber}
+                                      blockLetter={block.blockLetter}
+                                    />
                                   ))}
                                 </div>
                               )}
