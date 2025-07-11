@@ -66,32 +66,8 @@ export default function GoalsPage() {
           <p className="text-muted-foreground mt-2">Transform aspirations into achievements through strategic action</p>
         </div>
 
-        {/* Achievement History Section */}
-        <div className="mb-12">
-          <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-            <Trophy className="w-6 h-6 text-amber-500" />
-            Your Achievement History
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-            {achievements.map((achievement) => {
-              const Icon = achievement.icon;
-              return (
-                <Card key={achievement.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                  <CardContent className="p-4 text-center">
-                    <div className={`w-16 h-16 mx-auto rounded-full ${achievement.color} flex items-center justify-center mb-3`}>
-                      <Icon className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-sm mb-1">{achievement.title}</h3>
-                    <p className="text-xs text-muted-foreground">{achievement.year}</p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-
         {/* Active Goals Section */}
-        <div>
+        <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold flex items-center gap-2">
               <Target className="w-6 h-6 text-blue-600" />
@@ -128,6 +104,30 @@ export default function GoalsPage() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Achievement History Section */}
+        <div>
+          <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+            <Trophy className="w-6 h-6 text-amber-500" />
+            Your Achievement History
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+            {achievements.map((achievement) => {
+              const Icon = achievement.icon;
+              return (
+                <Card key={achievement.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                  <CardContent className="p-4 text-center">
+                    <div className={`w-16 h-16 mx-auto rounded-full ${achievement.color} flex items-center justify-center mb-3`}>
+                      <Icon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="font-semibold text-sm mb-1">{achievement.title}</h3>
+                    <p className="text-xs text-muted-foreground">{achievement.year}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
       </div>
 
