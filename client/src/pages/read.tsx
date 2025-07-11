@@ -5,6 +5,7 @@ import { ReadingTimer } from "@/components/reading/reading-timer";
 import { BookOpen, Clock, TrendingUp, Brain, Smartphone, History, Lightbulb, Plus, Trophy } from "lucide-react";
 import { ReadingList } from "@/components/reading/reading-list";
 import { MeditationSection } from "@/components/meditation/meditation-section";
+import DistractionSection from "@/components/distraction/distraction-section";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -281,11 +282,7 @@ export default function MindPage() {
 
           {/* Distraction Tab */}
           <TabsContent value="distraction" className="mt-6">
-            <div className="text-center py-12">
-              <Smartphone className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Social Media Tracking</h3>
-              <p className="text-gray-600">Coming soon - Monitor and reduce your social media usage</p>
-            </div>
+            <DistractionSection />
           </TabsContent>
         </Tabs>
       </div>

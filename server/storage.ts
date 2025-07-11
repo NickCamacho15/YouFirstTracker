@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import { 
   users, goals, microGoals, habits, habitLogs, readingSessions, readingList, meditationSessions, posts, visionBoard, tasks, rules,
   followers, postReactions, postComments, workouts, exercises, workoutExercises, bodyWeightLogs,
-  trainingTemplates, exerciseHistory,
+  trainingTemplates, exerciseHistory, screenTimeEntries,
   type User, type InsertUser, type Goal, type InsertGoal, type MicroGoal, type InsertMicroGoal,
   type Habit, type InsertHabit, type HabitLog, type InsertHabitLog,
   type ReadingSession, type InsertReadingSession, type ReadingListItem, type InsertReadingListItem,
@@ -16,7 +16,7 @@ import {
   type PostComment, type InsertPostComment, type Workout, type InsertWorkout,
   type Exercise, type InsertExercise, type WorkoutExercise, type InsertWorkoutExercise,
   type BodyWeightLog, type InsertBodyWeightLog, type TrainingTemplate, type InsertTrainingTemplate,
-  type ExerciseHistoryItem, type InsertExerciseHistory
+  type ExerciseHistoryItem, type InsertExerciseHistory, type ScreenTimeEntry, type InsertScreenTimeEntry
 } from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -151,6 +151,15 @@ export interface IStorage {
   getExerciseHistoryByUserId(userId: number): Promise<ExerciseHistoryItem[]>;
   addExerciseToHistory(exercise: InsertExerciseHistory): Promise<ExerciseHistoryItem>;
   searchExerciseHistory(userId: number, searchTerm: string): Promise<ExerciseHistoryItem[]>;
+
+  // Screen Time
+  getScreenTimeEntriesByUserId(userId: number): Promise<ScreenTimeEntry[]>;
+  createScreenTimeEntry(entry: InsertScreenTimeEntry): Promise<ScreenTimeEntry>;
+  getScreenTimeStats(userId: number): Promise<{
+    totalTime: number;
+    avgDaily: number;
+    platforms: { platform: string; totalTime: number; percentage: number; }[];
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -831,6 +840,51 @@ export class DatabaseStorage implements IStorage {
       .returning();
 
     return { success: true, rule: updatedRule[0] };
+  }
+
+  // Screen Time
+  async getScreenTimeEntriesByUserId(userId: number): Promise<ScreenTimeEntry[]> {
+    return await db.select().from(screenTimeEntries)
+      .where(eq(screenTimeEntries.userId, userId))
+      .orderBy(desc(screenTimeEntries.date));
+  }
+
+  async createScreenTimeEntry(entry: InsertScreenTimeEntry): Promise<ScreenTimeEntry> {
+    const result = await db.insert(screenTimeEntries).values(entry).returning();
+    return result[0];
+  }
+
+  async getScreenTimeStats(userId: number): Promise<{
+    totalTime: number;
+    avgDaily: number;
+    platforms: { platform: string; totalTime: number; percentage: number; }[];
+  }> {
+    // Get entries from the last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const entries = await db.select().from(screenTimeEntries)
+      .where(and(
+        eq(screenTimeEntries.userId, userId),
+        sql`${screenTimeEntries.date} >= ${sevenDaysAgo.toISOString().split('T')[0]}`
+      ));
+
+    const totalTime = entries.reduce((sum, entry) => sum + entry.timeMinutes, 0);
+    const avgDaily = totalTime > 0 ? Math.round(totalTime / 7) : 0;
+
+    // Calculate platform stats
+    const platformMap = new Map<string, number>();
+    entries.forEach(entry => {
+      platformMap.set(entry.platform, (platformMap.get(entry.platform) || 0) + entry.timeMinutes);
+    });
+
+    const platforms = Array.from(platformMap.entries()).map(([platform, time]) => ({
+      platform,
+      totalTime: time,
+      percentage: totalTime > 0 ? (time / totalTime) * 100 : 0
+    }));
+
+    return { totalTime, avgDaily, platforms };
   }
 }
 

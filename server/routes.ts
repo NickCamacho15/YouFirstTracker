@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
-import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertReadingListSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema } from "@shared/schema";
+import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertReadingListSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema, insertScreenTimeEntrySchema } from "@shared/schema";
 import { generateWorkoutProgram } from "./ai";
 import { z } from "zod";
 
@@ -983,6 +983,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Add exercise to history error:", error);
       res.status(500).json({ message: "Failed to add exercise to history" });
+    }
+  });
+
+  // Screen time routes
+  app.get("/api/screen-time/stats", requireAuth, async (req, res) => {
+    try {
+      const stats = await storage.getScreenTimeStats(req.session.userId);
+      res.json(stats);
+    } catch (error) {
+      console.error("Get screen time stats error:", error);
+      res.status(500).json({ message: "Failed to get screen time stats" });
+    }
+  });
+
+  app.get("/api/screen-time/entries", requireAuth, async (req, res) => {
+    try {
+      const entries = await storage.getScreenTimeEntriesByUserId(req.session.userId);
+      res.json(entries);
+    } catch (error) {
+      console.error("Get screen time entries error:", error);
+      res.status(500).json({ message: "Failed to get screen time entries" });
+    }
+  });
+
+  app.post("/api/screen-time/entries", requireAuth, async (req, res) => {
+    try {
+      const entryData = insertScreenTimeEntrySchema.parse({
+        ...req.body,
+        userId: req.session.userId
+      });
+      
+      const entry = await storage.createScreenTimeEntry(entryData);
+      res.json(entry);
+    } catch (error) {
+      console.error("Create screen time entry error:", error);
+      res.status(400).json({ message: "Failed to create screen time entry" });
     }
   });
 

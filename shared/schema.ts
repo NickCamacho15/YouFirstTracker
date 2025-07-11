@@ -219,6 +219,16 @@ export const exercises = pgTable("exercises", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Screen time tracking for distraction monitoring
+export const screenTimeEntries = pgTable("screen_time_entries", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  platform: text("platform").notNull(), // Instagram, TikTok, Snapchat, X
+  timeMinutes: integer("time_minutes").notNull(),
+  date: date("date").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Fitness Profile for workout program generation
 export const fitnessProfiles = pgTable("fitness_profiles", {
   id: serial("id").primaryKey(),
@@ -644,3 +654,8 @@ export type TrainingTemplate = typeof trainingTemplates.$inferSelect;
 export type InsertTrainingTemplate = z.infer<typeof insertTrainingTemplateSchema>;
 export type ExerciseHistoryItem = typeof exerciseHistory.$inferSelect;
 export type InsertExerciseHistory = z.infer<typeof insertExerciseHistorySchema>;
+
+// Screen time schemas
+export const insertScreenTimeEntrySchema = createInsertSchema(screenTimeEntries);
+export type ScreenTimeEntry = typeof screenTimeEntries.$inferSelect;
+export type InsertScreenTimeEntry = z.infer<typeof insertScreenTimeEntrySchema>;
