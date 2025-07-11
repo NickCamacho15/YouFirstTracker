@@ -134,8 +134,9 @@ Build scripts include:
   - **IMPROVED**: Personal records now show actual weight values with percentage calculations
   - **ADDED**: Add/Remove workout functionality in profile editor with Plus button and trash icon
   - **SIMPLIFIED**: Body composition now only tracks weight and body fat (removed muscle mass)
-  - **REMOVED**: Progress Analytics component (temporarily removed per user request)
-  - **REORGANIZED**: 4-week elite training program moved to very top of workout section
+  - **REMOVED**: Old progress analytics (Progress Summary, Weekly Volume, Training Focus donut chart)
+  - **RESTORED**: New ProgressAnalytics component with time-based toggles and exercise tracking lines
+  - **REORGANIZED**: 4-week elite training program positioned after new progress analytics
   - Profile editing provides quick access to percentage-based workout planning for technical maximum capacity
 - July 11, 2025: Distraction Section Complete Redesign with Day Tabs and Opportunity Cost Tracking
   - **NEW**: Top stats cards showing Total Time, Daily Average, and Top App usage
