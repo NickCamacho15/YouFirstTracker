@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Edit3, Save, X, Calculator, Target, Zap, Trophy } from "lucide-react";
+import { Edit3, Save, X, Calculator, Target, Zap, Trophy, Plus, Trash2 } from "lucide-react";
 
 interface PersonalRecord {
   exercise: string;
@@ -17,7 +17,6 @@ interface PersonalRecord {
 interface BodyMetrics {
   weight: number;
   bodyFat: number;
-  muscleMass: number;
 }
 
 interface ProfileEditorProps {
@@ -43,7 +42,6 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
     initialData?.bodyMetrics || {
       weight: 185,
       bodyFat: 12.5,
-      muscleMass: 162,
     }
   );
 
@@ -68,6 +66,15 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
     } else {
       newRecords[index][field as keyof PersonalRecord] = value as never;
     }
+    setPersonalRecords(newRecords);
+  };
+
+  const addNewRecord = () => {
+    setPersonalRecords([...personalRecords, { exercise: "", weight: 0, percentages: {} }]);
+  };
+
+  const removeRecord = (index: number) => {
+    const newRecords = personalRecords.filter((_, i) => i !== index);
     setPersonalRecords(newRecords);
   };
 
@@ -132,9 +139,19 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
         <TabsContent value="records" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm flex items-center">
-                <Target className="h-4 w-4 mr-2 text-blue-600" />
-                1 Rep Max Records
+              <CardTitle className="text-sm flex items-center justify-between">
+                <div className="flex items-center">
+                  <Target className="h-4 w-4 mr-2 text-blue-600" />
+                  1 Rep Max Records
+                </div>
+                <Button
+                  size="sm"
+                  onClick={addNewRecord}
+                  className="bg-blue-600 hover:bg-blue-700 flex items-center space-x-1"
+                >
+                  <Plus className="h-3 w-3" />
+                  <span>Add</span>
+                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -151,6 +168,7 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
                           value={record.exercise}
                           onChange={(e) => handleRecordChange(index, "exercise", e.target.value)}
                           className="mt-1"
+                          placeholder="Exercise name"
                         />
                       </div>
                       <div className="w-20">
@@ -163,18 +181,29 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
                           value={record.weight}
                           onChange={(e) => handleRecordChange(index, "weight", e.target.value)}
                           className="mt-1"
+                          placeholder="0"
                         />
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => togglePercentages(record.exercise)}
-                      className="flex items-center space-x-1"
-                    >
-                      <Calculator className="h-4 w-4" />
-                      <span>%</span>
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => togglePercentages(record.exercise)}
+                        className="flex items-center space-x-1"
+                      >
+                        <Calculator className="h-4 w-4" />
+                        <span>%</span>
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => removeRecord(index)}
+                        className="flex items-center space-x-1"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Percentage Calculator */}
@@ -208,7 +237,7 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="weight" className="text-sm font-medium">
                     Weight (lbs)
@@ -232,19 +261,6 @@ export default function ProfileEditor({ onSave, onCancel, initialData }: Profile
                     step="0.1"
                     value={bodyMetrics.bodyFat}
                     onChange={(e) => handleBodyMetricChange("bodyFat", e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="muscleMass" className="text-sm font-medium">
-                    Muscle Mass (lbs)
-                  </Label>
-                  <Input
-                    id="muscleMass"
-                    type="number"
-                    step="0.1"
-                    value={bodyMetrics.muscleMass}
-                    onChange={(e) => handleBodyMetricChange("muscleMass", e.target.value)}
                     className="mt-1"
                   />
                 </div>

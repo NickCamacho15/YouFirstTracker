@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronDown, Activity, Trophy, Play, User, Dumbbell, TrendingUp, Target, Zap, Timer, Edit3, Calculator } from "lucide-react";
 import WorkoutLogger from "@/components/workout/workout-logger";
 import ProfileEditor from "@/components/profile/profile-editor";
+import ProgressAnalytics from "@/components/analytics/progress-analytics";
 
 export default function HealthPage() {
   const [expandedWeeks, setExpandedWeeks] = useState<Set<number>>(new Set());
@@ -22,7 +23,6 @@ export default function HealthPage() {
   const [bodyMetrics, setBodyMetrics] = useState({
     weight: 185,
     bodyFat: 12.5,
-    muscleMass: 162,
   });
   const [showPercentages, setShowPercentages] = useState<{ [key: string]: boolean }>({});
 
@@ -332,7 +332,7 @@ export default function HealthPage() {
                     Body Metrics
                   </h3>
                   
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     <div className="text-center">
                       <div className="text-xs text-gray-600">Weight</div>
                       <div className="text-sm font-bold text-gray-900">{bodyMetrics.weight} lbs</div>
@@ -340,10 +340,6 @@ export default function HealthPage() {
                     <div className="text-center">
                       <div className="text-xs text-gray-600">Body Fat</div>
                       <div className="text-sm font-bold text-gray-900">{bodyMetrics.bodyFat}%</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-600">Muscle Mass</div>
-                      <div className="text-sm font-bold text-gray-900">{bodyMetrics.muscleMass} lbs</div>
                     </div>
                   </div>
                 </div>
@@ -353,6 +349,10 @@ export default function HealthPage() {
 
           {/* Workout Tab Content */}
           <TabsContent value="workout" className="mt-3 space-y-2">
+            {/* Progress Analytics */}
+            <ProgressAnalytics />
+            
+            {/* Workout Program */}
           {/* Program Overview */}
           <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
             <h3 className="text-sm font-semibold text-gray-900 mb-1 flex items-center">

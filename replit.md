@@ -132,6 +132,11 @@ Build scripts include:
   - **ENHANCED**: Toggle between view and edit modes with save/cancel functionality
   - **FIXED**: Database table structure - added missing 'date' column to workout_entries table
   - **IMPROVED**: Personal records now show actual weight values with percentage calculations
+  - **ADDED**: Add/Remove workout functionality in profile editor with Plus button and trash icon
+  - **SIMPLIFIED**: Body composition now only tracks weight and body fat (removed muscle mass)
+  - **NEW**: Progress Analytics component with time-based toggles (1 month, 6 months, 1 year)
+  - **CHARTS**: Added dedicated exercise tracking lines for bench press, squat, clean, and overhead press
+  - **FIXED**: Chart x-axis properly spaced without overlapping labels, fills container size
   - Profile editing provides quick access to percentage-based workout planning for technical maximum capacity
 - July 11, 2025: Distraction Section Complete Redesign with Day Tabs and Opportunity Cost Tracking
   - **NEW**: Top stats cards showing Total Time, Daily Average, and Top App usage
