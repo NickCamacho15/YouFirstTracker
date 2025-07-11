@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, Smartphone, TrendingUp, Calendar, Instagram, Twitter, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
+import { Clock, Smartphone, TrendingUp, Calendar, Instagram, Twitter, ChevronLeft, ChevronRight, AlertCircle, X, DollarSign, Users, Briefcase } from "lucide-react";
 import { SiTiktok, SiSnapchat } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -34,6 +34,10 @@ export default function DistractionSection() {
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [dayData, setDayData] = useState<DayData>({});
   const [activeDay, setActiveDay] = useState("");
+  const [hiddenPlatforms, setHiddenPlatforms] = useState<string[]>(() => {
+    const saved = localStorage.getItem('hiddenPlatforms');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -41,6 +45,11 @@ export default function DistractionSection() {
   // Load screen time entries
   const { data: entries = [] } = useQuery({
     queryKey: ["/api/screen-time/entries"],
+  });
+
+  // Load screen time stats
+  const { data: stats } = useQuery({
+    queryKey: ["/api/screen-time/stats"],
   });
 
   // Get week days
@@ -138,19 +147,32 @@ export default function DistractionSection() {
     
     newData[date][platform][field] = value;
     setDayData(newData);
+  };
 
-    // Auto-save when value changes
-    const hours = parseInt(field === 'hours' ? value : newData[date][platform].hours) || 0;
-    const minutes = parseInt(field === 'minutes' ? value : newData[date][platform].minutes) || 0;
+  const handleBlur = (date: string, platform: string) => {
+    const timeData = dayData[date]?.[platform];
+    if (!timeData) return;
+
+    const hours = parseInt(timeData.hours) || 0;
+    const minutes = parseInt(timeData.minutes) || 0;
     const totalMinutes = hours * 60 + minutes;
 
-    if (totalMinutes > 0) {
+    if (totalMinutes >= 0) {
       saveEntryMutation.mutate({
         platform,
         timeMinutes: totalMinutes,
         date
       });
     }
+  };
+
+  const togglePlatform = (platformName: string) => {
+    const newHidden = hiddenPlatforms.includes(platformName)
+      ? hiddenPlatforms.filter(p => p !== platformName)
+      : [...hiddenPlatforms, platformName];
+    
+    setHiddenPlatforms(newHidden);
+    localStorage.setItem('hiddenPlatforms', JSON.stringify(newHidden));
   };
 
   const formatTime = (minutes: number) => {
@@ -176,8 +198,55 @@ export default function DistractionSection() {
     return "bg-red-100 border-red-300";
   };
 
+  // Calculate total time wasted
+  const totalMinutes = (entries as ScreenTimeEntry[]).reduce((sum, e) => sum + e.timeMinutes, 0);
+  const totalHours = totalMinutes / 60;
+  const workWeeks = Math.floor(totalHours / 40);
+  const workDays = Math.floor((totalHours % 40) / 8);
+
   return (
     <div className="space-y-6">
+      {/* Stats Overview */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <Card className="shadow-md">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-blue-600" />
+              <div>
+                <p className="text-sm text-gray-600">Total Time</p>
+                <p className="text-xl font-bold">{formatTime(stats?.totalTime || 0)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="shadow-md">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-green-600" />
+              <div>
+                <p className="text-sm text-gray-600">Daily Average</p>
+                <p className="text-xl font-bold">{formatTime(stats?.avgDaily || 0)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="shadow-md">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <Smartphone className="w-5 h-5 text-purple-600" />
+              <div>
+                <p className="text-sm text-gray-600">Top App</p>
+                <p className="text-xl font-bold">
+                  {stats?.platforms?.[0]?.platform || 'None'}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Week Navigation */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -245,7 +314,7 @@ export default function DistractionSection() {
           return (
             <TabsContent key={dateStr} value={dateStr} className="mt-6">
               <div className="space-y-4">
-                {platforms.map((platform) => {
+                {platforms.filter(p => !hiddenPlatforms.includes(p.name)).map((platform) => {
                   const Icon = platform.icon;
                   const timeData = dayData[dateStr]?.[platform.name] || { hours: '', minutes: '' };
                   
@@ -254,45 +323,71 @@ export default function DistractionSection() {
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${platform.color} flex items-center justify-center`}>
-                              <Icon className="w-6 h-6 text-white" />
+                            <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${platform.color} flex items-center justify-center`}>
+                              <Icon className="w-5 h-5 text-white" />
                             </div>
-                            <h4 className="font-semibold text-lg text-gray-900">{platform.name}</h4>
+                            <h4 className="font-semibold text-base text-gray-900">{platform.name}</h4>
                           </div>
                           
                           <div className="flex items-center gap-2">
                             <div>
-                              <Label htmlFor={`${platform.name}-hours`} className="text-xs text-gray-600">Hours</Label>
+                              <Label htmlFor={`${platform.name}-hours`} className="text-xs text-gray-600">Hr</Label>
                               <Input
                                 id={`${platform.name}-hours`}
                                 type="number"
                                 value={timeData.hours}
                                 onChange={(e) => handleTimeChange(dateStr, platform.name, 'hours', e.target.value)}
-                                className="w-16 h-8 text-center"
+                                onBlur={() => handleBlur(dateStr, platform.name)}
+                                className="w-14 h-8 text-center text-sm"
                                 min="0"
                                 max="24"
                                 placeholder="0"
                               />
                             </div>
                             <div>
-                              <Label htmlFor={`${platform.name}-minutes`} className="text-xs text-gray-600">Minutes</Label>
+                              <Label htmlFor={`${platform.name}-minutes`} className="text-xs text-gray-600">Min</Label>
                               <Input
                                 id={`${platform.name}-minutes`}
                                 type="number"
                                 value={timeData.minutes}
                                 onChange={(e) => handleTimeChange(dateStr, platform.name, 'minutes', e.target.value)}
-                                className="w-16 h-8 text-center"
+                                onBlur={() => handleBlur(dateStr, platform.name)}
+                                className="w-14 h-8 text-center text-sm"
                                 min="0"
                                 max="59"
                                 placeholder="0"
                               />
                             </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 ml-2"
+                              onClick={() => togglePlatform(platform.name)}
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
                       </CardContent>
                     </Card>
                   );
                 })}
+                
+                {hiddenPlatforms.length > 0 && (
+                  <div className="text-center text-sm text-gray-500">
+                    Hidden apps: {hiddenPlatforms.join(', ')} 
+                    <Button 
+                      variant="link" 
+                      className="ml-2 p-0 h-auto text-blue-600"
+                      onClick={() => {
+                        setHiddenPlatforms([]);
+                        localStorage.removeItem('hiddenPlatforms');
+                      }}
+                    >
+                      Show all
+                    </Button>
+                  </div>
+                )}
               </div>
             </TabsContent>
           );
@@ -304,7 +399,7 @@ export default function DistractionSection() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-red-500" />
-            Social Media Time Wasted This Month
+            Social Media Time This Month
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -372,12 +467,81 @@ export default function DistractionSection() {
               return cells;
             })()}
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex items-center gap-2 text-red-700">
-              <AlertCircle className="w-4 h-4" />
-              <p className="text-sm font-medium">
-                Total time wasted this month: {formatTime((entries as ScreenTimeEntry[]).reduce((sum, e) => sum + e.timeMinutes, 0))}
+      {/* Opportunity Cost Table */}
+      <Card className="shadow-lg border-red-200 bg-red-50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-red-700">
+            <AlertCircle className="w-5 h-5" />
+            The True Cost of Your Digital Distraction
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Work Time Lost */}
+            <div className="p-3 bg-white rounded-lg border border-red-200">
+              <div className="flex items-center gap-2 mb-2">
+                <Briefcase className="w-4 h-4 text-red-600" />
+                <h4 className="font-semibold text-sm">Work Time Lost</h4>
+              </div>
+              <p className="text-lg">
+                {workWeeks > 0 && (
+                  <span className="font-bold text-red-700">{workWeeks} full work week{workWeeks > 1 ? 's' : ''}</span>
+                )}
+                {workWeeks > 0 && workDays > 0 && ' and '}
+                {workDays > 0 && (
+                  <span className="font-bold text-red-700">{workDays} work day{workDays > 1 ? 's' : ''}</span>
+                )}
+                {workWeeks === 0 && workDays === 0 && (
+                  <span className="text-gray-600">Less than a work day</span>
+                )}
+              </p>
+            </div>
+
+            {/* Money Lost */}
+            <div className="p-3 bg-white rounded-lg border border-red-200">
+              <div className="flex items-center gap-2 mb-2">
+                <DollarSign className="w-4 h-4 text-red-600" />
+                <h4 className="font-semibold text-sm">Income Opportunity Lost</h4>
+              </div>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-xs text-gray-600">$20/hour</p>
+                  <p className="text-lg font-bold text-red-700">${Math.round(totalHours * 20).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-600">$50/hour</p>
+                  <p className="text-lg font-bold text-red-700">${Math.round(totalHours * 50).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-600">$100/hour</p>
+                  <p className="text-lg font-bold text-red-700">${Math.round(totalHours * 100).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Time with Friends/Family Lost */}
+            <div className="p-3 bg-white rounded-lg border border-red-200">
+              <div className="flex items-center gap-2 mb-2">
+                <Users className="w-4 h-4 text-red-600" />
+                <h4 className="font-semibold text-sm">Quality Time Lost</h4>
+              </div>
+              <p className="text-sm">
+                Instead of scrolling, you could have had:
+              </p>
+              <ul className="mt-2 space-y-1 text-sm">
+                <li>• <span className="font-semibold">{Math.floor(totalHours / 2)}</span> meaningful conversations</li>
+                <li>• <span className="font-semibold">{Math.floor(totalHours / 3)}</span> family dinners</li>
+                <li>• <span className="font-semibold">{Math.floor(totalHours / 1.5)}</span> workout sessions</li>
+                <li>• <span className="font-semibold">{Math.floor(totalHours / 8)}</span> full nights of sleep</li>
+              </ul>
+            </div>
+
+            <div className="text-center pt-4">
+              <p className="text-sm font-medium text-red-700">
+                Total time on social media: <span className="text-lg font-bold">{formatTime(totalMinutes)}</span>
               </p>
             </div>
           </div>

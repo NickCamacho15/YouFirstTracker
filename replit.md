@@ -123,6 +123,21 @@ Build scripts include:
 
 ## Changelog
 
+- July 11, 2025: Distraction Section Complete Redesign with Day Tabs and Opportunity Cost Tracking
+  - **NEW**: Top stats cards showing Total Time, Daily Average, and Top App usage
+  - **REDESIGNED**: Day-based tabs (Sunday through Saturday) matching body/todo page style
+  - **ENHANCED**: Direct hour/minute input fields on each platform tile for easy time entry
+  - **OPTIONAL**: X button on each platform tile to hide unused apps (e.g., remove TikTok)
+  - **PERSISTENT**: Hidden platforms saved to localStorage and can be restored with "Show all" link
+  - **AUTO-SAVE**: Time entries save automatically when input fields lose focus (onBlur)
+  - **CALENDAR**: Monthly view with color-coded daily totals (green <1hr, yellow 1-2hrs, orange 2-3hrs, red 3hrs+)
+  - **OPPORTUNITY COST**: Comprehensive conversion table showing:
+    - Work weeks and days lost (based on 40-hour weeks)
+    - Income opportunity lost at $20, $50, and $100/hour rates
+    - Quality time lost (conversations, family dinners, workouts, sleep)
+  - **COMPACT**: Smaller input fields (w-14) and labels to ensure all text fits within tiles
+  - **VISUAL**: Red-themed opportunity cost section emphasizes the true cost of digital distraction
+  - Distraction tracking now provides powerful visualization of time wasted and its real-world impact
 - July 11, 2025: Body Analytics Redesigned with Clean Line Graphs and Training Focus Donut Chart
   - **WEEKLY VOLUME**: Clean line graph without dots showing week-by-week weight progression
   - **TRAINING FOCUS**: Donut chart visualization showing workout type distribution (Strength 60%, Cardio 25%, Functional 15%)
