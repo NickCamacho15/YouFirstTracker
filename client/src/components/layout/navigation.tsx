@@ -67,7 +67,7 @@ export function Navigation() {
                   : "text-gray-500 hover:text-gray-700"
               }`}>
                 <Repeat className="w-6 h-6 mb-1" />
-                <span className="text-xs font-medium">Habits</span>
+                <span className="text-xs font-medium">Foundations</span>
               </div>
             </Link>
 

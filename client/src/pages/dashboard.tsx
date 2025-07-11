@@ -201,6 +201,59 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Today's Tasks - Moved to Top */}
+        <Card className="border-0 shadow-lg mb-6">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                <CardTitle className="text-base sm:text-lg">Today's Tasks</CardTitle>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50"
+                onClick={() => {/* Add task */}}
+              >
+                <Plus className="w-3 h-3" />
+              </Button>
+            </div>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">
+              {dayNames[selectedDay]}'s priorities
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {currentDayTasks.map((task) => {
+                const goal = getGoalById(task.goalId);
+                return (
+                  <div 
+                    key={task.id}
+                    className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
+                      task.completed ? 'bg-blue-50 border-blue-200' : 'border-gray-200 hover:bg-blue-50'
+                    }`}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={task.completed}
+                      onChange={() => handleWeeklyTaskToggle(task.id)}
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded cursor-pointer"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <span className={`text-xs sm:text-sm ${task.completed ? 'text-blue-800 font-medium' : 'text-gray-700'}`}>
+                        {task.text}
+                      </span>
+                      {task.time && (
+                        <p className="text-xs text-gray-500 mt-1">{task.time}</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Weekly Time Metrics - 2x2 Grid */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           {/* Reading Time */}
@@ -297,221 +350,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Three-Column Layout: Morning Routine, Today's Tasks, Evening Routine */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
-          {/* Morning Routine */}
-          <Card className="border-0 shadow-lg relative">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Coffee className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
-                  <CardTitle className="text-base sm:text-lg">Morning Routine</CardTitle>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 text-amber-600 hover:bg-amber-50"
-                  onClick={() => {/* Add morning routine item */}}
-                >
-                  <Plus className="w-3 h-3" />
-                </Button>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                Start your day with purpose
-              </p>
-              
-              {/* Discipline Metrics Bar */}
-              <div className="bg-amber-50 rounded-lg p-3 mt-3 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs font-medium text-amber-800">Today's Progress</span>
-                  <span className="text-xs font-bold text-amber-800">{morningCompletionRate}%</span>
-                </div>
-                <div className="w-full bg-amber-200 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${morningCompletionRate}%` }}
-                  ></div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="text-center">
-                    <div className="font-bold text-green-600">{morningRoutines.filter(r => r.streak >= r.weeklyTarget).length}</div>
-                    <div className="text-gray-600">On Track</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-bold text-blue-600">{Math.round(morningRoutines.reduce((acc, r) => acc + r.streak, 0) / morningRoutines.length)}</div>
-                    <div className="text-gray-600">Avg Streak</div>
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-2">
-                {morningRoutines.map((routine) => (
-                  <div 
-                    key={routine.id}
-                    className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
-                      routine.completed ? 'bg-amber-50 border-amber-200' : 'border-gray-200 hover:bg-amber-50'
-                    }`}
-                  >
-                    <input 
-                      type="checkbox" 
-                      checked={routine.completed}
-                      onChange={() => handleMorningRoutineToggle(routine.id)}
-                      className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 rounded cursor-pointer"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <span className={`text-xs sm:text-sm ${routine.completed ? 'text-amber-800 font-medium' : 'text-gray-700'}`}>
-                        {routine.text}
-                      </span>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${
-                          routine.streak >= routine.weeklyTarget 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-orange-100 text-orange-700'
-                        }`}>
-                          {routine.streak} day streak
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Today's Tasks */}
-          <Card className="border-0 shadow-lg relative">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-                  <CardTitle className="text-base sm:text-lg">Today's Tasks</CardTitle>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50"
-                  onClick={() => {/* Add task */}}
-                >
-                  <Plus className="w-3 h-3" />
-                </Button>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                {dayNames[selectedDay]}'s priorities
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {currentDayTasks.map((task) => {
-                  const goal = getGoalById(task.goalId);
-                  return (
-                    <div 
-                      key={task.id}
-                      className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
-                        task.completed ? 'bg-blue-50 border-blue-200' : 'border-gray-200 hover:bg-blue-50'
-                      }`}
-                    >
-                      <input 
-                        type="checkbox" 
-                        checked={task.completed}
-                        onChange={() => handleWeeklyTaskToggle(task.id)}
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded cursor-pointer"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <span className={`text-xs sm:text-sm ${task.completed ? 'text-blue-800 font-medium' : 'text-gray-700'}`}>
-                          {task.text}
-                        </span>
-                        {task.time && (
-                          <p className="text-xs text-gray-500 mt-1">{task.time}</p>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Evening Routine */}
-          <Card className="border-0 shadow-lg relative">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
-                  <CardTitle className="text-base sm:text-lg">Evening Routine</CardTitle>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 text-indigo-600 hover:bg-indigo-50"
-                  onClick={() => {/* Add evening routine item */}}
-                >
-                  <Plus className="w-3 h-3" />
-                </Button>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                End your day with reflection
-              </p>
-              
-              {/* Discipline Metrics Bar */}
-              <div className="bg-indigo-50 rounded-lg p-3 mt-3 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs font-medium text-indigo-800">Today's Progress</span>
-                  <span className="text-xs font-bold text-indigo-800">{eveningCompletionRate}%</span>
-                </div>
-                <div className="w-full bg-indigo-200 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${eveningCompletionRate}%` }}
-                  ></div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="text-center">
-                    <div className="font-bold text-green-600">{eveningRoutines.filter(r => r.streak >= r.weeklyTarget).length}</div>
-                    <div className="text-gray-600">On Track</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-bold text-purple-600">{Math.round(eveningRoutines.reduce((acc, r) => acc + r.streak, 0) / eveningRoutines.length)}</div>
-                    <div className="text-gray-600">Avg Streak</div>
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-2">
-                {eveningRoutines.map((routine) => (
-                  <div 
-                    key={routine.id}
-                    className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
-                      routine.completed ? 'bg-indigo-50 border-indigo-200' : 'border-gray-200 hover:bg-indigo-50'
-                    }`}
-                  >
-                    <input 
-                      type="checkbox" 
-                      checked={routine.completed}
-                      onChange={() => handleEveningRoutineToggle(routine.id)}
-                      className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 rounded cursor-pointer"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <span className={`text-xs sm:text-sm ${routine.completed ? 'text-indigo-800 font-medium' : 'text-gray-700'}`}>
-                        {routine.text}
-                      </span>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${
-                          routine.streak >= routine.weeklyTarget 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-orange-100 text-orange-700'
-                        }`}>
-                          {routine.streak} day streak
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
       </main>
 

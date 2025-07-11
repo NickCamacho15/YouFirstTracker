@@ -123,6 +123,14 @@ Build scripts include:
 
 ## Changelog
 
+- July 11, 2025: Navigation Restructured - Habits Renamed to Foundations with Rituals/Rules Tabs
+  - **RENAMED**: "Habits" in navigation changed to "Foundations" to reflect broader personal development focus
+  - **RESTRUCTURED**: Foundations page now has only 2 tabs: "Rituals" and "Rules" (removed "New Habits" and old "Foundations")
+  - **MOVED**: Morning and Evening Routine cards relocated from Dashboard to Rituals tab for better organization
+  - **RELOCATED**: To-do list moved to top of Dashboard for immediate task focus
+  - **SIMPLIFIED**: Dashboard now contains only To-do list, Time Metrics (2x2 grid), and Active Goals
+  - **ENHANCED**: 2x2 grid layout for time metrics with larger, more readable tiles
+  - Foundations page emphasizes daily rituals and personal rules for comprehensive life structure
 - July 11, 2025: Dashboard Progress Circles Redesigned with Weekly Time Metrics
   - **TRANSFORMED**: Progress circles replaced with weekly time tracking tiles for personal investments/distractions
   - **NEW**: Reading time tracking (12.5h weekly, with month/total aggregates)

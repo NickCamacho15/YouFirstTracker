@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Settings, CheckCircle2, Circle, Flame, Star, Zap, BarChart3, Shield, X, Layers, Trophy } from "lucide-react";
+import { Plus, Settings, CheckCircle2, Circle, Flame, Star, Zap, BarChart3, Shield, X, Layers, Trophy, Coffee, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -246,15 +246,11 @@ export default function HabitsPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
           </div>
         ) : (
-          <Tabs defaultValue="new-habits" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="new-habits" className="flex items-center gap-2">
+          <Tabs defaultValue="rituals" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsTrigger value="rituals" className="flex items-center gap-2">
                 <Star className="w-4 h-4" />
-                New Habits
-              </TabsTrigger>
-              <TabsTrigger value="foundations" className="flex items-center gap-2">
-                <Flame className="w-4 h-4" />
-                Foundations
+                Rituals
               </TabsTrigger>
               <TabsTrigger value="rules" className="flex items-center gap-2">
                 <Shield className="w-4 h-4" />
@@ -262,7 +258,177 @@ export default function HabitsPage() {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="new-habits" className="space-y-6">
+            <TabsContent value="rituals" className="space-y-6">
+              {/* Morning Routine */}
+              <Card className="border-0 shadow-lg relative">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Coffee className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
+                      <CardTitle className="text-base sm:text-lg">Morning Routine</CardTitle>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 text-amber-600 hover:bg-amber-50"
+                      onClick={() => {/* Add morning routine item */}}
+                    >
+                      <Plus className="w-3 h-3" />
+                    </Button>
+                  </div>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                    Start your day with purpose
+                  </p>
+                  
+                  {/* Discipline Metrics Bar */}
+                  <div className="bg-amber-50 rounded-lg p-3 mt-3 space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-medium text-amber-800">Today's Progress</span>
+                      <span className="text-xs font-bold text-amber-800">75%</span>
+                    </div>
+                    <div className="w-full bg-amber-200 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: '75%' }}
+                      ></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="text-center">
+                        <div className="font-bold text-green-600">3</div>
+                        <div className="text-gray-600">On Track</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-bold text-blue-600">12</div>
+                        <div className="text-gray-600">Avg Streak</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-2">
+                    {[
+                      { id: 'morning-1', text: 'Meditation (10 min)', completed: true, streak: 12 },
+                      { id: 'morning-2', text: 'Exercise', completed: false, streak: 8 },
+                      { id: 'morning-3', text: 'Healthy breakfast', completed: false, streak: 15 },
+                      { id: 'morning-4', text: 'Review daily priorities', completed: false, streak: 6 }
+                    ].map((routine) => (
+                      <div 
+                        key={routine.id}
+                        className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
+                          routine.completed ? 'bg-amber-50 border-amber-200' : 'border-gray-200 hover:bg-amber-50'
+                        }`}
+                      >
+                        <input 
+                          type="checkbox" 
+                          checked={routine.completed}
+                          onChange={() => {}}
+                          className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 rounded cursor-pointer"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <span className={`text-xs sm:text-sm ${routine.completed ? 'text-amber-800 font-medium' : 'text-gray-700'}`}>
+                            {routine.text}
+                          </span>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${
+                              routine.streak >= 7 
+                                ? 'bg-green-100 text-green-700' 
+                                : 'bg-orange-100 text-orange-700'
+                            }`}>
+                              {routine.streak} day streak
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Evening Routine */}
+              <Card className="border-0 shadow-lg relative">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+                      <CardTitle className="text-base sm:text-lg">Evening Routine</CardTitle>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 text-indigo-600 hover:bg-indigo-50"
+                      onClick={() => {/* Add evening routine item */}}
+                    >
+                      <Plus className="w-3 h-3" />
+                    </Button>
+                  </div>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                    End your day with reflection
+                  </p>
+                  
+                  {/* Discipline Metrics Bar */}
+                  <div className="bg-indigo-50 rounded-lg p-3 mt-3 space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-medium text-indigo-800">Today's Progress</span>
+                      <span className="text-xs font-bold text-indigo-800">50%</span>
+                    </div>
+                    <div className="w-full bg-indigo-200 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: '50%' }}
+                      ></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="text-center">
+                        <div className="font-bold text-green-600">2</div>
+                        <div className="text-gray-600">On Track</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-bold text-purple-600">10</div>
+                        <div className="text-gray-600">Avg Streak</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-2">
+                    {[
+                      { id: 'evening-1', text: 'Daily reflection', completed: false, streak: 9 },
+                      { id: 'evening-2', text: 'Reading (30 min)', completed: false, streak: 11 },
+                      { id: 'evening-3', text: 'Prepare tomorrow', completed: false, streak: 4 },
+                      { id: 'evening-4', text: 'Gratitude practice', completed: false, streak: 14 }
+                    ].map((routine) => (
+                      <div 
+                        key={routine.id}
+                        className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
+                          routine.completed ? 'bg-indigo-50 border-indigo-200' : 'border-gray-200 hover:bg-indigo-50'
+                        }`}
+                      >
+                        <input 
+                          type="checkbox" 
+                          checked={routine.completed}
+                          onChange={() => {}}
+                          className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 rounded cursor-pointer"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <span className={`text-xs sm:text-sm ${routine.completed ? 'text-indigo-800 font-medium' : 'text-gray-700'}`}>
+                            {routine.text}
+                          </span>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${
+                              routine.streak >= 7 
+                                ? 'bg-green-100 text-green-700' 
+                                : 'bg-orange-100 text-orange-700'
+                            }`}>
+                              {routine.streak} day streak
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Individual Habit Progress Bars */}
               <IndividualHabitProgress habits={habits as Habit[]} />
 
@@ -651,314 +817,6 @@ export default function HabitsPage() {
                 </Card>
               )}
 
-            </TabsContent>
-
-            <TabsContent value="formation" className="space-y-6">
-              {/* Fitness-Style Analytics Dashboard for New Habits */}
-              <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-black rounded-3xl p-8 text-white mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h1 className="text-3xl font-black mb-2">HABIT FORMATION</h1>
-                    <p className="text-gray-300">67-day transformation tracking</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-blue-400 text-sm font-bold tracking-wide">FORMATION RATE</div>
-                    <div className="text-5xl font-black text-white">
-                      {habits.length > 0 ? Math.round((habits.filter(h => h.streak >= 21).length / habits.length) * 100) : 0}
-                    </div>
-                    <div className="text-blue-400 text-sm">BUILDING</div>
-                  </div>
-                </div>
-                
-                {/* Key Metrics Row */}
-                <div className="grid grid-cols-4 gap-6">
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-                    <div className="text-green-400 text-2xl font-black">
-                      {habits.filter(h => h.streak >= 67).length}
-                    </div>
-                    <div className="text-gray-300 text-xs font-medium">MASTERED</div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-                    <div className="text-yellow-400 text-2xl font-black">
-                      {habits.filter(h => h.streak >= 21 && h.streak < 67).length}
-                    </div>
-                    <div className="text-gray-300 text-xs font-medium">FORMING</div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-                    <div className="text-orange-400 text-2xl font-black">
-                      {habits.filter(h => h.streak < 21).length}
-                    </div>
-                    <div className="text-gray-300 text-xs font-medium">STARTING</div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-                    <div className="text-purple-400 text-2xl font-black">
-                      {habits.length > 0 ? Math.round(habits.reduce((sum, h) => sum + h.streak, 0) / habits.length) : 0}
-                    </div>
-                    <div className="text-gray-300 text-xs font-medium">AVG DAYS</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Scientific Habit Formation Overview */}
-              {showFormationScience && (
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
-                          <BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-xl">67-Day Formation Science</CardTitle>
-                          <p className="text-sm text-muted-foreground">Research-backed habit formation with bonus day for .uoY</p>
-                        </div>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => setShowFormationScience(false)}
-                        className="text-indigo-600 hover:text-indigo-800"
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Stage 1: Initial Formation */}
-                    <div className="text-center">
-                      <div className="relative w-20 h-20 mx-auto mb-4">
-                        <svg className="w-20 h-20 transform -rotate-90">
-                          <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-blue-200 dark:text-blue-800" />
-                          <circle 
-                            cx="40" 
-                            cy="40" 
-                            r="32" 
-                            stroke="#3b82f6" 
-                            strokeWidth="6" 
-                            fill="none" 
-                            strokeDasharray={`${2 * Math.PI * 32}`}
-                            strokeDashoffset={`${2 * Math.PI * 32 * (1 - 0.3)}`}
-                            strokeLinecap="round"
-                            className="transition-all duration-700"
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-lg font-bold text-blue-600">1-18</span>
-                        </div>
-                      </div>
-                      <h3 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">Initial Formation</h3>
-                      <p className="text-sm text-muted-foreground">Building awareness and momentum. Focus on consistency over perfection.</p>
-                    </div>
-
-                    {/* Stage 2: Strengthening */}
-                    <div className="text-center">
-                      <div className="relative w-20 h-20 mx-auto mb-4">
-                        <svg className="w-20 h-20 transform -rotate-90">
-                          <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-orange-200 dark:text-orange-800" />
-                          <circle 
-                            cx="40" 
-                            cy="40" 
-                            r="32" 
-                            stroke="#f59e0b" 
-                            strokeWidth="6" 
-                            fill="none" 
-                            strokeDasharray={`${2 * Math.PI * 32}`}
-                            strokeDashoffset={`${2 * Math.PI * 32 * (1 - 0.6)}`}
-                            strokeLinecap="round"
-                            className="transition-all duration-700"
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-lg font-bold text-orange-600">19-45</span>
-                        </div>
-                      </div>
-                      <h3 className="font-semibold text-orange-700 dark:text-orange-300 mb-2">Strengthening</h3>
-                      <p className="text-sm text-muted-foreground">Neural pathway development. The habit becomes more automatic.</p>
-                    </div>
-
-                    {/* Stage 3: Automaticity */}
-                    <div className="text-center">
-                      <div className="relative w-20 h-20 mx-auto mb-4">
-                        <svg className="w-20 h-20 transform -rotate-90">
-                          <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="6" fill="none" className="text-emerald-200 dark:text-emerald-800" />
-                          <circle 
-                            cx="40" 
-                            cy="40" 
-                            r="32" 
-                            stroke="#10b981" 
-                            strokeWidth="6" 
-                            fill="none" 
-                            strokeDasharray={`${2 * Math.PI * 32}`}
-                            strokeDashoffset={`${2 * Math.PI * 32 * (1 - 0.9)}`}
-                            strokeLinecap="round"
-                            className="transition-all duration-700"
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-lg font-bold text-emerald-600">46-67</span>
-                        </div>
-                      </div>
-                      <h3 className="font-semibold text-emerald-700 dark:text-emerald-300 mb-2">Automaticity + .uoY</h3>
-                      <p className="text-sm text-muted-foreground">Habit becomes automatic. Day 67 is your bonus day for .uoY mastery!</p>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-6 p-4 bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-lg">
-                    <p className="text-sm text-center text-gray-700 dark:text-gray-300">
-                      <strong>Science-backed approach:</strong> Based on research from University College London and behavioral psychology studies. 
-                      Each stage represents critical neural pathway development for lasting habit formation.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-              )}
-
-              {/* Enhanced Habit Tiles with Clear Reminder/Routine/Reward */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                {(habits as Habit[]).map((habit) => {
-                  const colors = getCategoryColors(habit.category);
-                  const progressPercentage = Math.min((habit.streak / 67) * 100, 100);
-                  
-                  return (
-                    <Card key={habit.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-200">
-                      <CardContent className="p-6">
-                        {/* Header with Category and Progress */}
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                              habit.category === 'mind' ? 'bg-purple-500' : 
-                              habit.category === 'body' ? 'bg-orange-500' : 'bg-emerald-500'
-                            }`}>
-                              <span className="text-2xl">
-                                {habit.category === 'mind' ? '🧠' : habit.category === 'body' ? '💪' : '✨'}
-                              </span>
-                            </div>
-                            <div>
-                              <h3 className="text-xl font-bold text-gray-900">{habit.title}</h3>
-                              <p className="text-sm text-gray-600 capitalize">{habit.category} • {habit.streak}/67 days</p>
-                            </div>
-                          </div>
-                          
-                          {/* Large Progress Circle */}
-                          <div className="relative w-16 h-16">
-                            <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 100 100">
-                              <circle
-                                cx="50"
-                                cy="50"
-                                r="40"
-                                stroke="currentColor"
-                                strokeWidth="8"
-                                fill="transparent"
-                                className="text-gray-200"
-                              />
-                              <circle
-                                cx="50"
-                                cy="50"
-                                r="40"
-                                stroke="currentColor"
-                                strokeWidth="8"
-                                fill="transparent"
-                                strokeDasharray={`${2 * Math.PI * 40}`}
-                                strokeDashoffset={`${2 * Math.PI * 40 * (1 - progressPercentage / 100)}`}
-                                className={habit.category === 'mind' ? 'text-purple-500' : 
-                                          habit.category === 'body' ? 'text-orange-500' : 'text-emerald-500'}
-                                strokeLinecap="round"
-                              />
-                            </svg>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-lg font-bold text-gray-900">{habit.streak}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Reminder, Routine, Reward Framework */}
-                        <div className="space-y-4 mb-6">
-                          <div className="bg-blue-50 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                                <span className="text-white text-sm font-bold">R</span>
-                              </div>
-                              <h4 className="font-semibold text-blue-900">Reminder</h4>
-                            </div>
-                            <p className="text-sm text-blue-800">
-                              {habit.timeOfDay ? `${habit.timeOfDay}` : 'Set your reminder time'}
-                              {habit.description && ` • ${habit.description}`}
-                            </p>
-                          </div>
-                          
-                          <div className="bg-green-50 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                                <span className="text-white text-sm font-bold">R</span>
-                              </div>
-                              <h4 className="font-semibold text-green-900">Routine</h4>
-                            </div>
-                            <p className="text-sm text-green-800 font-medium">
-                              {habit.title}
-                            </p>
-                            <p className="text-xs text-green-700 mt-1">
-                              {habit.frequency || 'Daily practice'}
-                            </p>
-                          </div>
-                          
-                          <div className="bg-amber-50 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
-                                <span className="text-white text-sm font-bold">R</span>
-                              </div>
-                              <h4 className="font-semibold text-amber-900">Reward</h4>
-                            </div>
-                            <p className="text-sm text-amber-800">
-                              {habit.streak > 0 ? `${habit.streak} day streak!` : 'Build your first streak'}
-                              {habit.streak >= 7 && ' ⭐'}
-                              {habit.streak >= 30 && ' 🏆'}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Completion Button */}
-                        <div className="flex gap-3">
-                          <button
-                            onClick={() => handleToggleHabit(habit.id)}
-                            disabled={toggleHabitMutation.isPending}
-                            className={`flex-1 py-3 px-4 rounded-xl font-semibold text-center transition-colors duration-200 ${
-                              habit.completedToday
-                                ? `${habit.category === 'mind' ? 'bg-purple-500' : 
-                                     habit.category === 'body' ? 'bg-orange-500' : 'bg-emerald-500'
-                                   } text-white`
-                                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                            }`}
-                          >
-                            {habit.completedToday ? (
-                              <div className="flex items-center justify-center gap-2">
-                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                                Completed Today
-                              </div>
-                            ) : (
-                              'Mark Complete'
-                            )}
-                          </button>
-                          
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditHabit(habit)}
-                            className="px-4"
-                          >
-                            <Settings className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-
-              {/* Full Formation Tracker */}
-              <HabitFormationTracker habits={habits as Habit[]} />
             </TabsContent>
 
             <TabsContent value="foundations">
