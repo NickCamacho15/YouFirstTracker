@@ -3,12 +3,13 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { eq, desc, and, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { 
-  users, goals, microGoals, habits, habitLogs, readingSessions, readingList, posts, visionBoard, tasks, rules,
+  users, goals, microGoals, habits, habitLogs, readingSessions, readingList, meditationSessions, posts, visionBoard, tasks, rules,
   followers, postReactions, postComments, workouts, exercises, workoutExercises, bodyWeightLogs,
   trainingTemplates, exerciseHistory,
   type User, type InsertUser, type Goal, type InsertGoal, type MicroGoal, type InsertMicroGoal,
   type Habit, type InsertHabit, type HabitLog, type InsertHabitLog,
   type ReadingSession, type InsertReadingSession, type ReadingListItem, type InsertReadingListItem,
+  type MeditationSession, type InsertMeditationSession,
   type Post, type InsertPost,
   type VisionBoardItem, type InsertVisionBoardItem, type Task, type InsertTask, type Rule, type InsertRule,
   type Follower, type InsertFollower, type PostReaction, type InsertPostReaction,
@@ -68,6 +69,10 @@ export interface IStorage {
   createReadingListItem(item: InsertReadingListItem): Promise<ReadingListItem>;
   updateReadingListItem(id: number, updates: Partial<ReadingListItem>): Promise<ReadingListItem | undefined>;
   deleteReadingListItem(id: number): Promise<boolean>;
+
+  // Meditation Sessions
+  getMeditationSessionsByUserId(userId: number): Promise<MeditationSession[]>;
+  createMeditationSession(session: InsertMeditationSession): Promise<MeditationSession>;
 
   // Posts
   getRecentPosts(limit?: number): Promise<(Post & { user: Pick<User, 'displayName'> })[]>;
@@ -311,6 +316,16 @@ export class DatabaseStorage implements IStorage {
   async deleteReadingListItem(id: number): Promise<boolean> {
     const result = await db.delete(readingList).where(eq(readingList.id, id));
     return result.rowCount > 0;
+  }
+
+  // Meditation Sessions
+  async getMeditationSessionsByUserId(userId: number): Promise<MeditationSession[]> {
+    return await db.select().from(meditationSessions).where(eq(meditationSessions.userId, userId)).orderBy(desc(meditationSessions.createdAt));
+  }
+
+  async createMeditationSession(session: InsertMeditationSession): Promise<MeditationSession> {
+    const result = await db.insert(meditationSessions).values(session).returning();
+    return result[0];
   }
 
   // Posts

@@ -460,6 +460,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Meditation routes
+  app.get("/api/meditation/stats", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      const sessions = await storage.getMeditationSessionsByUserId(userId);
+      
+      // Calculate stats
+      const totalTime = sessions.reduce((sum, s) => sum + s.duration, 0);
+      const sessionsCount = sessions.length;
+      
+      // Calculate streak
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let streak = 0;
+      let currentDate = new Date(today);
+      
+      while (true) {
+        const dayHasSession = sessions.some(s => {
+          const sessionDate = new Date(s.createdAt);
+          sessionDate.setHours(0, 0, 0, 0);
+          return sessionDate.getTime() === currentDate.getTime();
+        });
+        
+        if (dayHasSession) {
+          streak++;
+          currentDate.setDate(currentDate.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+      
+      res.json({ sessions: sessionsCount, streak, totalTime });
+    } catch (error) {
+      console.error("Get meditation stats error:", error);
+      res.status(500).json({ message: "Failed to get meditation stats" });
+    }
+  });
+
+  app.get("/api/meditation/milestones", requireAuth, async (req, res) => {
+    try {
+      // For now, return empty array - milestones will be calculated on frontend
+      res.json([]);
+    } catch (error) {
+      console.error("Get meditation milestones error:", error);
+      res.status(500).json({ message: "Failed to get meditation milestones" });
+    }
+  });
+
+  app.post("/api/meditation/sessions", requireAuth, async (req, res) => {
+    try {
+      const meditationData = insertMeditationSessionSchema.parse({
+        ...req.body,
+        userId: req.session.userId
+      });
+      
+      const session = await storage.createMeditationSession(meditationData);
+      res.json(session);
+    } catch (error) {
+      console.error("Create meditation session error:", error);
+      res.status(400).json({ message: "Failed to create meditation session" });
+    }
+  });
+
   // Vision Board routes
   app.get("/api/vision-board", requireAuth, async (req, res) => {
     try {

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReadingTimer } from "@/components/reading/reading-timer";
 import { BookOpen, Clock, TrendingUp, Brain, Smartphone, History, Lightbulb, Plus, Trophy } from "lucide-react";
 import { ReadingList } from "@/components/reading/reading-list";
+import { MeditationSection } from "@/components/meditation/meditation-section";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -275,11 +276,7 @@ export default function MindPage() {
 
           {/* Meditation Tab */}
           <TabsContent value="meditation" className="mt-6">
-            <div className="text-center py-12">
-              <Brain className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Meditation Tracking</h3>
-              <p className="text-gray-600">Coming soon - Track your meditation sessions and mindfulness practice</p>
-            </div>
+            <MeditationSection />
           </TabsContent>
 
           {/* Distraction Tab */}
