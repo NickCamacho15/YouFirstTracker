@@ -1,0 +1,2642 @@
+import { useState, useMemo } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useToast } from "@/hooks/use-toast";
+import { Plus, Calendar, TrendingUp, Dumbbell, Weight, Trophy, Activity, Search, Target, BarChart3, Clock, Trash2, Play, ChevronDown } from "lucide-react";
+import TrainingProgramCreator from "@/components/health/training-program-creator";
+import TrainingAnalytics from "@/components/health/training-analytics";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { apiRequest } from "@/lib/queryClient";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
+// Common exercises database
+const COMMON_EXERCISES = [
+  // Strength - Lower Body
+  { name: "Back Squat", category: "strength" },
+  { name: "Front Squat", category: "strength" },
+  { name: "Goblet Squat", category: "strength" },
+  { name: "Bulgarian Split Squat", category: "strength" },
+  { name: "Front Foot Elevated Split Squat", category: "strength" },
+  { name: "Reverse Lunge", category: "strength" },
+  { name: "Walking Lunge", category: "strength" },
+  { name: "Romanian Deadlift", category: "strength" },
+  { name: "Conventional Deadlift", category: "strength" },
+  { name: "Sumo Deadlift", category: "strength" },
+  { name: "Single Leg Deadlift", category: "strength" },
+  { name: "Hip Thrust", category: "strength" },
+  { name: "Calf Raise", category: "strength" },
+  { name: "Leg Press", category: "strength" },
+  { name: "Leg Extension", category: "strength" },
+  { name: "Leg Curl", category: "strength" },
+
+  // Strength - Upper Body Push
+  { name: "Bench Press", category: "strength" },
+  { name: "Incline Bench Press", category: "strength" },
+  { name: "Decline Bench Press", category: "strength" },
+  { name: "Dumbbell Press", category: "strength" },
+  { name: "Overhead Press", category: "strength" },
+  { name: "Push Press", category: "strength" },
+  { name: "Dips", category: "strength" },
+  { name: "Push-ups", category: "strength" },
+  { name: "Pike Push-ups", category: "strength" },
+  { name: "Diamond Push-ups", category: "strength" },
+  { name: "Lateral Raise", category: "strength" },
+  { name: "Front Raise", category: "strength" },
+  { name: "Rear Delt Fly", category: "strength" },
+
+  // Strength - Upper Body Pull
+  { name: "Pull-ups", category: "strength" },
+  { name: "Chin-ups", category: "strength" },
+  { name: "Lat Pulldown", category: "strength" },
+  { name: "Bent Over Row", category: "strength" },
+  { name: "T-Bar Row", category: "strength" },
+  { name: "Seated Cable Row", category: "strength" },
+  { name: "Single Arm Row", category: "strength" },
+  { name: "Face Pull", category: "strength" },
+  { name: "Shrugs", category: "strength" },
+
+  // Strength - Arms
+  { name: "Bicep Curl", category: "strength" },
+  { name: "Hammer Curl", category: "strength" },
+  { name: "Preacher Curl", category: "strength" },
+  { name: "Tricep Dip", category: "strength" },
+  { name: "Tricep Extension", category: "strength" },
+  { name: "Close Grip Bench Press", category: "strength" },
+  { name: "Skull Crushers", category: "strength" },
+
+  // Strength - Core
+  { name: "Plank", category: "strength" },
+  { name: "Side Plank", category: "strength" },
+  { name: "Russian Twist", category: "strength" },
+  { name: "Mountain Climbers", category: "strength" },
+  { name: "Dead Bug", category: "strength" },
+  { name: "Bird Dog", category: "strength" },
+
+  // Cardio
+  { name: "Running", category: "cardio" },
+  { name: "Cycling", category: "cardio" },
+  { name: "Swimming", category: "cardio" },
+  { name: "Rowing", category: "cardio" },
+  { name: "Elliptical", category: "cardio" },
+  { name: "Stair Climber", category: "cardio" },
+  { name: "Jump Rope", category: "cardio" },
+  { name: "Burpees", category: "cardio" },
+
+  // Functional
+  { name: "Thrusters", category: "functional" },
+  { name: "Wall Balls", category: "functional" },
+  { name: "Box Jumps", category: "functional" },
+  { name: "Kettlebell Swings", category: "functional" },
+  { name: "Turkish Get-up", category: "functional" },
+  { name: "Farmers Walk", category: "functional" },
+  { name: "Bear Crawl", category: "functional" },
+  { name: "Battle Ropes", category: "functional" },
+];
+
+// Form schemas
+const createExerciseSchema = z.object({
+  name: z.string().min(1, "Exercise name is required"),
+  category: z.string().min(1, "Category is required"),
+  description: z.string().optional(),
+});
+
+const workoutLogSchema = z.object({
+  exerciseName: z.string().min(1, "Exercise name is required"),
+  category: z.string().min(1, "Please select a category"),
+  // Strength fields
+  weight: z.number().min(0, "Weight must be positive").optional(),
+  reps: z.number().min(0, "Reps must be positive").optional(),
+  sets: z.number().min(0, "Sets must be positive").optional(),
+  // Cardio fields
+  distance: z.string().optional(),
+  time: z.string().optional(),
+  pace: z.string().optional(),
+  heartRate: z.number().min(0, "Heart rate must be positive").optional(),
+  cardioType: z.string().optional(),
+  // Functional fields
+  workoutName: z.string().optional(),
+  timeDomain: z.string().optional(),
+  roundsCompleted: z.number().min(0, "Rounds must be positive").optional(),
+  repsPerRound: z.number().min(0, "Reps per round must be positive").optional(),
+  rpe: z.number().min(1).max(10).optional(),
+  functionalType: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+// Compact Exercise Chart Component for Grid Display
+function CompactExerciseChart({ 
+  exerciseName, 
+  sessions, 
+  workouts, 
+  chartMetric 
+}: { 
+  exerciseName: string;
+  sessions: any[];
+  workouts: any[];
+  chartMetric: "e1rm" | "volume";
+}) {
+  if (sessions.length < 1) return null;
+  
+  // Calculate e1RM and volume for each session
+  const progressData = sessions.map(s => {
+    const workout = workouts.find(w => w.date === s.date);
+    const exercise = workout?.workoutExercises?.find((we: any) => we.exercise?.name === exerciseName);
+    
+    const weight = parseFloat(exercise?.weight) || 0;
+    const reps = parseInt(exercise?.reps) || 0;
+    const sets = parseInt(exercise?.sets) || 1;
+    
+    // Calculate Estimated 1-Rep Max using Brzycki formula: weight × (36 / (37 - reps))
+    const e1RM = weight > 0 ? (reps > 1 ? weight * (36 / (37 - reps)) : weight) : reps;
+    const volume = weight > 0 ? weight * reps * sets : reps * sets;
+    
+    return {
+      date: s.date,
+      weight,
+      reps,
+      sets,
+      e1RM: Math.round(e1RM * 10) / 10, // Round to 1 decimal
+      volume
+    };
+  }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  
+  // Determine chart values based on selected metric
+  const values = chartMetric === "e1rm" 
+    ? progressData.map(d => d.e1RM)
+    : progressData.map(d => d.volume);
+  
+  const maxValue = Math.max(...values);
+  const minValue = Math.min(...values);
+  const range = maxValue - minValue;
+  const padding = Math.max(range * 0.1, chartMetric === "e1rm" ? 5 : 50);
+  const chartMin = Math.max(0, minValue - padding);
+  const chartMax = maxValue + padding;
+  const chartRange = chartMax - chartMin;
+  
+  // Generate unique colors for each exercise
+  const colors = [
+    { line: "#3b82f6", gradient: "#e0f2fe" }, // blue
+    { line: "#10b981", gradient: "#d1fae5" }, // green
+    { line: "#f59e0b", gradient: "#fef3c7" }, // yellow
+    { line: "#ef4444", gradient: "#fee2e2" }, // red
+    { line: "#8b5cf6", gradient: "#ede9fe" }, // purple
+    { line: "#06b6d4", gradient: "#cffafe" }, // cyan
+  ];
+  const colorIndex = exerciseName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+  const color = colors[colorIndex];
+  
+  return (
+    <div className="border rounded-lg p-4 bg-white">
+      <h4 className="text-sm font-semibold text-gray-900 mb-3">
+        {exerciseName} Progress
+      </h4>
+      
+      {/* Compact Chart Container */}
+      <div className="relative h-32 bg-gray-50 rounded p-2">
+        {/* Y-axis labels */}
+        <div className="absolute left-0 top-0 bottom-0 w-8 flex flex-col justify-between text-xs text-gray-600 py-1">
+          <span className="text-xs">{Math.round(chartMax)}</span>
+          <span className="text-xs">{Math.round(chartMin)}</span>
+        </div>
+        
+        {/* Chart area */}
+        <div className="ml-8 h-full relative">
+          {/* Grid lines */}
+          <div className="absolute inset-0">
+            {[0, 0.5, 1].map((ratio) => (
+              <div
+                key={ratio}
+                className="absolute w-full border-t border-gray-200"
+                style={{ top: `${ratio * 100}%` }}
+              />
+            ))}
+          </div>
+          
+          {/* Progress line */}
+          <svg className="absolute inset-0 w-full h-full">
+            <defs>
+              <linearGradient id={`gradient-${exerciseName}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor={color.gradient} stopOpacity="0.8" />
+                <stop offset="100%" stopColor={color.gradient} stopOpacity="0.3" />
+              </linearGradient>
+            </defs>
+            
+
+            
+            {/* Progress line */}
+            <polyline
+              points={values.map((value, index) => {
+                const x = (index / (values.length - 1)) * 100;
+                const y = 100 - ((value - chartMin) / chartRange) * 100;
+                return `${x},${y}`;
+              }).join(' ')}
+              fill="none"
+              stroke={color.line}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            
+            {/* Data points */}
+            {values.map((value, index) => {
+              const x = (index / (values.length - 1)) * 100;
+              const y = 100 - ((value - chartMin) / chartRange) * 100;
+              const data = progressData[index];
+              return (
+                <g key={index}>
+                  <circle
+                    cx={`${x}%`}
+                    cy={`${y}%`}
+                    r="2"
+                    fill={color.line}
+                    stroke="white"
+                    strokeWidth="1"
+                  />
+                  <title>
+                    {`${new Date(data.date).toLocaleDateString()}: ${
+                      chartMetric === "e1rm" 
+                        ? (data.weight > 0 ? `${data.e1RM} lbs e1RM` : `${data.e1RM} reps/set`)
+                        : (data.weight > 0 ? `${data.volume} lbs volume` : `${data.volume} total reps`)
+                    }`}
+                  </title>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+      </div>
+      
+      {/* Progress summary */}
+      <div className="mt-2 flex justify-between text-xs text-gray-600">
+        <span>
+          Latest: {progressData[progressData.length - 1].weight > 0 
+            ? `${progressData[progressData.length - 1].weight} lbs` 
+            : `${progressData[progressData.length - 1].reps} reps`}
+        </span>
+        <span>{progressData.length} sessions</span>
+      </div>
+    </div>
+  );
+}
+
+// Exercise Progress View Component
+function ExerciseProgressView({ 
+  workouts, 
+  selectedExercise, 
+  setSelectedExercise, 
+  chartMetric, 
+  setChartMetric,
+  exerciseFilter,
+  setExerciseFilter,
+  exercises
+}: {
+  workouts: any[];
+  selectedExercise: string;
+  setSelectedExercise: (exercise: string) => void;
+  chartMetric: "e1rm" | "volume";
+  setChartMetric: (metric: "e1rm" | "volume") => void;
+  exerciseFilter: "all" | "strength" | "cardio" | "functional";
+  setExerciseFilter: (filter: "all" | "strength" | "cardio" | "functional") => void;
+  exercises: any[];
+}) {
+  // Process workout data to extract exercise progress
+  const exerciseProgress: { [key: string]: Array<{ date: string, volume: number, session: number, weight: number }> } = {};
+  
+  // Process all workouts to build exercise history
+  (workouts as any[]).forEach((workout: any) => {
+    if (workout.workoutExercises) {
+      workout.workoutExercises.forEach((we: any) => {
+        const exerciseName = we.exercise?.name || 'Unknown Exercise';
+        if (!exerciseProgress[exerciseName]) {
+          exerciseProgress[exerciseName] = [];
+        }
+        
+        // Calculate total volume: weight × reps × sets
+        const weight = parseFloat(we.weight) || 0;
+        const reps = parseInt(we.reps) || 0;
+        const sets = parseInt(we.sets) || 1;
+        const totalVolume = weight * reps * sets;
+        
+        exerciseProgress[exerciseName].push({
+          date: workout.date,
+          volume: totalVolume,
+          weight: weight, // Add the actual weight for "Latest" display
+          session: exerciseProgress[exerciseName].length + 1
+        });
+      });
+    }
+  });
+  
+  // Sort sessions by date for each exercise
+  Object.keys(exerciseProgress).forEach(exerciseName => {
+    exerciseProgress[exerciseName].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+    // Update session numbers after sorting
+    exerciseProgress[exerciseName] = exerciseProgress[exerciseName].map((session, index) => ({
+      ...session,
+      session: index + 1
+    }));
+  });
+  
+  // Filter exercises by category
+  const filteredExerciseProgress: { [key: string]: Array<{ date: string, volume: number, session: number, weight: number }> } = {};
+  
+  Object.keys(exerciseProgress).forEach(exerciseName => {
+    const exercise = exercises?.find(ex => ex.name === exerciseName);
+    const exerciseCategory = exercise?.category || 'strength';
+    
+    const shouldInclude = exerciseFilter === 'all' || 
+      (exerciseFilter === 'strength' && exerciseCategory === 'strength') ||
+      (exerciseFilter === 'cardio' && exerciseCategory === 'cardio') ||
+      (exerciseFilter === 'functional' && exerciseCategory === 'functional');
+    
+    if (shouldInclude) {
+      filteredExerciseProgress[exerciseName] = exerciseProgress[exerciseName];
+    }
+  });
+  
+  const exerciseNames = Object.keys(filteredExerciseProgress);
+  
+  return (
+    <div className="space-y-6">
+      {/* Category Filter and Metric Toggle */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        {/* Category Filter */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">Category:</label>
+          <div className="flex border border-gray-300 rounded-md overflow-hidden">
+            <button
+              onClick={() => setExerciseFilter("all")}
+              className={`px-3 py-2 text-sm font-medium ${
+                exerciseFilter === "all" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setExerciseFilter("strength")}
+              className={`px-3 py-2 text-sm font-medium ${
+                exerciseFilter === "strength" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Strength
+            </button>
+            <button
+              onClick={() => setExerciseFilter("cardio")}
+              className={`px-3 py-2 text-sm font-medium ${
+                exerciseFilter === "cardio" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Cardio
+            </button>
+            <button
+              onClick={() => setExerciseFilter("functional")}
+              className={`px-3 py-2 text-sm font-medium ${
+                exerciseFilter === "functional" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Functional
+            </button>
+          </div>
+        </div>
+        
+        {/* Metric Toggle */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">Metric:</label>
+          <div className="flex border border-gray-300 rounded-md overflow-hidden">
+            <button
+              onClick={() => setChartMetric("e1rm")}
+              className={`px-4 py-2 text-sm font-medium ${
+                chartMetric === "e1rm" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              e1RM
+            </button>
+            <button
+              onClick={() => setChartMetric("volume")}
+              className={`px-4 py-2 text-sm font-medium ${
+                chartMetric === "volume" 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Volume
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      {/* All Exercise Charts Grid */}
+      {exerciseNames.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500">
+            {exerciseFilter === 'all' 
+              ? 'No exercise data available yet.' 
+              : `No ${exerciseFilter} exercises logged yet.`
+            }
+          </p>
+          <p className="text-sm text-gray-400 mt-2">Start logging workouts to track your progress!</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {exerciseNames.map((exerciseName) => (
+            <CompactExerciseChart 
+              key={exerciseName}
+              exerciseName={exerciseName}
+              sessions={filteredExerciseProgress[exerciseName]}
+              workouts={workouts}
+              chartMetric={chartMetric}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Exercise Chart Component
+function RenderExerciseChart({ 
+  exerciseName, 
+  sessions, 
+  workouts, 
+  chartMetric 
+}: { 
+  exerciseName: string;
+  sessions: any[];
+  workouts: any[];
+  chartMetric: "e1rm" | "volume";
+}) {
+  if (sessions.length < 1) return null;
+  
+  // Calculate e1RM and volume for each session
+  const progressData = sessions.map(s => {
+    const workout = workouts.find(w => w.date === s.date);
+    const exercise = workout?.workoutExercises?.find((we: any) => we.exercise?.name === exerciseName);
+    
+    const weight = parseFloat(exercise?.weight) || 0;
+    const reps = parseInt(exercise?.reps) || 0;
+    const sets = parseInt(exercise?.sets) || 1;
+    
+    // Calculate Estimated 1-Rep Max using Brzycki formula: weight × (36 / (37 - reps))
+    const e1RM = reps > 1 ? weight * (36 / (37 - reps)) : weight;
+    const volume = weight * reps * sets;
+    
+    return {
+      date: s.date,
+      weight,
+      reps,
+      sets,
+      e1RM: Math.round(e1RM * 10) / 10, // Round to 1 decimal
+      volume
+    };
+  });
+  
+  // Determine chart values based on selected metric
+  const values = chartMetric === "e1rm" 
+    ? progressData.map(d => d.e1RM)
+    : progressData.map(d => d.volume);
+  
+  const maxValue = Math.max(...values);
+  const minValue = Math.min(...values);
+  const range = maxValue - minValue;
+  const padding = Math.max(range * 0.1, chartMetric === "e1rm" ? 5 : 50);
+  const chartMin = Math.max(0, minValue - padding);
+  const chartMax = maxValue + padding;
+  const chartRange = chartMax - chartMin;
+  
+  return (
+    <div className="border rounded-lg p-6">
+      <h4 className="text-lg font-semibold text-gray-900 mb-4">
+        {exerciseName} Progress ({chartMetric === "e1rm" ? "Estimated 1RM" : "Total Volume"})
+      </h4>
+      
+      {/* Chart Container */}
+      <div className="relative h-64 bg-gray-50 rounded-lg p-4">
+        {/* Y-axis labels */}
+        <div className="absolute left-0 top-0 bottom-0 w-16 flex flex-col justify-between text-xs text-gray-600 py-4">
+          <span>{Math.round(chartMax)} lbs</span>
+          <span>{Math.round(chartMax - chartRange * 0.25)} lbs</span>
+          <span>{Math.round(chartMax - chartRange * 0.5)} lbs</span>
+          <span>{Math.round(chartMax - chartRange * 0.75)} lbs</span>
+          <span>{Math.round(chartMin)} lbs</span>
+        </div>
+        
+        {/* Chart area */}
+        <div className="ml-16 h-full relative">
+          {/* Grid lines */}
+          <div className="absolute inset-0">
+            {[0, 0.25, 0.5, 0.75, 1].map((ratio) => (
+              <div
+                key={ratio}
+                className="absolute w-full border-t border-gray-200"
+                style={{ top: `${ratio * 100}%` }}
+              />
+            ))}
+          </div>
+          
+          {/* Progress line */}
+          <svg className="absolute inset-0 w-full h-full">
+            <defs>
+              <linearGradient id={`gradient-${exerciseName}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#e0f2fe" stopOpacity="0.3" />
+              </linearGradient>
+            </defs>
+            
+
+            
+            {/* Progress line */}
+            <polyline
+              points={values.map((value, index) => {
+                const x = (index / (values.length - 1)) * 100;
+                const y = 100 - ((value - chartMin) / chartRange) * 100;
+                return `${x},${y}`;
+              }).join(' ')}
+              fill="none"
+              stroke="#3b82f6"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            
+            {/* Data points with tooltips */}
+            {values.map((value, index) => {
+              const x = (index / (values.length - 1)) * 100;
+              const y = 100 - ((value - chartMin) / chartRange) * 100;
+              const data = progressData[index];
+              return (
+                <g key={index}>
+                  <circle
+                    cx={`${x}%`}
+                    cy={`${y}%`}
+                    r="4"
+                    fill="#3b82f6"
+                    stroke="white"
+                    strokeWidth="2"
+                  />
+                  <title>
+                    {`Date: ${new Date(data.date).toLocaleDateString()}\nWeight: ${data.weight} lbs\nReps: ${data.reps}\nSets: ${data.sets}\ne1RM: ${data.e1RM} lbs\nVolume: ${data.volume} lbs`}
+                  </title>
+                </g>
+              );
+            })}
+          </svg>
+          
+          {/* X-axis labels with dates */}
+          <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-gray-600 pt-2">
+            {progressData.map((data, index) => (
+              <span key={index} className="text-center">
+                {new Date(data.date).toLocaleDateString('en-US', { 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      {/* Progress summary */}
+      <div className="mt-4 flex justify-between text-sm">
+        <span className="text-gray-600">
+          Latest: {chartMetric === "e1rm" 
+            ? `${progressData[progressData.length - 1].e1RM} lbs e1RM`
+            : `${progressData[progressData.length - 1].volume} lbs volume`
+          }
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export default function HealthPage() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  // Fetch workouts
+  const { data: workouts = [], isLoading: workoutsLoading } = useQuery({
+    queryKey: ["/api/workouts"],
+    enabled: !!user,
+  });
+
+  // Fetch body weight logs
+  const { data: bodyWeightLogs = [], isLoading: bodyWeightLoading } = useQuery({
+    queryKey: ["/api/body-weight-logs"],
+    enabled: !!user,
+  });
+
+  // Fetch exercises for dropdown
+  const { data: exercises = [], isLoading: exercisesLoading } = useQuery({
+    queryKey: ["/api/exercises"],
+    enabled: !!user,
+  });
+
+  const [activeTab, setActiveTab] = useState("overview");
+  const [workoutTab, setWorkoutTab] = useState("log-workout");
+  const [workoutSession, setWorkoutSession] = useState<any[]>([]);
+  const [workoutDate, setWorkoutDate] = useState(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  });
+  
+  // Progress chart controls
+  const [selectedExercise, setSelectedExercise] = useState<string>("");
+  const [chartMetric, setChartMetric] = useState<"e1rm" | "volume">("e1rm");
+  const [exerciseFilter, setExerciseFilter] = useState<"all" | "strength" | "cardio" | "functional">("all");
+  
+  // Exercise search state
+  const [exerciseSearchOpen, setExerciseSearchOpen] = useState(false);
+  const [exerciseSearchValue, setExerciseSearchValue] = useState("");
+  const [showAddExerciseDialog, setShowAddExerciseDialog] = useState(false);
+  
+  // Program generator state
+
+  const [selectedWeek, setSelectedWeek] = useState(1);
+  const [selectedDay, setSelectedDay] = useState(1);
+
+
+
+  // Combine common exercises with database exercises
+  const allExercises = useMemo(() => {
+    const dbExercises = exercises as any[];
+    const dbExerciseNames = new Set(dbExercises.map((ex: any) => ex.name));
+    const commonExercisesNotInDb = COMMON_EXERCISES.filter(ex => !dbExerciseNames.has(ex.name));
+    const combined = [...dbExercises, ...commonExercisesNotInDb];
+    // Sort alphabetically
+    return combined.sort((a, b) => a.name.localeCompare(b.name));
+  }, [exercises]);
+
+  // Filter exercises based on search
+  const filteredExercises = useMemo(() => {
+    if (!exerciseSearchValue) return allExercises;
+    const filtered = allExercises.filter(exercise =>
+      exercise.name.toLowerCase().includes(exerciseSearchValue.toLowerCase())
+    );
+    // Keep alphabetical order in filtered results
+    return filtered.sort((a, b) => a.name.localeCompare(b.name));
+  }, [allExercises, exerciseSearchValue]);
+
+
+
+
+  // Form for logging workouts
+  const workoutForm = useForm<z.infer<typeof workoutLogSchema>>({
+    resolver: zodResolver(workoutLogSchema),
+    defaultValues: {
+      exerciseName: "",
+      category: "",
+      weight: undefined,
+      reps: undefined,
+      sets: undefined,
+      distance: "",
+      time: "",
+      pace: "",
+      heartRate: undefined,
+      cardioType: "",
+      workoutName: "",
+      timeDomain: "",
+      roundsCompleted: undefined,
+      repsPerRound: undefined,
+      rpe: undefined,
+      functionalType: "",
+      notes: "",
+    },
+  });
+
+  // Get selected category to determine which fields to show
+  const selectedCategory = workoutForm.watch("category");
+
+  // Create workout log mutation
+  const createWorkoutMutation = useMutation({
+    mutationFn: async (sessionData: { date: string; exercises: any[] }) => {
+      // Helper function to convert time format (mm:ss) to seconds
+      const parseTime = (timeString: string): number => {
+        if (!timeString) return 0;
+        const parts = timeString.split(':');
+        if (parts.length === 2) {
+          const minutes = parseInt(parts[0], 10) || 0;
+          const seconds = parseInt(parts[1], 10) || 0;
+          return minutes * 60 + seconds;
+        }
+        return 0;
+      };
+
+      // Transform exercises for backend
+      const workoutExercises = sessionData.exercises.map(exerciseData => {
+        const baseExercise = {
+          name: exerciseData.exerciseName,
+          category: exerciseData.category,
+          notes: exerciseData.notes,
+        };
+
+        if (exerciseData.category === 'strength') {
+          return {
+            ...baseExercise,
+            sets: exerciseData.sets,
+            reps: exerciseData.reps,
+            weight: exerciseData.weight,
+          };
+        } else if (exerciseData.category === 'cardio') {
+          return {
+            ...baseExercise,
+            sets: 1,
+            distance: exerciseData.distance ? Math.round(parseFloat(exerciseData.distance) * 1609.34) : null, // Convert miles to meters
+            duration: exerciseData.time ? parseTime(exerciseData.time) : null,
+          };
+        } else if (exerciseData.category === 'functional') {
+          return {
+            ...baseExercise,
+            sets: exerciseData.roundsCompleted || 1,
+            reps: exerciseData.repsPerRound,
+            duration: exerciseData.timeDomain ? parseTime(exerciseData.timeDomain) : null,
+          };
+        }
+
+        return { ...baseExercise, sets: 1 };
+      });
+
+      // Create the workout
+      const response = await fetch("/api/workouts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: `Workout - ${new Date(sessionData.date).toLocaleDateString()}`,
+          description: `Complete workout with ${sessionData.exercises.length} exercises`,
+          date: sessionData.date,
+          exercises: workoutExercises,
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to create workout");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/exercises"] });
+      toast({
+        title: "Workout logged",
+        description: `Complete workout with ${workoutSession.length} exercises recorded.`,
+      });
+      setWorkoutSession([]);
+      // Reset workout date to today for next workout
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      setWorkoutDate(`${year}-${month}-${day}`);
+      setWorkoutTab("dashboard");
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to log workout. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Form for adding new exercises
+  const newExerciseForm = useForm<z.infer<typeof createExerciseSchema>>({
+    resolver: zodResolver(createExerciseSchema),
+    defaultValues: {
+      name: "",
+      category: "",
+      description: "",
+    },
+  });
+
+  // Create exercise mutation
+  const createExerciseMutation = useMutation({
+    mutationFn: async (exerciseData: z.infer<typeof createExerciseSchema>) => {
+      const response = await fetch("/api/exercises", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(exerciseData),
+      });
+      if (!response.ok) throw new Error("Failed to create exercise");
+      return response.json();
+    },
+    onSuccess: (newExercise) => {
+      // Update the cache directly with the new exercise
+      queryClient.setQueryData(["/api/exercises"], (oldData: any) => {
+        const updatedData = oldData ? [...oldData, newExercise] : [newExercise];
+        return updatedData.sort((a: any, b: any) => a.name.localeCompare(b.name));
+      });
+      
+      toast({
+        title: "Exercise added",
+        description: `"${newExercise.name}" has been added and selected.`,
+      });
+      
+      // Auto-select the new exercise in the workout form
+      workoutForm.setValue("exerciseName", newExercise.name);
+      workoutForm.setValue("category", newExercise.category);
+      
+      setShowAddExerciseDialog(false);
+      newExerciseForm.reset();
+    },
+  });
+
+  // Update exercise category mutation
+  const updateExerciseMutation = useMutation({
+    mutationFn: async ({ exerciseId, category }: { exerciseId: number; category: string }) => {
+      const response = await fetch(`/api/exercises/${exerciseId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ category }),
+      });
+      if (!response.ok) throw new Error("Failed to update exercise");
+      return response.json();
+    },
+    onSuccess: (updatedExercise) => {
+      // Update the cache with the updated exercise
+      queryClient.setQueryData(["/api/exercises"], (oldData: any) => {
+        if (!oldData) return [];
+        return oldData.map((exercise: any) => 
+          exercise.id === updatedExercise.id 
+            ? { ...exercise, category: updatedExercise.category }
+            : exercise
+        );
+      });
+      
+      toast({
+        title: "Exercise updated",
+        description: `"${updatedExercise.name}" category updated to ${updatedExercise.category}.`,
+      });
+    },
+  });
+
+  // Delete workout mutation
+  const deleteWorkoutMutation = useMutation({
+    mutationFn: async (workoutId: number) => {
+      const response = await fetch(`/api/workouts/${workoutId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete workout');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/workouts'] });
+      toast({
+        title: "Workout deleted",
+        description: "The workout has been removed from your history.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error deleting workout",
+        description: error.message || "Failed to delete workout. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const deleteWorkout = (workoutId: number) => {
+    deleteWorkoutMutation.mutate(workoutId);
+  };
+
+  const onAddExerciseToSession = (data: z.infer<typeof workoutLogSchema>) => {
+    // Clean up the data to remove undefined values and ensure proper types
+    const cleanedData = {
+      exerciseName: data.exerciseName,
+      category: data.category,
+      // Convert undefined to null for numeric fields
+      weight: data.weight || null,
+      reps: data.reps || null,
+      sets: data.sets || null,
+      heartRate: data.heartRate || null,
+      roundsCompleted: data.roundsCompleted || null,
+      repsPerRound: data.repsPerRound || null,
+      rpe: data.rpe || null,
+      // Keep string fields as empty strings if undefined
+      distance: data.distance || "",
+      time: data.time || "",
+      pace: data.pace || "",
+      cardioType: data.cardioType || "",
+      workoutName: data.workoutName || "",
+      timeDomain: data.timeDomain || "",
+      functionalType: data.functionalType || "",
+      notes: data.notes || "",
+    };
+
+    const newExercise = {
+      id: Date.now(), // temporary ID for session
+      ...cleanedData
+    };
+    setWorkoutSession(prev => [...prev, newExercise]);
+    workoutForm.reset({
+      exerciseName: "",
+      category: "",
+      weight: undefined,
+      reps: undefined,
+      sets: undefined,
+      distance: "",
+      time: "",
+      pace: "",
+      heartRate: undefined,
+      cardioType: "",
+      workoutName: "",
+      timeDomain: "",
+      roundsCompleted: undefined,
+      repsPerRound: undefined,
+      rpe: undefined,
+      functionalType: "",
+      notes: "",
+    });
+    toast({
+      title: "Exercise added",
+      description: `${data.exerciseName} added to today's workout`,
+    });
+  };
+
+  const onLogCompleteWorkout = () => {
+    if (workoutSession.length === 0) {
+      toast({
+        title: "No exercises",
+        description: "Please add at least one exercise to log a workout",
+        variant: "destructive",
+      });
+      return;
+    }
+    createWorkoutMutation.mutate({
+      date: workoutDate,
+      exercises: workoutSession
+    });
+  };
+
+  const removeFromSession = (id: number) => {
+    setWorkoutSession(prev => prev.filter(ex => ex.id !== id));
+  };
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Please sign in to access Health</h2>
+          <p className="text-gray-600">Track your workouts and nutrition progress</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show workout section if activeTab is "workout-section"
+  if (activeTab === "workout-section") {
+    return (
+      <div className="min-h-screen bg-gray-50 pb-24">
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center space-x-2">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setActiveTab("dashboard")}
+                  className="mr-2"
+                >
+                  ← Back
+                </Button>
+                <Dumbbell className="h-8 w-8 text-blue-600" />
+                <div>
+                  <h1 className="text-xl font-semibold text-gray-900">Workout Section</h1>
+                  <p className="text-sm text-gray-600">Track and log your workouts</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Workout Section Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Tabs value={workoutTab} onValueChange={setWorkoutTab}>
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="training-schedule">Training Schedule</TabsTrigger>
+              <TabsTrigger value="log-workout">Log Workout</TabsTrigger>
+              <TabsTrigger value="progress">Progress</TabsTrigger>
+              <TabsTrigger value="workout-history">History</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="training-schedule" className="mt-6">
+              <div className="space-y-6">
+                {/* Generated Program Display */}
+                {generatedProgram ? (
+                  <div className="space-y-6">
+                    {/* Program Header */}
+                    <div className="bg-white rounded-lg shadow-sm p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h3 className="text-xl font-semibold text-gray-900 flex items-center">
+                            <Trophy className="h-5 w-5 mr-2 text-blue-600" />
+                            {generatedProgram.program?.name || "4-Week Training Program"}
+                          </h3>
+                          <p className="text-sm text-gray-600 mt-1">{generatedProgram.program?.description}</p>
+                        </div>
+                        <Button variant="outline" size="sm" onClick={() => setShowProgramDialog(true)}>
+                          <Calendar className="h-4 w-4 mr-2" />
+                          Edit Program
+                        </Button>
+                      </div>
+                      
+                      {/* Phase Overview */}
+                      <div className="grid grid-cols-4 gap-4">
+                        {[1, 2, 3, 4].map((week) => {
+                          const weekData = generatedProgram.weeks?.find(w => w.weekNumber === week);
+                          const phase = week <= 2 ? "Load" : week === 3 ? "Peak" : "Deload";
+                          const phaseColor = week <= 2 ? "blue" : week === 3 ? "red" : "green";
+                          
+                          return (
+                            <div key={week} className={`rounded-lg p-4 border-2 ${
+                              phase === "Load" ? "border-blue-200 bg-blue-50" :
+                              phase === "Peak" ? "border-red-200 bg-red-50" :
+                              "border-green-200 bg-green-50"
+                            }`}>
+                              <div className="text-center">
+                                <div className="text-sm font-medium text-gray-700">Week {week}</div>
+                                <div className={`text-lg font-bold ${
+                                  phase === "Load" ? "text-blue-600" :
+                                  phase === "Peak" ? "text-red-600" :
+                                  "text-green-600"
+                                }`}>{phase} Phase</div>
+                                <div className="text-xs text-gray-600 mt-1">
+                                  {weekData?.phaseDescription || 
+                                    (phase === "Load" ? "Building volume" :
+                                     phase === "Peak" ? "Maximum intensity" :
+                                     "Active recovery")}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Week-by-Week Schedule */}
+                    {generatedProgram.weeks?.map((week) => (
+                      <div key={week.weekNumber} className="bg-white rounded-lg shadow-sm p-6">
+                        <div className="mb-4">
+                          <h4 className="text-lg font-medium text-gray-900">
+                            Week {week.weekNumber} - {week.phase} Phase
+                          </h4>
+                          <p className="text-sm text-gray-600">{week.phaseDescription}</p>
+                        </div>
+                        
+                        {/* Daily Workouts Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {week.days?.map((day) => (
+                            <div key={day.dayNumber} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                              <div className="flex justify-between items-center mb-3">
+                                <h5 className="font-medium text-gray-900">
+                                  Day {day.dayNumber}: {day.name}
+                                </h5>
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost"
+                                  onClick={() => {
+                                    setSelectedWeek(week.weekNumber);
+                                    setSelectedDay(day.dayNumber);
+                                    setShowProgramDialog(true);
+                                  }}
+                                >
+                                  View
+                                </Button>
+                              </div>
+                              
+                              {/* Workout Summary */}
+                              <div className="space-y-2 text-sm">
+                                {day.blocks?.map((block, idx) => (
+                                  <div key={idx} className="flex items-center text-gray-600">
+                                    <div className={`w-2 h-2 rounded-full mr-2 ${
+                                      block.blockType === 'warmup' ? 'bg-orange-400' :
+                                      block.blockType === 'main_a' ? 'bg-red-400' :
+                                      block.blockType === 'main_b' ? 'bg-blue-400' :
+                                      'bg-green-400'
+                                    }`}></div>
+                                    <span className="truncate">{block.name}</span>
+                                  </div>
+                                ))}
+                              </div>
+                              
+                              {/* Completion Status */}
+                              <div className="mt-3 pt-3 border-t">
+                                <div className="flex items-center justify-between text-sm">
+                                  <span className="text-gray-500">Status</span>
+                                  <span className="text-gray-700 font-medium">Not Started</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+                    <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Training Program Generated</h3>
+                    <p className="text-gray-600 mb-6">Generate a personalized 4-week program based on your fitness profile</p>
+                    <Button 
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={() => {
+                        setActiveTab("dashboard");
+                        setShowFitnessProfileDialog(true);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Generate Program
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="workout-history" className="mt-6">
+              <div className="space-y-6">
+                {/* Workout History */}
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Workout History</h3>
+                  
+                  {workoutsLoading ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">Loading workout history...</p>
+                    </div>
+                  ) : workouts.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">No workouts recorded yet.</p>
+                      <p className="text-sm text-gray-400 mt-2">Start logging workouts to see your history here!</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {workouts.map((workout: any) => (
+                        <div key={workout.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="flex-1">
+                              <h4 className="font-medium text-gray-900">{workout.name}</h4>
+                              <p className="text-sm text-gray-500 mt-1">
+                                {new Date(workout.date).toLocaleDateString('en-US', { 
+                                  weekday: 'long', 
+                                  year: 'numeric', 
+                                  month: 'long', 
+                                  day: 'numeric' 
+                                })}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="text-right">
+                                <p className="text-sm font-medium text-blue-600">
+                                  {workout.duration ? `${workout.duration} min` : 'Duration not recorded'}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {new Date(workout.createdAt).toLocaleTimeString('en-US', { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit' 
+                                  })}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => deleteWorkout(workout.id)}
+                                className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50"
+                                title="Delete workout"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                          
+                          {/* Exercise Details */}
+                          {workout.workoutExercises && workout.workoutExercises.length > 0 && (
+                            <div className="mt-3 space-y-2">
+                              <h5 className="text-sm font-medium text-gray-700">Exercises:</h5>
+                              <div className="space-y-1">
+                                {workout.workoutExercises.map((we: any) => (
+                                  <div key={we.id} className="flex justify-between items-center text-sm bg-gray-50 p-2 rounded">
+                                    <span className="font-medium text-gray-900">{we.exercise?.name || 'Unknown Exercise'}</span>
+                                    <div className="flex gap-3 text-gray-600">
+                                      {we.weight && (
+                                        <span className="text-black">{we.weight} lbs</span>
+                                      )}
+                                      {we.reps && (
+                                        <span className="text-black">{we.reps} reps</span>
+                                      )}
+                                      {we.sets && (
+                                        <span className="text-black">{we.sets} sets</span>
+                                      )}
+                                      {we.distance && (
+                                        <span className="text-black">{we.distance}m</span>
+                                      )}
+                                      {we.duration && (
+                                        <span className="text-black">{we.duration} min</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Workout Notes */}
+                          {workout.notes && (
+                            <div className="mt-3 p-3 bg-gray-50 rounded-md">
+                              <p className="text-sm text-black"><strong>Workout Notes:</strong> {workout.notes}</p>
+                            </div>
+                          )}
+                          
+                          {/* Exercise Notes */}
+                          {workout.workoutExercises && workout.workoutExercises.some((we: any) => we.notes) && (
+                            <div className="mt-3 space-y-2">
+                              <h5 className="text-sm font-medium text-black">Exercise Notes:</h5>
+                              {workout.workoutExercises.filter((we: any) => we.notes).map((we: any) => (
+                                <div key={we.id} className="p-2 bg-gray-50 rounded text-sm">
+                                  <span className="font-medium text-black">{we.exercise?.name}:</span> 
+                                  <span className="text-black ml-1">{we.notes}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="log-workout" className="mt-6">
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-6">Log New Workout</h3>
+                
+                {/* Workout Date */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Workout Date</label>
+                  <input
+                    type="date"
+                    value={workoutDate}
+                    onChange={(e) => setWorkoutDate(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Current Workout Session */}
+                {workoutSession.length > 0 && (
+                  <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="font-medium text-gray-900">Today's Workout ({workoutSession.length} exercises)</h4>
+                      <Button 
+                        onClick={onLogCompleteWorkout}
+                        disabled={createWorkoutMutation.isPending}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        {createWorkoutMutation.isPending ? "Logging..." : "Log Complete Workout"}
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      {workoutSession.map((exercise) => (
+                        <div key={exercise.id} className="flex justify-between items-center p-3 bg-white rounded border">
+                          <div>
+                            <span className="font-medium">{exercise.exerciseName}</span>
+                            <span className="text-sm text-gray-500 ml-2">({exercise.category})</span>
+                            {(exercise.weight || exercise.reps || exercise.sets) && (
+                              <span className="text-sm text-gray-600 ml-2">
+                                {exercise.weight ? `${exercise.weight}lbs` : ''} 
+                                {exercise.reps ? ` × ${exercise.reps}` : ''}
+                                {exercise.sets ? ` × ${exercise.sets}` : ''}
+                              </span>
+                            )}
+                            {(exercise.distance || exercise.time) && (
+                              <span className="text-sm text-gray-600 ml-2">
+                                {exercise.distance || ''}{exercise.distance && exercise.time ? ', ' : ''}{exercise.time || ''}
+                              </span>
+                            )}
+                            {exercise.workoutName && <span className="text-sm text-gray-600 ml-2">{exercise.workoutName}</span>}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeFromSession(exercise.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Add Exercise Form */}
+                <Form {...workoutForm}>
+                  <form onSubmit={workoutForm.handleSubmit(onAddExerciseToSession)} className="space-y-6">
+                    <FormField
+                      control={workoutForm.control}
+                      name="exerciseName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Exercise Name</FormLabel>
+                          <Popover open={exerciseSearchOpen} onOpenChange={setExerciseSearchOpen}>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  aria-expanded={exerciseSearchOpen}
+                                  className="w-full justify-between text-left font-normal"
+                                >
+                                  {field.value || "Search exercises..."}
+                                  <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0" align="start">
+                              <Command>
+                                <CommandInput
+                                  placeholder="Search exercises..."
+                                  value={exerciseSearchValue}
+                                  onValueChange={setExerciseSearchValue}
+                                />
+                                <CommandList>
+                                  <CommandEmpty className="py-6 text-center text-sm">
+                                    <div className="space-y-3">
+                                      <p>No exercises found.</p>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => {
+                                          // Create the exercise immediately and add to workout
+                                          const exerciseName = exerciseSearchValue.trim();
+                                          if (exerciseName) {
+                                            createExerciseMutation.mutate({
+                                              name: exerciseName,
+                                              category: "functional", // Default category
+                                              description: "",
+                                            });
+                                            setExerciseSearchOpen(false);
+                                            setExerciseSearchValue("");
+                                          }
+                                        }}
+                                      >
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Add "{exerciseSearchValue}" Exercise
+                                      </Button>
+                                    </div>
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    {filteredExercises.map((exercise: any) => (
+                                      <CommandItem
+                                        key={exercise.name}
+                                        value={exercise.name}
+                                        onSelect={(currentValue) => {
+                                          field.onChange(currentValue);
+                                          workoutForm.setValue("category", exercise.category);
+                                          setExerciseSearchOpen(false);
+                                          setExerciseSearchValue("");
+                                        }}
+                                      >
+                                        <div className="flex flex-col">
+                                          <span>{exercise.name}</span>
+                                          <span className="text-xs text-muted-foreground capitalize">
+                                            {exercise.category}
+                                          </span>
+                                        </div>
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={workoutForm.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Category</FormLabel>
+                          <Select onValueChange={(newCategory) => {
+                            field.onChange(newCategory);
+                            
+                            // If an exercise is selected and the category is manually changed, update the exercise
+                            const selectedExerciseName = workoutForm.getValues("exerciseName");
+                            if (selectedExerciseName && exercises && Array.isArray(exercises)) {
+                              const selectedExercise = exercises.find((ex: any) => ex.name === selectedExerciseName);
+                              if (selectedExercise && selectedExercise.id && selectedExercise.category !== newCategory) {
+                                updateExerciseMutation.mutate({
+                                  exerciseId: selectedExercise.id,
+                                  category: newCategory
+                                });
+                              }
+                            }
+                          }} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="py-0 h-10 items-center">
+                                <SelectValue placeholder="Select category" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="strength">
+                                <div className="flex flex-col py-1">
+                                  <span>Strength</span>
+                                  <span className="text-xs text-white/80 data-[highlighted]:text-white">Focused on building muscle and increasing load capacity</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="cardio">
+                                <div className="flex flex-col py-1">
+                                  <span>Cardio</span>
+                                  <span className="text-xs text-white/80 data-[highlighted]:text-white">Focused on endurance, heart rate, and aerobic capacity</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="functional">
+                                <div className="flex flex-col py-1">
+                                  <span>Functional</span>
+                                  <span className="text-xs text-white/80 data-[highlighted]:text-white">Blends strength, mobility, and conditioning for real-world movement</span>
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Conditional fields based on selected category */}
+                    {selectedCategory === "strength" && (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          control={workoutForm.control}
+                          name="weight"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Weight (lbs)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min="0"
+                                  placeholder="e.g., 135"
+                                  value={field.value ?? ""}
+                                  onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={workoutForm.control}
+                          name="reps"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Reps</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min="0"
+                                  placeholder="e.g., 12"
+                                  value={field.value ?? ""}
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={workoutForm.control}
+                          name="sets"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Sets</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min="0"
+                                  placeholder="e.g., 3"
+                                  value={field.value ?? ""}
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+
+                    {selectedCategory === "cardio" && (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={workoutForm.control}
+                            name="distance"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Distance</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="e.g., 2.5 miles or 400m" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={workoutForm.control}
+                            name="time"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Time</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="e.g., 20:15 (mm:ss)" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={workoutForm.control}
+                            name="pace"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Pace (Optional)</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Auto-calculated or manual entry" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={workoutForm.control}
+                            name="heartRate"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Heart Rate (Optional)</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min="0"
+                                    placeholder="Avg or max BPM"
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={workoutForm.control}
+                          name="cardioType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Type</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select cardio type" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="run">Run</SelectItem>
+                                  <SelectItem value="bike">Bike</SelectItem>
+                                  <SelectItem value="row">Row</SelectItem>
+                                  <SelectItem value="swim">Swim</SelectItem>
+                                  <SelectItem value="walk">Walk</SelectItem>
+                                  <SelectItem value="elliptical">Elliptical</SelectItem>
+                                  <SelectItem value="stairs">Stairs</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+
+                    {selectedCategory === "functional" && (
+                      <div className="space-y-4">
+                        <FormField
+                          control={workoutForm.control}
+                          name="workoutName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Workout Name or Block Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder='e.g., "Murph," "AMRAP 12: KB + Burpees"' {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={workoutForm.control}
+                            name="functionalType"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Type</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select workout type" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="amrap">AMRAP (As Many Rounds As Possible)</SelectItem>
+                                    <SelectItem value="emom">EMOM (Every Minute On the Minute)</SelectItem>
+                                    <SelectItem value="fortime">For Time</SelectItem>
+                                    <SelectItem value="circuit">Circuit</SelectItem>
+                                    <SelectItem value="tabata">Tabata</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={workoutForm.control}
+                            name="timeDomain"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Time Domain</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Total time or work/rest ratio" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <FormField
+                            control={workoutForm.control}
+                            name="roundsCompleted"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Rounds Completed</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min="0"
+                                    placeholder="e.g., 5"
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={workoutForm.control}
+                            name="repsPerRound"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Reps per Round</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min="0"
+                                    placeholder="e.g., 10"
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={workoutForm.control}
+                            name="rpe"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>RPE (1-10)</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min="1" 
+                                    max="10"
+                                    placeholder="Rate of Perceived Exertion"
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    <FormField
+                      control={workoutForm.control}
+                      name="notes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Notes (Optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Any additional notes about this workout" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                    >
+                      Add Exercise to Workout
+                    </Button>
+                  </form>
+                </Form>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="progress" className="mt-6">
+              <div className="space-y-6">
+                {/* Exercise Progress Charts */}
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <h3 className="text-lg font-medium text-gray-900 mb-6">Exercise Progress</h3>
+                  
+                  {workoutsLoading || exercisesLoading ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">Loading progress data...</p>
+                    </div>
+                  ) : (
+                    <ExerciseProgressView 
+                      workouts={workouts as any[]}
+                      selectedExercise={selectedExercise}
+                      setSelectedExercise={setSelectedExercise}
+                      chartMetric={chartMetric}
+                      setChartMetric={setChartMetric}
+                      exerciseFilter={exerciseFilter}
+                      setExerciseFilter={setExerciseFilter}
+                      exercises={exercises as any[]}
+                    />
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    );
+  }
+
+  // Helper function to get week dates
+  const getWeekDates = (weekNumber: number) => {
+    const today = new Date();
+    const startOfProgram = new Date(today);
+    startOfProgram.setDate(today.getDate() - ((weekNumber - 1) * 7));
+    
+    const weekStart = new Date(startOfProgram);
+    const weekEnd = new Date(startOfProgram);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    
+    return {
+      start: weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      end: weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    };
+  };
+
+  const getDayDate = (weekNumber: number, dayNumber: number) => {
+    const today = new Date();
+    const startOfProgram = new Date(today);
+    startOfProgram.setDate(today.getDate() - ((weekNumber - 1) * 7) + (dayNumber - 1));
+    
+    return startOfProgram.toLocaleDateString('en-US', { 
+      weekday: 'short', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
+
+  const [expandedWeeks, setExpandedWeeks] = useState<Set<number>>(new Set());
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
+
+  const toggleWeek = (weekNumber: number) => {
+    const newExpanded = new Set(expandedWeeks);
+    if (newExpanded.has(weekNumber)) {
+      newExpanded.delete(weekNumber);
+    } else {
+      newExpanded.add(weekNumber);
+    }
+    setExpandedWeeks(newExpanded);
+  };
+
+  const toggleDay = (weekNumber: number, dayNumber: number) => {
+    const key = `${weekNumber}-${dayNumber}`;
+    const newExpanded = new Set(expandedDays);
+    if (newExpanded.has(key)) {
+      newExpanded.delete(key);
+    } else {
+      newExpanded.add(key);
+    }
+    setExpandedDays(newExpanded);
+  };
+
+  // Static 4-week template - always available
+  const staticProgram = {
+    program: {
+      name: "4-Week Elite Training Program",
+      description: "Comprehensive strength and conditioning program designed for maximum results"
+    },
+    weeks: [
+      {
+        weekNumber: 1,
+        phase: "Load",
+        phaseDescription: "Building foundation with progressive overload",
+        days: [
+          {
+            dayNumber: 1,
+            name: "Upper Power",
+            blocks: [
+              {
+                name: "Strength Focus",
+                exercises: [
+                  { exerciseName: "Bench Press", sets: "4", reps: "5", weight: "85%" },
+                  { exerciseName: "Weighted Pull-ups", sets: "4", reps: "6", weight: "BW+25" },
+                  { exerciseName: "Overhead Press", sets: "3", reps: "8", weight: "75%" }
+                ]
+              },
+              {
+                name: "Accessory Work",
+                exercises: [
+                  { exerciseName: "Barbell Rows", sets: "3", reps: "10", weight: "70%" },
+                  { exerciseName: "Dips", sets: "3", reps: "12", weight: "BW" },
+                  { exerciseName: "Face Pulls", sets: "3", reps: "15", weight: "Light" }
+                ]
+              }
+            ]
+          },
+          {
+            dayNumber: 2,
+            name: "Lower Power",
+            blocks: [
+              {
+                name: "Strength Focus",
+                exercises: [
+                  { exerciseName: "Back Squat", sets: "4", reps: "5", weight: "85%" },
+                  { exerciseName: "Romanian Deadlift", sets: "3", reps: "8", weight: "75%" },
+                  { exerciseName: "Bulgarian Split Squats", sets: "3", reps: "10", weight: "BW" }
+                ]
+              },
+              {
+                name: "Conditioning",
+                exercises: [
+                  { exerciseName: "Box Jumps", sets: "4", reps: "6", weight: "24\"" },
+                  { exerciseName: "Kettlebell Swings", sets: "3", reps: "20", weight: "32kg" },
+                  { exerciseName: "Plank", sets: "3", reps: "60s", weight: "Hold" }
+                ]
+              }
+            ]
+          },
+          {
+            dayNumber: 3,
+            name: "Active Recovery",
+            blocks: [
+              {
+                name: "Mobility & Core",
+                exercises: [
+                  { exerciseName: "Yoga Flow", sets: "1", reps: "20min", weight: "Light" },
+                  { exerciseName: "Foam Rolling", sets: "1", reps: "15min", weight: "Full Body" },
+                  { exerciseName: "Core Circuit", sets: "3", reps: "12", weight: "Various" }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        weekNumber: 2,
+        phase: "Load",
+        phaseDescription: "Increasing intensity while maintaining volume",
+        days: [
+          {
+            dayNumber: 1,
+            name: "Upper Power",
+            blocks: [
+              {
+                name: "Strength Focus",
+                exercises: [
+                  { exerciseName: "Bench Press", sets: "4", reps: "4", weight: "90%" },
+                  { exerciseName: "Weighted Pull-ups", sets: "4", reps: "5", weight: "BW+30" },
+                  { exerciseName: "Overhead Press", sets: "3", reps: "6", weight: "80%" }
+                ]
+              },
+              {
+                name: "Accessory Work",
+                exercises: [
+                  { exerciseName: "Barbell Rows", sets: "3", reps: "8", weight: "75%" },
+                  { exerciseName: "Dips", sets: "3", reps: "10", weight: "BW+10" },
+                  { exerciseName: "Face Pulls", sets: "3", reps: "12", weight: "Moderate" }
+                ]
+              }
+            ]
+          },
+          {
+            dayNumber: 2,
+            name: "Lower Power",
+            blocks: [
+              {
+                name: "Strength Focus",
+                exercises: [
+                  { exerciseName: "Back Squat", sets: "4", reps: "4", weight: "90%" },
+                  { exerciseName: "Romanian Deadlift", sets: "3", reps: "6", weight: "80%" },
+                  { exerciseName: "Bulgarian Split Squats", sets: "3", reps: "8", weight: "BW+20" }
+                ]
+              },
+              {
+                name: "Conditioning",
+                exercises: [
+                  { exerciseName: "Box Jumps", sets: "5", reps: "5", weight: "30\"" },
+                  { exerciseName: "Kettlebell Swings", sets: "4", reps: "15", weight: "40kg" },
+                  { exerciseName: "Plank", sets: "3", reps: "90s", weight: "Hold" }
+                ]
+              }
+            ]
+          },
+          {
+            dayNumber: 3,
+            name: "Active Recovery",
+            blocks: [
+              {
+                name: "Mobility & Core",
+                exercises: [
+                  { exerciseName: "Yoga Flow", sets: "1", reps: "25min", weight: "Light" },
+                  { exerciseName: "Foam Rolling", sets: "1", reps: "15min", weight: "Full Body" },
+                  { exerciseName: "Core Circuit", sets: "3", reps: "15", weight: "Various" }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        weekNumber: 3,
+        phase: "Peak",
+        phaseDescription: "Maximum intensity - testing your limits",
+        days: [
+          {
+            dayNumber: 1,
+            name: "Upper Power",
+            blocks: [
+              {
+                name: "Strength Focus",
+                exercises: [
+                  { exerciseName: "Bench Press", sets: "5", reps: "3", weight: "95%" },
+                  { exerciseName: "Weighted Pull-ups", sets: "4", reps: "4", weight: "BW+35" },
+                  { exerciseName: "Overhead Press", sets: "3", reps: "5", weight: "85%" }
+                ]
+              },
+              {
+                name: "Accessory Work",
+                exercises: [
+                  { exerciseName: "Barbell Rows", sets: "3", reps: "6", weight: "80%" },
+                  { exerciseName: "Dips", sets: "3", reps: "8", weight: "BW+15" },
+                  { exerciseName: "Face Pulls", sets: "3", reps: "10", weight: "Heavy" }
+                ]
+              }
+            ]
+          },
+          {
+            dayNumber: 2,
+            name: "Lower Power",
+            blocks: [
+              {
+                name: "Strength Focus",
+                exercises: [
+                  { exerciseName: "Back Squat", sets: "5", reps: "3", weight: "95%" },
+                  { exerciseName: "Romanian Deadlift", sets: "3", reps: "5", weight: "85%" },
+                  { exerciseName: "Bulgarian Split Squats", sets: "3", reps: "6", weight: "BW+25" }
+                ]
+              },
+              {
+                name: "Conditioning",
+                exercises: [
+                  { exerciseName: "Box Jumps", sets: "6", reps: "4", weight: "36\"" },
+                  { exerciseName: "Kettlebell Swings", sets: "5", reps: "12", weight: "48kg" },
+                  { exerciseName: "Plank", sets: "3", reps: "120s", weight: "Hold" }
+                ]
+              }
+            ]
+          },
+          {
+            dayNumber: 3,
+            name: "Active Recovery",
+            blocks: [
+              {
+                name: "Mobility & Core",
+                exercises: [
+                  { exerciseName: "Yoga Flow", sets: "1", reps: "30min", weight: "Light" },
+                  { exerciseName: "Foam Rolling", sets: "1", reps: "20min", weight: "Full Body" },
+                  { exerciseName: "Core Circuit", sets: "3", reps: "20", weight: "Various" }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        weekNumber: 4,
+        phase: "Deload",
+        phaseDescription: "Recovery and preparation for next cycle",
+        days: [
+          {
+            dayNumber: 1,
+            name: "Upper Recovery",
+            blocks: [
+              {
+                name: "Light Strength",
+                exercises: [
+                  { exerciseName: "Bench Press", sets: "3", reps: "8", weight: "70%" },
+                  { exerciseName: "Pull-ups", sets: "3", reps: "10", weight: "BW" },
+                  { exerciseName: "Overhead Press", sets: "3", reps: "12", weight: "60%" }
+                ]
+              },
+              {
+                name: "Recovery Work",
+                exercises: [
+                  { exerciseName: "Band Pull-aparts", sets: "3", reps: "20", weight: "Light" },
+                  { exerciseName: "Push-ups", sets: "3", reps: "15", weight: "BW" },
+                  { exerciseName: "Stretching", sets: "1", reps: "15min", weight: "Various" }
+                ]
+              }
+            ]
+          },
+          {
+            dayNumber: 2,
+            name: "Lower Recovery",
+            blocks: [
+              {
+                name: "Light Strength",
+                exercises: [
+                  { exerciseName: "Back Squat", sets: "3", reps: "8", weight: "70%" },
+                  { exerciseName: "Romanian Deadlift", sets: "3", reps: "10", weight: "60%" },
+                  { exerciseName: "Goblet Squats", sets: "3", reps: "15", weight: "Light" }
+                ]
+              },
+              {
+                name: "Recovery Work",
+                exercises: [
+                  { exerciseName: "Walking", sets: "1", reps: "20min", weight: "Easy" },
+                  { exerciseName: "Stretching", sets: "1", reps: "20min", weight: "Various" },
+                  { exerciseName: "Breathing Work", sets: "3", reps: "5min", weight: "Calm" }
+                ]
+              }
+            ]
+          },
+          {
+            dayNumber: 3,
+            name: "Full Recovery",
+            blocks: [
+              {
+                name: "Complete Rest",
+                exercises: [
+                  { exerciseName: "Gentle Yoga", sets: "1", reps: "30min", weight: "Restorative" },
+                  { exerciseName: "Meditation", sets: "1", reps: "10min", weight: "Mindful" },
+                  { exerciseName: "Hydration", sets: "All Day", reps: "8+", weight: "Glasses" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 pb-24">
+      {/* Ultra Compact Header */}
+      <div className="bg-white shadow-md border-b">
+        <div className="px-3">
+          <div className="flex items-center justify-between h-12">
+            <div className="flex items-center space-x-2">
+              <Activity className="h-5 w-5 text-blue-600" />
+              <div>
+                <h1 className="text-base font-bold text-gray-900">Body</h1>
+                <p className="text-xs text-gray-600">Elite Training Program</p>
+              </div>
+            </div>
+            <Button 
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-xs shadow-md"
+              onClick={() => setActiveTab("workout-section")}
+            >
+              <Play className="h-3 w-3 mr-1" />
+              Start Workout
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile-Optimized Content */}
+      <div className="px-2 py-3">
+        <div className="space-y-2">
+          {/* Program Overview */}
+          <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+            <h3 className="text-sm font-semibold text-gray-900 mb-1 flex items-center">
+              <Trophy className="h-4 w-4 mr-2 text-blue-600" />
+              {staticProgram.program.name}
+            </h3>
+            <p className="text-xs text-gray-600 mb-2">{staticProgram.program.description}</p>
+            
+            {/* Compact Phase Overview */}
+            <div className="grid grid-cols-4 gap-1">
+              {[1, 2, 3, 4].map((week) => {
+                const phase = week <= 2 ? "Load" : week === 3 ? "Peak" : "Deload";
+                
+                return (
+                  <div key={week} className={`rounded p-1.5 border text-center shadow-sm ${
+                    phase === "Load" ? "border-blue-300 bg-blue-50" :
+                    phase === "Peak" ? "border-red-300 bg-red-50" :
+                    "border-green-300 bg-green-50"
+                  }`}>
+                    <div className="text-xs font-medium text-gray-700">W{week}</div>
+                    <div className={`text-xs font-bold ${
+                      phase === "Load" ? "text-blue-600" :
+                      phase === "Peak" ? "text-red-600" :
+                      "text-green-600"
+                    }`}>{phase}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Compact Week Dropdowns */}
+          <div className="space-y-1">
+            {staticProgram.weeks.map((week) => {
+              const weekDates = getWeekDates(week.weekNumber);
+              const isExpanded = expandedWeeks.has(week.weekNumber);
+              
+              return (
+                <div key={week.weekNumber} className="bg-white rounded-lg shadow-md border border-blue-200">
+                  {/* Week Header */}
+                  <button
+                    onClick={() => toggleWeek(week.weekNumber)}
+                    className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <div className="text-sm font-semibold text-blue-600">
+                        Week {week.weekNumber}: {week.phase}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {weekDates.start} - {weekDates.end}
+                      </div>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 text-blue-600 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Week Content */}
+                  {isExpanded && (
+                    <div className="px-3 pb-3 space-y-1">
+                      <p className="text-xs text-gray-600 mb-2">{week.phaseDescription}</p>
+                      
+                      {/* Day Blocks */}
+                      <div className="space-y-1">
+                        {week.days.map((day) => {
+                          const dayKey = `${week.weekNumber}-${day.dayNumber}`;
+                          const isDayExpanded = expandedDays.has(dayKey);
+                          const dayDate = getDayDate(week.weekNumber, day.dayNumber);
+                          
+                          return (
+                            <div key={day.dayNumber} className="border border-gray-200 rounded shadow-sm">
+                              {/* Day Header */}
+                              <button
+                                onClick={() => toggleDay(week.weekNumber, day.dayNumber)}
+                                className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-sm font-medium text-gray-900">
+                                    Day {day.dayNumber}: {day.name}
+                                  </span>
+                                  <span className="text-xs text-gray-500">{dayDate}</span>
+                                </div>
+                                <ChevronDown className={`h-3 w-3 text-gray-600 transform transition-transform ${isDayExpanded ? 'rotate-180' : ''}`} />
+                              </button>
+
+                              {/* Day Workout Blocks */}
+                              {isDayExpanded && (
+                                <div className="px-3 pb-3 space-y-1 bg-gray-50">
+                                  {day.blocks.map((block, idx) => (
+                                    <div key={idx} className="bg-white rounded p-2 border shadow-sm">
+                                      <div className="flex items-center justify-between mb-1">
+                                        <span className="text-sm font-medium text-blue-600">
+                                          Block {String.fromCharCode(65 + idx)}: {block.name}
+                                        </span>
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          className="text-xs px-2 py-1 h-6"
+                                          onClick={() => {
+                                            setSelectedWeek(week.weekNumber);
+                                            setSelectedDay(day.dayNumber);
+                                            setActiveTab("workout-section");
+                                          }}
+                                        >
+                                          Enter
+                                        </Button>
+                                      </div>
+                                      
+                                      {/* Exercise Preview */}
+                                      <div className="space-y-0.5">
+                                        {block.exercises.slice(0, 2).map((exercise, exIdx) => (
+                                          <div key={exIdx} className="text-xs text-gray-600 flex justify-between">
+                                            <span>{exercise.exerciseName}</span>
+                                            <span>{exercise.sets}x{exercise.reps} {exercise.weight}</span>
+                                          </div>
+                                        ))}
+                                        {block.exercises.length > 2 && (
+                                          <div className="text-xs text-gray-500">
+                                            +{block.exercises.length - 2} more
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Add New Exercise Dialog */}
+      <Dialog open={showAddExerciseDialog} onOpenChange={setShowAddExerciseDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add New Exercise</DialogTitle>
+          </DialogHeader>
+          <Form {...newExerciseForm}>
+            <form onSubmit={newExerciseForm.handleSubmit((data) => createExerciseMutation.mutate(data))} className="space-y-4">
+              <FormField
+                control={newExerciseForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Exercise Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Bulgarian Split Squat" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={newExerciseForm.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="strength">Strength</SelectItem>
+                        <SelectItem value="cardio">Cardio</SelectItem>
+                        <SelectItem value="functional">Functional</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={newExerciseForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Brief description of the exercise" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAddExerciseDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={createExerciseMutation.isPending}>
+                  {createExerciseMutation.isPending ? "Adding..." : "Add Exercise"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 pb-24">
+      {/* Compact Header */}
+      <div className="bg-white shadow-md border-b">
+        <div className="px-3">
+          <div className="flex items-center justify-between h-12">
+            <div className="flex items-center space-x-2">
+              <Activity className="h-5 w-5 text-blue-600" />
+              <div>
+                <h1 className="text-base font-bold text-gray-900">Body</h1>
+                <p className="text-xs text-gray-600">Elite Training Program</p>
+              </div>
+            </div>
+            <Button 
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-xs shadow-md"
+              onClick={() => setActiveTab("workout-section")}
+            >
+              <Play className="h-3 w-3 mr-1" />
+              Start Workout
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile-Optimized Content */}
+      <div className="px-2 py-3">
+        <div className="space-y-2">
+          {/* Program Overview */}
+          <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+            <h3 className="text-sm font-semibold text-gray-900 mb-1 flex items-center">
+              <Trophy className="h-4 w-4 mr-2 text-blue-600" />
+              4-Week Elite Training Program
+            </h3>
+            <p className="text-xs text-gray-600 mb-2">Comprehensive strength and conditioning program designed for maximum results</p>
+            
+            {/* Compact Phase Overview */}
+            <div className="grid grid-cols-4 gap-1">
+              {[1, 2, 3, 4].map((week) => {
+                const phase = week <= 2 ? "Load" : week === 3 ? "Peak" : "Deload";
+                
+                return (
+                  <div key={week} className={`rounded p-1.5 border text-center shadow-sm ${
+                    phase === "Load" ? "border-blue-300 bg-blue-50" :
+                    phase === "Peak" ? "border-red-300 bg-red-50" :
+                    "border-green-300 bg-green-50"
+                  }`}>
+                    <div className="text-xs font-medium text-gray-700">W{week}</div>
+                    <div className={`text-xs font-bold ${
+                      phase === "Load" ? "text-blue-600" :
+                      phase === "Peak" ? "text-red-600" :
+                      "text-green-600"
+                    }`}>{phase}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Compact Week Dropdowns */}
+          <div className="space-y-1">
+            {staticProgram.weeks.map((week) => {
+              const weekDates = getWeekDates(week.weekNumber);
+              const isExpanded = expandedWeeks.has(week.weekNumber);
+              
+              return (
+                <div key={week.weekNumber} className="bg-white rounded-lg shadow-md border border-blue-200">
+                  {/* Week Header */}
+                  <button
+                    onClick={() => toggleWeek(week.weekNumber)}
+                    className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <div className="text-sm font-semibold text-blue-600">
+                        Week {week.weekNumber}: {week.phase}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {weekDates.start} - {weekDates.end}
+                      </div>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 text-blue-600 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Week Content */}
+                  {isExpanded && (
+                    <div className="px-3 pb-3 space-y-1">
+                      <p className="text-xs text-gray-600 mb-2">{week.phaseDescription}</p>
+                      
+                      {/* Day Blocks */}
+                      <div className="space-y-1">
+                        {week.days.map((day) => {
+                          const dayKey = `${week.weekNumber}-${day.dayNumber}`;
+                          const isDayExpanded = expandedDays.has(dayKey);
+                          const dayDate = getDayDate(week.weekNumber, day.dayNumber);
+                          
+                          return (
+                            <div key={day.dayNumber} className="border border-gray-200 rounded shadow-sm">
+                              {/* Day Header */}
+                              <button
+                                onClick={() => toggleDay(week.weekNumber, day.dayNumber)}
+                                className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-sm font-medium text-gray-900">
+                                    Day {day.dayNumber}: {day.name}
+                                  </span>
+                                  <span className="text-xs text-gray-500">{dayDate}</span>
+                                </div>
+                                <ChevronDown className={`h-3 w-3 text-gray-600 transform transition-transform ${isDayExpanded ? 'rotate-180' : ''}`} />
+                              </button>
+
+                              {/* Day Workout Blocks */}
+                              {isDayExpanded && (
+                                <div className="px-3 pb-3 space-y-1 bg-gray-50">
+                                  {day.blocks.map((block, idx) => (
+                                    <div key={idx} className="bg-white rounded p-2 border shadow-sm">
+                                      <div className="flex items-center justify-between mb-1">
+                                        <span className="text-sm font-medium text-blue-600">
+                                          Block {String.fromCharCode(65 + idx)}: {block.name}
+                                        </span>
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          className="text-xs px-2 py-1 h-6"
+                                          onClick={() => {
+                                            setSelectedWeek(week.weekNumber);
+                                            setSelectedDay(day.dayNumber);
+                                            setActiveTab("workout-section");
+                                          }}
+                                        >
+                                          Enter
+                                        </Button>
+                                      </div>
+                                      
+                                      {/* Exercise Preview */}
+                                      <div className="space-y-0.5">
+                                        {block.exercises.slice(0, 2).map((exercise, exIdx) => (
+                                          <div key={exIdx} className="text-xs text-gray-600 flex justify-between">
+                                            <span>{exercise.exerciseName}</span>
+                                            <span>{exercise.sets}x{exercise.reps} {exercise.weight}</span>
+                                          </div>
+                                        ))}
+                                        {block.exercises.length > 2 && (
+                                          <div className="text-xs text-gray-500">
+                                            +{block.exercises.length - 2} more
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Add New Exercise Dialog */}
+      <Dialog open={showAddExerciseDialog} onOpenChange={setShowAddExerciseDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add New Exercise</DialogTitle>
+          </DialogHeader>
+          <Form {...newExerciseForm}>
+            <form onSubmit={newExerciseForm.handleSubmit((data) => createExerciseMutation.mutate(data))} className="space-y-4">
+              <FormField
+                control={newExerciseForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Exercise Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Bulgarian Split Squat" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={newExerciseForm.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="strength">Strength</SelectItem>
+                        <SelectItem value="cardio">Cardio</SelectItem>
+                        <SelectItem value="functional">Functional</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={newExerciseForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Brief description of the exercise" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAddExerciseDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={createExerciseMutation.isPending}>
+                  {createExerciseMutation.isPending ? "Adding..." : "Add Exercise"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
