@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Settings, CheckCircle2, Circle, Flame, Star, Zap, BarChart3, Shield, X, Layers, Trophy, Coffee, Moon } from "lucide-react";
+import { Plus, Settings, CheckCircle2, Circle, Flame, Star, Zap, BarChart3, Shield, X, Layers, Trophy, Coffee, Moon, Target, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -78,932 +78,726 @@ const getTimeOfDayLabel = (timeOfDay?: string) => {
     case 'afternoon': return 'Afternoon';
     case 'evening': return 'Evening';
     case 'night': return 'Night';
-    default: return 'Any time';
+    default: return 'Anytime';
   }
 };
 
+interface Rule {
+  id: number;
+  title: string;
+  description?: string;
+  completedToday: boolean;
+  streak: number;
+  category?: string;
+  importance?: 'high' | 'medium' | 'low';
+}
+
+interface ChallengeData {
+  id: number;
+  title: string;
+  description?: string;
+  duration: number; // 75 or 100 days
+  currentDay: number;
+  startDate: string;
+  completedDays: number[];
+  category?: string;
+  rules?: string[];
+}
+
 export default function HabitsPage() {
-  const [editHabitModalOpen, setEditHabitModalOpen] = useState(false);
-  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
-  const [showFormationInfo, setShowFormationInfo] = useState(true);
-  const [showFormationScience, setShowFormationScience] = useState(true);
-  const [rules, setRules] = useState([
-    { id: 1, text: "No social media before 10 AM", violated: false, streak: 12, category: "Digital Wellness", completedToday: true, failures: 2 },
-    { id: 2, text: "No processed food on weekdays", violated: false, streak: 8, category: "Nutrition", completedToday: true, failures: 0 },
-    { id: 3, text: "No screens 1 hour before bed", violated: true, streak: 0, category: "Sleep Hygiene", completedToday: false, failures: 5 },
-    { id: 4, text: "No negative self-talk", violated: false, streak: 5, category: "Mental Health", completedToday: true, failures: 1 },
-    { id: 5, text: "No skipping workouts without valid reason", violated: false, streak: 15, category: "Fitness", completedToday: true, failures: 0 },
-  ]);
+  const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [showNewHabitModal, setShowNewHabitModal] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [showHealthScore, setShowHealthScore] = useState(false);
   const [newRule, setNewRule] = useState("");
-  const [newRuleCategory, setNewRuleCategory] = useState("Personal");
+  const [isAddingRule, setIsAddingRule] = useState(false);
+  const [selectedTab, setSelectedTab] = useState("rituals");
+  const [activeChallenges, setActiveChallenges] = useState<ChallengeData[]>([]);
+  const [challengeTitle, setChallengeTitle] = useState("");
+  const [challengeDescription, setChallengeDescription] = useState("");
+  const [challengeDuration, setChallengeDuration] = useState(75);
+  const [challengeRules, setChallengeRules] = useState<string[]>([]);
+  const [newChallengeRule, setNewChallengeRule] = useState("");
+  const [isCreatingChallenge, setIsCreatingChallenge] = useState(false);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: habits = [], isLoading, error } = useQuery({
+  const { data: habits = [], isLoading: isLoadingHabits } = useQuery({
     queryKey: ['/api/habits'],
+    queryFn: () => apiRequest('/api/habits'),
+    refetchInterval: 5000,
+  });
+
+  const { data: rules = [], isLoading: isLoadingRules } = useQuery({
+    queryKey: ['/api/rules'],
+    queryFn: () => apiRequest('/api/rules'),
+    refetchInterval: 5000,
   });
 
   const toggleHabitMutation = useMutation({
-    mutationFn: async ({ habitId }: { habitId: number }) => {
-      const response = await apiRequest('POST', `/api/habits/${habitId}/toggle`);
-      return response;
-    },
+    mutationFn: (habitId: number) => apiRequest(`/api/habits/${habitId}/toggle`, { method: 'POST' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/habits'] });
       toast({
-        title: "Success",
-        description: "Habit updated successfully",
+        title: "Habit updated!",
+        description: "Keep building those positive routines.",
       });
     },
     onError: (error) => {
-      console.error("Toggle habit error:", error);
+      console.error('Error toggling habit:', error);
       toast({
         title: "Error",
-        description: "Failed to update habit",
+        description: "Failed to update habit. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteHabitMutation = useMutation({
+    mutationFn: (habitId: number) => apiRequest(`/api/habits/${habitId}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/habits'] });
+      toast({
+        title: "Habit deleted",
+        description: "The habit has been removed.",
+      });
+    },
+    onError: (error) => {
+      console.error('Error deleting habit:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete habit. Please try again.",
         variant: "destructive",
       });
     },
   });
 
   const handleToggleHabit = (habitId: number) => {
-    toggleHabitMutation.mutate({ habitId });
+    toggleHabitMutation.mutate(habitId);
+  };
+
+  const handleDeleteHabit = (habitId: number) => {
+    deleteHabitMutation.mutate(habitId);
   };
 
   const handleEditHabit = (habit: Habit) => {
-    setEditingHabit(habit);
-    setEditHabitModalOpen(true);
+    setSelectedHabit(habit);
+    setIsEditModalOpen(true);
   };
-
-  // Rules functions
 
   const handleAddRule = () => {
     if (newRule.trim()) {
-      const newRuleObj = {
-        id: Math.max(...rules.map(r => r.id), 0) + 1,
-        text: newRule.trim(),
-        violated: false,
-        streak: 0,
-        category: newRuleCategory,
-        completedToday: false,
-        failures: 0
-      };
-      setRules(prev => [...prev, newRuleObj]);
+      console.log('Adding rule:', newRule);
       setNewRule("");
-      toast({
-        title: "Success",
-        description: "New rule added successfully",
-      });
+      setIsAddingRule(false);
     }
   };
 
-  const handleDeleteRule = (ruleId: number) => {
-    setRules(prev => prev.filter(rule => rule.id !== ruleId));
+  const toggleRuleCompletion = (ruleId: number) => {
+    console.log('Toggling rule completion:', ruleId);
+  };
+
+  const markRuleFailure = (ruleId: number) => {
+    console.log('Marking rule failure:', ruleId);
+  };
+
+  const handleChallengeCheckOff = (challengeId: number, day: number) => {
+    setActiveChallenges(prev => 
+      prev.map(challenge => 
+        challenge.id === challengeId
+          ? {
+              ...challenge,
+              completedDays: challenge.completedDays.includes(day)
+                ? challenge.completedDays.filter(d => d !== day)
+                : [...challenge.completedDays, day]
+            }
+          : challenge
+      )
+    );
+  };
+
+  const createChallenge = () => {
+    if (!challengeTitle.trim()) return;
+    
+    const newChallenge: ChallengeData = {
+      id: Date.now(),
+      title: challengeTitle,
+      description: challengeDescription,
+      duration: challengeDuration,
+      currentDay: 1,
+      startDate: new Date().toISOString().split('T')[0],
+      completedDays: [],
+      rules: challengeRules
+    };
+    
+    setActiveChallenges(prev => [...prev, newChallenge]);
+    setChallengeTitle("");
+    setChallengeDescription("");
+    setChallengeRules([]);
+    setIsCreatingChallenge(false);
+    
     toast({
-      title: "Success", 
-      description: "Rule deleted successfully",
+      title: "Challenge Created!",
+      description: `Your ${challengeDuration}-day challenge has been started.`,
     });
   };
 
-  const toggleRuleCompletion = (id: number) => {
-    setRules(rules.map(rule => 
-      rule.id === id 
-        ? { 
-            ...rule, 
-            completedToday: !rule.completedToday,
-            streak: !rule.completedToday ? rule.streak + 1 : Math.max(0, rule.streak - 1)
-          }
-        : rule
-    ));
-    
-    const rule = rules.find(r => r.id === id);
-    if (rule) {
-      toast({
-        title: rule.completedToday ? "Promise broken today" : "Promise kept!",
-        description: rule.completedToday ? "Reset your commitment tomorrow" : "Building integrity, one day at a time",
-      });
-    }
-  };
-
-  const breakRule = (id: number) => {
-    setRules(rules.map(rule => 
-      rule.id === id 
-        ? { 
-            ...rule, 
-            completedToday: false,
-            violated: true,
-            streak: 0,
-            failures: rule.failures + 1
-          }
-        : rule
-    ));
-    
-    const rule = rules.find(r => r.id === id);
-    if (rule) {
-      toast({
-        title: "Promise broken",
-        description: `"${rule.text}" - Tomorrow is a fresh start to rebuild integrity`,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const markRuleFailure = (id: number) => {
-    setRules(rules.map(rule => 
-      rule.id === id 
-        ? { 
-            ...rule, 
-            failures: rule.failures + 1
-          }
-        : rule
-    ));
-    
-    const rule = rules.find(r => r.id === id);
-    if (rule) {
-      toast({
-        title: "Failure recorded",
-        description: `"${rule.text}" - Tracking for growth and awareness`,
-        variant: "destructive",
-      });
-    }
-  };
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Error loading habits</h2>
-          <p className="text-muted-foreground">{error instanceof Error ? error.message : 'Unknown error'}</p>
-        </div>
-      </div>
-    );
+  if (isLoadingHabits || isLoadingRules) {
+    return <div className="flex justify-center items-center h-64">Loading...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-8 pb-24">
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+    <div className="container mx-auto p-4 pb-24 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg">
+            <Layers className="w-6 h-6 text-white" />
           </div>
-        ) : (
-          <Tabs defaultValue="rituals" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="rituals" className="flex items-center gap-2">
-                <Star className="w-4 h-4" />
-                Rituals
-              </TabsTrigger>
-              <TabsTrigger value="rules" className="flex items-center gap-2">
-                <Shield className="w-4 h-4" />
-                Rules
-              </TabsTrigger>
-              <TabsTrigger value="challenge" className="flex items-center gap-2">
-                <Trophy className="w-4 h-4" />
-                Challenge
-              </TabsTrigger>
-            </TabsList>
+          <div>
+            <h1 className="text-2xl font-bold">Disciplines</h1>
+            <p className="text-gray-600">Build character through daily commitment</p>
+          </div>
+        </div>
+      </div>
 
-            <TabsContent value="rituals" className="space-y-6">
-              {/* Morning Routine */}
-              <Card className="border-0 shadow-lg relative">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Coffee className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
-                      <CardTitle className="text-base sm:text-lg">Morning Routine</CardTitle>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 w-7 p-0 text-amber-600 hover:bg-amber-50"
-                      onClick={() => {/* Add morning routine item */}}
-                    >
-                      <Plus className="w-3 h-3" />
-                    </Button>
-                  </div>
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                    Start your day with purpose
-                  </p>
-                  
-                  {/* Discipline Metrics Bar */}
-                  <div className="bg-amber-50 rounded-lg p-3 mt-3 space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs font-medium text-amber-800">Today's Progress</span>
-                      <span className="text-xs font-bold text-amber-800">75%</span>
-                    </div>
-                    <div className="w-full bg-amber-200 rounded-full h-2">
-                      <div 
-                        className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all duration-300"
-                        style={{ width: '75%' }}
-                      ></div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="text-center">
-                        <div className="font-bold text-green-600">3</div>
-                        <div className="text-gray-600">On Track</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="font-bold text-blue-600">12</div>
-                        <div className="text-gray-600">Avg Streak</div>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-2">
-                    {[
-                      { id: 'morning-1', text: 'Meditation (10 min)', completed: true, streak: 12 },
-                      { id: 'morning-2', text: 'Exercise', completed: false, streak: 8 },
-                      { id: 'morning-3', text: 'Healthy breakfast', completed: false, streak: 15 },
-                      { id: 'morning-4', text: 'Review daily priorities', completed: false, streak: 6 }
-                    ].map((routine) => (
-                      <div 
-                        key={routine.id}
-                        className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
-                          routine.completed ? 'bg-amber-50 border-amber-200' : 'border-gray-200 hover:bg-amber-50'
-                        }`}
-                      >
-                        <input 
-                          type="checkbox" 
-                          checked={routine.completed}
-                          onChange={() => {}}
-                          className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 rounded cursor-pointer"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <span className={`text-xs sm:text-sm ${routine.completed ? 'text-amber-800 font-medium' : 'text-gray-700'}`}>
-                            {routine.text}
-                          </span>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${
-                              routine.streak >= 7 
-                                ? 'bg-green-100 text-green-700' 
-                                : 'bg-orange-100 text-orange-700'
-                            }`}>
-                              {routine.streak} day streak
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+      {/* Tabs */}
+      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="rituals" className="flex items-center gap-2">
+            <Settings className="w-4 h-4" />
+            Rituals
+          </TabsTrigger>
+          <TabsTrigger value="rules" className="flex items-center gap-2">
+            <Shield className="w-4 h-4" />
+            Rules
+          </TabsTrigger>
+          <TabsTrigger value="challenge" className="flex items-center gap-2">
+            <Trophy className="w-4 h-4" />
+            Challenge
+          </TabsTrigger>
+        </TabsList>
 
-              {/* Evening Routine */}
-              <Card className="border-0 shadow-lg relative">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
-                      <CardTitle className="text-base sm:text-lg">Evening Routine</CardTitle>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 w-7 p-0 text-indigo-600 hover:bg-indigo-50"
-                      onClick={() => {/* Add evening routine item */}}
-                    >
-                      <Plus className="w-3 h-3" />
-                    </Button>
+        <TabsContent value="rituals" className="space-y-6">
+          {/* Morning Routine */}
+          <Card className="border-0 shadow-lg relative">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Coffee className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
+                  <CardTitle className="text-base sm:text-lg">Morning Routine</CardTitle>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 text-amber-600 hover:bg-amber-50"
+                  onClick={() => {/* Add morning routine item */}}
+                >
+                  <Plus className="w-3 h-3" />
+                </Button>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                Start your day with purpose
+              </p>
+              
+              {/* Discipline Metrics Bar */}
+              <div className="bg-amber-50 rounded-lg p-3 mt-3 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-medium text-amber-800">Today's Progress</span>
+                  <span className="text-xs font-bold text-amber-800">75%</span>
+                </div>
+                <div className="w-full bg-amber-200 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: '75%' }}
+                  ></div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="text-center">
+                    <div className="font-bold text-green-600">3</div>
+                    <div className="text-gray-600">On Track</div>
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                    End your day with reflection
-                  </p>
-                  
-                  {/* Discipline Metrics Bar */}
-                  <div className="bg-indigo-50 rounded-lg p-3 mt-3 space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs font-medium text-indigo-800">Today's Progress</span>
-                      <span className="text-xs font-bold text-indigo-800">50%</span>
-                    </div>
-                    <div className="w-full bg-indigo-200 rounded-full h-2">
-                      <div 
-                        className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300"
-                        style={{ width: '50%' }}
-                      ></div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="text-center">
-                        <div className="font-bold text-green-600">2</div>
-                        <div className="text-gray-600">On Track</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="font-bold text-purple-600">10</div>
-                        <div className="text-gray-600">Avg Streak</div>
-                      </div>
-                    </div>
+                  <div className="text-center">
+                    <div className="font-bold text-blue-600">12</div>
+                    <div className="text-gray-600">Avg Streak</div>
                   </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-2">
-                    {[
-                      { id: 'evening-1', text: 'Daily reflection', completed: false, streak: 9 },
-                      { id: 'evening-2', text: 'Reading (30 min)', completed: false, streak: 11 },
-                      { id: 'evening-3', text: 'Prepare tomorrow', completed: false, streak: 4 },
-                      { id: 'evening-4', text: 'Gratitude practice', completed: false, streak: 14 }
-                    ].map((routine) => (
-                      <div 
-                        key={routine.id}
-                        className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
-                          routine.completed ? 'bg-indigo-50 border-indigo-200' : 'border-gray-200 hover:bg-indigo-50'
-                        }`}
-                      >
-                        <input 
-                          type="checkbox" 
-                          checked={routine.completed}
-                          onChange={() => {}}
-                          className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 rounded cursor-pointer"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <span className={`text-xs sm:text-sm ${routine.completed ? 'text-indigo-800 font-medium' : 'text-gray-700'}`}>
-                            {routine.text}
-                          </span>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${
-                              routine.streak >= 7 
-                                ? 'bg-green-100 text-green-700' 
-                                : 'bg-orange-100 text-orange-700'
-                            }`}>
-                              {routine.streak} day streak
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Individual Habit Progress Bars */}
-              <IndividualHabitProgress habits={habits as Habit[]} />
-
-              {/* New Habits Section with Mind/Body/Soul Categories */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                
-                {/* Mind Category */}
-                <Card className="border-0 shadow-lg relative">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
-                          <span className="text-white text-xs">🧠</span>
-                        </div>
-                        <CardTitle className="text-base sm:text-lg">Mind Habits</CardTitle>
-                      </div>
-                      <NewHabitModal 
-                        category="mind"
-                        trigger={
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </Button>
-                        }
-                      />
-                    </div>
-                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                      Strengthen mental clarity and focus
-                    </p>
-                    
-                    {/* Progress Bar */}
-                    <div className="bg-blue-50 rounded-lg p-3 mt-3 space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs font-medium text-blue-800">67-Day Formation</span>
-                        <span className="text-xs font-bold text-blue-800">
-                          {Math.round(((habits as Habit[]).filter(h => h.category === 'mind' && h.completedToday).length / Math.max(1, (habits as Habit[]).filter(h => h.category === 'mind').length)) * 100)}%
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-2">
+                {[
+                  { id: 'morning-1', text: 'Meditation (10 min)', completed: true, streak: 12 },
+                  { id: 'morning-2', text: 'Exercise', completed: false, streak: 8 },
+                  { id: 'morning-3', text: 'Healthy breakfast', completed: false, streak: 15 },
+                  { id: 'morning-4', text: 'Review daily priorities', completed: false, streak: 6 }
+                ].map((routine) => (
+                  <div 
+                    key={routine.id}
+                    className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
+                      routine.completed ? 'bg-amber-50 border-amber-200' : 'border-gray-200 hover:bg-amber-50'
+                    }`}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={routine.completed}
+                      onChange={() => {}}
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 rounded cursor-pointer"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <span className={`text-xs sm:text-sm ${routine.completed ? 'text-amber-800 font-medium' : 'text-gray-700'}`}>
+                        {routine.text}
+                      </span>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          routine.streak >= 7 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-orange-100 text-orange-700'
+                        }`}>
+                          {routine.streak} day streak
                         </span>
                       </div>
-                      <div className="w-full bg-blue-200 rounded-full h-2">
-                        <div 
-                          className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-300"
-                          style={{ 
-                            width: `${Math.round(((habits as Habit[]).filter(h => h.category === 'mind' && h.completedToday).length / Math.max(1, (habits as Habit[]).filter(h => h.category === 'mind').length)) * 100)}%` 
-                          }}
-                        ></div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="text-center">
-                          <div className="font-bold text-green-600">
-                            {(habits as Habit[]).filter(h => h.category === 'mind' && h.streak >= 7).length}
-                          </div>
-                          <div className="text-gray-600">Forming</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-bold text-blue-600">
-                            {(habits as Habit[]).filter(h => h.category === 'mind').length > 0 
-                              ? Math.round((habits as Habit[]).filter(h => h.category === 'mind').reduce((acc, h) => acc + h.streak, 0) / (habits as Habit[]).filter(h => h.category === 'mind').length) 
-                              : 0}
-                          </div>
-                          <div className="text-gray-600">Avg Days</div>
-                        </div>
-                      </div>
                     </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-2">
-                      {(habits as Habit[]).filter(h => h.category === 'mind').map((habit) => (
-                        <div 
-                          key={habit.id}
-                          className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
-                            habit.completedToday ? 'bg-blue-50 border-blue-200' : 'border-gray-200 hover:bg-blue-50'
-                          }`}
-                        >
-                          <input 
-                            type="checkbox" 
-                            checked={habit.completedToday}
-                            onChange={() => handleToggleHabit(habit.id)}
-                            className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded cursor-pointer"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <span className={`text-xs sm:text-sm ${habit.completedToday ? 'text-blue-800 font-medium' : 'text-gray-700'}`}>
-                              {habit.title}
-                            </span>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                habit.streak >= 67
-                                  ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' 
-                                  : habit.streak >= 30
-                                  ? 'bg-green-100 text-green-700' 
-                                  : 'bg-blue-100 text-blue-700'
-                              }`}>
-                                {habit.streak}/67 days
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {(habits as Habit[]).filter(h => h.category === 'mind').length === 0 && (
-                        <div className="text-center py-4 text-gray-500 text-sm">
-                          No mind habits yet. Add one to start building mental clarity!
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-                {/* Body Category */}
-                <Card className="border-0 shadow-lg relative">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center">
-                          <span className="text-white text-xs">💪</span>
-                        </div>
-                        <CardTitle className="text-base sm:text-lg">Body Habits</CardTitle>
-                      </div>
-                      <NewHabitModal 
-                        category="body"
-                        trigger={
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0 text-orange-600 hover:bg-orange-50"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </Button>
-                        }
-                      />
-                    </div>
-                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                      Build physical strength and vitality
-                    </p>
-                    
-                    {/* Progress Bar */}
-                    <div className="bg-orange-50 rounded-lg p-3 mt-3 space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs font-medium text-orange-800">67-Day Formation</span>
-                        <span className="text-xs font-bold text-orange-800">
-                          {Math.round(((habits as Habit[]).filter(h => h.category === 'body' && h.completedToday).length / Math.max(1, (habits as Habit[]).filter(h => h.category === 'body').length)) * 100)}%
+          {/* Evening Routine */}
+          <Card className="border-0 shadow-lg relative">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+                  <CardTitle className="text-base sm:text-lg">Evening Routine</CardTitle>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 text-indigo-600 hover:bg-indigo-50"
+                  onClick={() => {/* Add evening routine item */}}
+                >
+                  <Plus className="w-3 h-3" />
+                </Button>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                End your day with reflection
+              </p>
+              
+              {/* Discipline Metrics Bar */}
+              <div className="bg-indigo-50 rounded-lg p-3 mt-3 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-medium text-indigo-800">Today's Progress</span>
+                  <span className="text-xs font-bold text-indigo-800">50%</span>
+                </div>
+                <div className="w-full bg-indigo-200 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: '50%' }}
+                  ></div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="text-center">
+                    <div className="font-bold text-green-600">2</div>
+                    <div className="text-gray-600">On Track</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-purple-600">10</div>
+                    <div className="text-gray-600">Avg Streak</div>
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-2">
+                {[
+                  { id: 'evening-1', text: 'Daily reflection', completed: false, streak: 9 },
+                  { id: 'evening-2', text: 'Reading (30 min)', completed: false, streak: 11 },
+                  { id: 'evening-3', text: 'Prepare tomorrow', completed: false, streak: 4 },
+                  { id: 'evening-4', text: 'Gratitude practice', completed: false, streak: 14 }
+                ].map((routine) => (
+                  <div 
+                    key={routine.id}
+                    className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
+                      routine.completed ? 'bg-indigo-50 border-indigo-200' : 'border-gray-200 hover:bg-indigo-50'
+                    }`}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={routine.completed}
+                      onChange={() => {}}
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 rounded cursor-pointer"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <span className={`text-xs sm:text-sm ${routine.completed ? 'text-indigo-800 font-medium' : 'text-gray-700'}`}>
+                        {routine.text}
+                      </span>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          routine.streak >= 7 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-orange-100 text-orange-700'
+                        }`}>
+                          {routine.streak} day streak
                         </span>
                       </div>
-                      <div className="w-full bg-orange-200 rounded-full h-2">
-                        <div 
-                          className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full transition-all duration-300"
-                          style={{ 
-                            width: `${Math.round(((habits as Habit[]).filter(h => h.category === 'body' && h.completedToday).length / Math.max(1, (habits as Habit[]).filter(h => h.category === 'body').length)) * 100)}%` 
-                          }}
-                        ></div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="text-center">
-                          <div className="font-bold text-green-600">
-                            {(habits as Habit[]).filter(h => h.category === 'body' && h.streak >= 7).length}
-                          </div>
-                          <div className="text-gray-600">Forming</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-bold text-orange-600">
-                            {(habits as Habit[]).filter(h => h.category === 'body').length > 0 
-                              ? Math.round((habits as Habit[]).filter(h => h.category === 'body').reduce((acc, h) => acc + h.streak, 0) / (habits as Habit[]).filter(h => h.category === 'body').length) 
-                              : 0}
-                          </div>
-                          <div className="text-gray-600">Avg Days</div>
-                        </div>
-                      </div>
                     </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-2">
-                      {(habits as Habit[]).filter(h => h.category === 'body').map((habit) => (
-                        <div 
-                          key={habit.id}
-                          className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
-                            habit.completedToday ? 'bg-orange-50 border-orange-200' : 'border-gray-200 hover:bg-orange-50'
-                          }`}
-                        >
-                          <input 
-                            type="checkbox" 
-                            checked={habit.completedToday}
-                            onChange={() => handleToggleHabit(habit.id)}
-                            className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 rounded cursor-pointer"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <span className={`text-xs sm:text-sm ${habit.completedToday ? 'text-orange-800 font-medium' : 'text-gray-700'}`}>
-                              {habit.title}
-                            </span>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                habit.streak >= 67
-                                  ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' 
-                                  : habit.streak >= 30
-                                  ? 'bg-green-100 text-green-700' 
-                                  : 'bg-orange-100 text-orange-700'
-                              }`}>
-                                {habit.streak}/67 days
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {(habits as Habit[]).filter(h => h.category === 'body').length === 0 && (
-                        <div className="text-center py-4 text-gray-500 text-sm">
-                          No body habits yet. Add one to start building physical strength!
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-                {/* Soul Category */}
-                <Card className="border-0 shadow-lg relative">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 flex items-center justify-center">
-                          <span className="text-white text-xs">✨</span>
-                        </div>
-                        <CardTitle className="text-base sm:text-lg">Soul Habits</CardTitle>
-                      </div>
-                      <NewHabitModal 
-                        category="soul"
-                        trigger={
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0 text-emerald-600 hover:bg-emerald-50"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </Button>
-                        }
-                      />
-                    </div>
-                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                      Nurture spiritual growth and purpose
-                    </p>
-                    
-                    {/* Progress Bar */}
-                    <div className="bg-emerald-50 rounded-lg p-3 mt-3 space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs font-medium text-emerald-800">67-Day Formation</span>
-                        <span className="text-xs font-bold text-emerald-800">
-                          {Math.round(((habits as Habit[]).filter(h => h.category === 'soul' && h.completedToday).length / Math.max(1, (habits as Habit[]).filter(h => h.category === 'soul').length)) * 100)}%
-                        </span>
-                      </div>
-                      <div className="w-full bg-emerald-200 rounded-full h-2">
-                        <div 
-                          className="bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full transition-all duration-300"
-                          style={{ 
-                            width: `${Math.round(((habits as Habit[]).filter(h => h.category === 'soul' && h.completedToday).length / Math.max(1, (habits as Habit[]).filter(h => h.category === 'soul').length)) * 100)}%` 
-                          }}
-                        ></div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="text-center">
-                          <div className="font-bold text-green-600">
-                            {(habits as Habit[]).filter(h => h.category === 'soul' && h.streak >= 7).length}
-                          </div>
-                          <div className="text-gray-600">Forming</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-bold text-emerald-600">
-                            {(habits as Habit[]).filter(h => h.category === 'soul').length > 0 
-                              ? Math.round((habits as Habit[]).filter(h => h.category === 'soul').reduce((acc, h) => acc + h.streak, 0) / (habits as Habit[]).filter(h => h.category === 'soul').length) 
-                              : 0}
-                          </div>
-                          <div className="text-gray-600">Avg Days</div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-2">
-                      {(habits as Habit[]).filter(h => h.category === 'soul').map((habit) => (
-                        <div 
-                          key={habit.id}
-                          className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
-                            habit.completedToday ? 'bg-emerald-50 border-emerald-200' : 'border-gray-200 hover:bg-emerald-50'
-                          }`}
-                        >
-                          <input 
-                            type="checkbox" 
-                            checked={habit.completedToday}
-                            onChange={() => handleToggleHabit(habit.id)}
-                            className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 rounded cursor-pointer"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <span className={`text-xs sm:text-sm ${habit.completedToday ? 'text-emerald-800 font-medium' : 'text-gray-700'}`}>
-                              {habit.title}
-                            </span>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                habit.streak >= 67
-                                  ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' 
-                                  : habit.streak >= 30
-                                  ? 'bg-green-100 text-green-700' 
-                                  : 'bg-emerald-100 text-emerald-700'
-                              }`}>
-                                {habit.streak}/67 days
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {(habits as Habit[]).filter(h => h.category === 'soul').length === 0 && (
-                        <div className="text-center py-4 text-gray-500 text-sm">
-                          No soul habits yet. Add one to start nurturing your spiritual growth!
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+          {/* Active Data Display for Long-term Completion and Adherence */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
+                    <Target className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl">Ritual Mastery Dashboard</CardTitle>
+                    <p className="text-sm text-gray-600">Long-term completion and adherence tracking</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-blue-100 text-blue-800">
+                    {(habits as Habit[]).filter(h => h.streak >= 30).length} mastered
+                  </Badge>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                {/* Overall Completion Rate */}
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {Math.round(((habits as Habit[]).filter(h => h.completedToday).length / Math.max(1, (habits as Habit[]).length)) * 100)}%
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1">Daily Completion</p>
+                  <div className="w-full bg-blue-200 rounded-full h-2 mt-2">
+                    <div 
+                      className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: `${Math.round(((habits as Habit[]).filter(h => h.completedToday).length / Math.max(1, (habits as Habit[]).length)) * 100)}%` 
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Average Streak */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-green-600">
+                    {(habits as Habit[]).length > 0 
+                      ? Math.round((habits as Habit[]).reduce((acc, h) => acc + h.streak, 0) / (habits as Habit[]).length) 
+                      : 0}
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1">Average Streak</p>
+                  <div className="flex items-center justify-center gap-1 mt-2">
+                    <Flame className="w-4 h-4 text-green-500" />
+                    <span className="text-xs text-gray-600">days</span>
+                  </div>
+                </div>
+
+                {/* Consistency Score */}
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {Math.round(((habits as Habit[]).filter(h => h.streak >= 7).length / Math.max(1, (habits as Habit[]).length)) * 100)}%
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1">Consistency Score</p>
+                  <div className="flex items-center justify-center gap-1 mt-2">
+                    <Star className="w-4 h-4 text-purple-500" />
+                    <span className="text-xs text-gray-600">7+ day streaks</span>
+                  </div>
+                </div>
+
+                {/* Total Active Rituals */}
+                <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-orange-600">
+                    {(habits as Habit[]).length}
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1">Active Rituals</p>
+                  <div className="flex items-center justify-center gap-1 mt-2">
+                    <CheckCircle2 className="w-4 h-4 text-orange-500" />
+                    <span className="text-xs text-gray-600">in progress</span>
+                  </div>
+                </div>
               </div>
 
-              {/* Mastered Habits Section (67+ days) */}
-              {(habits as Habit[]).some(h => h.streak >= 67) && (
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-yellow-50 to-orange-50">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-yellow-100 rounded-lg">
-                          <Trophy className="w-5 h-5 text-yellow-600" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg text-yellow-800">Mastered Habits</CardTitle>
-                          <p className="text-sm text-yellow-700">Congratulations! These habits are now automatic</p>
-                        </div>
-                      </div>
-                      <Badge className="bg-yellow-200 text-yellow-800 border-yellow-300">
-                        {(habits as Habit[]).filter(h => h.streak >= 67).length} mastered
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {(habits as Habit[]).filter(h => h.streak >= 67).map((habit) => {
-                        const categoryColors = {
-                          mind: 'bg-blue-100 text-blue-800 border-blue-300',
-                          body: 'bg-orange-100 text-orange-800 border-orange-300',
-                          soul: 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                        };
-                        
-                        const categoryIcons = {
-                          mind: '🧠',
-                          body: '💪',
-                          soul: '✨'
-                        };
-                        
-                        return (
+              {/* Weekly Progress Chart */}
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-medium text-gray-900 mb-3">Weekly Adherence Pattern</h4>
+                <div className="grid grid-cols-7 gap-2">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => {
+                    const completionRate = Math.floor(Math.random() * 100) + 1; // Mock data - replace with real calculation
+                    return (
+                      <div key={day} className="text-center">
+                        <div className="text-xs text-gray-600 mb-1">{day}</div>
+                        <div className="h-16 bg-gray-200 rounded relative">
                           <div 
-                            key={habit.id}
-                            className="bg-white rounded-lg p-4 border-2 border-yellow-200 hover:border-yellow-300 transition-all duration-200"
-                          >
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex items-center gap-2">
-                                <span className="text-lg">
-                                  {categoryIcons[habit.category as keyof typeof categoryIcons]}
-                                </span>
-                                <span className="font-medium text-gray-900">{habit.title}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Trophy className="w-4 h-4 text-yellow-600" />
-                                <span className="text-xs font-bold text-yellow-700">{habit.streak} days</span>
-                              </div>
-                            </div>
-                            
-                            <div className="flex items-center justify-between">
-                              <Badge 
-                                className={`text-xs ${categoryColors[habit.category as keyof typeof categoryColors]}`}
-                              >
-                                {habit.category?.charAt(0).toUpperCase()}{habit.category?.slice(1)}
-                              </Badge>
-                              
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-600">Mastered</span>
-                                <CheckCircle2 className="w-4 h-4 text-green-500" />
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-            </TabsContent>
-
-            <TabsContent value="foundations">
-              <FoundationsDashboard 
-                habits={habits as Habit[]} 
-                onToggleHabit={handleToggleHabit}
-                onEditHabit={handleEditHabit}
-                isLoading={toggleHabitMutation.isPending}
-              />
-            </TabsContent>
-
-            <TabsContent value="rules" className="space-y-6">
-              <RulesDashboard
-                rules={rules}
-                onToggleRuleCompletion={toggleRuleCompletion}
-                onMarkRuleFailure={markRuleFailure}
-                onAddRule={handleAddRule}
-                isLoading={false}
-              />
-            </TabsContent>
-
-            <TabsContent value="challenge" className="space-y-6">
-              {/* Active Challenges */}
-              <div className="space-y-4">
-                {/* Challenge Header */}
-                <Card className="border-0 shadow-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-2xl font-bold">75-100 Day Challenges</CardTitle>
-                        <p className="text-purple-100 mt-1">Push your limits with extended commitment challenges</p>
-                      </div>
-                      <Button 
-                        variant="secondary"
-                        className="bg-white text-purple-600 hover:bg-purple-50"
-                        onClick={() => {/* Add new challenge */}}
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        New Challenge
-                      </Button>
-                    </div>
-                  </CardHeader>
-                </Card>
-
-                {/* Example Challenge - 75 Hard */}
-                <Card className="border-0 shadow-lg">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-xl">75 Hard Challenge</CardTitle>
-                        <p className="text-sm text-gray-600 mt-1">Mental toughness program • Day 23 of 75</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-purple-600">30%</div>
-                        <p className="text-xs text-gray-500">Complete</p>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {/* Daily Tasks */}
-                    <div className="space-y-3 mb-6">
-                      <h4 className="font-medium text-gray-900 mb-2">Today's Requirements:</h4>
-                      <div className="space-y-2">
-                        {[
-                          { task: "Workout #1 (45 min)", completed: true },
-                          { task: "Workout #2 (45 min outdoor)", completed: false },
-                          { task: "Follow diet plan", completed: true },
-                          { task: "Drink 1 gallon of water", completed: true },
-                          { task: "Read 10 pages", completed: false },
-                          { task: "Take progress photo", completed: true }
-                        ].map((item, index) => (
-                          <div key={index} className="flex items-center gap-3">
-                            <input
-                              type="checkbox"
-                              checked={item.completed}
-                              onChange={() => {}}
-                              className="w-5 h-5 text-purple-600 rounded cursor-pointer"
-                            />
-                            <span className={`text-sm ${item.completed ? 'line-through text-gray-500' : 'text-gray-700'}`}>
-                              {item.task}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Progress Grid */}
-                    <div className="border-t pt-4">
-                      <h4 className="font-medium text-gray-900 mb-3">Progress Tracker:</h4>
-                      <div className="grid grid-cols-10 gap-1">
-                        {Array.from({ length: 75 }, (_, i) => {
-                          const dayNumber = i + 1;
-                          const isCompleted = dayNumber <= 22;
-                          const isToday = dayNumber === 23;
-                          const isFuture = dayNumber > 23;
-                          
-                          return (
-                            <div
-                              key={i}
-                              className={`
-                                aspect-square rounded flex items-center justify-center text-xs font-medium
-                                ${isCompleted ? 'bg-green-500 text-white' : ''}
-                                ${isToday ? 'bg-purple-500 text-white ring-2 ring-purple-300' : ''}
-                                ${isFuture ? 'bg-gray-100 text-gray-400' : ''}
-                              `}
-                            >
-                              {dayNumber}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Example Challenge - 100 Days of Code */}
-                <Card className="border-0 shadow-lg">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-xl">100 Days of Code</CardTitle>
-                        <p className="text-sm text-gray-600 mt-1">Code for at least 1 hour daily • Day 45 of 100</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-blue-600">45%</div>
-                        <p className="text-xs text-gray-500">Complete</p>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {/* Daily Task */}
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            checked={false}
-                            onChange={() => {}}
-                            className="w-6 h-6 text-blue-600 rounded cursor-pointer"
-                          />
-                          <div>
-                            <p className="font-medium text-gray-900">Code for 1+ hours</p>
-                            <p className="text-sm text-gray-600">Work on personal project or tutorials</p>
-                          </div>
+                            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-500 to-blue-300 rounded transition-all duration-300"
+                            style={{ height: `${completionRate}%` }}
+                          ></div>
                         </div>
-                        <Button variant="outline" size="sm">
-                          Log Progress
+                        <div className="text-xs text-gray-500 mt-1">{completionRate}%</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Monthly Progress Trend */}
+              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                <h4 className="font-medium text-gray-900 mb-3">Monthly Trend</h4>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-600">89%</div>
+                      <p className="text-xs text-gray-600">This Month</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-green-600">+12%</div>
+                      <p className="text-xs text-gray-600">vs Last Month</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-purple-600">24</div>
+                      <p className="text-xs text-gray-600">Best Streak</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <ChevronUp className="w-4 h-4 text-green-500" />
+                    <span className="text-sm text-green-600 font-medium">Improving</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="rules" className="space-y-6">
+          <RulesDashboard
+            rules={rules}
+            onToggleRuleCompletion={toggleRuleCompletion}
+            onMarkRuleFailure={markRuleFailure}
+            onAddRule={handleAddRule}
+            isLoading={false}
+          />
+        </TabsContent>
+
+        <TabsContent value="challenge" className="space-y-6">
+          {/* Active Challenges */}
+          <div className="space-y-4">
+            {/* Challenge Header */}
+            <Card className="border-0 shadow-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl font-bold">75-100 Day Challenges</CardTitle>
+                    <p className="text-purple-100 mt-1">Push your limits with extended commitment challenges</p>
+                  </div>
+                  <Button
+                    onClick={() => setIsCreatingChallenge(true)}
+                    className="bg-white text-purple-600 hover:bg-purple-50"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Challenge
+                  </Button>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {/* Active Challenges List */}
+            {activeChallenges.map((challenge) => (
+              <Card key={challenge.id} className="border-0 shadow-lg">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-xl">{challenge.title}</CardTitle>
+                      <p className="text-sm text-gray-600">{challenge.description}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-purple-600">
+                        {challenge.currentDay}/{challenge.duration}
+                      </div>
+                      <p className="text-sm text-gray-600">Days</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {/* Progress Grid */}
+                  <div className="grid grid-cols-10 gap-2 mb-4">
+                    {Array.from({ length: challenge.duration }, (_, i) => i + 1).map((day) => (
+                      <button
+                        key={day}
+                        onClick={() => handleChallengeCheckOff(challenge.id, day)}
+                        className={`
+                          w-8 h-8 rounded text-xs font-medium border-2 transition-all duration-200
+                          ${challenge.completedDays.includes(day)
+                            ? 'bg-green-500 border-green-500 text-white'
+                            : day <= challenge.currentDay
+                              ? 'bg-gray-100 border-gray-300 hover:bg-green-100 hover:border-green-300'
+                              : 'bg-gray-50 border-gray-200 text-gray-400'
+                          }
+                        `}
+                        disabled={day > challenge.currentDay}
+                      >
+                        {day}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Challenge Rules */}
+                  {challenge.rules && challenge.rules.length > 0 && (
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-medium text-gray-900 mb-2">Challenge Rules:</h4>
+                      <ul className="space-y-1">
+                        {challenge.rules.map((rule, index) => (
+                          <li key={index} className="text-sm text-gray-700 flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            {rule}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+
+            {/* Create Challenge Form */}
+            {isCreatingChallenge && (
+              <Card className="border-0 shadow-lg">
+                <CardHeader>
+                  <CardTitle>Create New Challenge</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Challenge Title
+                    </label>
+                    <input
+                      type="text"
+                      value={challengeTitle}
+                      onChange={(e) => setChallengeTitle(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Enter challenge title..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Description
+                    </label>
+                    <textarea
+                      value={challengeDescription}
+                      onChange={(e) => setChallengeDescription(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      rows={3}
+                      placeholder="Describe your challenge..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Duration
+                    </label>
+                    <select
+                      value={challengeDuration}
+                      onChange={(e) => setChallengeDuration(Number(e.target.value))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                      <option value={75}>75 Days</option>
+                      <option value={100}>100 Days</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Challenge Rules
+                    </label>
+                    <div className="space-y-2">
+                      {challengeRules.map((rule, index) => (
+                        <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                          <CheckCircle2 className="w-4 h-4 text-green-500" />
+                          <span className="text-sm">{rule}</span>
+                          <button
+                            onClick={() => setChallengeRules(challengeRules.filter((_, i) => i !== index))}
+                            className="ml-auto text-red-500 hover:text-red-700"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={newChallengeRule}
+                          onChange={(e) => setNewChallengeRule(e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          placeholder="Add a rule..."
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter' && newChallengeRule.trim()) {
+                              setChallengeRules([...challengeRules, newChallengeRule.trim()]);
+                              setNewChallengeRule("");
+                            }
+                          }}
+                        />
+                        <Button
+                          onClick={() => {
+                            if (newChallengeRule.trim()) {
+                              setChallengeRules([...challengeRules, newChallengeRule.trim()]);
+                              setNewChallengeRule("");
+                            }
+                          }}
+                          size="sm"
+                        >
+                          <Plus className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Progress Bar */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Progress</span>
-                        <span className="font-medium">45 / 100 days</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div 
-                          className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300"
-                          style={{ width: '45%' }}
-                        ></div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
-        )}
+                  <div className="flex gap-3">
+                    <Button onClick={createChallenge} className="bg-purple-600 hover:bg-purple-700">
+                      Create Challenge
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setIsCreatingChallenge(false);
+                        setChallengeTitle("");
+                        setChallengeDescription("");
+                        setChallengeRules([]);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
 
-        {/* Edit Habit Modal */}
-        <EditHabitModal
-          open={editHabitModalOpen}
-          onOpenChange={setEditHabitModalOpen}
-          onSuccess={() => {
-            queryClient.invalidateQueries({ queryKey: ['/api/habits'] });
-            setEditHabitModalOpen(false);
-            setEditingHabit(null);
-          }}
-          habit={editingHabit}
-        />
-      </div>
+      {/* Modals */}
+      <EditHabitModal
+        habit={selectedHabit}
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedHabit(null);
+        }}
+        onSave={() => {
+          queryClient.invalidateQueries({ queryKey: ['/api/habits'] });
+          setIsEditModalOpen(false);
+          setSelectedHabit(null);
+        }}
+      />
     </div>
   );
 }

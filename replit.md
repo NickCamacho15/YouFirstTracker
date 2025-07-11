@@ -123,6 +123,16 @@ Build scripts include:
 
 ## Changelog
 
+- July 11, 2025: Rituals Tab Restructured - Removed Mind/Body/Soul Categories for Morning/Evening Routines Only
+  - **REMOVED**: Mind, Body, Soul category cards from Rituals tab
+  - **SIMPLIFIED**: Rituals tab now contains only Morning and Evening routines with active data display
+  - **NEW**: Ritual Mastery Dashboard with comprehensive long-term completion and adherence tracking
+  - **ENHANCED**: Active data display featuring Daily Completion, Average Streak, Consistency Score, and Total Active Rituals
+  - **ADDED**: Weekly Adherence Pattern chart showing completion rates across all seven days
+  - **ADDED**: Monthly Progress Trend section with improvement indicators and comparative metrics
+  - **STREAMLINED**: Focus on core morning/evening routines with discipline metrics bars for each section
+  - **IMPROVED**: Visual data presentation with gradient backgrounds, progress charts, and statistical insights
+  - Rituals tab now emphasizes structured daily routines with powerful analytics for long-term habit adherence
 - July 11, 2025: Navigation Refined - Disciplines Page with Improved Grid Layout and Challenge Tracking
   - **RENAMED**: "Habits" navigation renamed to "Disciplines" for stronger personal development messaging
   - **RESTRUCTURED**: Disciplines page now has 3 tabs: "Rituals", "Rules", and "Challenge"
