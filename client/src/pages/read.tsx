@@ -74,40 +74,40 @@ export default function MindPage() {
           {/* Reading Tab */}
           <TabsContent value="reading" className="mt-6">
             {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-3 gap-4 mb-8">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Reading Time</CardTitle>
-                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs font-medium">Total Time</CardTitle>
+                  <Clock className="h-3 w-3 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{Math.floor(totalMinutes / 60)}h {totalMinutes % 60}m</div>
+                <CardContent className="pb-2">
+                  <div className="text-lg font-bold">{Math.floor(totalMinutes / 60)}h {totalMinutes % 60}m</div>
                   <p className="text-xs text-muted-foreground">
-                    Across all sessions
+                    All sessions
                   </p>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Reading Sessions</CardTitle>
-                  <BookOpen className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs font-medium">Sessions</CardTitle>
+                  <BookOpen className="h-3 w-3 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{totalSessions}</div>
+                <CardContent className="pb-2">
+                  <div className="text-lg font-bold">{totalSessions}</div>
                   <p className="text-xs text-muted-foreground">
-                    Total completed
+                    Completed
                   </p>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Average Session</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-xs font-medium">Average</CardTitle>
+                  <TrendingUp className="h-3 w-3 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{averageSession}m</div>
+                <CardContent className="pb-2">
+                  <div className="text-lg font-bold">{averageSession}m</div>
                   <p className="text-xs text-muted-foreground">
                     Per session
                   </p>
