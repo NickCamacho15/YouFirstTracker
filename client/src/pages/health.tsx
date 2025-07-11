@@ -349,9 +349,6 @@ export default function HealthPage() {
 
           {/* Workout Tab Content */}
           <TabsContent value="workout" className="mt-3 space-y-2">
-            {/* Progress Analytics */}
-            <ProgressAnalytics />
-            
             {/* Program Overview */}
           <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
             <h3 className="text-sm font-semibold text-gray-900 mb-1 flex items-center">
@@ -458,7 +455,9 @@ export default function HealthPage() {
               );
             })}
           </div>
-
+          
+          {/* Progress Analytics */}
+          <ProgressAnalytics />
 
           </TabsContent>
         </Tabs>
