@@ -45,34 +45,27 @@ export function MeditationSection() {
     },
   });
 
-  // Play sharper, louder gong sound
+  // Play authentic gong sound - louder but natural
   const playGong = () => {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
-    const filterNode = audioContext.createBiquadFilter();
     
-    oscillator.connect(filterNode);
-    filterNode.connect(gainNode);
+    oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
     
-    // Sharper frequency profile for clearer gong
-    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 2.5);
+    // Authentic gong frequency - starts at 150Hz and decays to 80Hz
+    oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 3);
     oscillator.type = "sine";
     
-    // Filter for sharper, clearer sound
-    filterNode.type = 'bandpass';
-    filterNode.frequency.setValueAtTime(300, audioContext.currentTime);
-    filterNode.Q.setValueAtTime(8, audioContext.currentTime);
-    
-    // Louder volume with sharper attack
+    // Louder but natural gong envelope
     gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.8, audioContext.currentTime + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 3);
+    gainNode.gain.linearRampToValueAtTime(0.7, audioContext.currentTime + 0.02);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 4);
     
     oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 3);
+    oscillator.stop(audioContext.currentTime + 4);
   };
 
   // Timer logic
