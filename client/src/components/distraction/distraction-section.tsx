@@ -300,7 +300,12 @@ export default function DistractionSection() {
           return (
             <TabsContent key={dateStr} value={dateStr} className="mt-6">
               <div className="space-y-4">
-                {platforms.filter(p => !hiddenPlatforms.includes(p.name)).map((platform) => {
+                {platforms.map((platform) => {
+                  // Skip if platform is hidden
+                  if (hiddenPlatforms.includes(platform.name)) {
+                    return null;
+                  }
+                  
                   const Icon = platform.icon;
                   const timeData = dayData[dateStr]?.[platform.name] || { hours: '', minutes: '' };
                   
@@ -317,9 +322,9 @@ export default function DistractionSection() {
                           
                           <div className="flex items-center gap-2">
                             <div>
-                              <Label htmlFor={`${platform.name}-hours`} className="text-xs text-gray-600">Hr</Label>
+                              <Label htmlFor={`${platform.name}-hours-${dateStr}`} className="text-xs text-gray-600">Hr</Label>
                               <Input
-                                id={`${platform.name}-hours`}
+                                id={`${platform.name}-hours-${dateStr}`}
                                 type="number"
                                 value={timeData.hours}
                                 onChange={(e) => handleTimeChange(dateStr, platform.name, 'hours', e.target.value)}
@@ -331,9 +336,9 @@ export default function DistractionSection() {
                               />
                             </div>
                             <div>
-                              <Label htmlFor={`${platform.name}-minutes`} className="text-xs text-gray-600">Min</Label>
+                              <Label htmlFor={`${platform.name}-minutes-${dateStr}`} className="text-xs text-gray-600">Min</Label>
                               <Input
-                                id={`${platform.name}-minutes`}
+                                id={`${platform.name}-minutes-${dateStr}`}
                                 type="number"
                                 value={timeData.minutes}
                                 onChange={(e) => handleTimeChange(dateStr, platform.name, 'minutes', e.target.value)}
