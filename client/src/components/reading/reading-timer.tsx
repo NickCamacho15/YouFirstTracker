@@ -53,15 +53,6 @@ export function ReadingTimer({ readingSessions }: ReadingTimerProps) {
   });
 
   const startReading = () => {
-    if (!currentBook.trim()) {
-      toast({
-        title: "Book title required",
-        description: "Please enter the book you're reading.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsRunning(true);
     startTimeRef.current = new Date();
     setElapsedTime(0);
@@ -70,7 +61,7 @@ export function ReadingTimer({ readingSessions }: ReadingTimerProps) {
       setElapsedTime(prev => prev + 1);
     }, 1000);
 
-    toast({ title: "Reading session started", description: `Enjoy reading "${currentBook}"!` });
+    toast({ title: "Reading session started", description: "Timer is now running. Happy reading!" });
   };
 
   const stopReading = () => {
@@ -84,7 +75,7 @@ export function ReadingTimer({ readingSessions }: ReadingTimerProps) {
 
     const endTime = new Date();
     setSessionData({
-      bookTitle: currentBook,
+      bookTitle: currentBook || "Reading Session",
       startTime: startTimeRef.current,
       endTime,
     });
@@ -130,35 +121,34 @@ export function ReadingTimer({ readingSessions }: ReadingTimerProps) {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Reading Timer */}
       <div className="lg:col-span-2">
-        <Card className="p-8 mb-6 text-center">
-          <h3 className="text-lg font-semibold text-primary mb-6">Reading Session</h3>
+        <Card className="p-8 mb-6 text-center bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+          <h3 className="text-lg font-semibold text-orange-800 mb-6">Reading Session</h3>
           
           {/* Timer Display */}
           <div className="mb-8">
-            <div className="text-6xl font-bold text-accent mb-2">
+            <div className="text-6xl font-bold text-orange-800 mb-2">
               {formatTime(elapsedTime)}
             </div>
-            <p className="text-muted-foreground">Current session</p>
+            <p className="text-orange-600 font-medium">Current session</p>
           </div>
 
           {/* Book Input */}
           <div className="mb-6">
             <Input
-              placeholder="What are you reading today?"
+              placeholder="Book title (optional)..."
               value={currentBook}
               onChange={(e) => setCurrentBook(e.target.value)}
               disabled={isRunning}
-              className="max-w-sm mx-auto mb-4"
+              className="max-w-sm mx-auto mb-4 text-center"
             />
-            <p className="text-muted-foreground text-sm">Currently Reading</p>
           </div>
 
           {/* Timer Controls */}
-          <div className="flex justify-center space-x-4">
+          <div className="flex flex-col gap-2">
             <Button
               onClick={startReading}
               disabled={isRunning}
-              className="px-8 py-3 font-medium"
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-3 font-medium"
             >
               <Play className="w-4 h-4 mr-2" />
               Start Reading
@@ -167,7 +157,7 @@ export function ReadingTimer({ readingSessions }: ReadingTimerProps) {
               onClick={stopReading}
               disabled={!isRunning}
               variant="outline"
-              className="px-8 py-3 font-medium"
+              className="border-orange-300 text-orange-700 hover:bg-orange-100 px-8 py-3 font-medium"
             >
               <Square className="w-4 h-4 mr-2" />
               End & Reflect

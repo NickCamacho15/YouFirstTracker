@@ -3,12 +3,13 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { eq, desc, and, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { 
-  users, goals, microGoals, habits, habitLogs, readingSessions, posts, visionBoard, tasks, rules,
+  users, goals, microGoals, habits, habitLogs, readingSessions, readingList, posts, visionBoard, tasks, rules,
   followers, postReactions, postComments, workouts, exercises, workoutExercises, bodyWeightLogs,
   trainingTemplates, exerciseHistory,
   type User, type InsertUser, type Goal, type InsertGoal, type MicroGoal, type InsertMicroGoal,
   type Habit, type InsertHabit, type HabitLog, type InsertHabitLog,
-  type ReadingSession, type InsertReadingSession, type Post, type InsertPost,
+  type ReadingSession, type InsertReadingSession, type ReadingListItem, type InsertReadingListItem,
+  type Post, type InsertPost,
   type VisionBoardItem, type InsertVisionBoardItem, type Task, type InsertTask, type Rule, type InsertRule,
   type Follower, type InsertFollower, type PostReaction, type InsertPostReaction,
   type PostComment, type InsertPostComment, type Workout, type InsertWorkout,
@@ -61,6 +62,12 @@ export interface IStorage {
   // Reading Sessions
   getReadingSessionsByUserId(userId: number): Promise<ReadingSession[]>;
   createReadingSession(session: InsertReadingSession): Promise<ReadingSession>;
+
+  // Reading List
+  getReadingListByUserId(userId: number): Promise<ReadingListItem[]>;
+  createReadingListItem(item: InsertReadingListItem): Promise<ReadingListItem>;
+  updateReadingListItem(id: number, updates: Partial<ReadingListItem>): Promise<ReadingListItem | undefined>;
+  deleteReadingListItem(id: number): Promise<boolean>;
 
   // Posts
   getRecentPosts(limit?: number): Promise<(Post & { user: Pick<User, 'displayName'> })[]>;
@@ -284,6 +291,26 @@ export class DatabaseStorage implements IStorage {
   async createReadingSession(session: InsertReadingSession): Promise<ReadingSession> {
     const result = await db.insert(readingSessions).values(session).returning();
     return result[0];
+  }
+
+  // Reading List
+  async getReadingListByUserId(userId: number): Promise<ReadingListItem[]> {
+    return await db.select().from(readingList).where(eq(readingList.userId, userId)).orderBy(desc(readingList.createdAt));
+  }
+
+  async createReadingListItem(item: InsertReadingListItem): Promise<ReadingListItem> {
+    const result = await db.insert(readingList).values(item).returning();
+    return result[0];
+  }
+
+  async updateReadingListItem(id: number, updates: Partial<ReadingListItem>): Promise<ReadingListItem | undefined> {
+    const result = await db.update(readingList).set(updates).where(eq(readingList.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteReadingListItem(id: number): Promise<boolean> {
+    const result = await db.delete(readingList).where(eq(readingList.id, id));
+    return result.rowCount > 0;
   }
 
   // Posts

@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
-import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema } from "@shared/schema";
+import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertReadingListSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema } from "@shared/schema";
 import { generateWorkoutProgram } from "./ai";
 import { z } from "zod";
 
@@ -393,6 +393,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Create reading session error:", error);
       res.status(400).json({ message: "Failed to create reading session" });
+    }
+  });
+
+  // Reading List routes
+  app.get("/api/reading-list", requireAuth, async (req, res) => {
+    try {
+      const readingList = await storage.getReadingListByUserId(req.session.userId);
+      res.json(readingList);
+    } catch (error) {
+      console.error("Get reading list error:", error);
+      res.status(500).json({ message: "Failed to get reading list" });
+    }
+  });
+
+  app.post("/api/reading-list", requireAuth, async (req, res) => {
+    try {
+      const readingListData = insertReadingListSchema.parse({ 
+        ...req.body, 
+        userId: req.session.userId 
+      });
+      const readingListItem = await storage.createReadingListItem(readingListData);
+      res.json(readingListItem);
+    } catch (error) {
+      console.error("Create reading list item error:", error);
+      res.status(400).json({ message: "Failed to create reading list item" });
+    }
+  });
+
+  app.patch("/api/reading-list/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = req.body;
+      const readingListItem = await storage.updateReadingListItem(id, updates);
+      
+      if (!readingListItem) {
+        return res.status(404).json({ message: "Reading list item not found" });
+      }
+
+      res.json(readingListItem);
+    } catch (error) {
+      console.error("Update reading list item error:", error);
+      res.status(400).json({ message: "Failed to update reading list item" });
+    }
+  });
+
+  app.delete("/api/reading-list/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deleteReadingListItem(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Reading list item not found" });
+      }
+
+      res.json({ message: "Reading list item deleted" });
+    } catch (error) {
+      console.error("Delete reading list item error:", error);
+      res.status(400).json({ message: "Failed to delete reading list item" });
     }
   });
 

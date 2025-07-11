@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReadingTimer } from "@/components/reading/reading-timer";
 import { BookOpen, Clock, TrendingUp, Brain, Smartphone } from "lucide-react";
+import { ReadingList } from "@/components/reading/reading-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ReadingSession {
@@ -75,40 +76,40 @@ export default function MindPage() {
           <TabsContent value="reading" className="mt-6">
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 mb-8">
-              <Card>
+              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs font-medium">Total Time</CardTitle>
-                  <Clock className="h-3 w-3 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-blue-700">Total Time</CardTitle>
+                  <Clock className="h-5 w-5 text-blue-600" />
                 </CardHeader>
                 <CardContent className="pb-2">
-                  <div className="text-lg font-bold">{Math.floor(totalMinutes / 60)}h {totalMinutes % 60}m</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="text-3xl font-bold text-blue-800">{Math.floor(totalMinutes / 60)}h {totalMinutes % 60}m</div>
+                  <p className="text-sm text-blue-600 font-medium">
                     All sessions
                   </p>
                 </CardContent>
               </Card>
               
-              <Card>
+              <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs font-medium">Sessions</CardTitle>
-                  <BookOpen className="h-3 w-3 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-green-700">Sessions</CardTitle>
+                  <BookOpen className="h-5 w-5 text-green-600" />
                 </CardHeader>
                 <CardContent className="pb-2">
-                  <div className="text-lg font-bold">{totalSessions}</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="text-3xl font-bold text-green-800">{totalSessions}</div>
+                  <p className="text-sm text-green-600 font-medium">
                     Completed
                   </p>
                 </CardContent>
               </Card>
               
-              <Card>
+              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-xs font-medium">Average</CardTitle>
-                  <TrendingUp className="h-3 w-3 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-purple-700">Average</CardTitle>
+                  <TrendingUp className="h-5 w-5 text-purple-600" />
                 </CardHeader>
                 <CardContent className="pb-2">
-                  <div className="text-lg font-bold">{averageSession}m</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="text-3xl font-bold text-purple-800">{averageSession}m</div>
+                  <p className="text-sm text-purple-600 font-medium">
                     Per session
                   </p>
                 </CardContent>
@@ -118,6 +119,11 @@ export default function MindPage() {
             {/* Reading Timer */}
             <div className="mb-8">
               <ReadingTimer readingSessions={readingSessions as ReadingSession[]} />
+            </div>
+
+            {/* Reading List */}
+            <div className="mb-8">
+              <ReadingList />
             </div>
           </TabsContent>
 

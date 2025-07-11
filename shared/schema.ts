@@ -67,6 +67,16 @@ export const readingSessions = pgTable("reading_sessions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const readingList = pgTable("reading_list", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  title: text("title").notNull(),
+  author: text("author"),
+  isCompleted: boolean("is_completed").default(false).notNull(),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Social features
 export const followers = pgTable("followers", {
   id: serial("id").primaryKey(),
@@ -408,6 +418,13 @@ export const insertReadingSessionSchema = createInsertSchema(readingSessions).om
   createdAt: true,
 });
 
+export const insertReadingListSchema = createInsertSchema(readingList).omit({
+  id: true,
+  createdAt: true,
+  isCompleted: true,
+  completedAt: true,
+});
+
 export const insertFollowerSchema = createInsertSchema(followers).omit({
   id: true,
   createdAt: true,
@@ -560,6 +577,8 @@ export type HabitLog = typeof habitLogs.$inferSelect;
 export type InsertHabitLog = z.infer<typeof insertHabitLogSchema>;
 export type ReadingSession = typeof readingSessions.$inferSelect;
 export type InsertReadingSession = z.infer<typeof insertReadingSessionSchema>;
+export type ReadingListItem = typeof readingList.$inferSelect;
+export type InsertReadingListItem = z.infer<typeof insertReadingListSchema>;
 export type Post = typeof posts.$inferSelect;
 export type InsertPost = z.infer<typeof insertPostSchema>;
 export type VisionBoardItem = typeof visionBoard.$inferSelect;
