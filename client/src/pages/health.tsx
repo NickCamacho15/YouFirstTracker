@@ -1918,36 +1918,255 @@ export default function HealthPage() {
     );
   }
 
+  // Helper function to get week dates
+  const getWeekDates = (weekNumber: number) => {
+    const today = new Date();
+    const startOfProgram = new Date(today);
+    startOfProgram.setDate(today.getDate() - ((weekNumber - 1) * 7));
+    
+    const weekStart = new Date(startOfProgram);
+    const weekEnd = new Date(startOfProgram);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    
+    return {
+      start: weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      end: weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    };
+  };
+
+  const getDayDate = (weekNumber: number, dayNumber: number) => {
+    const today = new Date();
+    const startOfProgram = new Date(today);
+    startOfProgram.setDate(today.getDate() - ((weekNumber - 1) * 7) + (dayNumber - 1));
+    
+    return startOfProgram.toLocaleDateString('en-US', { 
+      weekday: 'short', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
+
+  const [expandedWeeks, setExpandedWeeks] = useState<Set<number>>(new Set());
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
+
+  const toggleWeek = (weekNumber: number) => {
+    const newExpanded = new Set(expandedWeeks);
+    if (newExpanded.has(weekNumber)) {
+      newExpanded.delete(weekNumber);
+    } else {
+      newExpanded.add(weekNumber);
+    }
+    setExpandedWeeks(newExpanded);
+  };
+
+  const toggleDay = (weekNumber: number, dayNumber: number) => {
+    const key = `${weekNumber}-${dayNumber}`;
+    const newExpanded = new Set(expandedDays);
+    if (newExpanded.has(key)) {
+      newExpanded.delete(key);
+    } else {
+      newExpanded.add(key);
+    }
+    setExpandedDays(newExpanded);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14">
+      {/* Compact Header */}
+      <div className="bg-white shadow-md border-b">
+        <div className="max-w-6xl mx-auto px-3">
+          <div className="flex items-center justify-between h-10">
             <div className="flex items-center space-x-2">
-              <Activity className="h-6 w-6 text-blue-600" />
+              <Activity className="h-5 w-5 text-blue-600" />
               <div>
-                <h1 className="text-lg font-semibold text-gray-900">Health & Fitness</h1>
-                <p className="text-xs text-gray-600">Track your wellness journey</p>
+                <h1 className="text-sm font-bold text-gray-900">Body Training</h1>
+                <p className="text-xs text-gray-600">Workout program builder</p>
               </div>
             </div>
+            <Button 
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-xs shadow-md"
+              onClick={() => setShowFitnessProfileDialog(true)}
+            >
+              <Plus className="h-3 w-3 mr-1" />
+              Generate Program
+            </Button>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Training Program Creator - Full Width */}
-        <div className="space-y-6">
-          <TrainingProgramCreator 
-            onGenerateProgram={() => setShowFitnessProfileDialog(true)} 
-            generatedProgram={generatedProgram}
-          />
-        </div>
+      {/* Compact Main Content */}
+      <div className="max-w-6xl mx-auto px-3 py-3">
+        {/* Week-based Program with Dropdowns */}
+        {generatedProgram ? (
+          <div className="space-y-3">
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                <Trophy className="h-4 w-4 mr-2 text-blue-600" />
+                {generatedProgram.program?.name || "4-Week Training Program"}
+              </h3>
+              <p className="text-xs text-gray-600 mb-3">{generatedProgram.program?.description}</p>
+              
+              {/* Phase Overview - Compact */}
+              <div className="grid grid-cols-4 gap-2 mb-3">
+                {[1, 2, 3, 4].map((week) => {
+                  const phase = week <= 2 ? "Load" : week === 3 ? "Peak" : "Deload";
+                  const phaseColor = week <= 2 ? "blue" : week === 3 ? "red" : "green";
+                  
+                  return (
+                    <div key={week} className={`rounded p-2 border text-center shadow-sm ${
+                      phase === "Load" ? "border-blue-300 bg-blue-50" :
+                      phase === "Peak" ? "border-red-300 bg-red-50" :
+                      "border-green-300 bg-green-50"
+                    }`}>
+                      <div className="text-xs font-medium text-gray-700">Week {week}</div>
+                      <div className={`text-sm font-bold ${
+                        phase === "Load" ? "text-blue-600" :
+                        phase === "Peak" ? "text-red-600" :
+                        "text-green-600"
+                      }`}>{phase}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
-        {/* Training Analytics Section */}
-        <div className="mt-6">
-          <TrainingAnalytics />
+            {/* Week Dropdowns */}
+            <div className="space-y-2">
+              {generatedProgram.weeks?.map((week) => {
+                const weekDates = getWeekDates(week.weekNumber);
+                const isExpanded = expandedWeeks.has(week.weekNumber);
+                
+                return (
+                  <div key={week.weekNumber} className="bg-white rounded-lg shadow-md border border-blue-200">
+                    {/* Week Header - Clickable Dropdown */}
+                    <button
+                      onClick={() => toggleWeek(week.weekNumber)}
+                      className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-blue-50 rounded-lg transition-colors"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <div className="text-sm font-semibold text-blue-600">
+                          Week {week.weekNumber}: {week.phase} Phase
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {weekDates.start} - {weekDates.end}
+                        </div>
+                      </div>
+                      <div className={`transform transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                        <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </button>
+
+                    {/* Week Content - Expandable */}
+                    {isExpanded && (
+                      <div className="px-3 pb-3 space-y-2">
+                        <p className="text-xs text-gray-600 mb-2">{week.phaseDescription}</p>
+                        
+                        {/* Day Blocks as Dropdowns */}
+                        <div className="space-y-1">
+                          {week.days?.map((day) => {
+                            const dayKey = `${week.weekNumber}-${day.dayNumber}`;
+                            const isDayExpanded = expandedDays.has(dayKey);
+                            const dayDate = getDayDate(week.weekNumber, day.dayNumber);
+                            
+                            return (
+                              <div key={day.dayNumber} className="border border-gray-200 rounded shadow-sm">
+                                {/* Day Header - Clickable */}
+                                <button
+                                  onClick={() => toggleDay(week.weekNumber, day.dayNumber)}
+                                  className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                                >
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-sm font-medium text-gray-900">
+                                      Day {day.dayNumber}: {day.name}
+                                    </span>
+                                    <span className="text-xs text-gray-500">{dayDate}</span>
+                                  </div>
+                                  <div className={`transform transition-transform ${isDayExpanded ? 'rotate-180' : ''}`}>
+                                    <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                  </div>
+                                </button>
+
+                                {/* Day Workout Blocks */}
+                                {isDayExpanded && (
+                                  <div className="px-3 pb-3 space-y-2 bg-gray-50">
+                                    {day.blocks?.map((block, idx) => (
+                                      <div key={idx} className="bg-white rounded p-2 border shadow-sm">
+                                        <div className="flex items-center justify-between mb-2">
+                                          <span className="text-sm font-medium text-blue-600">
+                                            Block {String.fromCharCode(65 + idx)}: {block.name}
+                                          </span>
+                                          <Button 
+                                            size="sm" 
+                                            variant="outline"
+                                            className="text-xs px-2 py-1 h-6"
+                                            onClick={() => {
+                                              setSelectedWeek(week.weekNumber);
+                                              setSelectedDay(day.dayNumber);
+                                              setActiveTab("workout-section");
+                                            }}
+                                          >
+                                            Enter Workout
+                                          </Button>
+                                        </div>
+                                        
+                                        {/* Exercise Preview */}
+                                        <div className="space-y-1">
+                                          {block.exercises?.slice(0, 2).map((exercise, exIdx) => (
+                                            <div key={exIdx} className="text-xs text-gray-600 flex justify-between">
+                                              <span>{exercise.exerciseName}</span>
+                                              <span>{exercise.sets}x{exercise.reps} {exercise.weight}</span>
+                                            </div>
+                                          ))}
+                                          {block.exercises?.length > 2 && (
+                                            <div className="text-xs text-gray-500">
+                                              +{block.exercises.length - 2} more exercises
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-md p-6 text-center border border-blue-200">
+            <Target className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+            <h3 className="text-sm font-medium text-gray-900 mb-2">No Training Program</h3>
+            <p className="text-xs text-gray-600 mb-4">Generate a personalized 4-week program</p>
+            <Button 
+              className="bg-blue-600 hover:bg-blue-700 shadow-md"
+              onClick={() => setShowFitnessProfileDialog(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Generate Program
+            </Button>
+          </div>
+        )}
+
+        {/* Compact Analytics */}
+        <div className="mt-4">
+          <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+            <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+              <BarChart3 className="h-4 w-4 mr-2 text-blue-600" />
+              Quick Analytics
+            </h3>
+            <TrainingAnalytics />
+          </div>
         </div>
       </div>
 

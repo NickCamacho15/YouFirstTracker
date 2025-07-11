@@ -123,6 +123,18 @@ Build scripts include:
 
 ## Changelog
 
+- July 11, 2025: Complete Body Page Redesign - Compact Interface with Dropdown Workout Blocks
+  - **RENAMED**: "Health" section renamed to "Body" in bottom navigation
+  - **COMPACT**: Dramatically reduced all section sizes - header reduced to h-10, smaller text, tighter spacing
+  - **DROPDOWNS**: Week-based workout program with expandable dropdown interface
+  - **BLOCK FORMAT**: Each workout block displays as "Block A: Exercise Name" with dropdown to workout entry
+  - **DATES**: Real date calculations showing actual week ranges and daily dates for workout scheduling
+  - **BLUE THEME**: Applied consistent blue coloring to tabs, dropdowns, and section headers per app branding
+  - **SHADOWS**: Added drop shadows (shadow-md) to all sections, cards, and buttons for visual depth
+  - **NAVIGATION**: Fixed mobile navigation issues by making interface elements much smaller and more accessible
+  - **WORKOUT ENTRY**: "Enter Workout" buttons in each block dropdown lead directly to workout logging interface
+  - **MOBILE OPTIMIZED**: All elements sized for smooth mobile navigation without off-screen content
+  - Body page now provides intuitive, compact workout program management with clear date-based organization
 - July 11, 2025: Reverted Health Page to Original Simple Layout with Compact Header
   - **REVERTED**: Returned to original simple layout with training program creator at top and analytics below
   - **COMPACT HEADER**: Reduced header height (h-14) and smaller icons/text for better mobile viewing
