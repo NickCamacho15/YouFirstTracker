@@ -201,50 +201,50 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Weekly Time Metrics - Four Across */}
-        <div className="grid grid-cols-4 gap-2 mb-6">
+        {/* Weekly Time Metrics - 2x2 Grid */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
           {/* Reading Time */}
-          <div className="text-center bg-white rounded-lg p-3 shadow-md border border-blue-200">
-            <BookOpen className="w-6 h-6 mx-auto mb-2 text-blue-600" />
-            <div className="text-lg font-bold text-gray-900">12.5h</div>
-            <div className="text-xs text-gray-600">Weekly</div>
-            <div className="text-xs text-gray-500">52h month • 185h total</div>
-            <h3 className="text-xs font-semibold text-gray-700 mt-1">Reading</h3>
+          <div className="text-center bg-white rounded-lg p-4 shadow-md border border-blue-200">
+            <BookOpen className="w-8 h-8 mx-auto mb-3 text-blue-600" />
+            <div className="text-2xl font-bold text-gray-900">12.5h</div>
+            <div className="text-sm text-gray-600">Weekly</div>
+            <div className="text-xs text-gray-500 mt-1">52h month • 185h total</div>
+            <h3 className="text-sm font-semibold text-gray-700 mt-2">Reading</h3>
           </div>
 
           {/* Meditation Time */}
-          <div className="text-center bg-white rounded-lg p-3 shadow-md border border-green-200">
-            <div className="w-6 h-6 mx-auto mb-2 bg-green-600 rounded-full flex items-center justify-center">
-              <div className="w-2 h-2 bg-white rounded-full"></div>
+          <div className="text-center bg-white rounded-lg p-4 shadow-md border border-green-200">
+            <div className="w-8 h-8 mx-auto mb-3 bg-green-600 rounded-full flex items-center justify-center">
+              <div className="w-3 h-3 bg-white rounded-full"></div>
             </div>
-            <div className="text-lg font-bold text-gray-900">3.2h</div>
-            <div className="text-xs text-gray-600">Weekly</div>
-            <div className="text-xs text-gray-500">14h month • 67h total</div>
-            <h3 className="text-xs font-semibold text-gray-700 mt-1">Meditation</h3>
+            <div className="text-2xl font-bold text-gray-900">3.2h</div>
+            <div className="text-sm text-gray-600">Weekly</div>
+            <div className="text-xs text-gray-500 mt-1">14h month • 67h total</div>
+            <h3 className="text-sm font-semibold text-gray-700 mt-2">Meditation</h3>
           </div>
 
           {/* Screen Time (Distraction) */}
-          <div className="text-center bg-white rounded-lg p-3 shadow-md border border-red-200">
-            <div className="w-6 h-6 mx-auto mb-2 bg-red-600 rounded flex items-center justify-center">
-              <div className="w-3 h-3 bg-white rounded-sm"></div>
+          <div className="text-center bg-white rounded-lg p-4 shadow-md border border-red-200">
+            <div className="w-8 h-8 mx-auto mb-3 bg-red-600 rounded flex items-center justify-center">
+              <div className="w-4 h-4 bg-white rounded-sm"></div>
             </div>
-            <div className="text-lg font-bold text-gray-900">28h</div>
-            <div className="text-xs text-gray-600">Weekly</div>
-            <div className="text-xs text-gray-500">98h month • 412h total</div>
-            <h3 className="text-xs font-semibold text-gray-700 mt-1">Screen Time</h3>
+            <div className="text-2xl font-bold text-gray-900">28h</div>
+            <div className="text-sm text-gray-600">Weekly</div>
+            <div className="text-xs text-gray-500 mt-1">98h month • 412h total</div>
+            <h3 className="text-sm font-semibold text-gray-700 mt-2">Screen Time</h3>
           </div>
 
           {/* Workout Time */}
-          <div className="text-center bg-white rounded-lg p-3 shadow-md border border-orange-200">
-            <div className="w-6 h-6 mx-auto mb-2 text-orange-600">
+          <div className="text-center bg-white rounded-lg p-4 shadow-md border border-orange-200">
+            <div className="w-8 h-8 mx-auto mb-3 text-orange-600">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/>
               </svg>
             </div>
-            <div className="text-lg font-bold text-gray-900">6.8h</div>
-            <div className="text-xs text-gray-600">Weekly</div>
-            <div className="text-xs text-gray-500">27h month • 142h total</div>
-            <h3 className="text-xs font-semibold text-gray-700 mt-1">Workouts</h3>
+            <div className="text-2xl font-bold text-gray-900">6.8h</div>
+            <div className="text-sm text-gray-600">Weekly</div>
+            <div className="text-xs text-gray-500 mt-1">27h month • 142h total</div>
+            <h3 className="text-sm font-semibold text-gray-700 mt-2">Workouts</h3>
           </div>
         </div>
 
