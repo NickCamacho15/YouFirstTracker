@@ -425,6 +425,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const updates = req.body;
+      
+      // Convert completedAt to proper timestamp if it's provided
+      if (updates.completedAt && typeof updates.completedAt === 'string') {
+        updates.completedAt = new Date(updates.completedAt);
+      }
+      
       const readingListItem = await storage.updateReadingListItem(id, updates);
       
       if (!readingListItem) {

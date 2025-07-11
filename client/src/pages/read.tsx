@@ -22,6 +22,10 @@ export default function MindPage() {
     queryKey: ["/api/reading-sessions"],
   });
 
+  const { data: readingList = [] } = useQuery({
+    queryKey: ["/api/reading-list"],
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -40,6 +44,7 @@ export default function MindPage() {
 
   const totalSessions = readingSessions.length;
   const averageSession = totalSessions > 0 ? Math.round(totalMinutes / totalSessions) : 0;
+  const booksCompleted = (readingList as any[]).filter(book => book.isCompleted).length;
 
   return (
     <div className="min-h-screen bg-background relative pb-20">
@@ -75,42 +80,55 @@ export default function MindPage() {
           {/* Reading Tab */}
           <TabsContent value="reading" className="mt-6">
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 mb-8">
-              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              <Card className="bg-background border shadow-md shadow-blue-500/10">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-blue-700">Total Time</CardTitle>
-                  <Clock className="h-5 w-5 text-blue-600" />
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Time</CardTitle>
+                  <Clock className="h-5 w-5 text-blue-500" />
                 </CardHeader>
                 <CardContent className="pb-2">
-                  <div className="text-3xl font-bold text-blue-800">{Math.floor(totalMinutes / 60)}h {totalMinutes % 60}m</div>
-                  <p className="text-sm text-blue-600 font-medium">
+                  <div className="text-4xl font-bold text-foreground">{Math.floor(totalMinutes / 60)}h {totalMinutes % 60}m</div>
+                  <p className="text-sm text-muted-foreground">
                     All sessions
                   </p>
                 </CardContent>
               </Card>
               
-              <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+              <Card className="bg-background border shadow-md shadow-green-500/10">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-green-700">Sessions</CardTitle>
-                  <BookOpen className="h-5 w-5 text-green-600" />
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Sessions</CardTitle>
+                  <BookOpen className="h-5 w-5 text-green-500" />
                 </CardHeader>
                 <CardContent className="pb-2">
-                  <div className="text-3xl font-bold text-green-800">{totalSessions}</div>
-                  <p className="text-sm text-green-600 font-medium">
+                  <div className="text-4xl font-bold text-foreground">{totalSessions}</div>
+                  <p className="text-sm text-muted-foreground">
                     Completed
                   </p>
                 </CardContent>
               </Card>
               
-              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+              <Card className="bg-background border shadow-md shadow-purple-500/10">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-purple-700">Average</CardTitle>
-                  <TrendingUp className="h-5 w-5 text-purple-600" />
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Average Time</CardTitle>
+                  <TrendingUp className="h-5 w-5 text-purple-500" />
                 </CardHeader>
                 <CardContent className="pb-2">
-                  <div className="text-3xl font-bold text-purple-800">{averageSession}m</div>
-                  <p className="text-sm text-purple-600 font-medium">
+                  <div className="text-4xl font-bold text-foreground">{averageSession}m</div>
+                  <p className="text-sm text-muted-foreground">
                     Per session
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-background border shadow-md shadow-orange-500/10">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Books Completed</CardTitle>
+                  <Brain className="h-5 w-5 text-orange-500" />
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <div className="text-4xl font-bold text-foreground">{booksCompleted}</div>
+                  <p className="text-sm text-muted-foreground">
+                    Finished
                   </p>
                 </CardContent>
               </Card>

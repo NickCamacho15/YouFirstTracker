@@ -122,21 +122,21 @@ export function ReadingList() {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
+    <Card className="bg-background border shadow-md shadow-emerald-500/10">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between text-emerald-800">
+        <CardTitle className="flex items-center justify-between text-foreground">
           <div className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5" />
+            <BookOpen className="w-5 h-5 text-emerald-500" />
             Reading List
           </div>
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-1">
-              <Target className="w-4 h-4 text-emerald-600" />
-              <span className="text-emerald-700">{pendingBooks.length} to read</span>
+              <Target className="w-4 h-4 text-emerald-500" />
+              <span className="text-muted-foreground">{pendingBooks.length} to read</span>
             </div>
             <div className="flex items-center gap-1">
-              <Trophy className="w-4 h-4 text-emerald-600" />
-              <span className="text-emerald-700">{completedBooks.length} completed</span>
+              <Trophy className="w-4 h-4 text-emerald-500" />
+              <span className="text-muted-foreground">{completedBooks.length} completed</span>
             </div>
           </div>
         </CardTitle>

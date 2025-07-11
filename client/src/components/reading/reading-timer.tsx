@@ -121,15 +121,15 @@ export function ReadingTimer({ readingSessions }: ReadingTimerProps) {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Reading Timer */}
       <div className="lg:col-span-2">
-        <Card className="p-8 mb-6 text-center bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-          <h3 className="text-lg font-semibold text-orange-800 mb-6">Reading Session</h3>
+        <Card className="p-8 mb-6 text-center bg-background border shadow-md shadow-orange-500/10">
+          <h3 className="text-lg font-semibold text-foreground mb-6">Reading Session</h3>
           
           {/* Timer Display */}
           <div className="mb-8">
-            <div className="text-6xl font-bold text-orange-800 mb-2">
+            <div className="text-6xl font-bold text-foreground mb-2">
               {formatTime(elapsedTime)}
             </div>
-            <p className="text-orange-600 font-medium">Current session</p>
+            <p className="text-muted-foreground font-medium">Current session</p>
           </div>
 
           {/* Book Input */}
