@@ -1919,294 +1919,36 @@ export default function HealthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-14">
             <div className="flex items-center space-x-2">
-              <Activity className="h-8 w-8 text-blue-600" />
+              <Activity className="h-6 w-6 text-blue-600" />
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">Health & Fitness</h1>
-                <p className="text-sm text-gray-600">Track your wellness journey</p>
+                <h1 className="text-lg font-semibold text-gray-900">Health & Fitness</h1>
+                <p className="text-xs text-gray-600">Track your wellness journey</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile-First Tab Navigation */}
-      <div className="bg-white border-b sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex overflow-x-auto">
-            {[
-              { id: 'overview', label: 'Overview', icon: Activity },
-              { id: 'progress', label: 'Progress', icon: TrendingUp },
-              { id: 'volume', label: 'Volume', icon: BarChart3 },
-              { id: 'history', label: 'History', icon: Clock }
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-shrink-0 flex items-center space-x-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
-                  activeTab === tab.id
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <tab.icon className="h-4 w-4" />
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Tab Content */}
+      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Overview Tab */}
-        {activeTab === 'overview' && (
-          <div className="space-y-6">
-            {/* 2x2 Stat Cards Grid */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">This Week</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {workouts.filter(w => {
-                        const workoutDate = new Date(w.date);
-                        const weekStart = new Date();
-                        weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-                        return workoutDate >= weekStart;
-                      }).length}
-                    </p>
-                  </div>
-                  <div className="p-2 bg-blue-50 rounded-full">
-                    <Activity className="h-5 w-5 text-blue-600" />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-white border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Total Workouts</p>
-                    <p className="text-2xl font-bold text-gray-900">{workouts.length}</p>
-                  </div>
-                  <div className="p-2 bg-green-50 rounded-full">
-                    <Target className="h-5 w-5 text-green-600" />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-white border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Avg Duration</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {workouts.length > 0 
-                        ? Math.round(workouts.reduce((acc, w) => acc + (w.duration || 0), 0) / workouts.length)
-                        : 0}m
-                    </p>
-                  </div>
-                  <div className="p-2 bg-purple-50 rounded-full">
-                    <Clock className="h-5 w-5 text-purple-600" />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-white border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Last Workout</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {workouts.length > 0 
-                        ? `${Math.ceil((Date.now() - new Date(workouts[0].date).getTime()) / (1000 * 60 * 60 * 24))}d`
-                        : 'N/A'}
-                    </p>
-                  </div>
-                  <div className="p-2 bg-orange-50 rounded-full">
-                    <Calendar className="h-5 w-5 text-orange-600" />
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Training Program Creator - Full Width */}
+        <div className="space-y-6">
+          <TrainingProgramCreator 
+            onGenerateProgram={() => setShowFitnessProfileDialog(true)} 
+            generatedProgram={generatedProgram}
+          />
+        </div>
 
-            {/* Training Program Section */}
-            <div className="bg-white border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Training Program</h3>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setActiveTab('program')}
-                  className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                >
-                  Manage
-                </Button>
-              </div>
-              <p className="text-sm text-gray-600 mb-3">
-                {generatedProgram ? 'AI-Generated Program Active' : 'No active program'}
-              </p>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-sm text-gray-700">
-                  {generatedProgram 
-                    ? `${generatedProgram.program?.name || 'Custom Program'} - Week ${Math.ceil((Date.now() - new Date().getTime()) / (1000 * 60 * 60 * 24 * 7)) % 4 + 1}`
-                    : 'Create your first training program to get started'}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Progress Tab */}
-        {activeTab === 'progress' && (
-          <div className="space-y-6">
-            <div className="bg-white border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Exercise Progress</h3>
-                <div className="flex space-x-2">
-                  {['Week', 'Month', 'Year'].map(period => (
-                    <button
-                      key={period}
-                      className={`px-3 py-1 text-sm font-medium rounded-md ${
-                        period === 'Month' 
-                          ? 'bg-blue-100 text-blue-700' 
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      {period}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              {workoutsLoading || exercisesLoading ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">Loading progress data...</p>
-                </div>
-              ) : (
-                <ExerciseProgressView 
-                  workouts={workouts as any[]}
-                  selectedExercise={selectedExercise}
-                  setSelectedExercise={setSelectedExercise}
-                  chartMetric={chartMetric}
-                  setChartMetric={setChartMetric}
-                  exerciseFilter={exerciseFilter}
-                  setExerciseFilter={setExerciseFilter}
-                  exercises={exercises as any[]}
-                />
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Volume Tab */}
-        {activeTab === 'volume' && (
-          <div className="space-y-6">
-            <div className="bg-white border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Training Volume</h3>
-                <div className="flex space-x-2">
-                  {['Week', 'Month', 'Year'].map(period => (
-                    <button
-                      key={period}
-                      className={`px-3 py-1 text-sm font-medium rounded-md ${
-                        period === 'Month' 
-                          ? 'bg-blue-100 text-blue-700' 
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      {period}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="text-center py-12">
-                <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h4 className="text-lg font-medium text-gray-900 mb-2">Volume Tracking</h4>
-                <p className="text-gray-600">Training volume analytics coming soon</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* History Tab */}
-        {activeTab === 'history' && (
-          <div className="space-y-4">
-            {workoutsLoading ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500">Loading workout history...</p>
-              </div>
-            ) : workouts.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500">No workouts recorded yet.</p>
-                <p className="text-sm text-gray-400 mt-2">Start logging workouts to see your history here!</p>
-              </div>
-            ) : (
-              workouts.map((workout: any) => (
-                <div key={workout.id} className="bg-white border rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{workout.name}</h4>
-                      <p className="text-sm text-gray-500 mt-1">
-                        {new Date(workout.date).toLocaleDateString('en-US', { 
-                          weekday: 'short', 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-blue-600">
-                          {workout.duration ? `${workout.duration}m` : 'N/A'}
-                        </p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deleteWorkout(workout.id)}
-                        className="text-red-500 hover:text-red-700 p-1"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  {workout.workoutExercises && workout.workoutExercises.length > 0 && (
-                    <div className="mt-3 space-y-2">
-                      <div className="flex flex-wrap gap-2">
-                        {workout.workoutExercises.slice(0, 3).map((we: any) => (
-                          <div key={we.id} className="bg-gray-50 px-2 py-1 rounded text-xs">
-                            {we.exercise?.name || 'Unknown'}
-                          </div>
-                        ))}
-                        {workout.workoutExercises.length > 3 && (
-                          <div className="bg-gray-50 px-2 py-1 rounded text-xs text-gray-500">
-                            +{workout.workoutExercises.length - 3} more
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-        )}
-
-        {/* Program Tab */}
-        {activeTab === 'program' && (
-          <div className="space-y-6">
-            <TrainingProgramCreator 
-              onGenerateProgram={() => setShowFitnessProfileDialog(true)} 
-              generatedProgram={generatedProgram}
-            />
-          </div>
-        )}
+        {/* Training Analytics Section */}
+        <div className="mt-6">
+          <TrainingAnalytics />
+        </div>
       </div>
 
       {/* Add New Exercise Dialog */}
