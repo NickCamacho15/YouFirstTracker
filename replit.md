@@ -123,6 +123,16 @@ Build scripts include:
 
 ## Changelog
 
+- July 11, 2025: Body Profile Page Enhanced with Editable Personal Records and Percentage Calculator
+  - **NEW**: Edit button on profile tab allowing modification of personal records and body metrics
+  - **NEW**: 1 Rep Max percentage calculator showing 60% to 90% in 5% increments for easy workout planning
+  - **NEW**: ProfileEditor component with tabbed interface for Personal Records and Body Metrics editing
+  - **INTERACTIVE**: Click calculator icon on each exercise to view training percentages instantly
+  - **DYNAMIC**: Body metrics display actual values from state (weight, body fat, muscle mass)
+  - **ENHANCED**: Toggle between view and edit modes with save/cancel functionality
+  - **FIXED**: Database table structure - added missing 'date' column to workout_entries table
+  - **IMPROVED**: Personal records now show actual weight values with percentage calculations
+  - Profile editing provides quick access to percentage-based workout planning for technical maximum capacity
 - July 11, 2025: Distraction Section Complete Redesign with Day Tabs and Opportunity Cost Tracking
   - **NEW**: Top stats cards showing Total Time, Daily Average, and Top App usage
   - **REDESIGNED**: Day-based tabs (Sunday through Saturday) matching body/todo page style

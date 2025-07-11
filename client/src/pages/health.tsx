@@ -2,15 +2,55 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDown, Activity, Trophy, Play, User, Dumbbell, TrendingUp, Target, Zap, Timer } from "lucide-react";
+import { ChevronDown, Activity, Trophy, Play, User, Dumbbell, TrendingUp, Target, Zap, Timer, Edit3, Calculator } from "lucide-react";
 import WorkoutLogger from "@/components/workout/workout-logger";
+import ProfileEditor from "@/components/profile/profile-editor";
 
 export default function HealthPage() {
   const [expandedWeeks, setExpandedWeeks] = useState<Set<number>>(new Set());
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState("workout");
+  const [activeTab, setActiveTab] = useState("profile");
   const [workoutTimer, setWorkoutTimer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [personalRecords, setPersonalRecords] = useState([
+    { exercise: "Bench Press", weight: 225, percentages: {} },
+    { exercise: "Squat", weight: 315, percentages: {} },
+    { exercise: "Deadlift", weight: 405, percentages: {} },
+    { exercise: "Overhead Press", weight: 135, percentages: {} },
+  ]);
+  const [bodyMetrics, setBodyMetrics] = useState({
+    weight: 185,
+    bodyFat: 12.5,
+    muscleMass: 162,
+  });
+  const [showPercentages, setShowPercentages] = useState<{ [key: string]: boolean }>({});
+
+  // Profile editing functions
+  const handleProfileSave = (data: { personalRecords: any[]; bodyMetrics: any }) => {
+    setPersonalRecords(data.personalRecords);
+    setBodyMetrics(data.bodyMetrics);
+    setIsEditingProfile(false);
+  };
+
+  const handleProfileCancel = () => {
+    setIsEditingProfile(false);
+  };
+
+  const togglePercentages = (exercise: string) => {
+    setShowPercentages(prev => ({
+      ...prev,
+      [exercise]: !prev[exercise],
+    }));
+  };
+
+  const calculatePercentages = (maxWeight: number): { [key: string]: number } => {
+    const percentages: { [key: string]: number } = {};
+    for (let i = 60; i <= 90; i += 5) {
+      percentages[`${i}%`] = Math.round((maxWeight * i) / 100);
+    }
+    return percentages;
+  };
 
   // Timer effect
   useEffect(() => {
@@ -193,78 +233,122 @@ export default function HealthPage() {
 
           {/* Profile Tab Content */}
           <TabsContent value="profile" className="mt-3 space-y-2">
-            {/* 1RM Section */}
-            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
-              <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                <Trophy className="h-4 w-4 mr-2 text-blue-600" />
-                Personal Records (1RM)
-              </h3>
-              
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { exercise: "Bench Press", weight: "315 lbs", date: "Jan 5" },
-                  { exercise: "Squat", weight: "405 lbs", date: "Jan 2" },
-                  { exercise: "Deadlift", weight: "455 lbs", date: "Dec 28" },
-                  { exercise: "Overhead Press", weight: "185 lbs", date: "Jan 8" }
-                ].map((pr) => (
-                  <div key={pr.exercise} className="bg-gray-50 rounded p-2 border border-gray-200">
-                    <div className="text-xs font-medium text-gray-700">{pr.exercise}</div>
-                    <div className="text-sm font-bold text-blue-600">{pr.weight}</div>
-                    <div className="text-xs text-gray-500">{pr.date}</div>
+            {isEditingProfile ? (
+              <ProfileEditor
+                onSave={handleProfileSave}
+                onCancel={handleProfileCancel}
+                initialData={{
+                  personalRecords,
+                  bodyMetrics,
+                }}
+              />
+            ) : (
+              <>
+                {/* Profile Header with Edit Button */}
+                <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-gray-900 flex items-center">
+                      <Trophy className="h-4 w-4 mr-2 text-blue-600" />
+                      Personal Records (1RM)
+                    </h3>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setIsEditingProfile(true)}
+                      className="flex items-center space-x-1 text-xs"
+                    >
+                      <Edit3 className="h-3 w-3" />
+                      <span>Edit</span>
+                    </Button>
                   </div>
-                ))}
-              </div>
-            </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    {personalRecords.map((record) => (
+                      <div key={record.exercise} className="space-y-2">
+                        <div className="bg-gray-50 rounded p-2 border border-gray-200">
+                          <div className="text-xs font-medium text-gray-700">{record.exercise}</div>
+                          <div className="text-sm font-bold text-blue-600">{record.weight} lbs</div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => togglePercentages(record.exercise)}
+                            className="text-xs p-0 h-auto mt-1 flex items-center space-x-1"
+                          >
+                            <Calculator className="h-3 w-3" />
+                            <span>%</span>
+                          </Button>
+                        </div>
+                        
+                        {/* Percentage Display */}
+                        {showPercentages[record.exercise] && (
+                          <div className="bg-blue-50 rounded p-2 border border-blue-200">
+                            <div className="text-xs font-medium text-blue-900 mb-1">Training %</div>
+                            <div className="grid grid-cols-2 gap-1">
+                              {Object.entries(calculatePercentages(record.weight)).map(([percentage, weight]) => (
+                                <div key={percentage} className="text-center text-xs">
+                                  <div className="text-blue-600 font-medium">{percentage}</div>
+                                  <div className="text-gray-900 font-bold">{weight} lbs</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-            {/* Training Stats */}
-            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
-              <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                <Target className="h-4 w-4 mr-2 text-blue-600" />
-                Training Stats
-              </h3>
-              
-              <div className="space-y-2">
-                <div className="flex justify-between items-center py-1 border-b border-gray-100">
-                  <span className="text-xs text-gray-600">Total Workouts</span>
-                  <span className="text-sm font-medium text-gray-900">247</span>
+                {/* Training Stats */}
+                <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                    <Target className="h-4 w-4 mr-2 text-blue-600" />
+                    Training Stats
+                  </h3>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                      <span className="text-xs text-gray-600">Total Workouts</span>
+                      <span className="text-sm font-medium text-gray-900">247</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                      <span className="text-xs text-gray-600">Avg. Workout Duration</span>
+                      <span className="text-sm font-medium text-gray-900">52 mins</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                      <span className="text-xs text-gray-600">Current Streak</span>
+                      <span className="text-sm font-medium text-green-600">12 days</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-xs text-gray-600">Total Volume This Week</span>
+                      <span className="text-sm font-medium text-gray-900">42,350 lbs</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-gray-100">
-                  <span className="text-xs text-gray-600">Avg. Workout Duration</span>
-                  <span className="text-sm font-medium text-gray-900">52 mins</span>
-                </div>
-                <div className="flex justify-between items-center py-1 border-b border-gray-100">
-                  <span className="text-xs text-gray-600">Current Streak</span>
-                  <span className="text-sm font-medium text-green-600">12 days</span>
-                </div>
-                <div className="flex justify-between items-center py-1">
-                  <span className="text-xs text-gray-600">Total Volume This Week</span>
-                  <span className="text-sm font-medium text-gray-900">42,350 lbs</span>
-                </div>
-              </div>
-            </div>
 
-            {/* Body Metrics */}
-            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
-              <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                <Zap className="h-4 w-4 mr-2 text-blue-600" />
-                Body Metrics
-              </h3>
-              
-              <div className="grid grid-cols-3 gap-2">
-                <div className="text-center">
-                  <div className="text-xs text-gray-600">Weight</div>
-                  <div className="text-sm font-bold text-gray-900">185 lbs</div>
+                {/* Body Metrics */}
+                <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                    <Zap className="h-4 w-4 mr-2 text-blue-600" />
+                    Body Metrics
+                  </h3>
+                  
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-center">
+                      <div className="text-xs text-gray-600">Weight</div>
+                      <div className="text-sm font-bold text-gray-900">{bodyMetrics.weight} lbs</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-600">Body Fat</div>
+                      <div className="text-sm font-bold text-gray-900">{bodyMetrics.bodyFat}%</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-600">Muscle Mass</div>
+                      <div className="text-sm font-bold text-gray-900">{bodyMetrics.muscleMass} lbs</div>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-xs text-gray-600">Body Fat</div>
-                  <div className="text-sm font-bold text-gray-900">12.5%</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xs text-gray-600">Muscle Mass</div>
-                  <div className="text-sm font-bold text-gray-900">162 lbs</div>
-                </div>
-              </div>
-            </div>
+              </>
+            )}
           </TabsContent>
 
           {/* Workout Tab Content */}
