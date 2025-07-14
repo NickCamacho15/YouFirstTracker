@@ -536,7 +536,6 @@ export const insertRuleSchema = createInsertSchema(rules).omit({
   id: true,
   createdAt: true,
   lastCompletionTime: true,
-  lastViolationTime: true,
 });
 
 export const insertUserStatsSchema = createInsertSchema(userStats).omit({
