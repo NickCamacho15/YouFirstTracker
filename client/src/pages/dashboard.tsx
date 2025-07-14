@@ -182,158 +182,206 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Weekly Overview - Circular Design */}
+        {/* Weekly Overview - Apple Fitness Style Nested Rings */}
         <div className="mb-6">
-          <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-lg p-6 border border-blue-100">
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-1">Today's Focus</h2>
-              <p className="text-sm text-gray-600">Weekly Investment Tracker</p>
+          <div className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 rounded-2xl shadow-xl p-8 border border-blue-100">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Today's Focus</h2>
+              <p className="text-base text-gray-600 font-medium">Weekly Investment Tracker</p>
             </div>
             
-            <div className="grid grid-cols-2 gap-6">
-              {/* Reading Circle */}
-              <div className="flex flex-col items-center">
-                <div className="relative w-24 h-24 mb-3">
-                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="#E0E0E0"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="#4A90E2"
-                      strokeWidth="3"
-                      strokeDasharray="83, 100"
-                      strokeLinecap="round"
-                      className="drop-shadow-sm"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="text-xs font-bold text-gray-800">83%</div>
-                    </div>
+            {/* Nested Rings Container */}
+            <div className="flex justify-center mb-8">
+              <div className="relative w-48 h-48 md:w-56 md:h-56">
+                {/* Outer Ring - Reading */}
+                <svg className="absolute inset-0 w-full h-full transform -rotate-90">
+                  <circle
+                    cx="50%"
+                    cy="50%"
+                    r="47%"
+                    fill="none"
+                    stroke="#E5E7EB"
+                    strokeWidth="10"
+                  />
+                  <circle
+                    cx="50%"
+                    cy="50%"
+                    r="47%"
+                    fill="none"
+                    stroke="url(#blueGradient)"
+                    strokeWidth="10"
+                    strokeDasharray="83, 100"
+                    strokeLinecap="round"
+                    className="drop-shadow-lg"
+                  />
+                  <defs>
+                    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#60A5FA" />
+                      <stop offset="100%" stopColor="#3B82F6" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+
+                {/* Second Ring - Meditation */}
+                <svg className="absolute inset-[15%] w-[70%] h-[70%] transform -rotate-90">
+                  <circle
+                    cx="50%"
+                    cy="50%"
+                    r="45%"
+                    fill="none"
+                    stroke="#E5E7EB"
+                    strokeWidth="10"
+                  />
+                  <circle
+                    cx="50%"
+                    cy="50%"
+                    r="45%"
+                    fill="none"
+                    stroke="url(#greenGradient)"
+                    strokeWidth="10"
+                    strokeDasharray="91, 100"
+                    strokeLinecap="round"
+                    className="drop-shadow-lg"
+                  />
+                  <defs>
+                    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#34D399" />
+                      <stop offset="100%" stopColor="#10B981" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+
+                {/* Third Ring - Screen Time */}
+                <svg className="absolute inset-[30%] w-[40%] h-[40%] transform -rotate-90">
+                  <circle
+                    cx="50%"
+                    cy="50%"
+                    r="42%"
+                    fill="none"
+                    stroke="#E5E7EB"
+                    strokeWidth="10"
+                  />
+                  <circle
+                    cx="50%"
+                    cy="50%"
+                    r="42%"
+                    fill="none"
+                    stroke="url(#redGradient)"
+                    strokeWidth="10"
+                    strokeDasharray="100, 100"
+                    strokeLinecap="round"
+                    className="drop-shadow-lg"
+                  />
+                  <defs>
+                    <linearGradient id="redGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#F87171" />
+                      <stop offset="100%" stopColor="#DC2626" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+
+                {/* Inner Ring - Workouts */}
+                <svg className="absolute inset-[45%] w-[10%] h-[10%] transform -rotate-90">
+                  <circle
+                    cx="50%"
+                    cy="50%"
+                    r="40%"
+                    fill="none"
+                    stroke="#E5E7EB"
+                    strokeWidth="10"
+                  />
+                  <circle
+                    cx="50%"
+                    cy="50%"
+                    r="40%"
+                    fill="none"
+                    stroke="url(#orangeGradient)"
+                    strokeWidth="10"
+                    strokeDasharray="97, 100"
+                    strokeLinecap="round"
+                    className="drop-shadow-lg animate-pulse"
+                  />
+                  <defs>
+                    <linearGradient id="orangeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#FBBF24" />
+                      <stop offset="100%" stopColor="#F59E0B" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+            </div>
+
+            {/* Data Display Below Rings */}
+            <div className="grid grid-cols-2 gap-4 md:gap-6">
+              {/* Reading */}
+              <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-md">
+                    <span className="text-lg">📚</span>
                   </div>
-                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
-                    <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs">📚</span>
-                    </div>
+                  <h4 className="font-bold text-gray-900 text-lg">Reading</h4>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-blue-600">12.5h / 15h</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-600">Weekly Progress</span>
+                    <span className="text-lg font-bold text-blue-600">83%</span>
                   </div>
                 </div>
-                <h4 className="font-semibold text-gray-900 text-sm">Reading</h4>
-                <p className="text-xs text-gray-600 font-medium">12.5h / 15h</p>
               </div>
 
-              {/* Meditation Circle */}
-              <div className="flex flex-col items-center">
-                <div className="relative w-24 h-24 mb-3">
-                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="#E0E0E0"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="#50C878"
-                      strokeWidth="3"
-                      strokeDasharray="91, 100"
-                      strokeLinecap="round"
-                      className="drop-shadow-sm"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="text-xs font-bold text-gray-800">91%</div>
-                    </div>
+              {/* Meditation */}
+              <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-md">
+                    <span className="text-lg">🧘</span>
                   </div>
-                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
-                    <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs">🧘</span>
-                    </div>
+                  <h4 className="font-bold text-gray-900 text-lg">Meditation</h4>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-green-600">3.2h / 3.5h</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-600">Weekly Progress</span>
+                    <span className="text-lg font-bold text-green-600">91%</span>
                   </div>
                 </div>
-                <h4 className="font-semibold text-gray-900 text-sm">Meditation</h4>
-                <p className="text-xs text-gray-600 font-medium">3.2h / 3.5h</p>
               </div>
 
-              {/* Screen Time Circle */}
-              <div className="flex flex-col items-center">
-                <div className="relative w-24 h-24 mb-3">
-                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="#E0E0E0"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="#E74C3C"
-                      strokeWidth="3"
-                      strokeDasharray="100, 100"
-                      strokeLinecap="round"
-                      className="drop-shadow-sm"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="text-xs font-bold text-red-600">200%</div>
-                    </div>
+              {/* Screen Time */}
+              <div className="bg-red-50 rounded-xl p-4 border border-red-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-md">
+                    <span className="text-lg">📱</span>
                   </div>
-                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
-                    <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs">📱</span>
-                    </div>
-                  </div>
-                  <div className="absolute top-0 right-0">
-                    <div className="w-3 h-3 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">!</span>
-                    </div>
+                  <h4 className="font-bold text-gray-900 text-lg">Screen Time</h4>
+                  <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center animate-pulse">
+                    <span className="text-white text-xs font-bold">!</span>
                   </div>
                 </div>
-                <h4 className="font-semibold text-gray-900 text-sm">Screen Time</h4>
-                <p className="text-xs text-red-600 font-medium">28h / 14h</p>
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-red-600">28h / 14h</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-600">Weekly Limit</span>
+                    <span className="text-lg font-bold text-red-600">200% ⚠️</span>
+                  </div>
+                </div>
               </div>
 
-              {/* Workouts Circle */}
-              <div className="flex flex-col items-center">
-                <div className="relative w-24 h-24 mb-3">
-                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="#E0E0E0"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="#F39C12"
-                      strokeWidth="3"
-                      strokeDasharray="97, 100"
-                      strokeLinecap="round"
-                      className="drop-shadow-sm animate-pulse"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="text-xs font-bold text-gray-800">97%</div>
-                    </div>
+              {/* Workouts */}
+              <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center shadow-md">
+                    <span className="text-lg">💪</span>
                   </div>
-                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
-                    <div className="w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs">💪</span>
-                    </div>
+                  <h4 className="font-bold text-gray-900 text-lg">Workouts</h4>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-orange-600">6.8h / 7h</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-600">Weekly Goal</span>
+                    <span className="text-lg font-bold text-orange-600">97% 🔥</span>
                   </div>
                 </div>
-                <h4 className="font-semibold text-gray-900 text-sm">Workouts</h4>
-                <p className="text-xs text-gray-600 font-medium">6.8h / 7h</p>
               </div>
             </div>
           </div>
