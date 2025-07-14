@@ -537,8 +537,8 @@ export default function HabitsPage() {
                       </div>
                     </div>
 
-                    {/* Today's Requirements */}
-                    {challenge.rules && challenge.rules.length > 0 && (
+                    {/* Today's Requirements or No Rules Message */}
+                    {challenge.rules && challenge.rules.length > 0 ? (
                       <div className="bg-blue-50 rounded-lg p-4">
                         <h4 className="font-medium text-gray-900 mb-3 text-sm flex items-center justify-between">
                           <span>Today's Requirements</span>
@@ -563,6 +563,11 @@ export default function HabitsPage() {
                             ))}
                           </ul>
                         )}
+                      </div>
+                    ) : (
+                      <div className="bg-gray-50 rounded-lg p-4 text-center">
+                        <p className="text-sm text-gray-600 mb-2">No daily requirements set</p>
+                        <p className="text-xs text-gray-500">To track daily progress with checkboxes, delete this challenge and create a new one with specific rules</p>
                       </div>
                     )}
                   </CardContent>
@@ -616,12 +621,12 @@ export default function HabitsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Challenge Rules (Optional)</Label>
+                    <Label>Challenge Rules <span className="text-sm font-normal text-gray-500">(Add rules to enable daily checkboxes)</span></Label>
                     <div className="flex gap-2">
                       <Input
                         value={newChallengeRule}
                         onChange={(e) => setNewChallengeRule(e.target.value)}
-                        placeholder="Add a rule..."
+                        placeholder="Type a rule and press Enter or click +"
                         className="border-purple-200 focus:border-purple-500"
                         onKeyPress={(e) => e.key === 'Enter' && addChallengeRule()}
                       />
