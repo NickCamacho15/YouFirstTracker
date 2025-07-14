@@ -182,57 +182,158 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Weekly Metrics Bar Graph */}
-        <div className="mb-4">
-          <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Weekly Overview</h3>
-            <div className="space-y-3">
-              {/* Reading - Target: 15h */}
-              <div className="flex items-center">
-                <div className="w-20 text-xs font-medium text-gray-600">Reading</div>
-                <div className="flex-1 mx-3">
-                  <div className="bg-gray-100 rounded-full h-2">
-                    <div className="bg-blue-500 h-2 rounded-full" style={{width: `${Math.min((12.5 / 15) * 100, 100)}%`}}></div>
+        {/* Weekly Overview - Circular Design */}
+        <div className="mb-6">
+          <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-lg p-6 border border-blue-100">
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-1">Today's Focus</h2>
+              <p className="text-sm text-gray-600">Weekly Investment Tracker</p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-6">
+              {/* Reading Circle */}
+              <div className="flex flex-col items-center">
+                <div className="relative w-24 h-24 mb-3">
+                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#E0E0E0"
+                      strokeWidth="2"
+                    />
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#4A90E2"
+                      strokeWidth="3"
+                      strokeDasharray="83, 100"
+                      strokeLinecap="round"
+                      className="drop-shadow-sm"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-xs font-bold text-gray-800">83%</div>
+                    </div>
+                  </div>
+                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
+                    <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs">📚</span>
+                    </div>
                   </div>
                 </div>
-                <div className="w-16 text-xs font-semibold text-right">12.5h / 15h</div>
-                <div className="w-8 text-xs text-gray-500 text-right">83%</div>
+                <h4 className="font-semibold text-gray-900 text-sm">Reading</h4>
+                <p className="text-xs text-gray-600 font-medium">12.5h / 15h</p>
               </div>
 
-              {/* Meditation - Target: 3.5h */}
-              <div className="flex items-center">
-                <div className="w-20 text-xs font-medium text-gray-600">Meditation</div>
-                <div className="flex-1 mx-3">
-                  <div className="bg-gray-100 rounded-full h-2">
-                    <div className="bg-green-500 h-2 rounded-full" style={{width: `${Math.min((3.2 / 3.5) * 100, 100)}%`}}></div>
+              {/* Meditation Circle */}
+              <div className="flex flex-col items-center">
+                <div className="relative w-24 h-24 mb-3">
+                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#E0E0E0"
+                      strokeWidth="2"
+                    />
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#50C878"
+                      strokeWidth="3"
+                      strokeDasharray="91, 100"
+                      strokeLinecap="round"
+                      className="drop-shadow-sm"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-xs font-bold text-gray-800">91%</div>
+                    </div>
+                  </div>
+                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
+                    <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs">🧘</span>
+                    </div>
                   </div>
                 </div>
-                <div className="w-16 text-xs font-semibold text-right">3.2h / 3.5h</div>
-                <div className="w-8 text-xs text-gray-500 text-right">91%</div>
+                <h4 className="font-semibold text-gray-900 text-sm">Meditation</h4>
+                <p className="text-xs text-gray-600 font-medium">3.2h / 3.5h</p>
               </div>
 
-              {/* Screen Time - Target: 14h (lower is better) */}
-              <div className="flex items-center">
-                <div className="w-20 text-xs font-medium text-gray-600">Screen Time</div>
-                <div className="flex-1 mx-3">
-                  <div className="bg-gray-100 rounded-full h-2">
-                    <div className="bg-red-500 h-2 rounded-full" style={{width: `${Math.min((28 / 14) * 50, 100)}%`}}></div>
+              {/* Screen Time Circle */}
+              <div className="flex flex-col items-center">
+                <div className="relative w-24 h-24 mb-3">
+                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#E0E0E0"
+                      strokeWidth="2"
+                    />
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#E74C3C"
+                      strokeWidth="3"
+                      strokeDasharray="100, 100"
+                      strokeLinecap="round"
+                      className="drop-shadow-sm"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-xs font-bold text-red-600">200%</div>
+                    </div>
+                  </div>
+                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
+                    <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs">📱</span>
+                    </div>
+                  </div>
+                  <div className="absolute top-0 right-0">
+                    <div className="w-3 h-3 bg-red-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">!</span>
+                    </div>
                   </div>
                 </div>
-                <div className="w-16 text-xs font-semibold text-right">28h / 14h</div>
-                <div className="w-8 text-xs text-red-600 text-right">200%</div>
+                <h4 className="font-semibold text-gray-900 text-sm">Screen Time</h4>
+                <p className="text-xs text-red-600 font-medium">28h / 14h</p>
               </div>
 
-              {/* Workouts - Target: 7h */}
-              <div className="flex items-center">
-                <div className="w-20 text-xs font-medium text-gray-600">Workouts</div>
-                <div className="flex-1 mx-3">
-                  <div className="bg-gray-100 rounded-full h-2">
-                    <div className="bg-orange-500 h-2 rounded-full" style={{width: `${Math.min((6.8 / 7) * 100, 100)}%`}}></div>
+              {/* Workouts Circle */}
+              <div className="flex flex-col items-center">
+                <div className="relative w-24 h-24 mb-3">
+                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#E0E0E0"
+                      strokeWidth="2"
+                    />
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#F39C12"
+                      strokeWidth="3"
+                      strokeDasharray="97, 100"
+                      strokeLinecap="round"
+                      className="drop-shadow-sm animate-pulse"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-xs font-bold text-gray-800">97%</div>
+                    </div>
+                  </div>
+                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
+                    <div className="w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs">💪</span>
+                    </div>
                   </div>
                 </div>
-                <div className="w-16 text-xs font-semibold text-right">6.8h / 7h</div>
-                <div className="w-8 text-xs text-gray-500 text-right">97%</div>
+                <h4 className="font-semibold text-gray-900 text-sm">Workouts</h4>
+                <p className="text-xs text-gray-600 font-medium">6.8h / 7h</p>
               </div>
             </div>
           </div>

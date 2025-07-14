@@ -123,6 +123,18 @@ Build scripts include:
 
 ## Changelog
 
+- July 14, 2025: Enhanced You. Dashboard with Beautiful Circular Weekly Overview
+  - **REDESIGNED**: Weekly Overview transformed from linear bars to stunning circular progress design
+  - **NEW**: "Today's Focus" header with elegant gradient background (blue-to-white)
+  - **CIRCULAR METRICS**: Four glowing orbs in 2x2 grid layout with SVG-based progress circles
+  - **VISUAL ENHANCEMENTS**: Each metric features matching emoji icons, color-coded progress, and subtle shadows
+  - **READING**: Blue circle (#4A90E2) showing 83% completion with book emoji
+  - **MEDITATION**: Green circle (#50C878) displaying 91% with meditation emoji and serene glow
+  - **SCREEN TIME**: Red circle (#E74C3C) at 200% with warning alert icon for excess usage
+  - **WORKOUTS**: Orange circle (#F39C12) at 97% with celebratory pulse animation near completion
+  - **PREMIUM FEEL**: Modern typography, cohesive color palette, and sophisticated visual hierarchy
+  - **MOBILE OPTIMIZED**: Responsive design maintaining elegance across all device sizes
+  - Dashboard now provides dynamic, engaging visual feedback encouraging user interaction with progress metrics
 - July 11, 2025: Task-Goal Integration System with Dashboard Gamification Complete
   - **REDESIGNED**: Time metrics tiles (Reading, Meditation, Screen Time, Workouts) now gamified without icons
   - **NEW**: "Personal Investment Tracker" with gradient color tiles and metrics as centerpiece
