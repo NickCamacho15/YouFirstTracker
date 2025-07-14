@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, ArrowLeft, Check, Target, Heart, Users, List, Plus, X } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, Target, Heart, AlertTriangle, Users, List, Plus, X } from "lucide-react";
 
 const goalSchema = z.object({
   title: z.string().min(1, "Goal is required"),
@@ -32,6 +32,7 @@ interface NewGoalModalProps {
 export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProps) {
   const [step, setStep] = useState(1);
   const [benefits, setBenefits] = useState<string[]>(["", "", ""]);
+  const [consequences, setConsequences] = useState<string[]>(["", "", ""]);
   const [peopleHelped, setPeopleHelped] = useState<string[]>(["", "", ""]);
   const [microGoals, setMicroGoals] = useState<string[]>(["", "", "", "", "", "", ""]);
   const { toast } = useToast();
@@ -46,7 +47,7 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
   });
 
   const createGoalMutation = useMutation({
-    mutationFn: async (data: GoalFormData & { benefits: string[]; peopleHelped: string[]; microGoals: string[] }) => {
+    mutationFn: async (data: GoalFormData & { benefits: string[]; consequences: string[]; peopleHelped: string[]; microGoals: string[] }) => {
       const response = await apiRequest("POST", "/api/goals", data);
       return response.json();
     },
@@ -69,6 +70,7 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
     form.reset();
     setStep(1);
     setBenefits(["", "", ""]);
+    setConsequences(["", "", ""]);
     setPeopleHelped(["", "", ""]);
     setMicroGoals(["", "", "", "", "", "", ""]);
   };
@@ -88,6 +90,16 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
         return;
       }
     } else if (step === 3) {
+      const filledConsequences = consequences.filter(c => c.trim() !== "").length;
+      if (filledConsequences < 1) {
+        toast({
+          title: "Add consequences",
+          description: "Please add at least 1 consequence of not achieving this goal.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else if (step === 4) {
       const filledPeople = peopleHelped.filter(p => p.trim() !== "").length;
       if (filledPeople < 3) {
         toast({
@@ -97,7 +109,7 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
         });
         return;
       }
-    } else if (step === 4) {
+    } else if (step === 5) {
       const filledMicroGoals = microGoals.filter(mg => mg.trim() !== "").length;
       if (filledMicroGoals < 5) {
         toast({
@@ -109,7 +121,7 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
       }
     }
     
-    if (step < 5) {
+    if (step < 6) {
       setStep(step + 1);
     }
   };
@@ -123,12 +135,14 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
   const handleSubmit = () => {
     const formData = form.getValues();
     const filteredBenefits = benefits.filter(b => b.trim() !== "");
+    const filteredConsequences = consequences.filter(c => c.trim() !== "");
     const filteredPeople = peopleHelped.filter(p => p.trim() !== "");
     const filteredMicroGoals = microGoals.filter(mg => mg.trim() !== "");
     
     createGoalMutation.mutate({
       ...formData,
       benefits: filteredBenefits,
+      consequences: filteredConsequences,
       peopleHelped: filteredPeople,
       microGoals: filteredMicroGoals,
     });
@@ -152,9 +166,21 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
     setMicroGoals(updated);
   };
 
+  const updateConsequence = (index: number, value: string) => {
+    const updated = [...consequences];
+    updated[index] = value;
+    setConsequences(updated);
+  };
+
   const addBenefit = () => {
     if (benefits.length < 5) {
       setBenefits([...benefits, ""]);
+    }
+  };
+
+  const addConsequence = () => {
+    if (consequences.length < 5) {
+      setConsequences([...consequences, ""]);
     }
   };
 
@@ -170,6 +196,12 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
     }
   };
 
+  const removeConsequence = (index: number) => {
+    if (consequences.length > 1) {
+      setConsequences(consequences.filter((_, i) => i !== index));
+    }
+  };
+
   const removePerson = (index: number) => {
     if (peopleHelped.length > 3) {
       setPeopleHelped(peopleHelped.filter((_, i) => i !== index));
@@ -179,9 +211,10 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
   const steps = [
     { number: 1, title: "Set Your Goal", icon: Target },
     { number: 2, title: "List Benefits", icon: Heart },
-    { number: 3, title: "Who It Helps", icon: Users },
-    { number: 4, title: "Break It Down", icon: List },
-    { number: 5, title: "Review & Create", icon: Check },
+    { number: 3, title: "Consequences", icon: AlertTriangle },
+    { number: 4, title: "Who It Helps", icon: Users },
+    { number: 5, title: "Break It Down", icon: List },
+    { number: 6, title: "Review & Create", icon: Check },
   ];
 
   return (
@@ -196,7 +229,7 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
 
         {/* Progress Bar */}
         <div className="mb-6">
-          <Progress value={(step / 5) * 100} className="h-2" />
+          <Progress value={(step / 6) * 100} className="h-2" />
           <div className="flex justify-between mt-4">
             {steps.map((s) => {
               const Icon = s.icon;
@@ -322,8 +355,49 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
               </div>
             )}
 
-            {/* Step 3: People Helped */}
+            {/* Step 3: Consequences */}
             {step === 3 && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">What happens if you don't achieve this goal?</h3>
+                  <p className="text-sm text-muted-foreground mb-4">List the consequences of not following through</p>
+                </div>
+                {consequences.map((consequence, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Input
+                      placeholder={`Consequence ${index + 1}`}
+                      value={consequence}
+                      onChange={(e) => updateConsequence(index, e.target.value)}
+                    />
+                    {consequences.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeConsequence(index)}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                {consequences.length < 5 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addConsequence}
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add another consequence
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {/* Step 4: People Helped */}
+            {step === 4 && (
               <div className="space-y-4">
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Who will benefit from this goal?</h3>
@@ -363,8 +437,8 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
               </div>
             )}
 
-            {/* Step 4: Chunk Down */}
-            {step === 4 && (
+            {/* Step 5: Chunk Down */}
+            {step === 5 && (
               <div className="space-y-4">
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Break it down into actionable steps</h3>
@@ -385,8 +459,8 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
               </div>
             )}
 
-            {/* Step 5: Review */}
-            {step === 5 && (
+            {/* Step 6: Review */}
+            {step === 6 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold mb-4">Review Your Goal</h3>
                 
@@ -403,6 +477,15 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
                         <ul className="list-disc list-inside text-sm space-y-1">
                           {benefits.filter(b => b.trim() !== "").map((benefit, i) => (
                             <li key={i}>{benefit}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h5 className="font-medium text-sm text-red-600 mb-2">Consequences of not achieving:</h5>
+                        <ul className="list-disc list-inside text-sm space-y-1">
+                          {consequences.filter(c => c.trim() !== "").map((consequence, i) => (
+                            <li key={i}>{consequence}</li>
                           ))}
                         </ul>
                       </div>
@@ -455,7 +538,7 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
                   Cancel
                 </Button>
                 
-                {step < 5 ? (
+                {step < 6 ? (
                   <Button
                     type="button"
                     onClick={handleNext}
