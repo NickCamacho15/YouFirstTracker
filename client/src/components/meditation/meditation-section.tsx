@@ -45,27 +45,86 @@ export function MeditationSection() {
     },
   });
 
-  // Play authentic gong sound - louder but natural
+  // Play deep traditional meditation gong sound
   const playGong = () => {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
+    
+    // Create multiple oscillators for rich harmonic content
+    const fundamental = audioContext.createOscillator();
+    const harmonic1 = audioContext.createOscillator();
+    const harmonic2 = audioContext.createOscillator();
+    const noise = audioContext.createOscillator();
+    
     const gainNode = audioContext.createGain();
+    const harmonic1Gain = audioContext.createGain();
+    const harmonic2Gain = audioContext.createGain();
+    const noiseGain = audioContext.createGain();
+    const filterNode = audioContext.createBiquadFilter();
     
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    // Connect nodes
+    fundamental.connect(gainNode);
+    harmonic1.connect(harmonic1Gain);
+    harmonic2.connect(harmonic2Gain);
+    noise.connect(noiseGain);
     
-    // Authentic gong frequency - starts at 150Hz and decays to 80Hz
-    oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 3);
-    oscillator.type = "sine";
+    harmonic1Gain.connect(gainNode);
+    harmonic2Gain.connect(gainNode);
+    noiseGain.connect(gainNode);
+    gainNode.connect(filterNode);
+    filterNode.connect(audioContext.destination);
     
-    // Louder but natural gong envelope
+    // Deep traditional gong - fundamental frequency around 100Hz
+    fundamental.frequency.setValueAtTime(100, audioContext.currentTime);
+    fundamental.frequency.exponentialRampToValueAtTime(60, audioContext.currentTime + 6);
+    fundamental.type = "sine";
+    
+    // Harmonics for richness
+    harmonic1.frequency.setValueAtTime(200, audioContext.currentTime);
+    harmonic1.frequency.exponentialRampToValueAtTime(120, audioContext.currentTime + 4);
+    harmonic1.type = "sine";
+    
+    harmonic2.frequency.setValueAtTime(300, audioContext.currentTime);
+    harmonic2.frequency.exponentialRampToValueAtTime(180, audioContext.currentTime + 3);
+    harmonic2.type = "sine";
+    
+    // Add slight noise for metallic texture
+    noise.frequency.setValueAtTime(1000, audioContext.currentTime);
+    noise.type = "sawtooth";
+    
+    // Low-pass filter for warmth
+    filterNode.type = "lowpass";
+    filterNode.frequency.setValueAtTime(2000, audioContext.currentTime);
+    filterNode.frequency.exponentialRampToValueAtTime(500, audioContext.currentTime + 4);
+    
+    // Volume envelopes - traditional gong attack and long decay
     gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.7, audioContext.currentTime + 0.02);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 4);
+    gainNode.gain.linearRampToValueAtTime(0.8, audioContext.currentTime + 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.3, audioContext.currentTime + 0.5);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 8);
     
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 4);
+    harmonic1Gain.gain.setValueAtTime(0, audioContext.currentTime);
+    harmonic1Gain.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
+    harmonic1Gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 5);
+    
+    harmonic2Gain.gain.setValueAtTime(0, audioContext.currentTime);
+    harmonic2Gain.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.15);
+    harmonic2Gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 3);
+    
+    noiseGain.gain.setValueAtTime(0, audioContext.currentTime);
+    noiseGain.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
+    noiseGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+    
+    // Start all oscillators
+    fundamental.start(audioContext.currentTime);
+    harmonic1.start(audioContext.currentTime);
+    harmonic2.start(audioContext.currentTime);
+    noise.start(audioContext.currentTime);
+    
+    // Stop all oscillators
+    fundamental.stop(audioContext.currentTime + 8);
+    harmonic1.stop(audioContext.currentTime + 5);
+    harmonic2.stop(audioContext.currentTime + 3);
+    noise.stop(audioContext.currentTime + 0.3);
   };
 
   // Timer logic
