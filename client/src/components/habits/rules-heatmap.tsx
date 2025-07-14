@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Calendar, TrendingUp } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 
 interface Rule {
   id: number;
@@ -53,76 +53,67 @@ export function RulesHeatmap({ rules }: RulesHeatmapProps) {
   const avgStreak = totalRules > 0 ? Math.round(rules.reduce((acc, r) => acc + r.streak, 0) / totalRules) : 0;
 
   return (
-    <Card className="border-0 shadow-lg">
-      <CardHeader>
+    <Card className="border-gray-200 shadow-sm">
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-red-500 to-orange-600 rounded-lg">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <CardTitle className="text-xl">Personal Rules Adherence</CardTitle>
-              <p className="text-sm text-gray-600">Your discipline heat map</p>
-            </div>
+          <div>
+            <CardTitle className="text-lg font-semibold text-gray-900">Personal Rules Adherence</CardTitle>
+            <p className="text-xs text-gray-500 mt-1">30-day discipline overview</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge className="bg-red-100 text-red-800">
-              {completionRate}% today
-            </Badge>
-            <Badge variant="outline">
-              {avgStreak} avg streak
-            </Badge>
+          <div className="text-right">
+            <div className="text-2xl font-bold text-gray-900">{completionRate}%</div>
+            <p className="text-xs text-gray-500">today</p>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+      <CardContent className="p-4 pt-2">
+        {/* Minimal Stats Row */}
+        <div className="flex justify-around py-3 border-b border-gray-100 mb-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">{totalRules}</div>
-            <p className="text-sm text-gray-600">Active Rules</p>
+            <div className="text-xl font-semibold text-gray-900">{totalRules}</div>
+            <p className="text-xs text-gray-500">Active Rules</p>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{completedToday}</div>
-            <p className="text-sm text-gray-600">Kept Today</p>
+            <div className="text-xl font-semibold text-gray-900">{completedToday}</div>
+            <p className="text-xs text-gray-500">Kept Today</p>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-orange-600">{rules.filter(r => r.streak >= 7).length}</div>
-            <p className="text-sm text-gray-600">Strong Habits</p>
+            <div className="text-xl font-semibold text-gray-900">{avgStreak}</div>
+            <p className="text-xs text-gray-500">Avg Streak</p>
           </div>
         </div>
 
-        {/* Heat Map Calendar */}
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium text-gray-900 flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              30-Day Consistency
-            </h4>
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-gray-600">Less</span>
-              <div className="flex gap-1">
-                <div className="w-3 h-3 bg-gray-200 rounded"></div>
-                <div className="w-3 h-3 bg-red-400 rounded"></div>
-                <div className="w-3 h-3 bg-orange-400 rounded"></div>
-                <div className="w-3 h-3 bg-yellow-400 rounded"></div>
-                <div className="w-3 h-3 bg-green-400 rounded"></div>
-                <div className="w-3 h-3 bg-green-500 rounded"></div>
+        {/* Larger Heat Map Calendar - No Padding */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-sm font-medium text-gray-700">30-Day Consistency</h4>
+            <div className="flex items-center gap-1.5 text-xs">
+              <span className="text-gray-500">Less</span>
+              <div className="flex gap-0.5">
+                <div className="w-2.5 h-2.5 bg-gray-200 rounded-sm"></div>
+                <div className="w-2.5 h-2.5 bg-red-400 rounded-sm"></div>
+                <div className="w-2.5 h-2.5 bg-orange-400 rounded-sm"></div>
+                <div className="w-2.5 h-2.5 bg-yellow-400 rounded-sm"></div>
+                <div className="w-2.5 h-2.5 bg-green-400 rounded-sm"></div>
+                <div className="w-2.5 h-2.5 bg-green-500 rounded-sm"></div>
               </div>
-              <span className="text-gray-600">More</span>
+              <span className="text-gray-500">More</span>
             </div>
           </div>
           
           <div className="grid grid-cols-10 gap-1">
             {Object.entries(monthData).map(([date, value]) => {
               const day = new Date(date).getDate();
+              const isToday = new Date(date).toDateString() === new Date().toDateString();
               return (
                 <div
                   key={date}
-                  className={`aspect-square rounded-sm ${getColorForValue(value)} relative group cursor-pointer`}
-                  title={`${date}: ${Math.round(value * 100)}% completion`}
+                  className={`aspect-square rounded ${getColorForValue(value)} relative group cursor-pointer ${
+                    isToday ? 'ring-2 ring-blue-600 ring-offset-1' : ''
+                  }`}
+                  title={`Day ${day}: ${Math.round(value * 100)}% completion`}
                 >
-                  <div className="absolute inset-0 flex items-center justify-center text-xs font-medium text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-white">
                     {day}
                   </div>
                 </div>
@@ -131,26 +122,7 @@ export function RulesHeatmap({ rules }: RulesHeatmapProps) {
           </div>
         </div>
 
-        {/* Top Rules by Streak */}
-        <div className="mt-6">
-          <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4" />
-            Strongest Rules
-          </h4>
-          <div className="space-y-2">
-            {rules
-              .sort((a, b) => b.streak - a.streak)
-              .slice(0, 3)
-              .map((rule) => (
-                <div key={rule.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">{rule.title}</span>
-                  <Badge className="bg-green-100 text-green-800">
-                    {rule.streak} days
-                  </Badge>
-                </div>
-              ))}
-          </div>
-        </div>
+
       </CardContent>
     </Card>
   );
