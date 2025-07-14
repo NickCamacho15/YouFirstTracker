@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +46,70 @@ interface ChallengeData {
   completedDays: number[];
   category?: string;
   rules?: string[];
+}
+
+// Component for today's requirements with checkboxes
+function TodayRequirements({ challenge, today, completedDays, onComplete }: {
+  challenge: ChallengeData;
+  today: number;
+  completedDays: number[];
+  onComplete: () => void;
+}) {
+  const [checkedRules, setCheckedRules] = useState<Set<number>>(new Set());
+  const isCompleted = completedDays.includes(today);
+
+  useEffect(() => {
+    // If all rules are checked, mark the day as complete
+    if (challenge.rules && checkedRules.size === challenge.rules.length && !isCompleted) {
+      onComplete();
+    }
+  }, [checkedRules, challenge.rules, isCompleted, onComplete]);
+
+  const toggleRule = (index: number) => {
+    if (isCompleted) return;
+    
+    const newCheckedRules = new Set(checkedRules);
+    if (newCheckedRules.has(index)) {
+      newCheckedRules.delete(index);
+    } else {
+      newCheckedRules.add(index);
+    }
+    setCheckedRules(newCheckedRules);
+  };
+
+  if (!challenge.rules) return null;
+
+  return (
+    <div className="space-y-2">
+      {challenge.rules.map((rule, index) => (
+        <label
+          key={index}
+          className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
+            isCompleted ? 'bg-green-50' : 'hover:bg-blue-100'
+          }`}
+        >
+          <input
+            type="checkbox"
+            checked={isCompleted || checkedRules.has(index)}
+            onChange={() => toggleRule(index)}
+            disabled={isCompleted}
+            className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 disabled:opacity-50"
+          />
+          <span className={`text-sm ${isCompleted ? 'text-green-700 font-medium' : 'text-gray-700'}`}>
+            {rule}
+          </span>
+        </label>
+      ))}
+      {isCompleted && (
+        <div className="mt-2 text-center">
+          <span className="text-sm font-medium text-green-600 flex items-center justify-center gap-1">
+            <CheckCircle2 className="w-4 h-4" />
+            Day {today} Complete!
+          </span>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function HabitsPage() {
@@ -437,18 +501,32 @@ export default function HabitsPage() {
                       </div>
                     </div>
 
-                    {/* Challenge Rules */}
+                    {/* Today's Requirements */}
                     {challenge.rules && challenge.rules.length > 0 && (
                       <div className="bg-blue-50 rounded-lg p-4">
-                        <h4 className="font-medium text-gray-900 mb-2 text-sm">Challenge Rules</h4>
-                        <ul className="space-y-1">
-                          {challenge.rules.map((rule, index) => (
-                            <li key={index} className="text-sm text-gray-700 flex items-center gap-2">
-                              <CheckCircle2 className="w-3 h-3 text-blue-500 flex-shrink-0" />
-                              {rule}
-                            </li>
-                          ))}
-                        </ul>
+                        <h4 className="font-medium text-gray-900 mb-3 text-sm flex items-center justify-between">
+                          <span>Today's Requirements</span>
+                          {day <= today && !completedDays.includes(today) && (
+                            <span className="text-xs text-gray-500">Complete all to win the day</span>
+                          )}
+                        </h4>
+                        {day <= today ? (
+                          <TodayRequirements 
+                            challenge={challenge}
+                            today={today}
+                            completedDays={completedDays}
+                            onComplete={() => handleChallengeCheckOff(challenge.id, today)}
+                          />
+                        ) : (
+                          <ul className="space-y-1">
+                            {challenge.rules.map((rule, index) => (
+                              <li key={index} className="text-sm text-gray-700 flex items-center gap-2">
+                                <CheckCircle2 className="w-3 h-3 text-blue-500 flex-shrink-0" />
+                                {rule}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
                     )}
                   </CardContent>
