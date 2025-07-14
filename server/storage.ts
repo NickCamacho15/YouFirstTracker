@@ -119,6 +119,7 @@ export interface IStorage {
   getChallengesByUserId(userId: number): Promise<Challenge[]>;
   getChallengeById(id: number): Promise<Challenge | undefined>;
   createChallenge(challenge: InsertChallenge): Promise<Challenge>;
+  deleteChallenge(id: number): Promise<boolean>;
   updateChallengeLog(challengeId: number, day: number, completed: boolean): Promise<ChallengeLog>;
 
   // Workouts
@@ -999,6 +1000,20 @@ export class DatabaseStorage implements IStorage {
   async createChallenge(challenge: InsertChallenge): Promise<Challenge> {
     const result = await db.insert(challenges).values(challenge).returning();
     return result[0];
+  }
+
+  async deleteChallenge(id: number): Promise<boolean> {
+    try {
+      // First delete all challenge logs
+      await db.delete(challengeLogs).where(eq(challengeLogs.challengeId, id));
+      
+      // Then delete the challenge
+      const result = await db.delete(challenges).where(eq(challenges.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error('Error deleting challenge:', error);
+      return false;
+    }
   }
 
   async updateChallengeLog(challengeId: number, day: number, completed: boolean): Promise<ChallengeLog> {

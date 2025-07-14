@@ -73,8 +73,8 @@ export default function GoalsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <div className="max-w-6xl mx-auto px-4 pt-8">
+      <div className="min-h-screen bg-background">
+        <div className="max-w-4xl mx-auto px-4 pt-8">
           <div className="text-center py-8">Loading your goals...</div>
         </div>
       </div>
@@ -82,15 +82,15 @@ export default function GoalsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative pb-20">
-      <div className="max-w-6xl mx-auto px-4 pt-8 pb-24">
+    <div className="min-h-screen bg-background relative pb-20">
+      <div className="max-w-4xl mx-auto px-4 pt-8 pb-24">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-            <Target className="w-8 h-8 text-blue-600" />
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <Target className="w-6 h-6 text-blue-600" />
             Goals & Achievements
           </h1>
-          <p className="text-muted-foreground mt-2">Transform aspirations into achievements through strategic action</p>
+          <p className="text-muted-foreground">Transform aspirations into achievements through strategic action</p>
         </div>
 
         {/* Active Goals Section */}

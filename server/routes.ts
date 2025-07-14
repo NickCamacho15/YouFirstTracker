@@ -377,6 +377,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/challenges/:id", requireAuth, async (req, res) => {
+    try {
+      const challengeId = parseInt(req.params.id);
+      const challenge = await storage.getChallengeById(challengeId);
+      
+      if (!challenge || challenge.userId !== req.session.userId) {
+        return res.status(404).json({ message: "Challenge not found" });
+      }
+      
+      const success = await storage.deleteChallenge(challengeId);
+      if (success) {
+        res.json({ message: "Challenge deleted successfully" });
+      } else {
+        res.status(500).json({ message: "Failed to delete challenge" });
+      }
+    } catch (error) {
+      console.error("Delete challenge error:", error);
+      res.status(500).json({ message: "Failed to delete challenge" });
+    }
+  });
+
   // Habits routes
   app.get("/api/habits", requireAuth, async (req, res) => {
     try {

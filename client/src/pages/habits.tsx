@@ -195,21 +195,18 @@ export default function HabitsPage() {
   });
 
   return (
-    <div className="container mx-auto p-4 pb-24 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg">
-            <Layers className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Disciplines</h1>
-            <p className="text-gray-600">Build character through daily commitment</p>
-          </div>
+    <div className="min-h-screen bg-background relative pb-20">
+      <div className="max-w-4xl mx-auto px-4 pt-8 pb-24 space-y-6">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <Layers className="w-6 h-6 text-blue-600" />
+            Disciplines
+          </h1>
+          <p className="text-muted-foreground">Build character through daily commitment</p>
         </div>
-      </div>
 
-      {/* Tabs */}
+        {/* Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="rules" className="flex items-center gap-2">
@@ -557,7 +554,7 @@ export default function HabitsPage() {
                   <Trophy className="w-12 h-12 text-gray-400 mb-4" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">No Active Challenges</h3>
                   <p className="text-gray-600 text-center mb-6">
-                    Start a 75 or 100-day challenge to push your limits and build unbreakable discipline.
+                    Start a 40, 70, or 100-day challenge to push your limits and build unbreakable discipline.
                   </p>
                 </CardContent>
               </Card>
@@ -565,6 +562,7 @@ export default function HabitsPage() {
           </div>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }
