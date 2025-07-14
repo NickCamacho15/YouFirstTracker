@@ -189,7 +189,7 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
       if (!open) resetForm();
       onOpenChange(open);
     }}>
-      <DialogContent className="max-w-2xl w-full mx-4 animate-slide-up">
+      <DialogContent className="max-w-2xl w-full mx-4 animate-slide-up max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">Create New Goal</DialogTitle>
         </DialogHeader>
@@ -431,7 +431,7 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
             )}
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between mt-8">
+            <div className="flex justify-between mt-8 pt-4 pb-6">
               {step > 1 && (
                 <Button
                   type="button"
