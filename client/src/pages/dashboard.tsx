@@ -184,88 +184,74 @@ export default function DashboardPage() {
 
         {/* Weekly Overview - Standalone Tiles */}
         <div className="mb-6">
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Reading Tile */}
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+            <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
-                    <span className="text-2xl">📚</span>
-                  </div>
-                  <div>
-                    <h4 className="text-base font-medium text-gray-600 uppercase tracking-wide mb-1">Reading</h4>
-                    <p className="text-xl font-bold text-gray-900">12.5 hours</p>
-                    <p className="text-sm text-gray-500">1.8h daily average</p>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Reading</h4>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <p className="text-lg font-bold text-gray-900">12.5h</p>
+                    <p className="text-xs text-gray-500">1.8h daily</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-3xl font-bold text-blue-600">83%</p>
-                  <p className="text-sm text-gray-500">of 15h goal</p>
+                  <p className="text-2xl font-bold text-blue-600">83%</p>
+                  <p className="text-xs text-gray-500">of 15h goal</p>
                 </div>
               </div>
             </div>
 
             {/* Meditation Tile */}
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+            <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center">
-                    <span className="text-2xl">🧘</span>
-                  </div>
-                  <div>
-                    <h4 className="text-base font-medium text-gray-600 uppercase tracking-wide mb-1">Meditation</h4>
-                    <p className="text-xl font-bold text-gray-900">3.2 hours</p>
-                    <p className="text-sm text-gray-500">27m daily average</p>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Meditation</h4>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <p className="text-lg font-bold text-gray-900">3.2h</p>
+                    <p className="text-xs text-gray-500">27m daily</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-3xl font-bold text-green-600">91%</p>
-                  <p className="text-sm text-gray-500">of 3.5h goal</p>
+                  <p className="text-2xl font-bold text-green-600">91%</p>
+                  <p className="text-xs text-gray-500">of 3.5h goal</p>
                 </div>
               </div>
             </div>
 
             {/* Screen Time Tile */}
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+            <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center">
-                    <span className="text-2xl">📱</span>
-                  </div>
-                  <div>
-                    <h4 className="text-base font-medium text-gray-600 uppercase tracking-wide mb-1">Screen Time</h4>
-                    <p className="text-xl font-bold text-gray-900">28 hours</p>
-                    <p className="text-sm text-gray-500">4h daily average</p>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Screen Time</h4>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <p className="text-lg font-bold text-gray-900">28h</p>
+                    <p className="text-xs text-gray-500">4h daily</p>
                   </div>
                 </div>
-                <div className="text-right flex items-center gap-2">
-                  <div>
-                    <p className="text-3xl font-bold text-red-600">200%</p>
-                    <p className="text-sm text-gray-500">14h limit exceeded</p>
+                <div className="text-right">
+                  <div className="flex items-center gap-1">
+                    <p className="text-2xl font-bold text-red-600">200%</p>
+                    <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
                   </div>
-                  <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center animate-pulse">
-                    <span className="text-white text-sm font-bold">!</span>
-                  </div>
+                  <p className="text-xs text-gray-500">limit exceeded</p>
                 </div>
               </div>
             </div>
 
             {/* Workouts Tile */}
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+            <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center">
-                    <span className="text-2xl">💪</span>
-                  </div>
-                  <div>
-                    <h4 className="text-base font-medium text-gray-600 uppercase tracking-wide mb-1">Workouts</h4>
-                    <p className="text-xl font-bold text-gray-900">6.8 hours</p>
-                    <p className="text-sm text-gray-500">58m daily average</p>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Workouts</h4>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <p className="text-lg font-bold text-gray-900">6.8h</p>
+                    <p className="text-xs text-gray-500">58m daily</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-3xl font-bold text-orange-600">97%</p>
-                  <p className="text-sm text-gray-500">of 7h goal</p>
+                  <p className="text-2xl font-bold text-orange-600">97%</p>
+                  <p className="text-xs text-gray-500">of 7h goal</p>
                 </div>
               </div>
             </div>
