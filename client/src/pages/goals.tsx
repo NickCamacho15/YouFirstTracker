@@ -163,68 +163,78 @@ export default function GoalsPage() {
               const progress = Math.min(100, Math.round((goal.tasksCompleted / 500) * 100));
               const isExpanded = expandedGoals.has(goal.id);
               return (
-                <div key={goal.id} className="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all overflow-hidden">
-                  <div className={`h-full p-4 ${goal.color}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-white font-bold text-lg truncate">{goal.title}</h3>
-                        <p className="text-white/80 text-sm truncate">{goal.description}</p>
+                <Card key={goal.id} className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-all">
+                  <CardContent className="p-6">
+                    {/* Header with Accent Color */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex-1">
+                        <h3 className={`text-2xl font-bold bg-gradient-to-r ${goal.color} bg-clip-text text-transparent`}>
+                          {goal.title}
+                        </h3>
+                        <p className="text-gray-600 mt-1">{goal.description}</p>
                       </div>
-                      <div className="flex items-center gap-4 text-white">
-                        <div className="text-right">
-                          <div className="text-xl font-bold">{goal.tasksCompleted}</div>
-                          <div className="text-xs opacity-80">tasks</div>
-                        </div>
-                        <div className="h-10 w-0.5 bg-white/30"></div>
-                        <div className="text-right">
-                          <div className="text-xl font-bold">{goal.daysWorking}</div>
-                          <div className="text-xs opacity-80">days</div>
-                        </div>
-                        <div className="h-10 w-0.5 bg-white/30"></div>
-                        <div className="text-right">
-                          <div className="text-xl font-bold">{Math.round(goal.tasksCompleted / goal.daysWorking)}</div>
-                          <div className="text-xs opacity-80">avg/day</div>
-                        </div>
-                        <div className="h-10 w-0.5 bg-white/30"></div>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => toggleGoalExpanded(goal.id)}
-                            className="text-white hover:bg-white/20 p-1 h-8 w-8"
-                          >
-                            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDeleteGoal(goal.id)}
-                            className="text-white hover:bg-red-500/50 p-1 h-8 w-8"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => toggleGoalExpanded(goal.id)}
+                          className="text-gray-400 hover:text-gray-600 p-1 h-8 w-8"
+                        >
+                          {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteGoal(goal.id)}
+                          className="text-gray-400 hover:text-red-600 p-1 h-8 w-8"
+                        >
+                          <X className="w-5 h-5" />
+                        </Button>
                       </div>
                     </div>
-                    {/* Progress Bar */}
-                    <div className="mt-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-white/70">Goal Progress</span>
-                        <span className="text-sm text-white/90 font-semibold">{progress}%</span>
+
+                    {/* Large Metrics Display */}
+                    <div className="grid grid-cols-3 gap-6 mb-6">
+                      <div className="text-center">
+                        <div className={`text-4xl font-bold bg-gradient-to-r ${goal.color} bg-clip-text text-transparent`}>
+                          {goal.tasksCompleted}
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1">Total Tasks</p>
                       </div>
-                      <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                      <div className="text-center">
+                        <div className={`text-4xl font-bold bg-gradient-to-r ${goal.color} bg-clip-text text-transparent`}>
+                          {goal.daysWorking}
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1">Days Active</p>
+                      </div>
+                      <div className="text-center">
+                        <div className={`text-4xl font-bold bg-gradient-to-r ${goal.color} bg-clip-text text-transparent`}>
+                          {Math.round(goal.tasksCompleted / goal.daysWorking)}
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1">Daily Average</p>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar with Gradient */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">Progress to Target</span>
+                        <span className={`text-lg font-bold bg-gradient-to-r ${goal.color} bg-clip-text text-transparent`}>
+                          {progress}%
+                        </span>
+                      </div>
+                      <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-white/80 rounded-full transition-all duration-500 ease-out"
+                          className={`h-full rounded-full transition-all duration-500 ease-out bg-gradient-to-r ${goal.color}`}
                           style={{ width: `${progress}%` }}
                         ></div>
                       </div>
                     </div>
-                  </div>
-                  
-                  {/* Expandable Details */}
-                  {isExpanded && (
-                    <div className="bg-white p-4 border-t">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    {/* Expandable Details */}
+                    {isExpanded && (
+                      <div className="mt-6 pt-6 border-t border-gray-200">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Left Column */}
                         <div className="space-y-4">
                           {/* Benefits */}
@@ -294,10 +304,11 @@ export default function GoalsPage() {
                             </div>
                           </div>
                         </div>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </CardContent>
+                </Card>
               );
             })}
           </div>

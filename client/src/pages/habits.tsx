@@ -19,7 +19,8 @@ import {
   CheckCircle2,
   Calendar,
   Trash2,
-  Star
+  Star,
+  X
 } from 'lucide-react';
 import { RulesHeatmap } from '@/components/habits/rules-heatmap';
 import { AchievementHistory } from '@/components/habits/achievement-history';
@@ -50,7 +51,8 @@ interface ChallengeData {
 export default function HabitsPage() {
   const [newRule, setNewRule] = useState("");
   const [isAddingRule, setIsAddingRule] = useState(false);
-  const [selectedTab, setSelectedTab] = useState("rules");
+  const [selectedTab, setSelectedTab] = useState("challenge");
+  const [showChallengeHeader, setShowChallengeHeader] = useState(true);
 
   const [challengeTitle, setChallengeTitle] = useState("");
   const [challengeDescription, setChallengeDescription] = useState("");
@@ -202,13 +204,13 @@ export default function HabitsPage() {
         {/* Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-gray-50 p-1 rounded-lg">
-          <TabsTrigger value="rules" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-            <Shield className="w-4 h-4" />
-            Rules
-          </TabsTrigger>
           <TabsTrigger value="challenge" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
             <Trophy className="w-4 h-4" />
             Challenge
+          </TabsTrigger>
+          <TabsTrigger value="rules" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <Shield className="w-4 h-4" />
+            Rules
           </TabsTrigger>
         </TabsList>
 
@@ -323,29 +325,37 @@ export default function HabitsPage() {
         <TabsContent value="challenge" className="space-y-6">
           {/* Active Challenges */}
           <div className="space-y-4">
-            {/* Challenge Header */}
-            <Card className="border-gray-200 shadow-sm">
-              <CardHeader className="bg-blue-50 rounded-t-lg">
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-6 h-6 text-blue-600" />
-                  <div>
-                    <CardTitle className="text-xl font-bold text-gray-900">Extended Challenges</CardTitle>
-                    <p className="text-gray-600 text-sm mt-1">40-100 day commitment challenges</p>
+            {/* Challenge Header - Dismissible */}
+            {showChallengeHeader && (
+              <Card className="border-gray-200 shadow-sm bg-gradient-to-r from-blue-50 to-indigo-50">
+                <CardHeader className="relative">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowChallengeHeader(false)}
+                    className="absolute top-3 right-3 h-8 w-8 p-0 text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                  <div className="flex items-center gap-3">
+                    <Trophy className="w-6 h-6 text-blue-600" />
+                    <div>
+                      <CardTitle className="text-xl font-bold text-gray-900">40-100 Day Challenge</CardTitle>
+                      <p className="text-gray-600 text-sm mt-1">Transform through extended commitment</p>
+                    </div>
                   </div>
-                </div>
-              </CardHeader>
-            </Card>
+                </CardHeader>
+              </Card>
+            )}
             
-            {/* New Challenge Button */}
-            <div className="flex justify-center">
-              <Button
-                onClick={() => setIsCreatingChallenge(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm px-6 py-3 font-medium flex items-center gap-2"
-              >
-                <Plus className="w-5 h-5" />
-                Start New Challenge
-              </Button>
-            </div>
+            {/* New Challenge Button - Full Width */}
+            <Button
+              onClick={() => setIsCreatingChallenge(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm py-3 font-medium flex items-center justify-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Start New Challenge
+            </Button>
 
             {/* Active Challenges List */}
             {challenges.map((challenge) => {

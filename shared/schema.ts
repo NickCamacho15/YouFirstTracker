@@ -23,6 +23,7 @@ export const goals = pgTable("goals", {
   peopleHelped: text("people_helped").array(), // People who will benefit from this goal
   dueDate: timestamp("due_date"),
   completed: boolean("completed").default(false).notNull(),
+  accentColor: text("accent_color").default("from-blue-500 to-indigo-600").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

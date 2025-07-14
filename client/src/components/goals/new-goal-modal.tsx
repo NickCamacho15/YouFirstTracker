@@ -19,6 +19,7 @@ const goalSchema = z.object({
   title: z.string().min(1, "Goal is required"),
   description: z.string().optional(),
   dueDate: z.string().optional(),
+  accentColor: z.string().optional(),
 });
 
 type GoalFormData = z.infer<typeof goalSchema>;
@@ -35,7 +36,19 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
   const [consequences, setConsequences] = useState<string[]>(["", "", ""]);
   const [peopleHelped, setPeopleHelped] = useState<string[]>(["", "", ""]);
   const [microGoals, setMicroGoals] = useState<string[]>(["", "", "", "", "", "", ""]);
+  const [selectedColor, setSelectedColor] = useState("from-blue-500 to-indigo-600");
   const { toast } = useToast();
+
+  const colorOptions = [
+    { value: "from-blue-500 to-indigo-600", label: "Blue", preview: "bg-gradient-to-r from-blue-500 to-indigo-600" },
+    { value: "from-purple-500 to-pink-600", label: "Purple", preview: "bg-gradient-to-r from-purple-500 to-pink-600" },
+    { value: "from-emerald-500 to-teal-600", label: "Emerald", preview: "bg-gradient-to-r from-emerald-500 to-teal-600" },
+    { value: "from-orange-500 to-red-600", label: "Orange", preview: "bg-gradient-to-r from-orange-500 to-red-600" },
+    { value: "from-cyan-500 to-blue-600", label: "Cyan", preview: "bg-gradient-to-r from-cyan-500 to-blue-600" },
+    { value: "from-rose-500 to-pink-600", label: "Rose", preview: "bg-gradient-to-r from-rose-500 to-pink-600" },
+    { value: "from-amber-500 to-orange-600", label: "Amber", preview: "bg-gradient-to-r from-amber-500 to-orange-600" },
+    { value: "from-violet-500 to-purple-600", label: "Violet", preview: "bg-gradient-to-r from-violet-500 to-purple-600" },
+  ];
 
   const form = useForm<GoalFormData>({
     resolver: zodResolver(goalSchema),
@@ -43,11 +56,12 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
       title: "",
       description: "",
       dueDate: "",
+      accentColor: "from-blue-500 to-indigo-600",
     },
   });
 
   const createGoalMutation = useMutation({
-    mutationFn: async (data: GoalFormData & { benefits: string[]; consequences: string[]; peopleHelped: string[]; microGoals: string[] }) => {
+    mutationFn: async (data: GoalFormData & { benefits: string[]; consequences: string[]; peopleHelped: string[]; microGoals: string[]; accentColor: string }) => {
       const response = await apiRequest("/api/goals", { method: "POST", body: data });
       return response.json();
     },
@@ -145,6 +159,7 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
       consequences: filteredConsequences,
       peopleHelped: filteredPeople,
       microGoals: filteredMicroGoals,
+      accentColor: selectedColor,
     });
   };
 
@@ -311,6 +326,30 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
                     </FormItem>
                   )}
                 />
+
+                {/* Color Picker */}
+                <div className="mt-6">
+                  <label className="text-sm font-medium text-gray-700 mb-3 block">Choose Accent Color</label>
+                  <div className="grid grid-cols-4 gap-3">
+                    {colorOptions.map((color) => (
+                      <button
+                        key={color.value}
+                        type="button"
+                        onClick={() => {
+                          setSelectedColor(color.value);
+                          form.setValue('accentColor', color.value);
+                        }}
+                        className={`relative h-12 rounded-lg ${color.preview} ${
+                          selectedColor === color.value ? 'ring-2 ring-offset-2 ring-gray-800' : ''
+                        } hover:scale-105 transition-transform`}
+                      >
+                        <span className="text-xs text-white font-medium absolute bottom-1 left-1/2 transform -translate-x-1/2">
+                          {color.label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
