@@ -169,6 +169,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/goals/:id", requireAuth, async (req, res) => {
+    try {
+      const goalId = parseInt(req.params.id);
+      
+      // Verify goal belongs to user
+      const goal = await storage.getGoalById(goalId);
+      if (!goal || goal.userId !== req.session.userId) {
+        return res.status(404).json({ message: "Goal not found" });
+      }
+      
+      // Delete associated micro-goals first
+      const microGoals = await storage.getMicroGoalsByGoalId(goalId);
+      for (const microGoal of microGoals) {
+        await storage.deleteMicroGoal(microGoal.id);
+      }
+      
+      // Delete the goal
+      const deleted = await storage.deleteGoal(goalId);
+      if (!deleted) {
+        return res.status(404).json({ message: "Goal not found" });
+      }
+      
+      res.json({ message: "Goal deleted successfully" });
+    } catch (error) {
+      console.error("Delete goal error:", error);
+      res.status(500).json({ message: "Failed to delete goal" });
+    }
+  });
+
   app.patch("/api/micro-goals/:id", requireAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
