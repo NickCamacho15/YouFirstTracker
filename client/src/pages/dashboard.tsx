@@ -1,176 +1,142 @@
-import { useState, useEffect, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
-import { NewGoalModal } from "@/components/goals/new-goal-modal";
-import { NewTaskModal } from "@/components/tasks/new-task-modal";
+import { useState } from 'react';
+import { Link } from 'wouter';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { CheckCircle2, ChevronLeft, ChevronRight, Plus, Target, Shield, Layers, Star, Flame } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { NewGoalModal } from '@/components/goals/new-goal-modal';
+import { NewTaskModal } from '@/components/dashboard/new-task-modal';
+import { AchievementHistory } from '@/components/habits/achievement-history';
 
-import { HabitStoryBar } from "@/components/habits/habit-story-bar";
-import { useAuth } from "@/hooks/use-auth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { 
-  Plus, 
-  Target, 
-  CheckCircle2,
-  Trophy,
-  ChevronLeft,
-  ChevronRight
-} from "lucide-react";
+interface Goal {
+  id: number;
+  title: string;
+  description?: string;
+  dueDate?: string;
+  completed: boolean;
+  benefits?: string[];
+  consequences?: string[];
+  peopleHelped?: string[];
+  microGoals: Array<{
+    id: number;
+    title: string;
+    completed: boolean;
+  }>;
+}
+
+interface Task {
+  id: string;
+  text: string;
+  time?: string;
+  completed: boolean;
+  type: 'morning' | 'evening' | 'critical' | 'today';
+  goalId: number;
+}
+
+interface RoutineTask {
+  id: string;
+  text: string;
+  completed: boolean;
+  streak: number;
+  weeklyTarget: number;
+}
 
 export default function DashboardPage() {
-  const { user } = useAuth();
-  const [showNewGoalModal, setShowNewGoalModal] = useState(false);
-
-  
-  // Critical tasks completion counter - tracks lifetime achievements
-  const [criticalTasksCompleted, setCriticalTasksCompleted] = useState(147);
   const [showNewTaskModal, setShowNewTaskModal] = useState(false);
-  
-  // Goals with cumulative task completion tracking
-  const [goals, setGoals] = useState([
-    { id: 1, title: 'Q4 Business Review', description: 'Complete quarterly business analysis', tasksCompleted: 234, daysWorking: 45, color: 'bg-gradient-to-r from-blue-500 to-indigo-600' },
-    { id: 2, title: 'Team Leadership', description: 'Develop team processes and culture', tasksCompleted: 187, daysWorking: 62, color: 'bg-gradient-to-r from-purple-500 to-pink-600' },
-    { id: 3, title: 'Personal Development', description: 'Health and wellness improvements', tasksCompleted: 456, daysWorking: 89, color: 'bg-gradient-to-r from-emerald-500 to-teal-600' },
-    { id: 4, title: 'Home Organization', description: 'Organize and optimize living space', tasksCompleted: 98, daysWorking: 23, color: 'bg-gradient-to-r from-orange-500 to-red-600' }
+  const [showNewGoalModal, setShowNewGoalModal] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(new Date().getDay());
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  const { data: goals = [] } = useQuery<Goal[]>({
+    queryKey: ['/api/goals'],
+  });
+
+  const [morningRoutines, setMorningRoutines] = useState<RoutineTask[]>([
+    { id: 'morning-1', text: 'Morning Prayer & Meditation', completed: false, streak: 12, weeklyTarget: 7 },
+    { id: 'morning-2', text: 'Exercise & Movement', completed: false, streak: 8, weeklyTarget: 5 },
+    { id: 'morning-3', text: 'Healthy Breakfast', completed: false, streak: 15, weeklyTarget: 7 },
+    { id: 'morning-4', text: 'Review Daily Priorities', completed: false, streak: 6, weeklyTarget: 7 }
   ]);
 
-  // Get current day and week
-  const currentDay = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const [selectedDay, setSelectedDay] = useState(currentDay === 0 ? 1 : currentDay); // Default to Monday if Sunday
+  const [eveningRoutines, setEveningRoutines] = useState<RoutineTask[]>([
+    { id: 'evening-1', text: 'Daily Reflection Journal', completed: false, streak: 9, weeklyTarget: 7 },
+    { id: 'evening-2', text: 'Reading (30 min)', completed: false, streak: 11, weeklyTarget: 6 },
+    { id: 'evening-3', text: 'Prepare Tomorrow', completed: false, streak: 4, weeklyTarget: 7 },
+    { id: 'evening-4', text: 'Gratitude Practice', completed: false, streak: 14, weeklyTarget: 7 }
+  ]);
 
-  // Weekly tasks organized by day
-  const [weeklyTasks, setWeeklyTasks] = useState({
+  const [weeklyTasks, setWeeklyTasks] = useState<{ [key: number]: Task[] }>({
+    0: [ // Sunday
+      { id: 'sun-1', text: 'Weekly planning & reflection', completed: false, type: 'today', goalId: 1 },
+      { id: 'sun-2', text: 'Meal prep for the week', completed: false, type: 'today', goalId: 2 },
+      { id: 'sun-3', text: 'Review financial goals', completed: false, type: 'today', goalId: 3 },
+    ],
     1: [ // Monday
-      { id: 'mon-1', text: 'Team standup meeting', completed: false, goalId: 2, time: '9 AM', priority: 1 },
-      { id: 'mon-2', text: 'Review quarterly metrics', completed: false, goalId: 1, time: 'Due 2 PM', priority: 2 },
-      { id: 'mon-3', text: 'Plan weekly priorities', completed: false, goalId: 1, priority: 3 }
+      { id: 'mon-1', text: 'Team meeting preparation', completed: false, type: 'today', goalId: 1 },
+      { id: 'mon-2', text: 'Work on strategic project', time: '10:00 AM', completed: false, type: 'today', goalId: 2 },
+      { id: 'mon-3', text: 'Gym - Upper body workout', time: '6:00 PM', completed: false, type: 'today', goalId: 3 },
+      { id: 'mon-4', text: 'Call Mom', time: '7:30 PM', completed: false, type: 'today', goalId: 4 },
     ],
     2: [ // Tuesday
-      { id: 'tue-1', text: 'Client presentation prep', completed: false, goalId: 1, time: '10 AM', priority: 1 },
-      { id: 'tue-2', text: 'Fitness training session', completed: false, goalId: 3, time: '6 PM', priority: 2 },
-      { id: 'tue-3', text: 'Team 1:1 meetings', completed: false, goalId: 2, priority: 3 }
+      { id: 'tue-1', text: 'Client presentation prep', completed: false, type: 'today', goalId: 1 },
+      { id: 'tue-2', text: 'Deep work block', time: '9:00 AM - 12:00 PM', completed: false, type: 'today', goalId: 2 },
+      { id: 'tue-3', text: 'Cardio & core workout', time: '5:30 PM', completed: false, type: 'today', goalId: 3 },
     ],
     3: [ // Wednesday
-      { id: 'wed-1', text: 'Mid-week project review', completed: false, goalId: 1, time: '2 PM', priority: 1 },
-      { id: 'wed-2', text: 'Meal prep for week', completed: false, goalId: 3, priority: 2 },
-      { id: 'wed-3', text: 'Update project timeline', completed: false, goalId: 2, priority: 3 }
+      { id: 'wed-1', text: 'Mid-week review', completed: false, type: 'today', goalId: 1 },
+      { id: 'wed-2', text: 'Professional development', time: '2:00 PM', completed: false, type: 'today', goalId: 2 },
+      { id: 'wed-3', text: 'Yoga & meditation', time: '6:00 PM', completed: false, type: 'today', goalId: 3 },
     ],
     4: [ // Thursday
-      { id: 'thu-1', text: 'Prepare presentation slides', completed: false, goalId: 1, time: '11 AM', priority: 1 },
-      { id: 'thu-2', text: 'Doctor appointment', completed: false, goalId: 3, time: '3 PM', priority: 2 },
-      { id: 'thu-3', text: 'Team retrospective', completed: false, goalId: 2, priority: 3 }
+      { id: 'thu-1', text: 'Project milestone check', completed: false, type: 'today', goalId: 1 },
+      { id: 'thu-2', text: 'Networking event', time: '5:00 PM', completed: false, type: 'today', goalId: 2 },
+      { id: 'thu-3', text: 'Lower body workout', time: '6:30 AM', completed: false, type: 'today', goalId: 3 },
     ],
     5: [ // Friday
-      { id: 'fri-1', text: 'Week wrap-up meeting', completed: false, goalId: 2, time: '4 PM', priority: 1 },
-      { id: 'fri-2', text: 'Complete weekly reports', completed: false, goalId: 1, priority: 2 },
-      { id: 'fri-3', text: 'Plan weekend activities', completed: false, goalId: 3, priority: 3 }
+      { id: 'fri-1', text: 'Weekly report completion', completed: false, type: 'today', goalId: 1 },
+      { id: 'fri-2', text: 'Team retrospective', time: '3:00 PM', completed: false, type: 'today', goalId: 2 },
+      { id: 'fri-3', text: 'Plan weekend activities', completed: false, type: 'today', goalId: 4 },
     ],
     6: [ // Saturday
-      { id: 'sat-1', text: 'Home organization project', completed: false, goalId: 4, time: '10 AM', priority: 1 },
-      { id: 'sat-2', text: 'Family time activities', completed: false, goalId: 3, priority: 2 },
-      { id: 'sat-3', text: 'Personal development reading', completed: false, goalId: 3, priority: 3 }
-    ],
-    0: [ // Sunday
-      { id: 'sun-1', text: 'Weekly reflection & planning', completed: false, goalId: 1, time: '6 PM', priority: 1 },
-      { id: 'sun-2', text: 'Prepare for upcoming week', completed: false, goalId: 2, priority: 2 },
-      { id: 'sun-3', text: 'Rest and recharge', completed: false, goalId: 3, priority: 3 }
+      { id: 'sat-1', text: 'Long run or hike', time: '7:00 AM', completed: false, type: 'today', goalId: 3 },
+      { id: 'sat-2', text: 'Personal project time', completed: false, type: 'today', goalId: 2 },
+      { id: 'sat-3', text: 'Social activity', time: 'Evening', completed: false, type: 'today', goalId: 4 },
     ]
   });
 
-  // Auto refresh on Sunday
-  useEffect(() => {
-    const checkSundayRefresh = () => {
-      const now = new Date();
-      const day = now.getDay();
-      
-      // If it's Sunday and past 6 PM, reset the week
-      if (day === 0 && now.getHours() >= 18) {
-        // Reset all tasks to uncompleted for the new week
-        setWeeklyTasks(prev => {
-          const resetTasks = { ...prev };
-          Object.keys(resetTasks).forEach(dayKey => {
-            resetTasks[dayKey] = resetTasks[dayKey].map(task => ({ ...task, completed: false }));
-          });
-          return resetTasks;
-        });
-      }
-    };
-
-    // Check every hour
-    const interval = setInterval(checkSundayRefresh, 60 * 60 * 1000);
-    checkSundayRefresh(); // Check immediately
-
-    return () => clearInterval(interval);
-  }, []);
-
+  // Get tasks for the selected day
   const currentDayTasks = weeklyTasks[selectedDay] || [];
 
-  // Morning routines with streak tracking
-  const [morningRoutines, setMorningRoutines] = useState([
-    { id: 'morning-1', text: 'Meditation (10 min)', completed: true, priority: 1, streak: 12, weeklyTarget: 7 },
-    { id: 'morning-2', text: 'Exercise', completed: false, priority: 2, streak: 8, weeklyTarget: 5 },
-    { id: 'morning-3', text: 'Healthy breakfast', completed: false, priority: 3, streak: 15, weeklyTarget: 7 },
-    { id: 'morning-4', text: 'Review daily priorities', completed: false, priority: 4, streak: 6, weeklyTarget: 7 }
-  ]);
-
-  // Evening routines with streak tracking
-  const [eveningRoutines, setEveningRoutines] = useState([
-    { id: 'evening-1', text: 'Daily reflection', completed: false, priority: 1, streak: 9, weeklyTarget: 7 },
-    { id: 'evening-2', text: 'Reading (30 min)', completed: false, priority: 2, streak: 11, weeklyTarget: 5 },
-    { id: 'evening-3', text: 'Prepare tomorrow', completed: false, priority: 3, streak: 4, weeklyTarget: 7 },
-    { id: 'evening-4', text: 'Gratitude practice', completed: false, priority: 4, streak: 14, weeklyTarget: 7 }
-  ]);
-
-  // Calculate routine completion percentages
-  const morningCompletionRate = Math.round((morningRoutines.filter(r => r.completed).length / morningRoutines.length) * 100);
-  const eveningCompletionRate = Math.round((eveningRoutines.filter(r => r.completed).length / eveningRoutines.length) * 100);
-  const routineOverallRate = Math.round(((morningRoutines.filter(r => r.completed).length + eveningRoutines.filter(r => r.completed).length) / (morningRoutines.length + eveningRoutines.length)) * 100);
+  // Calculate total completed tasks (cumulative counter)
+  const criticalTasksCompleted = Object.values(weeklyTasks).flat().filter(t => t.completed).length + 147; // Adding base amount for long-term tracking
 
   const handleWeeklyTaskToggle = (taskId: string) => {
     setWeeklyTasks(prev => ({
       ...prev,
-      [selectedDay]: prev[selectedDay as keyof typeof prev].map(task => {
-        if (task.id === taskId) {
-          const updatedTask = { ...task, completed: !task.completed };
-          
-          if (updatedTask.completed && !task.completed) {
-            setCriticalTasksCompleted(count => count + 1);
-            
-            // Increment goal progress if task is linked to a goal
-            if (task.goalId) {
-              setGoals(prevGoals => prevGoals.map(goal => 
-                goal.id === task.goalId 
-                  ? { ...goal, tasksCompleted: goal.tasksCompleted + 1 }
-                  : goal
-              ));
-            }
-          } else if (!updatedTask.completed && task.completed) {
-            setCriticalTasksCompleted(count => Math.max(0, count - 1));
-            
-            // Decrement goal progress if task is linked to a goal
-            if (task.goalId) {
-              setGoals(prevGoals => prevGoals.map(goal => 
-                goal.id === task.goalId 
-                  ? { ...goal, tasksCompleted: Math.max(0, goal.tasksCompleted - 1) }
-                  : goal
-              ));
-            }
-          }
-          
-          return updatedTask;
-        }
-        return task;
-      })
+      [selectedDay]: prev[selectedDay].map(task => 
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      )
     }));
   };
 
-  const handleNewTask = (newTask: any) => {
+  const handleNewTask = (taskData: { text: string; goalId: number; time?: string }) => {
+    const newTask: Task = {
+      id: `task-${Date.now()}`,
+      text: taskData.text,
+      time: taskData.time,
+      completed: false,
+      type: 'today',
+      goalId: taskData.goalId
+    };
+
     setWeeklyTasks(prev => ({
       ...prev,
-      [selectedDay]: [...(prev[selectedDay as keyof typeof prev] || []), newTask]
+      [selectedDay]: [...(prev[selectedDay] || []), newTask]
     }));
   };
 
@@ -197,7 +163,7 @@ export default function DashboardPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setSelectedDay(selectedDay === 1 ? 0 : selectedDay - 1)}
+              onClick={() => setSelectedDay(selectedDay === 0 ? 6 : selectedDay - 1)}
               className="h-8 w-8 p-0"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -209,7 +175,7 @@ export default function DashboardPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setSelectedDay(selectedDay === 0 ? 1 : (selectedDay + 1) % 7)}
+              onClick={() => setSelectedDay((selectedDay + 1) % 7)}
               className="h-8 w-8 p-0"
             >
               <ChevronRight className="w-4 h-4" />
@@ -273,64 +239,64 @@ export default function DashboardPage() {
           </div>
         </div>
 
-
-
-
-
-        {/* Today's Tasks with Long-term Tracking */}
+        {/* Mastery Dashboard */}
         <Card className="border-0 shadow-lg mb-6">
-          <CardHeader className="pb-3">
+          <CardHeader>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-                <CardTitle className="text-base sm:text-lg">Today's Tasks</CardTitle>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50"
-                onClick={() => setShowNewTaskModal(true)}
-              >
-                <Plus className="w-3 h-3" />
-              </Button>
-            </div>
-            <div className="flex items-center justify-between mt-2">
-              <p className="text-xs sm:text-sm text-gray-600">
-                {dayNames[selectedDay]}'s priorities
-              </p>
-              <div className="text-xs text-gray-500">
-                <span className="font-semibold text-blue-600">{criticalTasksCompleted}</span> total tasks completed
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
+                  <Target className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Personal Mastery Dashboard</CardTitle>
+                  <p className="text-sm text-gray-600">Your excellence metrics at a glance</p>
+                </div>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              {currentDayTasks.map((task) => {
-                const goal = getGoalById(task.goalId);
-                return (
-                  <div 
-                    key={task.id}
-                    className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
-                      task.completed ? 'bg-blue-50 border-blue-200' : 'border-gray-200 hover:bg-blue-50'
-                    }`}
-                  >
-                    <input 
-                      type="checkbox" 
-                      checked={task.completed}
-                      onChange={() => handleWeeklyTaskToggle(task.id)}
-                      className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded cursor-pointer"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <span className={`text-xs sm:text-sm ${task.completed ? 'text-blue-800 font-medium' : 'text-gray-700'}`}>
-                        {task.text}
-                      </span>
-                      {task.time && (
-                        <p className="text-xs text-gray-500 mt-1">{task.time}</p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Total Tasks Completed */}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">{criticalTasksCompleted}</div>
+                <p className="text-sm text-gray-600 mt-1">Tasks Completed</p>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                  <span className="text-xs text-gray-600">lifetime</span>
+                </div>
+              </div>
+
+              {/* Current Streaks */}
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-green-600">
+                  {Math.max(...morningRoutines.map(r => r.streak), ...eveningRoutines.map(r => r.streak))}
+                </div>
+                <p className="text-sm text-gray-600 mt-1">Best Streak</p>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <Flame className="w-4 h-4 text-green-500" />
+                  <span className="text-xs text-gray-600">days</span>
+                </div>
+              </div>
+
+              {/* Consistency Score */}
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-purple-600">89%</div>
+                <p className="text-sm text-gray-600 mt-1">Consistency</p>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <Star className="w-4 h-4 text-purple-500" />
+                  <span className="text-xs text-gray-600">this month</span>
+                </div>
+              </div>
+
+              {/* Active Goals */}
+              <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-orange-600">{goals.filter(g => !g.completed).length}</div>
+                <p className="text-sm text-gray-600 mt-1">Active Goals</p>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <Target className="w-4 h-4 text-orange-500" />
+                  <span className="text-xs text-gray-600">in progress</span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -394,6 +360,64 @@ export default function DashboardPage() {
                           style={{ width: `${Math.min(completionRate, 100)}%` }}
                         ></div>
                       </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Today's Tasks with Long-term Tracking */}
+        <Card className="border-0 shadow-lg mb-6">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                <CardTitle className="text-base sm:text-lg">Today's Tasks</CardTitle>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50"
+                onClick={() => setShowNewTaskModal(true)}
+              >
+                <Plus className="w-3 h-3" />
+              </Button>
+            </div>
+            <div className="flex items-center justify-between mt-2">
+              <p className="text-xs sm:text-sm text-gray-600">
+                {dayNames[selectedDay]}'s priorities
+              </p>
+              <div className="text-xs text-gray-500">
+                <span className="font-semibold text-blue-600">{criticalTasksCompleted}</span> total tasks completed
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {currentDayTasks.map((task) => {
+                const goal = getGoalById(task.goalId);
+                return (
+                  <div 
+                    key={task.id}
+                    className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
+                      task.completed ? 'bg-blue-50 border-blue-200' : 'border-gray-200 hover:bg-blue-50'
+                    }`}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={task.completed}
+                      onChange={() => handleWeeklyTaskToggle(task.id)}
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded cursor-pointer"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <span className={`text-xs sm:text-sm ${task.completed ? 'text-blue-800 font-medium' : 'text-gray-700'}`}>
+                        {task.text}
+                      </span>
+                      {task.time && (
+                        <p className="text-xs text-gray-500 mt-1">{task.time}</p>
+                      )}
                     </div>
                   </div>
                 );
@@ -469,6 +493,9 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
+        {/* Achievement History */}
+        <AchievementHistory />
+
       </main>
 
       <NewGoalModal 
@@ -484,8 +511,6 @@ export default function DashboardPage() {
         goals={goals}
         selectedDay={selectedDay}
       />
-      
-
     </div>
   );
 }

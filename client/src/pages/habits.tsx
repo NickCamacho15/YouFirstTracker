@@ -18,8 +18,11 @@ import {
   AlertTriangle,
   CheckCircle2,
   Calendar,
-  Trash2
+  Trash2,
+  Star
 } from 'lucide-react';
+import { RulesHeatmap } from '@/components/habits/rules-heatmap';
+import { AchievementHistory } from '@/components/habits/achievement-history';
 
 interface Rule {
   id: number;
@@ -208,15 +211,8 @@ export default function HabitsPage() {
         </TabsList>
 
         <TabsContent value="rules" className="space-y-6">
-          {/* Rules Header Card */}
-          <Card className="border-0 shadow-lg bg-gradient-to-r from-red-500 to-red-600 text-white">
-            <CardHeader>
-              <div>
-                <CardTitle className="text-2xl font-bold">Personal Rules</CardTitle>
-                <p className="text-red-100 mt-1">Standards that define your character</p>
-              </div>
-            </CardHeader>
-          </Card>
+          {/* Rules Heat Map */}
+          <RulesHeatmap rules={rules} />
 
           {/* Add New Rule */}
           {isAddingRule && (
