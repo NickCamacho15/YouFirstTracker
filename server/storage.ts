@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { eq, desc, and, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { 
-  users, goals, microGoals, habits, habitLogs, readingSessions, readingList, meditationSessions, posts, visionBoard, tasks, rules, challenges, challengeLogs,
+  users, goals, microGoals, habits, habitLogs, readingSessions, readingList, meditationSessions, posts, visionBoard, tasks, wonDays, rules, challenges, challengeLogs,
   followers, postReactions, postComments, workouts, exercises, workoutExercises, bodyWeightLogs,
   trainingTemplates, exerciseHistory, screenTimeEntries, workoutEntries,
   type User, type InsertUser, type Goal, type InsertGoal, type MicroGoal, type InsertMicroGoal,
@@ -11,7 +11,7 @@ import {
   type ReadingSession, type InsertReadingSession, type ReadingListItem, type InsertReadingListItem,
   type MeditationSession, type InsertMeditationSession,
   type Post, type InsertPost,
-  type VisionBoardItem, type InsertVisionBoardItem, type Task, type InsertTask, type Rule, type InsertRule,
+  type VisionBoardItem, type InsertVisionBoardItem, type Task, type InsertTask, type WonDay, type InsertWonDay, type Rule, type InsertRule,
   type Challenge, type InsertChallenge, type ChallengeLog, type InsertChallengeLog,
   type Follower, type InsertFollower, type PostReaction, type InsertPostReaction,
   type PostComment, type InsertPostComment, type Workout, type InsertWorkout,
@@ -121,6 +121,10 @@ export interface IStorage {
   createChallenge(challenge: InsertChallenge): Promise<Challenge>;
   deleteChallenge(id: number): Promise<boolean>;
   updateChallengeLog(challengeId: number, day: number, completed: boolean): Promise<ChallengeLog>;
+
+  // Won Days
+  getWonDaysByMonth(userId: number, yearMonth: string): Promise<WonDay[]>;
+  createOrUpdateWonDay(wonDay: InsertWonDay): Promise<WonDay>;
 
   // Workouts
   getWorkoutsByUserId(userId: number): Promise<Workout[]>;
@@ -1055,6 +1059,45 @@ export class DatabaseStorage implements IStorage {
       // Create new log
       const result = await db.insert(challengeLogs)
         .values({ challengeId, day, completed })
+        .returning();
+      return result[0];
+    }
+  }
+
+  // Won Days
+  async getWonDaysByMonth(userId: number, yearMonth: string): Promise<WonDay[]> {
+    const startDate = `${yearMonth}-01`;
+    const endDate = `${yearMonth}-31`;
+    
+    return await db.select().from(wonDays)
+      .where(and(
+        eq(wonDays.userId, userId),
+        sql`${wonDays.date} >= ${startDate}`,
+        sql`${wonDays.date} <= ${endDate}`
+      ))
+      .orderBy(wonDays.date);
+  }
+
+  async createOrUpdateWonDay(wonDay: InsertWonDay): Promise<WonDay> {
+    // Check if a won day already exists for this user and date
+    const existing = await db.select().from(wonDays)
+      .where(and(
+        eq(wonDays.userId, wonDay.userId),
+        eq(wonDays.date, wonDay.date)
+      ))
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing
+      const result = await db.update(wonDays)
+        .set(wonDay)
+        .where(eq(wonDays.id, existing[0].id))
+        .returning();
+      return result[0];
+    } else {
+      // Create new
+      const result = await db.insert(wonDays)
+        .values(wonDay)
         .returning();
       return result[0];
     }

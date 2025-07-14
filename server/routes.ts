@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
-import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertReadingListSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema, insertScreenTimeEntrySchema, insertWorkoutEntrySchema, insertRuleSchema, insertChallengeSchema, insertTaskSchema } from "@shared/schema";
+import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertReadingListSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema, insertScreenTimeEntrySchema, insertWorkoutEntrySchema, insertRuleSchema, insertChallengeSchema, insertTaskSchema, insertWonDaySchema } from "@shared/schema";
 import { generateWorkoutProgram } from "./ai";
 import { z } from "zod";
 
@@ -420,6 +420,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Delete challenge error:", error);
       res.status(500).json({ message: "Failed to delete challenge" });
+    }
+  });
+
+  // Won Days routes
+  app.get("/api/won-days/:yearMonth", requireAuth, async (req, res) => {
+    try {
+      const { yearMonth } = req.params;
+      const wonDays = await storage.getWonDaysByMonth(req.session.userId, yearMonth);
+      res.json(wonDays);
+    } catch (error) {
+      console.error("Get won days error:", error);
+      res.status(500).json({ message: "Failed to get won days" });
+    }
+  });
+
+  app.post("/api/won-days", requireAuth, async (req, res) => {
+    try {
+      const wonDayData = insertWonDaySchema.parse({
+        ...req.body,
+        userId: req.session.userId
+      });
+      const wonDay = await storage.createOrUpdateWonDay(wonDayData);
+      res.json(wonDay);
+    } catch (error) {
+      console.error("Create/update won day error:", error);
+      res.status(400).json({ message: "Failed to create/update won day" });
     }
   });
 

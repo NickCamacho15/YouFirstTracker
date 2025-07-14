@@ -180,6 +180,20 @@ export const tasks = pgTable("tasks", {
   completedAt: timestamp("completed_at"),
 });
 
+export const wonDays = pgTable("won_days", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  date: date("date").notNull(),
+  morningRoutineCompleted: boolean("morning_routine_completed").default(false).notNull(),
+  eveningRoutineCompleted: boolean("evening_routine_completed").default(false).notNull(),
+  tasksCompleted: boolean("tasks_completed").default(false).notNull(),
+  workedOut: boolean("worked_out").default(false).notNull(),
+  readCompleted: boolean("read_completed").default(false).notNull(),
+  rulesAdhered: boolean("rules_adhered").default(false).notNull(),
+  manuallyWon: boolean("manually_won").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 
 
 export const userStats = pgTable("user_stats", {
@@ -533,6 +547,11 @@ export const insertTaskSchema = createInsertSchema(tasks).omit({
   dueDate: z.string().optional().transform((val) => val && val !== "" ? new Date(val) : undefined),
 });
 
+export const insertWonDaySchema = createInsertSchema(wonDays).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertRuleSchema = createInsertSchema(rules).omit({
   id: true,
   createdAt: true,
@@ -661,6 +680,8 @@ export type VisionBoardItem = typeof visionBoard.$inferSelect;
 export type InsertVisionBoardItem = z.infer<typeof insertVisionBoardSchema>;
 export type Task = typeof tasks.$inferSelect;
 export type InsertTask = z.infer<typeof insertTaskSchema>;
+export type WonDay = typeof wonDays.$inferSelect;
+export type InsertWonDay = z.infer<typeof insertWonDaySchema>;
 export type Rule = typeof rules.$inferSelect;
 export type InsertRule = z.infer<typeof insertRuleSchema>;
 export type UserStats = typeof userStats.$inferSelect;

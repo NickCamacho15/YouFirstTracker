@@ -11,6 +11,7 @@ import { CheckCircle2, ChevronLeft, ChevronRight, Plus, Target, Shield, Layers, 
 import { useQuery } from '@tanstack/react-query';
 import { NewGoalModal } from '@/components/goals/new-goal-modal';
 import { NewTaskModal } from '@/components/dashboard/new-task-modal';
+import { DayTrackerCalendar } from '@/components/dashboard/day-tracker-calendar';
 
 interface Goal {
   id: number;
@@ -156,7 +157,10 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white">
       <main className="p-4 pb-24">
-
+        {/* Day Tracker Calendar */}
+        <div className="mb-6">
+          <DayTrackerCalendar />
+        </div>
 
         {/* Weekly Overview - Standalone Tiles */}
         <div className="mb-6">
