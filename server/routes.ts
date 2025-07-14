@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
-import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertReadingListSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema, insertScreenTimeEntrySchema, insertWorkoutEntrySchema, insertRuleSchema, insertChallengeSchema } from "@shared/schema";
+import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertReadingListSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema, insertScreenTimeEntrySchema, insertWorkoutEntrySchema, insertRuleSchema, insertChallengeSchema, insertTaskSchema } from "@shared/schema";
 import { generateWorkoutProgram } from "./ai";
 import { z } from "zod";
 
@@ -288,7 +288,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/rules", requireAuth, async (req, res) => {
     try {
-      const ruleData = insertRuleSchema.parse({ ...req.body, userId: req.session.userId });
+      const ruleData = { ...req.body, userId: req.session.userId };
       const rule = await storage.createRule(ruleData);
       res.json(rule);
     } catch (error) {
@@ -336,6 +336,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/rules/:id/break", requireAuth, async (req, res) => {
+    try {
+      const ruleId = parseInt(req.params.id);
+      const rule = await storage.getRuleById(ruleId);
+      
+      if (!rule || rule.userId !== req.session.userId) {
+        return res.status(404).json({ message: "Rule not found" });
+      }
+      
+      const updatedRule = await storage.updateRule(ruleId, {
+        completedToday: false,
+        streak: 0
+      });
+      
+      res.json(updatedRule);
+    } catch (error) {
+      console.error("Break rule error:", error);
+      res.status(500).json({ message: "Failed to break rule" });
+    }
+  });
+
   // Challenge routes
   app.get("/api/challenges", requireAuth, async (req, res) => {
     try {
@@ -349,7 +370,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/challenges", requireAuth, async (req, res) => {
     try {
-      const challengeData = insertChallengeSchema.parse({ ...req.body, userId: req.session.userId });
+      const challengeData = { 
+        ...req.body, 
+        userId: req.session.userId,
+        startDate: new Date(req.body.startDate)
+      };
       const challenge = await storage.createChallenge(challengeData);
       res.json(challenge);
     } catch (error) {

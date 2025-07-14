@@ -266,7 +266,7 @@ export default function HabitsPage() {
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              {rules.length === 0 ? (
+              {!rules || rules.length === 0 ? (
                 <div className="text-center py-8">
                   <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">No Rules Yet</h3>
@@ -280,7 +280,7 @@ export default function HabitsPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {rules.map((rule) => (
+                  {rules?.map((rule) => (
                     <div key={rule.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
                       <div className="flex items-center gap-3">
                         <button
