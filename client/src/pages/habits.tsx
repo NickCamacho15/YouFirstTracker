@@ -163,7 +163,8 @@ export default function HabitsPage() {
     const challenge = challenges.find(c => c.id === challengeId);
     if (!challenge) return;
     
-    const isCompleted = challenge.completedDays?.includes(day);
+    const completedDays = challenge.completedDays || [];
+    const isCompleted = completedDays.includes(day);
     updateChallengeLog.mutate({
       challengeId,
       day,
@@ -352,7 +353,8 @@ export default function HabitsPage() {
 
             {/* Active Challenges List */}
             {challenges.map((challenge) => {
-              const completedPercentage = Math.round((challenge.completedDays.length / challenge.duration) * 100);
+              const completedDays = challenge.completedDays || [];
+              const completedPercentage = Math.round((completedDays.length / challenge.duration) * 100);
               const today = Math.floor((new Date().getTime() - new Date(challenge.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1;
               
               return (
@@ -397,8 +399,8 @@ export default function HabitsPage() {
                         ></div>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500">
-                        <span>{challenge.completedDays.length} days completed</span>
-                        <span>{challenge.duration - challenge.completedDays.length} days remaining</span>
+                        <span>{completedDays.length} days completed</span>
+                        <span>{challenge.duration - completedDays.length} days remaining</span>
                       </div>
                     </div>
 
@@ -412,7 +414,7 @@ export default function HabitsPage() {
                             onClick={() => handleChallengeCheckOff(challenge.id, day)}
                             className={`
                               aspect-square rounded-md text-xs font-medium border transition-all duration-200 flex items-center justify-center
-                              ${challenge.completedDays.includes(day)
+                              ${completedDays.includes(day)
                                 ? 'bg-green-500 border-green-500 text-white shadow-sm'
                                 : day === today
                                   ? 'bg-purple-100 border-purple-400 text-purple-700 font-bold'

@@ -383,9 +383,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/challenges/:id/day/:day", requireAuth, async (req, res) => {
+  app.patch("/api/challenges/:challengeId/day/:day", requireAuth, async (req, res) => {
     try {
-      const challengeId = parseInt(req.params.id);
+      const challengeId = parseInt(req.params.challengeId);
       const day = parseInt(req.params.day);
       const { completed } = req.body;
       

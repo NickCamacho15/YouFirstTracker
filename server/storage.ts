@@ -988,13 +988,35 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Challenges
-  async getChallengesByUserId(userId: number): Promise<Challenge[]> {
-    return await db.select().from(challenges).where(eq(challenges.userId, userId)).orderBy(desc(challenges.createdAt));
+  async getChallengesByUserId(userId: number): Promise<any[]> {
+    const challengeList = await db.select().from(challenges).where(eq(challenges.userId, userId)).orderBy(desc(challenges.createdAt));
+    
+    // For each challenge, get the completed days
+    const challengesWithLogs = await Promise.all(challengeList.map(async (challenge) => {
+      const logs = await db.select().from(challengeLogs)
+        .where(and(eq(challengeLogs.challengeId, challenge.id), eq(challengeLogs.completed, true)));
+      
+      return {
+        ...challenge,
+        completedDays: logs.map(log => log.day)
+      };
+    }));
+    
+    return challengesWithLogs;
   }
 
-  async getChallengeById(id: number): Promise<Challenge | undefined> {
+  async getChallengeById(id: number): Promise<any | undefined> {
     const result = await db.select().from(challenges).where(eq(challenges.id, id)).limit(1);
-    return result[0];
+    if (result.length === 0) return undefined;
+    
+    const challenge = result[0];
+    const logs = await db.select().from(challengeLogs)
+      .where(and(eq(challengeLogs.challengeId, challenge.id), eq(challengeLogs.completed, true)));
+    
+    return {
+      ...challenge,
+      completedDays: logs.map(log => log.day)
+    };
   }
 
   async createChallenge(challenge: InsertChallenge): Promise<Challenge> {
