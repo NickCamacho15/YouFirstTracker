@@ -184,15 +184,15 @@ export default function DashboardPage() {
 
         {/* Weekly Overview - Apple Fitness Style Nested Rings */}
         <div className="mb-6">
-          <div className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 rounded-2xl shadow-xl p-8 border border-blue-100">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Today's Focus</h2>
-              <p className="text-base text-gray-600 font-medium">Weekly Investment Tracker</p>
+          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-1">Today's Focus</h2>
+              <p className="text-sm text-gray-600">Weekly Investment Tracker</p>
             </div>
             
             {/* Nested Rings Container */}
-            <div className="flex justify-center mb-8">
-              <div className="relative w-48 h-48 md:w-56 md:h-56">
+            <div className="flex justify-center mb-6">
+              <div className="relative w-40 h-40 md:w-48 md:h-48">
                 {/* Outer Ring - Reading */}
                 <svg className="absolute inset-0 w-full h-full transform -rotate-90">
                   <circle
@@ -311,77 +311,44 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Data Display Below Rings */}
-            <div className="grid grid-cols-2 gap-4 md:gap-6">
+            {/* Data Display Below Rings - Horizontal Layout */}
+            <div className="flex flex-wrap justify-center gap-6 px-4">
               {/* Reading */}
-              <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-md">
-                    <span className="text-lg">📚</span>
-                  </div>
-                  <h4 className="font-bold text-gray-900 text-lg">Reading</h4>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-2xl font-bold text-blue-600">12.5h / 15h</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600">Weekly Progress</span>
-                    <span className="text-lg font-bold text-blue-600">83%</span>
-                  </div>
-                </div>
+              <div className="text-center">
+                <h4 className="text-sm font-medium text-gray-600 mb-1">READING</h4>
+                <p className="text-2xl font-bold text-gray-900">12.5h</p>
+                <p className="text-sm text-gray-500">of 15h</p>
+                <p className="text-lg font-bold text-blue-600 mt-1">83%</p>
               </div>
+
+              <div className="w-px h-16 bg-gray-200 self-center hidden md:block"></div>
 
               {/* Meditation */}
-              <div className="bg-green-50 rounded-xl p-4 border border-green-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-md">
-                    <span className="text-lg">🧘</span>
-                  </div>
-                  <h4 className="font-bold text-gray-900 text-lg">Meditation</h4>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-2xl font-bold text-green-600">3.2h / 3.5h</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600">Weekly Progress</span>
-                    <span className="text-lg font-bold text-green-600">91%</span>
-                  </div>
-                </div>
+              <div className="text-center">
+                <h4 className="text-sm font-medium text-gray-600 mb-1">MEDITATION</h4>
+                <p className="text-2xl font-bold text-gray-900">3.2h</p>
+                <p className="text-sm text-gray-500">of 3.5h</p>
+                <p className="text-lg font-bold text-green-600 mt-1">91%</p>
               </div>
+
+              <div className="w-px h-16 bg-gray-200 self-center hidden md:block"></div>
 
               {/* Screen Time */}
-              <div className="bg-red-50 rounded-xl p-4 border border-red-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-md">
-                    <span className="text-lg">📱</span>
-                  </div>
-                  <h4 className="font-bold text-gray-900 text-lg">Screen Time</h4>
-                  <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center animate-pulse">
-                    <span className="text-white text-xs font-bold">!</span>
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-2xl font-bold text-red-600">28h / 14h</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600">Weekly Limit</span>
-                    <span className="text-lg font-bold text-red-600">200% ⚠️</span>
-                  </div>
-                </div>
+              <div className="text-center">
+                <h4 className="text-sm font-medium text-gray-600 mb-1">SCREEN TIME</h4>
+                <p className="text-2xl font-bold text-gray-900">28h</p>
+                <p className="text-sm text-gray-500">limit 14h</p>
+                <p className="text-lg font-bold text-red-600 mt-1">200% ⚠️</p>
               </div>
 
+              <div className="w-px h-16 bg-gray-200 self-center hidden md:block"></div>
+
               {/* Workouts */}
-              <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center shadow-md">
-                    <span className="text-lg">💪</span>
-                  </div>
-                  <h4 className="font-bold text-gray-900 text-lg">Workouts</h4>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-2xl font-bold text-orange-600">6.8h / 7h</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600">Weekly Goal</span>
-                    <span className="text-lg font-bold text-orange-600">97% 🔥</span>
-                  </div>
-                </div>
+              <div className="text-center">
+                <h4 className="text-sm font-medium text-gray-600 mb-1">WORKOUTS</h4>
+                <p className="text-2xl font-bold text-gray-900">6.8h</p>
+                <p className="text-sm text-gray-500">of 7h</p>
+                <p className="text-lg font-bold text-orange-600 mt-1">97%</p>
               </div>
             </div>
           </div>
