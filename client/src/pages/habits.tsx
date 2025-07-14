@@ -19,12 +19,11 @@ import {
   CheckCircle2,
   Calendar,
   Trash2,
-  Star,
-  X
+  Star
 } from 'lucide-react';
 import { RulesHeatmap } from '@/components/habits/rules-heatmap';
 import { AchievementHistory } from '@/components/habits/achievement-history';
-import { DisciplineStats } from '@/components/habits/discipline-stats';
+
 
 interface Rule {
   id: number;
@@ -52,7 +51,6 @@ export default function HabitsPage() {
   const [newRule, setNewRule] = useState("");
   const [isAddingRule, setIsAddingRule] = useState(false);
   const [selectedTab, setSelectedTab] = useState("rules");
-  const [showHeader, setShowHeader] = useState(true);
 
   const [challengeTitle, setChallengeTitle] = useState("");
   const [challengeDescription, setChallengeDescription] = useState("");
@@ -200,33 +198,6 @@ export default function HabitsPage() {
   return (
     <div className="min-h-screen bg-background relative pb-20">
       <div className="max-w-4xl mx-auto px-4 pt-8 pb-24 space-y-6">
-        {/* Discipline Stats - Top Priority */}
-        <DisciplineStats rules={rules} challenges={challenges} />
-
-        {/* Dismissible Title Tile */}
-        {showHeader && (
-          <Card className="border-gray-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                    <Layers className="w-6 h-6 text-blue-600" />
-                    Disciplines
-                  </h1>
-                  <p className="text-gray-600 mt-1">Build character through daily commitment</p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowHeader(false)}
-                  className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
