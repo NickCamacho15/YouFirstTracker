@@ -50,10 +50,10 @@ export default function HabitsPage() {
   const [newRule, setNewRule] = useState("");
   const [isAddingRule, setIsAddingRule] = useState(false);
   const [selectedTab, setSelectedTab] = useState("rules");
-  const [activeChallenges, setActiveChallenges] = useState<ChallengeData[]>([]);
+
   const [challengeTitle, setChallengeTitle] = useState("");
   const [challengeDescription, setChallengeDescription] = useState("");
-  const [challengeDuration, setChallengeDuration] = useState(75);
+  const [challengeDuration, setChallengeDuration] = useState(40);
   const [challengeRules, setChallengeRules] = useState<string[]>([]);
   const [newChallengeRule, setNewChallengeRule] = useState("");
   const [isCreatingChallenge, setIsCreatingChallenge] = useState(false);
@@ -64,6 +64,10 @@ export default function HabitsPage() {
   const { data: rules = [], isLoading: isLoadingRules } = useQuery({
     queryKey: ['/api/rules'],
     refetchInterval: 5000,
+  });
+
+  const { data: challenges = [], isLoading: isLoadingChallenges } = useQuery({
+    queryKey: ['/api/challenges'],
   });
 
   const toggleRuleCompletion = useMutation({
@@ -117,50 +121,55 @@ export default function HabitsPage() {
     }
   };
 
-  const handleCreateChallenge = () => {
-    if (challengeTitle.trim()) {
-      const newChallenge: ChallengeData = {
-        id: Date.now(),
-        title: challengeTitle.trim(),
-        description: challengeDescription.trim() || undefined,
-        duration: challengeDuration,
-        currentDay: 1,
-        startDate: new Date().toISOString(),
-        completedDays: [],
-        rules: challengeRules.length > 0 ? challengeRules : undefined
-      };
-      
-      setActiveChallenges(prev => [...prev, newChallenge]);
-      
-      // Reset form
+  const createChallenge = useMutation({
+    mutationFn: (data: any) => apiRequest('/api/challenges', { method: 'POST', body: data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/challenges'] });
       setChallengeTitle("");
       setChallengeDescription("");
-      setChallengeDuration(75);
+      setChallengeDuration(40);
       setChallengeRules([]);
       setIsCreatingChallenge(false);
-      
       toast({
         title: "Challenge created!",
         description: `Your ${challengeDuration}-day challenge begins now.`,
       });
-    }
+    },
+  });
+
+  const handleCreateChallenge = () => {
+    if (!challengeTitle.trim()) return;
+
+    createChallenge.mutate({
+      title: challengeTitle,
+      description: challengeDescription || undefined,
+      duration: challengeDuration,
+      startDate: new Date().toISOString(),
+      rules: challengeRules.length > 0 ? challengeRules : [],
+    });
   };
 
+  const updateChallengeLog = useMutation({
+    mutationFn: ({ challengeId, day, completed }: { challengeId: number; day: number; completed: boolean }) => 
+      apiRequest(`/api/challenges/${challengeId}/day/${day}`, { 
+        method: 'PATCH', 
+        body: { completed }
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/challenges'] });
+    },
+  });
+
   const handleChallengeCheckOff = (challengeId: number, day: number) => {
-    setActiveChallenges(prev => 
-      prev.map(challenge => {
-        if (challenge.id === challengeId) {
-          const isCompleted = challenge.completedDays.includes(day);
-          return {
-            ...challenge,
-            completedDays: isCompleted 
-              ? challenge.completedDays.filter(d => d !== day)
-              : [...challenge.completedDays, day].sort((a, b) => a - b)
-          };
-        }
-        return challenge;
-      })
-    );
+    const challenge = challenges.find(c => c.id === challengeId);
+    if (!challenge) return;
+    
+    const isCompleted = challenge.completedDays?.includes(day);
+    updateChallengeLog.mutate({
+      challengeId,
+      day,
+      completed: !isCompleted
+    });
   };
 
   const addChallengeRule = () => {
@@ -174,13 +183,16 @@ export default function HabitsPage() {
     setChallengeRules(prev => prev.filter(rule => rule !== ruleToRemove));
   };
 
-  const deleteChallenge = (challengeId: number) => {
-    setActiveChallenges(prev => prev.filter(c => c.id !== challengeId));
-    toast({
-      title: "Challenge deleted",
-      description: "Challenge removed from your active list.",
-    });
-  };
+  const deleteChallenge = useMutation({
+    mutationFn: (challengeId: number) => apiRequest(`/api/challenges/${challengeId}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/challenges'] });
+      toast({
+        title: "Challenge deleted",
+        description: "Challenge removed from your active list.",
+      });
+    },
+  });
 
   return (
     <div className="container mx-auto p-4 pb-24 space-y-6">
@@ -325,8 +337,8 @@ export default function HabitsPage() {
             <Card className="border-0 shadow-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
               <CardHeader>
                 <div>
-                  <CardTitle className="text-2xl font-bold">75-100 Day Challenges</CardTitle>
-                  <p className="text-purple-100 mt-1">Push your limits with extended commitment challenges</p>
+                  <CardTitle className="text-2xl font-bold">40-100 Day Challenges</CardTitle>
+                  <p className="text-purple-100 mt-1">Transform through extended commitment challenges</p>
                 </div>
               </CardHeader>
             </Card>
@@ -343,7 +355,7 @@ export default function HabitsPage() {
             </div>
 
             {/* Active Challenges List */}
-            {activeChallenges.map((challenge) => {
+            {challenges.map((challenge) => {
               const completedPercentage = Math.round((challenge.completedDays.length / challenge.duration) * 100);
               const today = Math.floor((new Date().getTime() - new Date(challenge.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1;
               
@@ -367,7 +379,7 @@ export default function HabitsPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => deleteChallenge(challenge.id)}
+                          onClick={() => deleteChallenge.mutate(challenge.id)}
                           className="text-red-500 hover:bg-red-50"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -472,16 +484,14 @@ export default function HabitsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="challenge-duration">Duration</Label>
-                    <Select 
-                      value={challengeDuration.toString()} 
-                      onValueChange={(value) => setChallengeDuration(parseInt(value))}
-                    >
+                    <Label htmlFor="challenge-duration">Duration (Days)</Label>
+                    <Select value={challengeDuration.toString()} onValueChange={(value) => setChallengeDuration(parseInt(value))}>
                       <SelectTrigger className="border-purple-200 focus:border-purple-500">
-                        <SelectValue />
+                        <SelectValue placeholder="Select duration" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="75">75 Days</SelectItem>
+                        <SelectItem value="40">40 Days</SelectItem>
+                        <SelectItem value="70">70 Days</SelectItem>
                         <SelectItem value="100">100 Days</SelectItem>
                       </SelectContent>
                     </Select>
@@ -541,7 +551,7 @@ export default function HabitsPage() {
             )}
 
             {/* Empty State for Challenges */}
-            {activeChallenges.length === 0 && !isCreatingChallenge && (
+            {challenges.length === 0 && !isCreatingChallenge && (
               <Card className="border-0 shadow-lg border-dashed border-gray-300">
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Trophy className="w-12 h-12 text-gray-400 mb-4" />

@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { eq, desc, and, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { 
-  users, goals, microGoals, habits, habitLogs, readingSessions, readingList, meditationSessions, posts, visionBoard, tasks, rules,
+  users, goals, microGoals, habits, habitLogs, readingSessions, readingList, meditationSessions, posts, visionBoard, tasks, rules, challenges, challengeLogs,
   followers, postReactions, postComments, workouts, exercises, workoutExercises, bodyWeightLogs,
   trainingTemplates, exerciseHistory, screenTimeEntries, workoutEntries,
   type User, type InsertUser, type Goal, type InsertGoal, type MicroGoal, type InsertMicroGoal,
@@ -12,6 +12,7 @@ import {
   type MeditationSession, type InsertMeditationSession,
   type Post, type InsertPost,
   type VisionBoardItem, type InsertVisionBoardItem, type Task, type InsertTask, type Rule, type InsertRule,
+  type Challenge, type InsertChallenge, type ChallengeLog, type InsertChallengeLog,
   type Follower, type InsertFollower, type PostReaction, type InsertPostReaction,
   type PostComment, type InsertPostComment, type Workout, type InsertWorkout,
   type Exercise, type InsertExercise, type WorkoutExercise, type InsertWorkoutExercise,
@@ -113,8 +114,12 @@ export interface IStorage {
   createRule(rule: InsertRule): Promise<Rule>;
   updateRule(id: number, updates: Partial<Rule>): Promise<Rule | undefined>;
   deleteRule(id: number): Promise<boolean>;
-  toggleRuleCompletion(ruleId: number, userId: number): Promise<{ success: boolean; reason?: string; rule?: Rule }>;
-  markRuleViolation(ruleId: number, userId: number): Promise<{ success: boolean; reason?: string; rule?: Rule }>;
+
+  // Challenges
+  getChallengesByUserId(userId: number): Promise<Challenge[]>;
+  getChallengeById(id: number): Promise<Challenge | undefined>;
+  createChallenge(challenge: InsertChallenge): Promise<Challenge>;
+  updateChallengeLog(challengeId: number, day: number, completed: boolean): Promise<ChallengeLog>;
 
   // Workouts
   getWorkoutsByUserId(userId: number): Promise<Workout[]>;
@@ -954,6 +959,68 @@ export class DatabaseStorage implements IStorage {
   async deleteWorkoutEntry(id: number): Promise<boolean> {
     const result = await db.delete(workoutEntries).where(eq(workoutEntries.id, id)).returning();
     return result.length > 0;
+  }
+
+  // Rules
+  async getRulesByUserId(userId: number): Promise<Rule[]> {
+    return await db.select().from(rules).where(eq(rules.userId, userId)).orderBy(desc(rules.createdAt));
+  }
+
+  async getRuleById(id: number): Promise<Rule | undefined> {
+    const result = await db.select().from(rules).where(eq(rules.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createRule(rule: InsertRule): Promise<Rule> {
+    const result = await db.insert(rules).values(rule).returning();
+    return result[0];
+  }
+
+  async updateRule(id: number, updates: Partial<Rule>): Promise<Rule | undefined> {
+    const result = await db.update(rules).set(updates).where(eq(rules.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteRule(id: number): Promise<boolean> {
+    const result = await db.delete(rules).where(eq(rules.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Challenges
+  async getChallengesByUserId(userId: number): Promise<Challenge[]> {
+    return await db.select().from(challenges).where(eq(challenges.userId, userId)).orderBy(desc(challenges.createdAt));
+  }
+
+  async getChallengeById(id: number): Promise<Challenge | undefined> {
+    const result = await db.select().from(challenges).where(eq(challenges.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createChallenge(challenge: InsertChallenge): Promise<Challenge> {
+    const result = await db.insert(challenges).values(challenge).returning();
+    return result[0];
+  }
+
+  async updateChallengeLog(challengeId: number, day: number, completed: boolean): Promise<ChallengeLog> {
+    // First try to find existing log
+    const existingLog = await db.select().from(challengeLogs)
+      .where(and(eq(challengeLogs.challengeId, challengeId), eq(challengeLogs.day, day)))
+      .limit(1);
+
+    if (existingLog.length > 0) {
+      // Update existing log
+      const result = await db.update(challengeLogs)
+        .set({ completed })
+        .where(eq(challengeLogs.id, existingLog[0].id))
+        .returning();
+      return result[0];
+    } else {
+      // Create new log
+      const result = await db.insert(challengeLogs)
+        .values({ challengeId, day, completed })
+        .returning();
+      return result[0];
+    }
   }
 }
 

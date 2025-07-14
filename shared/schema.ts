@@ -119,6 +119,43 @@ export const postComments = pgTable("post_comments", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const rules = pgTable("rules", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  category: text("category", { enum: ["digital", "nutrition", "sleep", "mental", "fitness", "personal"] }).default("personal").notNull(),
+  streak: integer("streak").default(0).notNull(),
+  completedToday: boolean("completed_today").default(false).notNull(),
+  lastCompletionTime: timestamp("last_completion_time"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const ruleLogs = pgTable("rule_logs", {
+  id: serial("id").primaryKey(),
+  ruleId: integer("rule_id").references(() => rules.id).notNull(),
+  date: timestamp("date").defaultNow().notNull(),
+  kept: boolean("kept").notNull(),
+});
+
+export const challenges = pgTable("challenges", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  duration: integer("duration", { enum: [40, 70, 100] }).notNull(),
+  startDate: timestamp("start_date").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const challengeLogs = pgTable("challenge_logs", {
+  id: serial("id").primaryKey(),
+  challengeId: integer("challenge_id").references(() => challenges.id).notNull(),
+  day: integer("day").notNull(),
+  completed: boolean("completed").notNull(),
+  date: timestamp("date").defaultNow().notNull(),
+});
+
 export const visionBoard = pgTable("vision_board", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
@@ -142,19 +179,7 @@ export const tasks = pgTable("tasks", {
   completedAt: timestamp("completed_at"),
 });
 
-export const rules = pgTable("rules", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
-  text: text("text").notNull(),
-  category: text("category").notNull().default("Personal"), // Digital Wellness, Nutrition, Sleep Hygiene, Mental Health, Fitness, Personal
-  streak: integer("streak").default(0).notNull(),
-  failures: integer("failures").default(0).notNull(),
-  completedToday: boolean("completed_today").default(false).notNull(),
-  violated: boolean("violated").default(false).notNull(),
-  lastCompletionTime: timestamp("last_completion_time"),
-  lastViolationTime: timestamp("last_violation_time"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+
 
 export const userStats = pgTable("user_stats", {
   id: serial("id").primaryKey(),
@@ -693,3 +718,30 @@ export const insertWorkoutEntrySchema = createInsertSchema(workoutEntries).omit(
 });
 export type WorkoutEntry = typeof workoutEntries.$inferSelect;
 export type InsertWorkoutEntry = z.infer<typeof insertWorkoutEntrySchema>;
+
+// Rules schemas
+export type Rule = typeof rules.$inferSelect;
+export type InsertRule = z.infer<typeof insertRuleSchema>;
+
+export const insertRuleLogSchema = createInsertSchema(ruleLogs).omit({
+  id: true,
+});
+export type RuleLog = typeof ruleLogs.$inferSelect;
+export type InsertRuleLog = z.infer<typeof insertRuleLogSchema>;
+
+// Challenge schemas
+export const insertChallengeSchema = createInsertSchema(challenges).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  startDate: z.string().transform((val) => new Date(val)),
+});
+export type Challenge = typeof challenges.$inferSelect;
+export type InsertChallenge = z.infer<typeof insertChallengeSchema>;
+
+export const insertChallengeLogSchema = createInsertSchema(challengeLogs).omit({
+  id: true,
+  date: true,
+});
+export type ChallengeLog = typeof challengeLogs.$inferSelect;
+export type InsertChallengeLog = z.infer<typeof insertChallengeLogSchema>;

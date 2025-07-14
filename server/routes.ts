@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
-import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertReadingListSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema, insertScreenTimeEntrySchema, insertWorkoutEntrySchema } from "@shared/schema";
+import { insertGoalSchema, insertMicroGoalSchema, insertHabitSchema, insertReadingSessionSchema, insertReadingListSchema, insertPostSchema, insertFollowerSchema, insertPostReactionSchema, insertPostCommentSchema, insertScreenTimeEntrySchema, insertWorkoutEntrySchema, insertRuleSchema, insertChallengeSchema } from "@shared/schema";
 import { generateWorkoutProgram } from "./ai";
 import { z } from "zod";
 
@@ -278,11 +278,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rules routes
   app.get("/api/rules", requireAuth, async (req, res) => {
     try {
-      // Return empty array for now as rules aren't implemented in the database yet
-      res.json([]);
+      const rules = await storage.getRulesByUserId(req.session.userId);
+      res.json(rules);
     } catch (error) {
       console.error("Get rules error:", error);
       res.status(500).json({ message: "Failed to get rules" });
+    }
+  });
+
+  app.post("/api/rules", requireAuth, async (req, res) => {
+    try {
+      const ruleData = insertRuleSchema.parse({ ...req.body, userId: req.session.userId });
+      const rule = await storage.createRule(ruleData);
+      res.json(rule);
+    } catch (error) {
+      console.error("Create rule error:", error);
+      res.status(400).json({ message: "Failed to create rule" });
+    }
+  });
+
+  app.delete("/api/rules/:id", requireAuth, async (req, res) => {
+    try {
+      const ruleId = parseInt(req.params.id);
+      const rule = await storage.getRuleById(ruleId);
+      
+      if (!rule || rule.userId !== req.session.userId) {
+        return res.status(404).json({ message: "Rule not found" });
+      }
+      
+      await storage.deleteRule(ruleId);
+      res.json({ message: "Rule deleted successfully" });
+    } catch (error) {
+      console.error("Delete rule error:", error);
+      res.status(500).json({ message: "Failed to delete rule" });
+    }
+  });
+
+  app.patch("/api/rules/:id/toggle", requireAuth, async (req, res) => {
+    try {
+      const ruleId = parseInt(req.params.id);
+      const rule = await storage.getRuleById(ruleId);
+      
+      if (!rule || rule.userId !== req.session.userId) {
+        return res.status(404).json({ message: "Rule not found" });
+      }
+      
+      const updatedRule = await storage.updateRule(ruleId, { 
+        completedToday: !rule.completedToday,
+        lastCompletionTime: !rule.completedToday ? new Date() : rule.lastCompletionTime,
+        streak: !rule.completedToday ? rule.streak + 1 : rule.streak
+      });
+      
+      res.json(updatedRule);
+    } catch (error) {
+      console.error("Toggle rule error:", error);
+      res.status(500).json({ message: "Failed to toggle rule" });
+    }
+  });
+
+  // Challenge routes
+  app.get("/api/challenges", requireAuth, async (req, res) => {
+    try {
+      const challenges = await storage.getChallengesByUserId(req.session.userId);
+      res.json(challenges);
+    } catch (error) {
+      console.error("Get challenges error:", error);
+      res.status(500).json({ message: "Failed to get challenges" });
+    }
+  });
+
+  app.post("/api/challenges", requireAuth, async (req, res) => {
+    try {
+      const challengeData = insertChallengeSchema.parse({ ...req.body, userId: req.session.userId });
+      const challenge = await storage.createChallenge(challengeData);
+      res.json(challenge);
+    } catch (error) {
+      console.error("Create challenge error:", error);
+      res.status(400).json({ message: "Failed to create challenge" });
+    }
+  });
+
+  app.patch("/api/challenges/:id/day/:day", requireAuth, async (req, res) => {
+    try {
+      const challengeId = parseInt(req.params.id);
+      const day = parseInt(req.params.day);
+      const { completed } = req.body;
+      
+      const challenge = await storage.getChallengeById(challengeId);
+      if (!challenge || challenge.userId !== req.session.userId) {
+        return res.status(404).json({ message: "Challenge not found" });
+      }
+      
+      const log = await storage.updateChallengeLog(challengeId, day, completed);
+      res.json(log);
+    } catch (error) {
+      console.error("Update challenge day error:", error);
+      res.status(500).json({ message: "Failed to update challenge day" });
     }
   });
 
