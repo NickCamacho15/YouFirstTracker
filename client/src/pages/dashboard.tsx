@@ -195,6 +195,7 @@ export default function DashboardPage() {
                   <div>
                     <h4 className="text-base font-medium text-gray-600 uppercase tracking-wide mb-1">Reading</h4>
                     <p className="text-xl font-bold text-gray-900">12.5 hours</p>
+                    <p className="text-sm text-gray-500">1.8h daily average</p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -214,6 +215,7 @@ export default function DashboardPage() {
                   <div>
                     <h4 className="text-base font-medium text-gray-600 uppercase tracking-wide mb-1">Meditation</h4>
                     <p className="text-xl font-bold text-gray-900">3.2 hours</p>
+                    <p className="text-sm text-gray-500">27m daily average</p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -233,6 +235,7 @@ export default function DashboardPage() {
                   <div>
                     <h4 className="text-base font-medium text-gray-600 uppercase tracking-wide mb-1">Screen Time</h4>
                     <p className="text-xl font-bold text-gray-900">28 hours</p>
+                    <p className="text-sm text-gray-500">4h daily average</p>
                   </div>
                 </div>
                 <div className="text-right flex items-center gap-2">
@@ -257,6 +260,7 @@ export default function DashboardPage() {
                   <div>
                     <h4 className="text-base font-medium text-gray-600 uppercase tracking-wide mb-1">Workouts</h4>
                     <p className="text-xl font-bold text-gray-900">6.8 hours</p>
+                    <p className="text-sm text-gray-500">58m daily average</p>
                   </div>
                 </div>
                 <div className="text-right">
