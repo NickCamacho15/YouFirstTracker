@@ -48,7 +48,7 @@ export function NewGoalModal({ open, onOpenChange, onSuccess }: NewGoalModalProp
 
   const createGoalMutation = useMutation({
     mutationFn: async (data: GoalFormData & { benefits: string[]; consequences: string[]; peopleHelped: string[]; microGoals: string[] }) => {
-      const response = await apiRequest("POST", "/api/goals", data);
+      const response = await apiRequest("/api/goals", { method: "POST", body: data });
       return response.json();
     },
     onSuccess: () => {

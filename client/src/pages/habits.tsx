@@ -97,8 +97,7 @@ export default function HabitsPage() {
     mutationFn: (ruleData: { title: string; description?: string; category?: string; importance?: string }) => 
       apiRequest('/api/rules', { 
         method: 'POST', 
-        body: JSON.stringify(ruleData),
-        headers: { 'Content-Type': 'application/json' }
+        body: ruleData
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/rules'] });
