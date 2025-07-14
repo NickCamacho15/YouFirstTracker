@@ -993,7 +993,7 @@ export class DatabaseStorage implements IStorage {
     
     // For each challenge, get the completed days
     const challengesWithLogs = await Promise.all(challengeList.map(async (challenge) => {
-      const logs = await db.select().from(challengeLogs)
+      const logs = await db.select({ day: challengeLogs.day }).from(challengeLogs)
         .where(and(eq(challengeLogs.challengeId, challenge.id), eq(challengeLogs.completed, true)));
       
       return {
@@ -1010,7 +1010,7 @@ export class DatabaseStorage implements IStorage {
     if (result.length === 0) return undefined;
     
     const challenge = result[0];
-    const logs = await db.select().from(challengeLogs)
+    const logs = await db.select({ day: challengeLogs.day }).from(challengeLogs)
       .where(and(eq(challengeLogs.challengeId, challenge.id), eq(challengeLogs.completed, true)));
     
     return {

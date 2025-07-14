@@ -19,10 +19,12 @@ import {
   CheckCircle2,
   Calendar,
   Trash2,
-  Star
+  Star,
+  X
 } from 'lucide-react';
 import { RulesHeatmap } from '@/components/habits/rules-heatmap';
 import { AchievementHistory } from '@/components/habits/achievement-history';
+import { DisciplineStats } from '@/components/habits/discipline-stats';
 
 interface Rule {
   id: number;
@@ -50,6 +52,7 @@ export default function HabitsPage() {
   const [newRule, setNewRule] = useState("");
   const [isAddingRule, setIsAddingRule] = useState(false);
   const [selectedTab, setSelectedTab] = useState("rules");
+  const [showHeader, setShowHeader] = useState(true);
 
   const [challengeTitle, setChallengeTitle] = useState("");
   const [challengeDescription, setChallengeDescription] = useState("");
@@ -197,23 +200,42 @@ export default function HabitsPage() {
   return (
     <div className="min-h-screen bg-background relative pb-20">
       <div className="max-w-4xl mx-auto px-4 pt-8 pb-24 space-y-6">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Layers className="w-6 h-6 text-blue-600" />
-            Disciplines
-          </h1>
-          <p className="text-muted-foreground">Build character through daily commitment</p>
-        </div>
+        {/* Discipline Stats - Top Priority */}
+        <DisciplineStats rules={rules} challenges={challenges} />
+
+        {/* Dismissible Title Tile */}
+        {showHeader && (
+          <Card className="border-gray-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <Layers className="w-6 h-6 text-blue-600" />
+                    Disciplines
+                  </h1>
+                  <p className="text-gray-600 mt-1">Build character through daily commitment</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowHeader(false)}
+                  className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="rules" className="flex items-center gap-2">
+        <TabsList className="grid w-full grid-cols-2 bg-gray-50 p-1 rounded-lg">
+          <TabsTrigger value="rules" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
             <Shield className="w-4 h-4" />
             Rules
           </TabsTrigger>
-          <TabsTrigger value="challenge" className="flex items-center gap-2">
+          <TabsTrigger value="challenge" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
             <Trophy className="w-4 h-4" />
             Challenge
           </TabsTrigger>
@@ -247,17 +269,17 @@ export default function HabitsPage() {
           )}
 
           {/* Rules List */}
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="pb-3">
+          <Card className="border-gray-200 shadow-sm">
+            <CardHeader className="pb-3 bg-gray-50 rounded-t-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-red-600" />
-                  <CardTitle className="text-lg">Rules of Discipline</CardTitle>
+                  <Shield className="w-5 h-5 text-blue-600" />
+                  <CardTitle className="text-lg text-gray-900">Active Rules</CardTitle>
                 </div>
                 {!isAddingRule && (
                   <Button 
                     onClick={() => setIsAddingRule(true)}
-                    variant="outline" 
+                    className="bg-blue-600 hover:bg-blue-700" 
                     size="sm"
                   >
                     <Plus className="w-4 h-4 mr-2" />
@@ -280,9 +302,9 @@ export default function HabitsPage() {
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {rules?.map((rule) => (
-                    <div key={rule.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                    <div key={rule.id} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-blue-50 transition-colors">
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => toggleRuleCompletion.mutate(rule.id)}
@@ -331,11 +353,14 @@ export default function HabitsPage() {
           {/* Active Challenges */}
           <div className="space-y-4">
             {/* Challenge Header */}
-            <Card className="border-0 shadow-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
-              <CardHeader>
-                <div>
-                  <CardTitle className="text-2xl font-bold">40-100 Day Challenges</CardTitle>
-                  <p className="text-purple-100 mt-1">Transform through extended commitment challenges</p>
+            <Card className="border-gray-200 shadow-sm">
+              <CardHeader className="bg-blue-50 rounded-t-lg">
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-6 h-6 text-blue-600" />
+                  <div>
+                    <CardTitle className="text-xl font-bold text-gray-900">Extended Challenges</CardTitle>
+                    <p className="text-gray-600 text-sm mt-1">40-100 day commitment challenges</p>
+                  </div>
                 </div>
               </CardHeader>
             </Card>
@@ -344,9 +369,9 @@ export default function HabitsPage() {
             <div className="flex justify-center">
               <Button
                 onClick={() => setIsCreatingChallenge(true)}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 shadow-lg px-8 py-6 text-lg font-semibold flex items-center gap-3"
+                className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm px-6 py-3 font-medium flex items-center gap-2"
               >
-                <Plus className="w-6 h-6" />
+                <Plus className="w-5 h-5" />
                 Start New Challenge
               </Button>
             </div>
@@ -358,21 +383,21 @@ export default function HabitsPage() {
               const today = Math.floor((new Date().getTime() - new Date(challenge.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1;
               
               return (
-                <Card key={challenge.id} className="border-0 shadow-lg">
+                <Card key={challenge.id} className="border-gray-200 shadow-sm">
                   <CardHeader className="pb-4">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <CardTitle className="text-xl font-bold">{challenge.title}</CardTitle>
+                        <CardTitle className="text-lg font-bold text-gray-900">{challenge.title}</CardTitle>
                         {challenge.description && (
                           <p className="text-sm text-gray-600 mt-1">{challenge.description}</p>
                         )}
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <div className="text-right">
-                          <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                          <div className="text-2xl font-bold text-blue-600">
                             Day {Math.min(today, challenge.duration)}
                           </div>
-                          <p className="text-sm text-gray-600">of {challenge.duration}</p>
+                          <p className="text-sm text-gray-500">of {challenge.duration}</p>
                         </div>
                         <Button
                           variant="ghost"
@@ -390,11 +415,11 @@ export default function HabitsPage() {
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium text-gray-700">Progress</span>
-                        <span className="text-sm font-bold text-purple-600">{completedPercentage}%</span>
+                        <span className="text-sm font-bold text-blue-600">{completedPercentage}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
-                          className="bg-gradient-to-r from-purple-500 to-indigo-500 h-3 rounded-full transition-all duration-500"
+                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                           style={{ width: `${completedPercentage}%` }}
                         ></div>
                       </div>
@@ -417,7 +442,7 @@ export default function HabitsPage() {
                               ${completedDays.includes(day)
                                 ? 'bg-green-500 border-green-500 text-white shadow-sm'
                                 : day === today
-                                  ? 'bg-purple-100 border-purple-400 text-purple-700 font-bold'
+                                  ? 'bg-blue-100 border-blue-400 text-blue-700 font-bold'
                                   : day < today
                                     ? 'bg-white border-gray-300 hover:bg-red-50 hover:border-red-300 text-gray-700'
                                     : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'

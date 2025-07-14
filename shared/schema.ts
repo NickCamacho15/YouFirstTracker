@@ -740,7 +740,7 @@ export type InsertChallenge = z.infer<typeof insertChallengeSchema>;
 
 export const insertChallengeLogSchema = createInsertSchema(challengeLogs).omit({
   id: true,
-  date: true,
+  createdAt: true,
 });
 export type ChallengeLog = typeof challengeLogs.$inferSelect;
 export type InsertChallengeLog = z.infer<typeof insertChallengeLogSchema>;
