@@ -311,44 +311,74 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Data Display Below Rings - Horizontal Layout */}
-            <div className="flex flex-wrap justify-center gap-6 px-4">
-              {/* Reading */}
-              <div className="text-center">
-                <h4 className="text-sm font-medium text-gray-600 mb-1">READING</h4>
-                <p className="text-2xl font-bold text-gray-900">12.5h</p>
-                <p className="text-sm text-gray-500">of 15h</p>
-                <p className="text-lg font-bold text-blue-600 mt-1">83%</p>
+            {/* Data Display Below Rings - Horizontal Tiles */}
+            <div className="space-y-3">
+              {/* Reading Tile */}
+              <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between border border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <span className="text-xl">📚</span>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Reading</h4>
+                    <p className="text-lg font-bold text-gray-900">12.5 hours</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-blue-600">83%</p>
+                  <p className="text-xs text-gray-500">of 15h goal</p>
+                </div>
               </div>
 
-              <div className="w-px h-16 bg-gray-200 self-center hidden md:block"></div>
-
-              {/* Meditation */}
-              <div className="text-center">
-                <h4 className="text-sm font-medium text-gray-600 mb-1">MEDITATION</h4>
-                <p className="text-2xl font-bold text-gray-900">3.2h</p>
-                <p className="text-sm text-gray-500">of 3.5h</p>
-                <p className="text-lg font-bold text-green-600 mt-1">91%</p>
+              {/* Meditation Tile */}
+              <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between border border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <span className="text-xl">🧘</span>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Meditation</h4>
+                    <p className="text-lg font-bold text-gray-900">3.2 hours</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-green-600">91%</p>
+                  <p className="text-xs text-gray-500">of 3.5h goal</p>
+                </div>
               </div>
 
-              <div className="w-px h-16 bg-gray-200 self-center hidden md:block"></div>
-
-              {/* Screen Time */}
-              <div className="text-center">
-                <h4 className="text-sm font-medium text-gray-600 mb-1">SCREEN TIME</h4>
-                <p className="text-2xl font-bold text-gray-900">28h</p>
-                <p className="text-sm text-gray-500">limit 14h</p>
-                <p className="text-lg font-bold text-red-600 mt-1">200% ⚠️</p>
+              {/* Screen Time Tile */}
+              <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between border border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                    <span className="text-xl">📱</span>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Screen Time</h4>
+                    <p className="text-lg font-bold text-gray-900">28 hours</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-red-600">200% ⚠️</p>
+                  <p className="text-xs text-gray-500">14h limit exceeded</p>
+                </div>
               </div>
 
-              <div className="w-px h-16 bg-gray-200 self-center hidden md:block"></div>
-
-              {/* Workouts */}
-              <div className="text-center">
-                <h4 className="text-sm font-medium text-gray-600 mb-1">WORKOUTS</h4>
-                <p className="text-2xl font-bold text-gray-900">6.8h</p>
-                <p className="text-sm text-gray-500">of 7h</p>
-                <p className="text-lg font-bold text-orange-600 mt-1">97%</p>
+              {/* Workouts Tile */}
+              <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between border border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <span className="text-xl">💪</span>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Workouts</h4>
+                    <p className="text-lg font-bold text-gray-900">6.8 hours</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-orange-600">97%</p>
+                  <p className="text-xs text-gray-500">of 7h goal</p>
+                </div>
               </div>
             </div>
           </div>
