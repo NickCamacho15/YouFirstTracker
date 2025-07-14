@@ -156,31 +156,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white">
       <main className="p-4 pb-24">
-        {/* Mobile Day Selector - Only visible on mobile */}
-        <div className="md:hidden mb-4">
-          <div className="flex items-center justify-between bg-gray-100 rounded-lg p-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedDay(selectedDay === 0 ? 6 : selectedDay - 1)}
-              className="h-8 w-8 p-0"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <div className="text-center">
-              <div className="text-sm font-semibold text-gray-900">{dayNames[selectedDay]}</div>
-              <div className="text-xs text-gray-500">Today's Focus</div>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedDay((selectedDay + 1) % 7)}
-              className="h-8 w-8 p-0"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
+
 
         {/* Weekly Overview - Standalone Tiles */}
         <div className="mb-6">
@@ -299,6 +275,32 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Day of Week Selector */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between bg-gray-100 rounded-lg p-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedDay(selectedDay === 0 ? 6 : selectedDay - 1)}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <div className="text-center">
+              <div className="text-sm font-semibold text-gray-900">{dayNames[selectedDay]}</div>
+              <div className="text-xs text-gray-500">Daily Routines</div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedDay((selectedDay + 1) % 7)}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
           </div>
         </div>
 
