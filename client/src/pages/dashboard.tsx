@@ -335,7 +335,139 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
+        {/* Morning Routine */}
+        <Card className="mb-6 shadow-md">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-bold text-gray-900 flex items-center justify-between">
+              <span>Morning Priming</span>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowNewTaskModal(true)}
+                className="h-8 w-8 p-0 hover:bg-blue-100"
+              >
+                <Plus className="w-4 h-4 text-blue-600" />
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-3">
+              {morningRoutines.map((routine) => {
+                const completionRate = Math.round((routine.streak / routine.weeklyTarget) * 100);
+                return (
+                  <div key={routine.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 border border-blue-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-3">
+                        <div 
+                          className={`w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors ${
+                            routine.completed 
+                              ? 'bg-blue-600 border-blue-600' 
+                              : 'border-gray-300 hover:border-blue-400'
+                          }`}
+                          onClick={() => handleMorningRoutineToggle(routine.id)}
+                        >
+                          {routine.completed && <CheckCircle2 className="w-3 h-3 text-white" />}
+                        </div>
+                        <span className={`text-sm font-medium ${routine.completed ? 'text-gray-500' : 'text-gray-800'}`}>
+                          {routine.text}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className={`px-2 py-1 rounded text-xs font-semibold ${
+                          routine.streak >= 7 ? 'bg-green-100 text-green-800' : 
+                          routine.streak >= 3 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {routine.streak} day streak
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Discipline Metrics Bar */}
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-gray-600">Weekly Progress</span>
+                        <span className="text-xs font-semibold text-blue-600">{completionRate}%</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-200 rounded-full">
+                        <div 
+                          className="h-1.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.min(completionRate, 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
+        {/* Evening Routine */}
+        <Card className="mb-6 shadow-md">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-bold text-gray-900 flex items-center justify-between">
+              <span>Evening Reflection</span>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowNewTaskModal(true)}
+                className="h-8 w-8 p-0 hover:bg-purple-100"
+              >
+                <Plus className="w-4 h-4 text-purple-600" />
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-3">
+              {eveningRoutines.map((routine) => {
+                const completionRate = Math.round((routine.streak / routine.weeklyTarget) * 100);
+                return (
+                  <div key={routine.id} className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-3 border border-purple-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-3">
+                        <div 
+                          className={`w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors ${
+                            routine.completed 
+                              ? 'bg-purple-600 border-purple-600' 
+                              : 'border-gray-300 hover:border-purple-400'
+                          }`}
+                          onClick={() => handleEveningRoutineToggle(routine.id)}
+                        >
+                          {routine.completed && <CheckCircle2 className="w-3 h-3 text-white" />}
+                        </div>
+                        <span className={`text-sm font-medium ${routine.completed ? 'text-gray-500' : 'text-gray-800'}`}>
+                          {routine.text}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className={`px-2 py-1 rounded text-xs font-semibold ${
+                          routine.streak >= 7 ? 'bg-green-100 text-green-800' : 
+                          routine.streak >= 3 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {routine.streak} day streak
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Discipline Metrics Bar */}
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-gray-600">Weekly Progress</span>
+                        <span className="text-xs font-semibold text-purple-600">{completionRate}%</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-200 rounded-full">
+                        <div 
+                          className="h-1.5 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.min(completionRate, 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
       </main>
 

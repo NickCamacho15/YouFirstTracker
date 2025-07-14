@@ -303,19 +303,12 @@ export default function GoalsPage() {
           </div>
 
           {(goals as Goal[]).length === 0 && (
-            <Card className="border-0 shadow-lg mt-6">
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <Target className="w-12 h-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium mb-2">No active goals yet</h3>
-                <p className="text-muted-foreground text-center mb-6">
-                  Start by setting a clear goal to track your progress toward excellence
-                </p>
-                <Button onClick={() => setShowNewGoalModal(true)} className="bg-blue-600 hover:bg-blue-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Set Your First Goal
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="text-center py-8">
+              <Button onClick={() => setShowNewGoalModal(true)} className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Set a Clear Goal
+              </Button>
+            </div>
           )}
         </div>
 
