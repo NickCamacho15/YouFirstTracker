@@ -543,11 +543,11 @@ export default function HabitsPage() {
                       <div className="bg-blue-50 rounded-lg p-4">
                         <h4 className="font-medium text-gray-900 mb-3 text-sm flex items-center justify-between">
                           <span>Today's Requirements</span>
-                          {day <= today && !completedDays.includes(today) && (
+                          {today <= challenge.duration && !completedDays.includes(today) && (
                             <span className="text-xs text-gray-500">Complete all to win the day</span>
                           )}
                         </h4>
-                        {day <= today ? (
+                        {today <= challenge.duration ? (
                           <TodayRequirements 
                             challenge={challenge}
                             today={today}
