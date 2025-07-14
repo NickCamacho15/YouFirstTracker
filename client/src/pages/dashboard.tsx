@@ -217,6 +217,58 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Weekly Metrics Bar Graph */}
+        <div className="mb-4">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Weekly Overview</h3>
+            <div className="space-y-3">
+              {/* Reading */}
+              <div className="flex items-center">
+                <div className="w-20 text-xs font-medium text-gray-600">Reading</div>
+                <div className="flex-1 mx-3">
+                  <div className="bg-gray-100 rounded-full h-2">
+                    <div className="bg-blue-500 h-2 rounded-full" style={{width: '75%'}}></div>
+                  </div>
+                </div>
+                <div className="w-12 text-xs font-semibold text-right">12.5h</div>
+              </div>
+
+              {/* Meditation */}
+              <div className="flex items-center">
+                <div className="w-20 text-xs font-medium text-gray-600">Meditation</div>
+                <div className="flex-1 mx-3">
+                  <div className="bg-gray-100 rounded-full h-2">
+                    <div className="bg-green-500 h-2 rounded-full" style={{width: '85%'}}></div>
+                  </div>
+                </div>
+                <div className="w-12 text-xs font-semibold text-right">3.2h</div>
+              </div>
+
+              {/* Screen Time */}
+              <div className="flex items-center">
+                <div className="w-20 text-xs font-medium text-gray-600">Screen Time</div>
+                <div className="flex-1 mx-3">
+                  <div className="bg-gray-100 rounded-full h-2">
+                    <div className="bg-red-500 h-2 rounded-full" style={{width: '45%'}}></div>
+                  </div>
+                </div>
+                <div className="w-12 text-xs font-semibold text-right">28h</div>
+              </div>
+
+              {/* Workouts */}
+              <div className="flex items-center">
+                <div className="w-20 text-xs font-medium text-gray-600">Workouts</div>
+                <div className="flex-1 mx-3">
+                  <div className="bg-gray-100 rounded-full h-2">
+                    <div className="bg-orange-500 h-2 rounded-full" style={{width: '92%'}}></div>
+                  </div>
+                </div>
+                <div className="w-12 text-xs font-semibold text-right">6.8h</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Personal Investment Metrics - Gamified Time Tracking */}
         <div className="mb-6">
           <h2 className="text-lg font-bold text-gray-900 mb-3">Personal Investment Tracker</h2>
