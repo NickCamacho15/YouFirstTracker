@@ -222,48 +222,52 @@ export default function DashboardPage() {
           <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">Weekly Overview</h3>
             <div className="space-y-3">
-              {/* Reading */}
+              {/* Reading - Target: 15h */}
               <div className="flex items-center">
                 <div className="w-20 text-xs font-medium text-gray-600">Reading</div>
                 <div className="flex-1 mx-3">
                   <div className="bg-gray-100 rounded-full h-2">
-                    <div className="bg-blue-500 h-2 rounded-full" style={{width: '75%'}}></div>
+                    <div className="bg-blue-500 h-2 rounded-full" style={{width: `${Math.min((12.5 / 15) * 100, 100)}%`}}></div>
                   </div>
                 </div>
-                <div className="w-12 text-xs font-semibold text-right">12.5h</div>
+                <div className="w-16 text-xs font-semibold text-right">12.5h / 15h</div>
+                <div className="w-8 text-xs text-gray-500 text-right">83%</div>
               </div>
 
-              {/* Meditation */}
+              {/* Meditation - Target: 3.5h */}
               <div className="flex items-center">
                 <div className="w-20 text-xs font-medium text-gray-600">Meditation</div>
                 <div className="flex-1 mx-3">
                   <div className="bg-gray-100 rounded-full h-2">
-                    <div className="bg-green-500 h-2 rounded-full" style={{width: '85%'}}></div>
+                    <div className="bg-green-500 h-2 rounded-full" style={{width: `${Math.min((3.2 / 3.5) * 100, 100)}%`}}></div>
                   </div>
                 </div>
-                <div className="w-12 text-xs font-semibold text-right">3.2h</div>
+                <div className="w-16 text-xs font-semibold text-right">3.2h / 3.5h</div>
+                <div className="w-8 text-xs text-gray-500 text-right">91%</div>
               </div>
 
-              {/* Screen Time */}
+              {/* Screen Time - Target: 14h (lower is better) */}
               <div className="flex items-center">
                 <div className="w-20 text-xs font-medium text-gray-600">Screen Time</div>
                 <div className="flex-1 mx-3">
                   <div className="bg-gray-100 rounded-full h-2">
-                    <div className="bg-red-500 h-2 rounded-full" style={{width: '45%'}}></div>
+                    <div className="bg-red-500 h-2 rounded-full" style={{width: `${Math.min((28 / 14) * 50, 100)}%`}}></div>
                   </div>
                 </div>
-                <div className="w-12 text-xs font-semibold text-right">28h</div>
+                <div className="w-16 text-xs font-semibold text-right">28h / 14h</div>
+                <div className="w-8 text-xs text-red-600 text-right">200%</div>
               </div>
 
-              {/* Workouts */}
+              {/* Workouts - Target: 7h */}
               <div className="flex items-center">
                 <div className="w-20 text-xs font-medium text-gray-600">Workouts</div>
                 <div className="flex-1 mx-3">
                   <div className="bg-gray-100 rounded-full h-2">
-                    <div className="bg-orange-500 h-2 rounded-full" style={{width: '92%'}}></div>
+                    <div className="bg-orange-500 h-2 rounded-full" style={{width: `${Math.min((6.8 / 7) * 100, 100)}%`}}></div>
                   </div>
                 </div>
-                <div className="w-12 text-xs font-semibold text-right">6.8h</div>
+                <div className="w-16 text-xs font-semibold text-right">6.8h / 7h</div>
+                <div className="w-8 text-xs text-gray-500 text-right">97%</div>
               </div>
             </div>
           </div>
@@ -277,10 +281,10 @@ export default function DashboardPage() {
             <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg transform hover:scale-[1.02] transition-all">
               <div className="flex justify-between items-start mb-2">
                 <h3 className="text-sm font-medium opacity-90">Reading</h3>
-                <span className="text-xs bg-white/20 px-2 py-1 rounded">+18%</span>
+                <span className="text-xs bg-white/20 px-2 py-1 rounded">83% of target</span>
               </div>
               <div className="text-3xl font-bold mb-1">12.5</div>
-              <div className="text-xs opacity-80">hours this week</div>
+              <div className="text-xs opacity-80">of 15h target</div>
               <div className="mt-3 pt-3 border-t border-white/20">
                 <div className="flex justify-between text-xs">
                   <span className="opacity-70">Month</span>
@@ -293,7 +297,7 @@ export default function DashboardPage() {
               </div>
               <div className="mt-2 bg-white/10 rounded p-1">
                 <div className="h-1 bg-white/30 rounded">
-                  <div className="h-1 bg-white rounded" style={{width: '75%'}}></div>
+                  <div className="h-1 bg-white rounded" style={{width: '83%'}}></div>
                 </div>
               </div>
             </div>
@@ -302,10 +306,10 @@ export default function DashboardPage() {
             <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white shadow-lg transform hover:scale-[1.02] transition-all">
               <div className="flex justify-between items-start mb-2">
                 <h3 className="text-sm font-medium opacity-90">Meditation</h3>
-                <span className="text-xs bg-white/20 px-2 py-1 rounded">+24%</span>
+                <span className="text-xs bg-white/20 px-2 py-1 rounded">91% of target</span>
               </div>
               <div className="text-3xl font-bold mb-1">3.2</div>
-              <div className="text-xs opacity-80">hours this week</div>
+              <div className="text-xs opacity-80">of 3.5h target</div>
               <div className="mt-3 pt-3 border-t border-white/20">
                 <div className="flex justify-between text-xs">
                   <span className="opacity-70">Month</span>
@@ -318,7 +322,7 @@ export default function DashboardPage() {
               </div>
               <div className="mt-2 bg-white/10 rounded p-1">
                 <div className="h-1 bg-white/30 rounded">
-                  <div className="h-1 bg-white rounded" style={{width: '85%'}}></div>
+                  <div className="h-1 bg-white rounded" style={{width: '91%'}}></div>
                 </div>
               </div>
             </div>
@@ -327,10 +331,10 @@ export default function DashboardPage() {
             <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-4 text-white shadow-lg transform hover:scale-[1.02] transition-all">
               <div className="flex justify-between items-start mb-2">
                 <h3 className="text-sm font-medium opacity-90">Screen Time</h3>
-                <span className="text-xs bg-white/20 px-2 py-1 rounded">-12%</span>
+                <span className="text-xs bg-white/20 px-2 py-1 rounded">200% over target</span>
               </div>
               <div className="text-3xl font-bold mb-1">28</div>
-              <div className="text-xs opacity-80">hours this week</div>
+              <div className="text-xs opacity-80">target: 14h max</div>
               <div className="mt-3 pt-3 border-t border-white/20">
                 <div className="flex justify-between text-xs">
                   <span className="opacity-70">Month</span>
@@ -343,7 +347,7 @@ export default function DashboardPage() {
               </div>
               <div className="mt-2 bg-white/10 rounded p-1">
                 <div className="h-1 bg-white/30 rounded">
-                  <div className="h-1 bg-red-300 rounded" style={{width: '45%'}}></div>
+                  <div className="h-1 bg-red-300 rounded" style={{width: '100%'}}></div>
                 </div>
               </div>
             </div>
@@ -352,10 +356,10 @@ export default function DashboardPage() {
             <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-4 text-white shadow-lg transform hover:scale-[1.02] transition-all">
               <div className="flex justify-between items-start mb-2">
                 <h3 className="text-sm font-medium opacity-90">Workouts</h3>
-                <span className="text-xs bg-white/20 px-2 py-1 rounded">+15%</span>
+                <span className="text-xs bg-white/20 px-2 py-1 rounded">97% of target</span>
               </div>
               <div className="text-3xl font-bold mb-1">6.8</div>
-              <div className="text-xs opacity-80">hours this week</div>
+              <div className="text-xs opacity-80">of 7h target</div>
               <div className="mt-3 pt-3 border-t border-white/20">
                 <div className="flex justify-between text-xs">
                   <span className="opacity-70">Month</span>
@@ -368,7 +372,7 @@ export default function DashboardPage() {
               </div>
               <div className="mt-2 bg-white/10 rounded p-1">
                 <div className="h-1 bg-white/30 rounded">
-                  <div className="h-1 bg-white rounded" style={{width: '92%'}}></div>
+                  <div className="h-1 bg-white rounded" style={{width: '97%'}}></div>
                 </div>
               </div>
             </div>
