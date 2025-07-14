@@ -146,6 +146,7 @@ export const challenges = pgTable("challenges", {
   description: text("description"),
   duration: integer("duration", { enum: [40, 70, 100] }).notNull(),
   startDate: timestamp("start_date").notNull(),
+  rules: text("rules").array(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

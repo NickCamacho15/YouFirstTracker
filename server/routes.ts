@@ -370,11 +370,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/challenges", requireAuth, async (req, res) => {
     try {
+      console.log("Received challenge data:", req.body);
       const challengeData = { 
         ...req.body, 
         userId: req.session.userId,
         startDate: new Date(req.body.startDate)
       };
+      console.log("Saving challenge with data:", challengeData);
       const challenge = await storage.createChallenge(challengeData);
       res.json(challenge);
     } catch (error) {

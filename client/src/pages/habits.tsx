@@ -206,12 +206,13 @@ export default function HabitsPage() {
   const handleCreateChallenge = () => {
     if (!challengeTitle.trim()) return;
 
+    console.log('Creating challenge with rules:', challengeRules);
     createChallenge.mutate({
       title: challengeTitle,
       description: challengeDescription || undefined,
       duration: challengeDuration,
       startDate: new Date().toISOString(),
-      rules: challengeRules.length > 0 ? challengeRules : [],
+      rules: challengeRules,
     });
   };
 
