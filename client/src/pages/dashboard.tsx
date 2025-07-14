@@ -182,202 +182,91 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Weekly Overview - Apple Fitness Style Nested Rings */}
+        {/* Weekly Overview - Standalone Tiles */}
         <div className="mb-6">
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-1">Today's Focus</h2>
-              <p className="text-sm text-gray-600">Weekly Investment Tracker</p>
-            </div>
-            
-            {/* Nested Rings Container */}
-            <div className="flex justify-center mb-6">
-              <div className="relative w-40 h-40 md:w-48 md:h-48">
-                {/* Outer Ring - Reading */}
-                <svg className="absolute inset-0 w-full h-full transform -rotate-90">
-                  <circle
-                    cx="50%"
-                    cy="50%"
-                    r="47%"
-                    fill="none"
-                    stroke="#E5E7EB"
-                    strokeWidth="10"
-                  />
-                  <circle
-                    cx="50%"
-                    cy="50%"
-                    r="47%"
-                    fill="none"
-                    stroke="url(#blueGradient)"
-                    strokeWidth="10"
-                    strokeDasharray="83, 100"
-                    strokeLinecap="round"
-                    className="drop-shadow-lg"
-                  />
-                  <defs>
-                    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#60A5FA" />
-                      <stop offset="100%" stopColor="#3B82F6" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-
-                {/* Second Ring - Meditation */}
-                <svg className="absolute inset-[15%] w-[70%] h-[70%] transform -rotate-90">
-                  <circle
-                    cx="50%"
-                    cy="50%"
-                    r="45%"
-                    fill="none"
-                    stroke="#E5E7EB"
-                    strokeWidth="10"
-                  />
-                  <circle
-                    cx="50%"
-                    cy="50%"
-                    r="45%"
-                    fill="none"
-                    stroke="url(#greenGradient)"
-                    strokeWidth="10"
-                    strokeDasharray="91, 100"
-                    strokeLinecap="round"
-                    className="drop-shadow-lg"
-                  />
-                  <defs>
-                    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#34D399" />
-                      <stop offset="100%" stopColor="#10B981" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-
-                {/* Third Ring - Screen Time */}
-                <svg className="absolute inset-[30%] w-[40%] h-[40%] transform -rotate-90">
-                  <circle
-                    cx="50%"
-                    cy="50%"
-                    r="42%"
-                    fill="none"
-                    stroke="#E5E7EB"
-                    strokeWidth="10"
-                  />
-                  <circle
-                    cx="50%"
-                    cy="50%"
-                    r="42%"
-                    fill="none"
-                    stroke="url(#redGradient)"
-                    strokeWidth="10"
-                    strokeDasharray="100, 100"
-                    strokeLinecap="round"
-                    className="drop-shadow-lg"
-                  />
-                  <defs>
-                    <linearGradient id="redGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#F87171" />
-                      <stop offset="100%" stopColor="#DC2626" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-
-                {/* Inner Ring - Workouts */}
-                <svg className="absolute inset-[45%] w-[10%] h-[10%] transform -rotate-90">
-                  <circle
-                    cx="50%"
-                    cy="50%"
-                    r="40%"
-                    fill="none"
-                    stroke="#E5E7EB"
-                    strokeWidth="10"
-                  />
-                  <circle
-                    cx="50%"
-                    cy="50%"
-                    r="40%"
-                    fill="none"
-                    stroke="url(#orangeGradient)"
-                    strokeWidth="10"
-                    strokeDasharray="97, 100"
-                    strokeLinecap="round"
-                    className="drop-shadow-lg animate-pulse"
-                  />
-                  <defs>
-                    <linearGradient id="orangeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#FBBF24" />
-                      <stop offset="100%" stopColor="#F59E0B" />
-                    </linearGradient>
-                  </defs>
-                </svg>
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-1">Today's Focus</h2>
+            <p className="text-sm text-gray-600">Weekly Investment Tracker</p>
+          </div>
+          
+          <div className="space-y-4">
+            {/* Reading Tile */}
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <span className="text-2xl">📚</span>
+                  </div>
+                  <div>
+                    <h4 className="text-base font-medium text-gray-600 uppercase tracking-wide mb-1">Reading</h4>
+                    <p className="text-xl font-bold text-gray-900">12.5 hours</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-3xl font-bold text-blue-600">83%</p>
+                  <p className="text-sm text-gray-500">of 15h goal</p>
+                </div>
               </div>
             </div>
 
-            {/* Data Display Below Rings - Horizontal Tiles */}
-            <div className="space-y-3">
-              {/* Reading Tile */}
-              <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between border border-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <span className="text-xl">📚</span>
+            {/* Meditation Tile */}
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center">
+                    <span className="text-2xl">🧘</span>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Reading</h4>
-                    <p className="text-lg font-bold text-gray-900">12.5 hours</p>
+                    <h4 className="text-base font-medium text-gray-600 uppercase tracking-wide mb-1">Meditation</h4>
+                    <p className="text-xl font-bold text-gray-900">3.2 hours</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-blue-600">83%</p>
-                  <p className="text-xs text-gray-500">of 15h goal</p>
+                  <p className="text-3xl font-bold text-green-600">91%</p>
+                  <p className="text-sm text-gray-500">of 3.5h goal</p>
                 </div>
               </div>
+            </div>
 
-              {/* Meditation Tile */}
-              <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between border border-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <span className="text-xl">🧘</span>
+            {/* Screen Time Tile */}
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center">
+                    <span className="text-2xl">📱</span>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Meditation</h4>
-                    <p className="text-lg font-bold text-gray-900">3.2 hours</p>
+                    <h4 className="text-base font-medium text-gray-600 uppercase tracking-wide mb-1">Screen Time</h4>
+                    <p className="text-xl font-bold text-gray-900">28 hours</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-green-600">91%</p>
-                  <p className="text-xs text-gray-500">of 3.5h goal</p>
+                <div className="text-right flex items-center gap-2">
+                  <div>
+                    <p className="text-3xl font-bold text-red-600">200%</p>
+                    <p className="text-sm text-gray-500">14h limit exceeded</p>
+                  </div>
+                  <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center animate-pulse">
+                    <span className="text-white text-sm font-bold">!</span>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              {/* Screen Time Tile */}
-              <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between border border-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                    <span className="text-xl">📱</span>
+            {/* Workouts Tile */}
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center">
+                    <span className="text-2xl">💪</span>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Screen Time</h4>
-                    <p className="text-lg font-bold text-gray-900">28 hours</p>
+                    <h4 className="text-base font-medium text-gray-600 uppercase tracking-wide mb-1">Workouts</h4>
+                    <p className="text-xl font-bold text-gray-900">6.8 hours</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-red-600">200% ⚠️</p>
-                  <p className="text-xs text-gray-500">14h limit exceeded</p>
-                </div>
-              </div>
-
-              {/* Workouts Tile */}
-              <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between border border-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <span className="text-xl">💪</span>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Workouts</h4>
-                    <p className="text-lg font-bold text-gray-900">6.8 hours</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-orange-600">97%</p>
-                  <p className="text-xs text-gray-500">of 7h goal</p>
+                  <p className="text-3xl font-bold text-orange-600">97%</p>
+                  <p className="text-sm text-gray-500">of 7h goal</p>
                 </div>
               </div>
             </div>
