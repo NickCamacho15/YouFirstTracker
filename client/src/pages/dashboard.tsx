@@ -12,19 +12,8 @@ import { Progress } from "@/components/ui/progress";
 import { 
   Plus, 
   Target, 
-  Repeat, 
-  BookOpen, 
-  ImageIcon, 
   CheckCircle2,
-  Clock,
-  ArrowRight,
-  Flame,
   Trophy,
-  Star,
-  ChevronUp,
-  ChevronDown,
-  Coffee,
-  Moon,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
@@ -201,7 +190,159 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Today's Tasks - Moved to Top */}
+        {/* Personal Investment Metrics - Gamified Time Tracking */}
+        <div className="mb-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-3">Personal Investment Tracker</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {/* Reading Time - Investment */}
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg transform hover:scale-[1.02] transition-all">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-sm font-medium opacity-90">Reading</h3>
+                <span className="text-xs bg-white/20 px-2 py-1 rounded">+18%</span>
+              </div>
+              <div className="text-3xl font-bold mb-1">12.5</div>
+              <div className="text-xs opacity-80">hours this week</div>
+              <div className="mt-3 pt-3 border-t border-white/20">
+                <div className="flex justify-between text-xs">
+                  <span className="opacity-70">Month</span>
+                  <span className="font-semibold">52h</span>
+                </div>
+                <div className="flex justify-between text-xs mt-1">
+                  <span className="opacity-70">All-time</span>
+                  <span className="font-semibold">185h</span>
+                </div>
+              </div>
+              <div className="mt-2 bg-white/10 rounded p-1">
+                <div className="h-1 bg-white/30 rounded">
+                  <div className="h-1 bg-white rounded" style={{width: '75%'}}></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Meditation Time - Investment */}
+            <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white shadow-lg transform hover:scale-[1.02] transition-all">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-sm font-medium opacity-90">Meditation</h3>
+                <span className="text-xs bg-white/20 px-2 py-1 rounded">+24%</span>
+              </div>
+              <div className="text-3xl font-bold mb-1">3.2</div>
+              <div className="text-xs opacity-80">hours this week</div>
+              <div className="mt-3 pt-3 border-t border-white/20">
+                <div className="flex justify-between text-xs">
+                  <span className="opacity-70">Month</span>
+                  <span className="font-semibold">14h</span>
+                </div>
+                <div className="flex justify-between text-xs mt-1">
+                  <span className="opacity-70">All-time</span>
+                  <span className="font-semibold">67h</span>
+                </div>
+              </div>
+              <div className="mt-2 bg-white/10 rounded p-1">
+                <div className="h-1 bg-white/30 rounded">
+                  <div className="h-1 bg-white rounded" style={{width: '85%'}}></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Screen Time - Distraction */}
+            <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-4 text-white shadow-lg transform hover:scale-[1.02] transition-all">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-sm font-medium opacity-90">Screen Time</h3>
+                <span className="text-xs bg-white/20 px-2 py-1 rounded">-12%</span>
+              </div>
+              <div className="text-3xl font-bold mb-1">28</div>
+              <div className="text-xs opacity-80">hours this week</div>
+              <div className="mt-3 pt-3 border-t border-white/20">
+                <div className="flex justify-between text-xs">
+                  <span className="opacity-70">Month</span>
+                  <span className="font-semibold">98h</span>
+                </div>
+                <div className="flex justify-between text-xs mt-1">
+                  <span className="opacity-70">All-time</span>
+                  <span className="font-semibold">412h</span>
+                </div>
+              </div>
+              <div className="mt-2 bg-white/10 rounded p-1">
+                <div className="h-1 bg-white/30 rounded">
+                  <div className="h-1 bg-red-300 rounded" style={{width: '45%'}}></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Workout Time - Investment */}
+            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-4 text-white shadow-lg transform hover:scale-[1.02] transition-all">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-sm font-medium opacity-90">Workouts</h3>
+                <span className="text-xs bg-white/20 px-2 py-1 rounded">+15%</span>
+              </div>
+              <div className="text-3xl font-bold mb-1">6.8</div>
+              <div className="text-xs opacity-80">hours this week</div>
+              <div className="mt-3 pt-3 border-t border-white/20">
+                <div className="flex justify-between text-xs">
+                  <span className="opacity-70">Month</span>
+                  <span className="font-semibold">27h</span>
+                </div>
+                <div className="flex justify-between text-xs mt-1">
+                  <span className="opacity-70">All-time</span>
+                  <span className="font-semibold">142h</span>
+                </div>
+              </div>
+              <div className="mt-2 bg-white/10 rounded p-1">
+                <div className="h-1 bg-white/30 rounded">
+                  <div className="h-1 bg-white rounded" style={{width: '92%'}}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Active Goals - Compact Nameplates with Progress */}
+        <div className="mb-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-3">Active Goals</h2>
+          <div className="space-y-2">
+            {goals.map((goal) => {
+              const progress = Math.min(100, Math.round((goal.tasksCompleted / 500) * 100)); // Assuming 500 tasks as a milestone
+              return (
+                <div key={goal.id} className="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all overflow-hidden">
+                  <div className={`h-full p-3 ${goal.color}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-white font-bold text-sm truncate">{goal.title}</h3>
+                        <p className="text-white/80 text-xs truncate">{goal.description}</p>
+                      </div>
+                      <div className="flex items-center gap-3 text-white">
+                        <div className="text-right">
+                          <div className="text-lg font-bold">{goal.tasksCompleted}</div>
+                          <div className="text-xs opacity-80">tasks</div>
+                        </div>
+                        <div className="h-8 w-0.5 bg-white/30"></div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold">{goal.daysWorking}</div>
+                          <div className="text-xs opacity-80">days</div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Progress Bar */}
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-white/70">Progress</span>
+                        <span className="text-xs text-white/90 font-semibold">{progress}%</span>
+                      </div>
+                      <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-white/80 rounded-full transition-all duration-500 ease-out"
+                          style={{ width: `${progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Today's Tasks */}
         <Card className="border-0 shadow-lg mb-6">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
@@ -253,102 +394,6 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Weekly Time Metrics - 2x2 Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          {/* Reading Time */}
-          <div className="text-center bg-white rounded-lg p-4 shadow-md border border-blue-200">
-            <BookOpen className="w-8 h-8 mx-auto mb-3 text-blue-600" />
-            <div className="text-2xl font-bold text-gray-900">12.5h</div>
-            <div className="text-sm text-gray-600">Weekly</div>
-            <div className="text-xs text-gray-500 mt-1">52h month • 185h total</div>
-            <h3 className="text-sm font-semibold text-gray-700 mt-2">Reading</h3>
-          </div>
-
-          {/* Meditation Time */}
-          <div className="text-center bg-white rounded-lg p-4 shadow-md border border-green-200">
-            <div className="w-8 h-8 mx-auto mb-3 bg-green-600 rounded-full flex items-center justify-center">
-              <div className="w-3 h-3 bg-white rounded-full"></div>
-            </div>
-            <div className="text-2xl font-bold text-gray-900">3.2h</div>
-            <div className="text-sm text-gray-600">Weekly</div>
-            <div className="text-xs text-gray-500 mt-1">14h month • 67h total</div>
-            <h3 className="text-sm font-semibold text-gray-700 mt-2">Meditation</h3>
-          </div>
-
-          {/* Screen Time (Distraction) */}
-          <div className="text-center bg-white rounded-lg p-4 shadow-md border border-red-200">
-            <div className="w-8 h-8 mx-auto mb-3 bg-red-600 rounded flex items-center justify-center">
-              <div className="w-4 h-4 bg-white rounded-sm"></div>
-            </div>
-            <div className="text-2xl font-bold text-gray-900">28h</div>
-            <div className="text-sm text-gray-600">Weekly</div>
-            <div className="text-xs text-gray-500 mt-1">98h month • 412h total</div>
-            <h3 className="text-sm font-semibold text-gray-700 mt-2">Screen Time</h3>
-          </div>
-
-          {/* Workout Time */}
-          <div className="text-center bg-white rounded-lg p-4 shadow-md border border-orange-200">
-            <div className="w-8 h-8 mx-auto mb-3 text-orange-600">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/>
-              </svg>
-            </div>
-            <div className="text-2xl font-bold text-gray-900">6.8h</div>
-            <div className="text-sm text-gray-600">Weekly</div>
-            <div className="text-xs text-gray-500 mt-1">27h month • 142h total</div>
-            <h3 className="text-sm font-semibold text-gray-700 mt-2">Workouts</h3>
-          </div>
-        </div>
-
-        {/* Active Goals Section */}
-        <div className="mb-4 sm:mb-6">
-          <div className="flex items-center gap-2 mb-3 px-1">
-            <Target className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Active Goals</h2>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3">
-            {goals.map((goal) => {
-              return (
-                <div key={goal.id} className={`${goal.color} p-3 sm:p-4 rounded-lg text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.01]`}>
-                  <div className="flex items-start justify-between mb-2 sm:mb-3">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm sm:text-lg font-bold mb-1 truncate">{goal.title}</h3>
-                      <p className="text-white/90 text-xs line-clamp-2">{goal.description}</p>
-                    </div>
-                    <div className="text-right ml-2">
-                      <div className="text-xl sm:text-3xl font-black">{goal.tasksCompleted}</div>
-                      <div className="text-xs text-white/80">tasks</div>
-                    </div>
-                  </div>
-                  
-                  {/* Commitment Stats */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="bg-white/20 rounded px-2 py-1">
-                        <div className="text-xs sm:text-sm font-bold">{goal.daysWorking}</div>
-                        <div className="text-xs text-white/80">days</div>
-                      </div>
-                      <div className="bg-white/20 rounded px-2 py-1">
-                        <div className="text-xs sm:text-sm font-bold">{Math.round(goal.tasksCompleted / goal.daysWorking)}</div>
-                        <div className="text-xs text-white/80">avg/day</div>
-                      </div>
-                    </div>
-                    <Badge variant="secondary" className="bg-white/20 text-white border-0 text-xs">
-                      <Trophy className="w-3 h-3 mr-1" />
-                      <span className="hidden sm:inline">Persistent</span>
-                      <span className="sm:hidden">🏆</span>
-                    </Badge>
-                  </div>
-                  
-                  <div className="text-xs text-white/90">
-                    <strong>Score:</strong> {goal.tasksCompleted} tasks / {goal.daysWorking} days
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
 
 
 

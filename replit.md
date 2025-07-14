@@ -123,6 +123,15 @@ Build scripts include:
 
 ## Changelog
 
+- July 11, 2025: Dashboard Gamified - Personal Investment Tracker with Compact Goal Nameplates
+  - **REDESIGNED**: Time metrics tiles (Reading, Meditation, Screen Time, Workouts) now gamified without icons
+  - **NEW**: "Personal Investment Tracker" with gradient color tiles and metrics as centerpiece
+  - **ENHANCED**: Each metric tile shows large numbers (12.5h format), progress bars, and percentage changes
+  - **ADDED**: Month and all-time stats within each tile with visual progress indicators
+  - **COMPACT**: Active Goals redesigned as horizontal nameplates with integrated progress bars
+  - **STREAMLINED**: Goals display as single-line cards with title, tasks, days, and progress percentage
+  - **REORDERED**: Dashboard now shows Investment Tracker → Active Goals → Today's Tasks
+  - Dashboard emphasizes gamified time tracking with visual progress and achievement metrics
 - July 11, 2025: Challenge Page Refined - New Challenge Button Below Title with Clean Design
   - **MOVED**: "New Challenge" button now positioned below the title tile as a prominent centered button
   - **ENHANCED**: Challenge cards with progress bars and optimized progress calendar showing all days at once
