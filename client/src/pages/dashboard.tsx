@@ -11,7 +11,6 @@ import { CheckCircle2, ChevronLeft, ChevronRight, Plus, Target, Shield, Layers, 
 import { useQuery } from '@tanstack/react-query';
 import { NewGoalModal } from '@/components/goals/new-goal-modal';
 import { NewTaskModal } from '@/components/dashboard/new-task-modal';
-import { AchievementHistory } from '@/components/habits/achievement-history';
 
 interface Goal {
   id: number;
@@ -239,68 +238,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Mastery Dashboard */}
-        <Card className="border-0 shadow-lg mb-6">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
-                  <Target className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl">Personal Mastery Dashboard</CardTitle>
-                  <p className="text-sm text-gray-600">Your excellence metrics at a glance</p>
-                </div>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {/* Total Tasks Completed */}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600">{criticalTasksCompleted}</div>
-                <p className="text-sm text-gray-600 mt-1">Tasks Completed</p>
-                <div className="flex items-center justify-center gap-1 mt-2">
-                  <CheckCircle2 className="w-4 h-4 text-blue-500" />
-                  <span className="text-xs text-gray-600">lifetime</span>
-                </div>
-              </div>
-
-              {/* Current Streaks */}
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {Math.max(...morningRoutines.map(r => r.streak), ...eveningRoutines.map(r => r.streak))}
-                </div>
-                <p className="text-sm text-gray-600 mt-1">Best Streak</p>
-                <div className="flex items-center justify-center gap-1 mt-2">
-                  <Flame className="w-4 h-4 text-green-500" />
-                  <span className="text-xs text-gray-600">days</span>
-                </div>
-              </div>
-
-              {/* Consistency Score */}
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-purple-600">89%</div>
-                <p className="text-sm text-gray-600 mt-1">Consistency</p>
-                <div className="flex items-center justify-center gap-1 mt-2">
-                  <Star className="w-4 h-4 text-purple-500" />
-                  <span className="text-xs text-gray-600">this month</span>
-                </div>
-              </div>
-
-              {/* Active Goals */}
-              <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-orange-600">{goals.filter(g => !g.completed).length}</div>
-                <p className="text-sm text-gray-600 mt-1">Active Goals</p>
-                <div className="flex items-center justify-center gap-1 mt-2">
-                  <Target className="w-4 h-4 text-orange-500" />
-                  <span className="text-xs text-gray-600">in progress</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Morning Routine */}
         <Card className="mb-6 shadow-md">
           <CardHeader className="pb-3">
@@ -493,8 +430,67 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Achievement History */}
-        <AchievementHistory />
+        {/* Mastery Dashboard */}
+        <Card className="border-0 shadow-lg mb-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
+                  <Target className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Personal Mastery Dashboard</CardTitle>
+                  <p className="text-sm text-gray-600">Your excellence metrics at a glance</p>
+                </div>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Total Tasks Completed */}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">{criticalTasksCompleted}</div>
+                <p className="text-sm text-gray-600 mt-1">Tasks Completed</p>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                  <span className="text-xs text-gray-600">lifetime</span>
+                </div>
+              </div>
+
+              {/* Current Streaks */}
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-green-600">
+                  {Math.max(...morningRoutines.map(r => r.streak), ...eveningRoutines.map(r => r.streak))}
+                </div>
+                <p className="text-sm text-gray-600 mt-1">Best Streak</p>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <Flame className="w-4 h-4 text-green-500" />
+                  <span className="text-xs text-gray-600">days</span>
+                </div>
+              </div>
+
+              {/* Consistency Score */}
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-purple-600">89%</div>
+                <p className="text-sm text-gray-600 mt-1">Consistency</p>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <Star className="w-4 h-4 text-purple-500" />
+                  <span className="text-xs text-gray-600">this month</span>
+                </div>
+              </div>
+
+              {/* Active Goals */}
+              <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-orange-600">{goals.filter(g => !g.completed).length}</div>
+                <p className="text-sm text-gray-600 mt-1">Active Goals</p>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <Target className="w-4 h-4 text-orange-500" />
+                  <span className="text-xs text-gray-600">in progress</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
       </main>
 
