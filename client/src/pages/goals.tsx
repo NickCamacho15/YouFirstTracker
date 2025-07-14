@@ -79,8 +79,62 @@ export default function GoalsPage() {
             </Button>
           </div>
 
-          {(goals as Goal[]).length === 0 ? (
-            <Card className="border-0 shadow-lg">
+          {/* Mock goals for layout - Replace with actual data when goals exist */}
+          <div className="space-y-3">
+            {/* Sample goals with nameplate design */}
+            {[
+              { id: 1, title: 'Q4 Business Review', description: 'Complete quarterly business analysis', tasksCompleted: 234, daysWorking: 45, color: 'bg-gradient-to-r from-blue-500 to-indigo-600' },
+              { id: 2, title: 'Team Leadership', description: 'Develop team processes and culture', tasksCompleted: 187, daysWorking: 62, color: 'bg-gradient-to-r from-purple-500 to-pink-600' },
+              { id: 3, title: 'Personal Development', description: 'Health and wellness improvements', tasksCompleted: 456, daysWorking: 89, color: 'bg-gradient-to-r from-emerald-500 to-teal-600' },
+              { id: 4, title: 'Home Organization', description: 'Organize and optimize living space', tasksCompleted: 98, daysWorking: 23, color: 'bg-gradient-to-r from-orange-500 to-red-600' }
+            ].map((goal) => {
+              const progress = Math.min(100, Math.round((goal.tasksCompleted / 500) * 100)); // Assuming 500 tasks as a milestone
+              return (
+                <div key={goal.id} className="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all overflow-hidden">
+                  <div className={`h-full p-4 ${goal.color}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-white font-bold text-lg truncate">{goal.title}</h3>
+                        <p className="text-white/80 text-sm truncate">{goal.description}</p>
+                      </div>
+                      <div className="flex items-center gap-4 text-white">
+                        <div className="text-right">
+                          <div className="text-xl font-bold">{goal.tasksCompleted}</div>
+                          <div className="text-xs opacity-80">tasks</div>
+                        </div>
+                        <div className="h-10 w-0.5 bg-white/30"></div>
+                        <div className="text-right">
+                          <div className="text-xl font-bold">{goal.daysWorking}</div>
+                          <div className="text-xs opacity-80">days</div>
+                        </div>
+                        <div className="h-10 w-0.5 bg-white/30"></div>
+                        <div className="text-right">
+                          <div className="text-xl font-bold">{Math.round(goal.tasksCompleted / goal.daysWorking)}</div>
+                          <div className="text-xs opacity-80">avg/day</div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Progress Bar */}
+                    <div className="mt-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-white/70">Goal Progress</span>
+                        <span className="text-sm text-white/90 font-semibold">{progress}%</span>
+                      </div>
+                      <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-white/80 rounded-full transition-all duration-500 ease-out"
+                          style={{ width: `${progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {(goals as Goal[]).length === 0 && (
+            <Card className="border-0 shadow-lg mt-6">
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Target className="w-12 h-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-medium mb-2">No active goals yet</h3>
@@ -93,16 +147,6 @@ export default function GoalsPage() {
                 </Button>
               </CardContent>
             </Card>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {(goals as Goal[]).map((goal: Goal) => (
-                <GoalCard
-                  key={goal.id}
-                  goal={goal}
-                  onUpdate={refreshGoals}
-                />
-              ))}
-            </div>
           )}
         </div>
 

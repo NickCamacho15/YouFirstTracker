@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { NewGoalModal } from "@/components/goals/new-goal-modal";
+import { NewTaskModal } from "@/components/tasks/new-task-modal";
 
 import { HabitStoryBar } from "@/components/habits/habit-story-bar";
 import { useAuth } from "@/hooks/use-auth";
@@ -25,9 +26,10 @@ export default function DashboardPage() {
   
   // Critical tasks completion counter - tracks lifetime achievements
   const [criticalTasksCompleted, setCriticalTasksCompleted] = useState(147);
+  const [showNewTaskModal, setShowNewTaskModal] = useState(false);
   
   // Goals with cumulative task completion tracking
-  const [goals] = useState([
+  const [goals, setGoals] = useState([
     { id: 1, title: 'Q4 Business Review', description: 'Complete quarterly business analysis', tasksCompleted: 234, daysWorking: 45, color: 'bg-gradient-to-r from-blue-500 to-indigo-600' },
     { id: 2, title: 'Team Leadership', description: 'Develop team processes and culture', tasksCompleted: 187, daysWorking: 62, color: 'bg-gradient-to-r from-purple-500 to-pink-600' },
     { id: 3, title: 'Personal Development', description: 'Health and wellness improvements', tasksCompleted: 456, daysWorking: 89, color: 'bg-gradient-to-r from-emerald-500 to-teal-600' },
@@ -136,14 +138,39 @@ export default function DashboardPage() {
           
           if (updatedTask.completed && !task.completed) {
             setCriticalTasksCompleted(count => count + 1);
+            
+            // Increment goal progress if task is linked to a goal
+            if (task.goalId) {
+              setGoals(prevGoals => prevGoals.map(goal => 
+                goal.id === task.goalId 
+                  ? { ...goal, tasksCompleted: goal.tasksCompleted + 1 }
+                  : goal
+              ));
+            }
           } else if (!updatedTask.completed && task.completed) {
             setCriticalTasksCompleted(count => Math.max(0, count - 1));
+            
+            // Decrement goal progress if task is linked to a goal
+            if (task.goalId) {
+              setGoals(prevGoals => prevGoals.map(goal => 
+                goal.id === task.goalId 
+                  ? { ...goal, tasksCompleted: Math.max(0, goal.tasksCompleted - 1) }
+                  : goal
+              ));
+            }
           }
           
           return updatedTask;
         }
         return task;
       })
+    }));
+  };
+
+  const handleNewTask = (newTask: any) => {
+    setWeeklyTasks(prev => ({
+      ...prev,
+      [selectedDay]: [...(prev[selectedDay as keyof typeof prev] || []), newTask]
     }));
   };
 
@@ -296,53 +323,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Active Goals - Compact Nameplates with Progress */}
-        <div className="mb-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-3">Active Goals</h2>
-          <div className="space-y-2">
-            {goals.map((goal) => {
-              const progress = Math.min(100, Math.round((goal.tasksCompleted / 500) * 100)); // Assuming 500 tasks as a milestone
-              return (
-                <div key={goal.id} className="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all overflow-hidden">
-                  <div className={`h-full p-3 ${goal.color}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-white font-bold text-sm truncate">{goal.title}</h3>
-                        <p className="text-white/80 text-xs truncate">{goal.description}</p>
-                      </div>
-                      <div className="flex items-center gap-3 text-white">
-                        <div className="text-right">
-                          <div className="text-lg font-bold">{goal.tasksCompleted}</div>
-                          <div className="text-xs opacity-80">tasks</div>
-                        </div>
-                        <div className="h-8 w-0.5 bg-white/30"></div>
-                        <div className="text-right">
-                          <div className="text-lg font-bold">{goal.daysWorking}</div>
-                          <div className="text-xs opacity-80">days</div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Progress Bar */}
-                    <div className="mt-2">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-white/70">Progress</span>
-                        <span className="text-xs text-white/90 font-semibold">{progress}%</span>
-                      </div>
-                      <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-white/80 rounded-full transition-all duration-500 ease-out"
-                          style={{ width: `${progress}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
 
-        {/* Today's Tasks */}
+
+        {/* Today's Tasks with Long-term Tracking */}
         <Card className="border-0 shadow-lg mb-6">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
@@ -354,14 +337,19 @@ export default function DashboardPage() {
                 variant="ghost"
                 size="sm"
                 className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50"
-                onClick={() => {/* Add task */}}
+                onClick={() => setShowNewTaskModal(true)}
               >
                 <Plus className="w-3 h-3" />
               </Button>
             </div>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1">
-              {dayNames[selectedDay]}'s priorities
-            </p>
+            <div className="flex items-center justify-between mt-2">
+              <p className="text-xs sm:text-sm text-gray-600">
+                {dayNames[selectedDay]}'s priorities
+              </p>
+              <div className="text-xs text-gray-500">
+                <span className="font-semibold text-blue-600">{criticalTasksCompleted}</span> total tasks completed
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -403,6 +391,14 @@ export default function DashboardPage() {
         open={showNewGoalModal} 
         onOpenChange={setShowNewGoalModal}
         onSuccess={() => {}}
+      />
+
+      <NewTaskModal
+        open={showNewTaskModal}
+        onOpenChange={setShowNewTaskModal}
+        onSuccess={handleNewTask}
+        goals={goals}
+        selectedDay={selectedDay}
       />
       
 
