@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Trophy, Flame } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trophy, Flame, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isBefore, startOfDay } from "date-fns";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
 interface WonDay {
@@ -118,7 +119,52 @@ export function DayTrackerCalendar() {
   const emptyCells = Array(startDayOfWeek).fill(null);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
+      {/* Win Today Tile */}
+      <Card className="bg-white shadow-sm p-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900">Win Today</h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Morning & Evening • Tasks • Workout • Reading • Rules
+            </p>
+          </div>
+          <div className="flex items-center gap-4 text-xs">
+            <div className="text-center">
+              <div className="font-semibold text-gray-900">{currentStreak}</div>
+              <div className="text-gray-500">Current</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold text-gray-900">{longestStreak}</div>
+              <div className="text-gray-500">Best</div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* I Won Today Button */}
+      <Button
+        onClick={() => winDayMutation.mutate()}
+        disabled={winDayMutation.isPending || wonDayDates.has(format(new Date(), "yyyy-MM-dd"))}
+        className={cn(
+          "w-full h-12 text-base font-medium transition-all",
+          wonDayDates.has(format(new Date(), "yyyy-MM-dd"))
+            ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600"
+            : "bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600"
+        )}
+      >
+        {winDayMutation.isPending ? (
+          <Loader2 className="w-5 h-5 animate-spin" />
+        ) : wonDayDates.has(format(new Date(), "yyyy-MM-dd")) ? (
+          <>
+            <Trophy className="w-5 h-5 mr-2" />
+            Today Won!
+          </>
+        ) : (
+          "I Won Today"
+        )}
+      </Button>
+
       {/* Calendar Card */}
       <Card className="bg-white/95 backdrop-blur border-gray-200 shadow-lg p-4">
         {/* Header */}
@@ -203,26 +249,6 @@ export function DayTrackerCalendar() {
             <span className="text-sm text-gray-600">Best:</span>
             <span className="text-sm font-bold text-gray-900">{longestStreak} days</span>
           </div>
-        </div>
-      </Card>
-
-      {/* Win Today Button */}
-      <Card className="bg-gradient-to-r from-blue-500 to-indigo-600 border-0 shadow-lg p-4">
-        <div className="flex items-center justify-between">
-          <div className="text-white">
-            <h3 className="font-semibold">Win Today</h3>
-            <p className="text-xs text-white/80 mt-1">
-              Completed your routines, tasks, workout, reading, and rules?
-            </p>
-          </div>
-          <Button
-            onClick={() => winDayMutation.mutate()}
-            disabled={winDayMutation.isPending || wonDayDates.has(format(new Date(), "yyyy-MM-dd"))}
-            className="bg-white text-blue-600 hover:bg-gray-100"
-            size="sm"
-          >
-            {wonDayDates.has(format(new Date(), "yyyy-MM-dd")) ? "Day Won!" : "I Won Today"}
-          </Button>
         </div>
       </Card>
     </div>
