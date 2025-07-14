@@ -84,15 +84,6 @@ export default function GoalsPage() {
   return (
     <div className="min-h-screen bg-background relative pb-20">
       <div className="max-w-4xl mx-auto px-4 pt-8 pb-24">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Target className="w-6 h-6 text-blue-600" />
-            Goals & Achievements
-          </h1>
-          <p className="text-muted-foreground">Transform aspirations into achievements through strategic action</p>
-        </div>
-
         {/* Active Goals Section */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
