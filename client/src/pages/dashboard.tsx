@@ -184,11 +184,6 @@ export default function DashboardPage() {
 
         {/* Weekly Overview - Standalone Tiles */}
         <div className="mb-6">
-          <div className="text-center mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Today's Focus</h2>
-            <p className="text-sm text-gray-600">Weekly Investment Tracker</p>
-          </div>
-          
           <div className="space-y-4">
             {/* Reading Tile */}
             <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
