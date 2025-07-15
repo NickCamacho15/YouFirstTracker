@@ -16,29 +16,41 @@ interface RulesHeatmapProps {
 }
 
 export function RulesHeatmap({ rules }: RulesHeatmapProps) {
-  const [monthData, setMonthData] = useState<{ [key: string]: number }>({});
+  const totalRules = rules.length;
+  const completedToday = rules.filter(r => r.completedToday).length;
+  const completionRate = totalRules > 0 ? Math.round((completedToday / totalRules) * 100) : 0;
+  const avgStreak = totalRules > 0 ? Math.round(rules.reduce((acc, r) => acc + r.streak, 0) / totalRules) : 0;
   
-  // Generate last 30 days of data
-  useEffect(() => {
-    const data: { [key: string]: number } = {};
-    const today = new Date();
+  // Generate last 30 days
+  const days = [];
+  const today = new Date();
+  
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
     
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
-      
-      // Simulate completion rate based on streaks
-      const avgStreak = rules.reduce((acc, r) => acc + r.streak, 0) / Math.max(rules.length, 1);
-      const baseRate = Math.min(avgStreak / 30, 1);
-      const randomVariation = Math.random() * 0.3 - 0.15;
-      data[dateStr] = Math.max(0, Math.min(1, baseRate + randomVariation));
+    // Calculate value for each day
+    let value = 0;
+    if (rules.length > 0) {
+      if (i === 0) {
+        // Today - use actual completion
+        value = completedToday / totalRules;
+      } else {
+        // Past days - simulate based on average streak
+        const avgCompletion = avgStreak / 30;
+        value = Math.min(1, avgCompletion + (Math.random() * 0.2 - 0.1));
+      }
     }
     
-    setMonthData(data);
-  }, [rules]);
+    days.push({
+      date: date,
+      day: date.getDate(),
+      value: Math.max(0, Math.min(1, value)),
+      isToday: i === 0
+    });
+  }
 
-  const getColorForValue = (value: number) => {
+  const getColorClass = (value: number) => {
     if (value >= 0.9) return 'bg-green-500';
     if (value >= 0.7) return 'bg-green-400';
     if (value >= 0.5) return 'bg-yellow-400';
@@ -46,11 +58,6 @@ export function RulesHeatmap({ rules }: RulesHeatmapProps) {
     if (value > 0) return 'bg-red-400';
     return 'bg-gray-200';
   };
-
-  const totalRules = rules.length;
-  const completedToday = rules.filter(r => r.completedToday).length;
-  const completionRate = totalRules > 0 ? Math.round((completedToday / totalRules) * 100) : 0;
-  const avgStreak = totalRules > 0 ? Math.round(rules.reduce((acc, r) => acc + r.streak, 0) / totalRules) : 0;
 
   return (
     <Card className="border-gray-200 shadow-sm">
@@ -92,21 +99,20 @@ export function RulesHeatmap({ rules }: RulesHeatmapProps) {
             </div>
           </div>
           
-          <div className="grid grid-cols-15 gap-0.5">
-            {Object.entries(monthData).map(([date, value]) => {
-              const day = new Date(date).getDate();
-              const isToday = new Date(date).toDateString() === new Date().toDateString();
-              return (
-                <div
-                  key={date}
-                  className={`aspect-square rounded-sm ${getColorForValue(value)} relative group cursor-pointer ${
-                    isToday ? 'ring-1 ring-blue-600 ring-offset-1' : ''
-                  }`}
-                  title={`Day ${day}: ${Math.round(value * 100)}% completion`}
-                >
+          <div className="grid grid-cols-10 gap-0.5">
+            {days.map((dayData, index) => (
+              <div
+                key={index}
+                className={`w-6 h-6 rounded-sm ${getColorClass(dayData.value)} relative cursor-pointer transition-all ${
+                  dayData.isToday ? 'ring-2 ring-blue-600' : ''
+                }`}
+                title={`Day ${dayData.day}: ${Math.round(dayData.value * 100)}% completion`}
+              >
+                <div className="absolute inset-0 flex items-center justify-center text-[9px] font-medium text-white opacity-80">
+                  {dayData.day}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </CardContent>

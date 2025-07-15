@@ -22,7 +22,7 @@ import {
   Star,
   X
 } from 'lucide-react';
-import { RulesHeatmap } from '@/components/habits/rules-heatmap';
+import { RulesHeatmap } from '@/components/habits/rules-calendar';
 import { AchievementHistory } from '@/components/habits/achievement-history';
 
 
