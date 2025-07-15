@@ -60,10 +60,11 @@ function TodayRequirements({ challenge, today, completedDays, onComplete }: {
 
   useEffect(() => {
     // If all rules are checked, mark the day as complete
-    if (challenge.rules && checkedRules.size === challenge.rules.length && !isCompleted) {
+    if (challenge.rules && checkedRules.size === challenge.rules.length && checkedRules.size > 0 && !isCompleted) {
       onComplete();
+      setCheckedRules(new Set()); // Reset after completion
     }
-  }, [checkedRules, challenge.rules, isCompleted, onComplete]);
+  }, [checkedRules.size, challenge.rules?.length, isCompleted]);
 
   const toggleRule = (index: number) => {
     if (isCompleted) return;
@@ -422,41 +423,7 @@ export default function HabitsPage() {
               Start New Challenge
             </Button>
 
-            {/* Today's Requirements Tile */}
-            {challenges.filter(c => c.rules && c.rules.length > 0).length > 0 && (
-              <Card className="border-gray-200 shadow-md bg-gradient-to-br from-blue-50 to-indigo-50">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg font-bold flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-blue-600" />
-                    Today's Requirements
-                  </CardTitle>
-                  <p className="text-sm text-gray-600">Complete all requirements to win the day</p>
-                </CardHeader>
-                <CardContent>
-                  {challenges.map(challenge => {
-                    if (!challenge.rules || challenge.rules.length === 0) return null;
-                    
-                    const startDate = new Date(challenge.startDate);
-                    const today = Math.floor((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-                    const completedDays = challenge.completedDays || [];
-                    
-                    if (today > challenge.duration || today < 1) return null;
-                    
-                    return (
-                      <div key={challenge.id} className="mb-4 last:mb-0">
-                        <h4 className="font-medium text-gray-900 mb-3">{challenge.title} - Day {today}</h4>
-                        <TodayRequirements 
-                          challenge={challenge}
-                          today={today}
-                          completedDays={completedDays}
-                          onComplete={() => handleChallengeCheckOff(challenge.id, today)}
-                        />
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-            )}
+
 
             {/* Active Challenges List */}
             {challenges.map((challenge) => {
