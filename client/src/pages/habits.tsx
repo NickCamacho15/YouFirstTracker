@@ -280,14 +280,22 @@ export default function HabitsPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="rules" className="space-y-6">
+        <TabsContent value="rules" className="space-y-4">
           {/* Rules Heat Map */}
           <RulesHeatmap rules={rules} />
 
-          {/* Add New Rule */}
-          {isAddingRule && (
-            <Card className="border-0 shadow-lg">
-              <CardContent className="pt-6">
+          {/* Add New Rule Button or Form */}
+          {!isAddingRule ? (
+            <Button
+              onClick={() => setIsAddingRule(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm py-3 font-medium flex items-center justify-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Add New Rule
+            </Button>
+          ) : (
+            <Card className="border-gray-200 shadow-md">
+              <CardContent className="pt-4 pb-4">
                 <div className="flex gap-2">
                   <Input
                     value={newRule}
@@ -295,11 +303,16 @@ export default function HabitsPage() {
                     placeholder="Enter your new rule..."
                     className="flex-1"
                     onKeyPress={(e) => e.key === 'Enter' && handleAddRule()}
+                    autoFocus
                   />
-                  <Button onClick={handleAddRule} disabled={!newRule.trim()}>
-                    Add Rule
+                  <Button 
+                    onClick={handleAddRule} 
+                    disabled={!newRule.trim() || addRuleMutation.isPending}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Add
                   </Button>
-                  <Button onClick={() => setIsAddingRule(false)} variant="outline">
+                  <Button onClick={() => {setIsAddingRule(false); setNewRule("");}} variant="outline">
                     Cancel
                   </Button>
                 </div>
@@ -307,85 +320,92 @@ export default function HabitsPage() {
             </Card>
           )}
 
-          {/* Rules List */}
-          <Card className="border-gray-200 shadow-sm">
-            <CardHeader className="pb-3 bg-gray-50 rounded-t-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-blue-600" />
-                  <CardTitle className="text-lg text-gray-900">Active Rules</CardTitle>
-                </div>
-                {!isAddingRule && (
-                  <Button 
-                    onClick={() => setIsAddingRule(true)}
-                    className="bg-blue-600 hover:bg-blue-700" 
-                    size="sm"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Rule
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {!rules || rules.length === 0 ? (
-                <div className="text-center py-8">
-                  <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No Rules Yet</h3>
-                  <p className="text-gray-600 mb-4">
-                    Create your first rule to start building personal discipline.
-                  </p>
-                  <Button onClick={() => setIsAddingRule(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Your First Rule
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {rules?.map((rule) => (
-                    <div key={rule.id} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-blue-50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => toggleRuleCompletion.mutate(rule.id)}
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                            rule.completedToday 
-                              ? 'bg-green-500 border-green-500 text-white' 
-                              : 'border-gray-300 hover:border-green-500'
-                          }`}
-                        >
-                          {rule.completedToday && <CheckCircle2 className="w-4 h-4" />}
-                        </button>
-                        <div>
-                          <h4 className="font-medium text-gray-900">{rule.title}</h4>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="secondary" className="text-xs">
-                              {rule.streak} day streak
-                            </Badge>
-                            {rule.category && (
-                              <Badge variant="outline" className="text-xs">
-                                {rule.category}
-                              </Badge>
+          {/* Rules List with Enhanced Statistics */}
+          {!rules || rules.length === 0 ? (
+            <Card className="border-gray-200 shadow-sm">
+              <CardContent className="py-12 text-center">
+                <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Rules Yet</h3>
+                <p className="text-gray-600 mb-4">
+                  Create your first rule to start building personal discipline.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {rules?.map((rule) => {
+                // Calculate statistics (mock data for now)
+                const totalDays = Math.max(rule.streak + 5, 30); // Placeholder calculation
+                const successRate = Math.round((rule.streak / totalDays) * 100);
+                const bestStreak = Math.max(rule.streak, 15); // Placeholder
+                
+                return (
+                  <Card key={rule.id} className="border-gray-200 shadow-sm hover:shadow-md transition-all">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-start gap-3 flex-1">
+                          <button
+                            onClick={() => toggleRuleCompletion.mutate(rule.id)}
+                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 mt-0.5 ${
+                              rule.completedToday 
+                                ? 'bg-green-500 border-green-500 text-white' 
+                                : 'border-gray-300 hover:border-green-500 hover:bg-green-50'
+                            }`}
+                          >
+                            {rule.completedToday && <CheckCircle2 className="w-4 h-4" />}
+                          </button>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-gray-900 text-base">{rule.title}</h4>
+                            {rule.description && (
+                              <p className="text-sm text-gray-600 mt-0.5">{rule.description}</p>
                             )}
                           </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2">
                         <Button
                           onClick={() => markRuleFailure.mutate(rule.id)}
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
-                          className="text-red-600 border-red-300 hover:bg-red-50"
+                          className="text-red-600 hover:bg-red-50 h-8 px-2"
                         >
-                          <AlertTriangle className="w-4 h-4 mr-1" />
-                          Break Rule
+                          <X className="w-4 h-4" />
                         </Button>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                      
+                      {/* Statistics Grid */}
+                      <div className="grid grid-cols-4 gap-3 mt-3 pt-3 border-t border-gray-100">
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-blue-600">{rule.streak}</div>
+                          <div className="text-xs text-gray-500">Current</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-gray-900">{bestStreak}</div>
+                          <div className="text-xs text-gray-500">Best</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-gray-900">{totalDays}</div>
+                          <div className="text-xs text-gray-500">Total Days</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-green-600">{successRate}%</div>
+                          <div className="text-xs text-gray-500">Success</div>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="mt-3">
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div 
+                            className="bg-gradient-to-r from-blue-500 to-blue-600 h-1.5 rounded-full transition-all duration-500"
+                            style={{ width: `${successRate}%` }}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="challenge" className="space-y-6">
