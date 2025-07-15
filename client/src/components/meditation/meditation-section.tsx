@@ -71,16 +71,16 @@ export function MeditationSection() {
     
     // Gentle chime - higher frequency for peaceful sound (A4 = 440Hz)
     fundamental.frequency.setValueAtTime(440, audioContext.currentTime);
-    fundamental.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 3);
+    fundamental.frequency.exponentialRampToValueAtTime(420, audioContext.currentTime + 2);
     fundamental.type = "sine";
     
     // Sweet harmonics for bell-like quality
     harmonic1.frequency.setValueAtTime(880, audioContext.currentTime); // Octave
-    harmonic1.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 2.5);
+    harmonic1.frequency.exponentialRampToValueAtTime(840, audioContext.currentTime + 1.8);
     harmonic1.type = "sine";
     
     harmonic2.frequency.setValueAtTime(1320, audioContext.currentTime); // Perfect fifth
-    harmonic2.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 2);
+    harmonic2.frequency.exponentialRampToValueAtTime(1260, audioContext.currentTime + 1.5);
     harmonic2.type = "sine";
     
     // High-pass filter for bright, clean sound
@@ -88,29 +88,29 @@ export function MeditationSection() {
     filterNode.frequency.setValueAtTime(200, audioContext.currentTime);
     filterNode.Q.setValueAtTime(0.5, audioContext.currentTime);
     
-    // Gentle envelope for peaceful decay
+    // Very gentle envelope for softer, shorter decay
     gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.02);
-    gainNode.gain.exponentialRampToValueAtTime(0.1, audioContext.currentTime + 0.3);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 3);
+    gainNode.gain.linearRampToValueAtTime(0.25, audioContext.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + 0.2);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
     
     harmonic1Gain.gain.setValueAtTime(0, audioContext.currentTime);
-    harmonic1Gain.gain.linearRampToValueAtTime(0.25, audioContext.currentTime + 0.05);
-    harmonic1Gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2.5);
+    harmonic1Gain.gain.linearRampToValueAtTime(0.18, audioContext.currentTime + 0.03);
+    harmonic1Gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.8);
     
     harmonic2Gain.gain.setValueAtTime(0, audioContext.currentTime);
-    harmonic2Gain.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.08);
-    harmonic2Gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
+    harmonic2Gain.gain.linearRampToValueAtTime(0.12, audioContext.currentTime + 0.05);
+    harmonic2Gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.5);
     
     // Start oscillators
     fundamental.start(audioContext.currentTime);
     harmonic1.start(audioContext.currentTime);
     harmonic2.start(audioContext.currentTime);
     
-    // Stop oscillators after peaceful decay
-    fundamental.stop(audioContext.currentTime + 3);
-    harmonic1.stop(audioContext.currentTime + 2.5);
-    harmonic2.stop(audioContext.currentTime + 2);
+    // Stop oscillators after gentle 2-second decay
+    fundamental.stop(audioContext.currentTime + 2);
+    harmonic1.stop(audioContext.currentTime + 1.8);
+    harmonic2.stop(audioContext.currentTime + 1.5);
   };
 
   // Timer logic
