@@ -97,69 +97,33 @@ export default function GoalsPage() {
             </Button>
           </div>
 
-          {/* Mock goals for layout - Replace with actual data when goals exist */}
-          <div className="space-y-3">
-            {/* Sample goals with nameplate design */}
-            {[
-              { 
-                id: 1, 
-                title: 'Q4 Business Review', 
-                description: 'Complete quarterly business analysis', 
-                tasksCompleted: 234, 
-                daysWorking: 45, 
-                color: 'bg-gradient-to-r from-blue-500 to-indigo-600',
-                benefits: ['Improved strategic decision making', 'Better resource allocation', 'Clear performance metrics'],
-                consequences: ['Missed growth opportunities', 'Poor resource utilization', 'Unclear business direction'],
-                peopleHelped: ['Team members', 'Stakeholders', 'Future customers'],
-                microGoals: [
-                  { id: 11, title: 'Gather Q4 financial data', completed: true },
-                  { id: 12, title: 'Analyze market trends', completed: true },
-                  { id: 13, title: 'Create presentation deck', completed: false },
-                  { id: 14, title: 'Schedule stakeholder meetings', completed: false }
-                ]
-              },
-              { 
-                id: 2, 
-                title: 'Team Leadership', 
-                description: 'Develop team processes and culture', 
-                tasksCompleted: 187, 
-                daysWorking: 62, 
-                color: 'bg-gradient-to-r from-purple-500 to-pink-600',
-                benefits: ['Higher team productivity', 'Better communication', 'Reduced turnover'],
-                consequences: ['Team dysfunction', 'Poor morale', 'High turnover rates'],
-                peopleHelped: ['Direct reports', 'Cross-functional teams', 'Organization'],
-                microGoals: [
-                  { id: 21, title: 'Establish weekly 1:1s', completed: true },
-                  { id: 22, title: 'Create team charter', completed: false },
-                  { id: 23, title: 'Implement feedback system', completed: false }
-                ]
-              },
-              { 
-                id: 3, 
-                title: 'Personal Development', 
-                description: 'Health and wellness improvements', 
-                tasksCompleted: 456, 
-                daysWorking: 89, 
-                color: 'bg-gradient-to-r from-emerald-500 to-teal-600',
-                benefits: ['Better energy levels', 'Improved focus', 'Enhanced well-being'],
-                consequences: ['Health deterioration', 'Decreased performance', 'Poor work-life balance'],
-                peopleHelped: ['Family', 'Colleagues', 'Future self'],
-                microGoals: [
-                  { id: 31, title: 'Exercise 4x per week', completed: true },
-                  { id: 32, title: 'Meditate daily', completed: true },
-                  { id: 33, title: 'Read 1 book per month', completed: false }
-                ]
-              }
-            ].map((goal) => {
-              const progress = Math.min(100, Math.round((goal.tasksCompleted / 500) * 100));
-              const isExpanded = expandedGoals.has(goal.id);
-              return (
+          {goals.length === 0 ? (
+            <Card className="bg-white border border-gray-200 shadow-sm">
+              <CardContent className="p-8 text-center">
+                <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                  <Target className="w-8 h-8 text-blue-600" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">No Active Goals</h3>
+                <p className="text-gray-600 text-sm mb-4">
+                  Set your first goal to start tracking your progress and achievements.
+                </p>
+                <Button onClick={() => setShowNewGoalModal(true)} className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Set Your First Goal
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {goals.map((goal) => {
+                const isExpanded = expandedGoals.has(goal.id);
+                return (
                 <Card key={goal.id} className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all">
                   <CardContent className="p-4">
                     {/* Header with Accent Color */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex-1">
-                        <h3 className={`text-xl font-bold bg-gradient-to-r ${goal.color} bg-clip-text text-transparent`}>
+                        <h3 className={`text-xl font-bold bg-gradient-to-r ${goal.accentColor || 'from-blue-500 to-indigo-600'} bg-clip-text text-transparent`}>
                           {goal.title}
                         </h3>
                         <p className="text-gray-600 text-sm mt-0.5">{goal.description}</p>
@@ -184,40 +148,18 @@ export default function GoalsPage() {
                       </div>
                     </div>
 
-                    {/* Large Metrics Display */}
-                    <div className="grid grid-cols-3 gap-6 mb-6">
-                      <div className="text-center">
-                        <div className={`text-4xl font-bold bg-gradient-to-r ${goal.color} bg-clip-text text-transparent`}>
-                          {goal.tasksCompleted}
-                        </div>
-                        <p className="text-sm text-gray-500 mt-1">Total Tasks</p>
-                      </div>
-                      <div className="text-center">
-                        <div className={`text-4xl font-bold bg-gradient-to-r ${goal.color} bg-clip-text text-transparent`}>
-                          {goal.daysWorking}
-                        </div>
-                        <p className="text-sm text-gray-500 mt-1">Days Active</p>
-                      </div>
-                      <div className="text-center">
-                        <div className={`text-4xl font-bold bg-gradient-to-r ${goal.color} bg-clip-text text-transparent`}>
-                          {Math.round(goal.tasksCompleted / goal.daysWorking)}
-                        </div>
-                        <p className="text-sm text-gray-500 mt-1">Daily Average</p>
-                      </div>
-                    </div>
-
                     {/* Progress Bar with Gradient */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">Progress to Target</span>
-                        <span className={`text-lg font-bold bg-gradient-to-r ${goal.color} bg-clip-text text-transparent`}>
-                          {progress}%
+                        <span className="text-sm font-medium text-gray-700">Goal Progress</span>
+                        <span className={`text-lg font-bold bg-gradient-to-r ${goal.accentColor || 'from-blue-500 to-indigo-600'} bg-clip-text text-transparent`}>
+                          {goal.completed ? '100%' : '0%'}
                         </span>
                       </div>
                       <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
                         <div 
-                          className={`h-full rounded-full transition-all duration-500 ease-out bg-gradient-to-r ${goal.color}`}
-                          style={{ width: `${progress}%` }}
+                          className={`h-full rounded-full transition-all duration-500 ease-out bg-gradient-to-r ${goal.accentColor || 'from-blue-500 to-indigo-600'}`}
+                          style={{ width: `${goal.completed ? '100%' : '0%'}` }}
                         ></div>
                       </div>
                     </div>
@@ -303,14 +245,6 @@ export default function GoalsPage() {
               );
             })}
           </div>
-
-          {(goals as Goal[]).length === 0 && (
-            <div className="text-center py-8">
-              <Button onClick={() => setShowNewGoalModal(true)} className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Set a Clear Goal
-              </Button>
-            </div>
           )}
         </div>
 
