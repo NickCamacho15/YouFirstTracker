@@ -164,9 +164,9 @@ export default function DashboardPage() {
 
         {/* Weekly Overview - Standalone Tiles */}
         <div className="mb-6">
-          <div className="space-y-3">
+          <div className="space-y-2">
             {/* Reading Tile */}
-            <div className="relative bg-white rounded-lg shadow-sm p-4 border border-gray-200 overflow-hidden">
+            <div className="relative bg-white rounded-lg shadow-sm p-3 border border-gray-200 overflow-hidden">
               {/* Background Bar Chart */}
               <div className="absolute inset-0 flex items-end justify-end gap-1 p-2 opacity-10">
                 <div className="w-2 bg-blue-500 rounded-t" style={{height: '75%'}}></div>
@@ -180,21 +180,21 @@ export default function DashboardPage() {
               
               <div className="relative flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Reading</h4>
-                  <div className="flex items-baseline gap-3 mt-1">
-                    <p className="text-lg font-bold text-gray-900">12.5h</p>
-                    <p className="text-sm font-bold text-blue-600">1.8h daily</p>
+                  <h4 className="text-xs font-medium text-gray-600 uppercase tracking-wide">Reading</h4>
+                  <div className="flex items-baseline gap-2 mt-0.5">
+                    <p className="text-base font-bold text-gray-900">12.5h</p>
+                    <p className="text-xs font-bold text-blue-600">1.8h daily</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-blue-600">83%</p>
-                  <p className="text-xs text-gray-500">of 15h goal</p>
+                  <p className="text-xl font-bold text-blue-600">83%</p>
+                  <p className="text-[10px] text-gray-500">of 15h goal</p>
                 </div>
               </div>
             </div>
 
             {/* Meditation Tile */}
-            <div className="relative bg-white rounded-lg shadow-sm p-4 border border-gray-200 overflow-hidden">
+            <div className="relative bg-white rounded-lg shadow-sm p-3 border border-gray-200 overflow-hidden">
               {/* Background Bar Chart */}
               <div className="absolute inset-0 flex items-end justify-end gap-1 p-2 opacity-10">
                 <div className="w-2 bg-green-500 rounded-t" style={{height: '80%'}}></div>
@@ -208,21 +208,21 @@ export default function DashboardPage() {
               
               <div className="relative flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Meditation</h4>
-                  <div className="flex items-baseline gap-3 mt-1">
-                    <p className="text-lg font-bold text-gray-900">3.2h</p>
-                    <p className="text-sm font-bold text-green-600">27m daily</p>
+                  <h4 className="text-xs font-medium text-gray-600 uppercase tracking-wide">Meditation</h4>
+                  <div className="flex items-baseline gap-2 mt-0.5">
+                    <p className="text-base font-bold text-gray-900">3.2h</p>
+                    <p className="text-xs font-bold text-green-600">27m daily</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-green-600">91%</p>
-                  <p className="text-xs text-gray-500">of 3.5h goal</p>
+                  <p className="text-xl font-bold text-green-600">91%</p>
+                  <p className="text-[10px] text-gray-500">of 3.5h goal</p>
                 </div>
               </div>
             </div>
 
             {/* Screen Time Tile */}
-            <div className="relative bg-white rounded-lg shadow-sm p-4 border border-gray-200 overflow-hidden">
+            <div className="relative bg-white rounded-lg shadow-sm p-3 border border-gray-200 overflow-hidden">
               {/* Background Bar Chart */}
               <div className="absolute inset-0 flex items-end justify-end gap-1 p-2 opacity-10">
                 <div className="w-2 bg-red-500 rounded-t" style={{height: '90%'}}></div>
@@ -236,24 +236,24 @@ export default function DashboardPage() {
               
               <div className="relative flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Screen Time</h4>
-                  <div className="flex items-baseline gap-3 mt-1">
-                    <p className="text-lg font-bold text-gray-900">28h</p>
-                    <p className="text-sm font-bold text-red-600">4h daily</p>
+                  <h4 className="text-xs font-medium text-gray-600 uppercase tracking-wide">Screen Time</h4>
+                  <div className="flex items-baseline gap-2 mt-0.5">
+                    <p className="text-base font-bold text-gray-900">28h</p>
+                    <p className="text-xs font-bold text-red-600">4h daily</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="flex items-center gap-1">
-                    <p className="text-2xl font-bold text-red-600">200%</p>
+                    <p className="text-xl font-bold text-red-600">200%</p>
                     <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
                   </div>
-                  <p className="text-xs text-gray-500">limit exceeded</p>
+                  <p className="text-[10px] text-gray-500">limit exceeded</p>
                 </div>
               </div>
             </div>
 
             {/* Workouts Tile */}
-            <div className="relative bg-white rounded-lg shadow-sm p-4 border border-gray-200 overflow-hidden">
+            <div className="relative bg-white rounded-lg shadow-sm p-3 border border-gray-200 overflow-hidden">
               {/* Background Bar Chart */}
               <div className="absolute inset-0 flex items-end justify-end gap-1 p-2 opacity-10">
                 <div className="w-2 bg-orange-500 rounded-t" style={{height: '85%'}}></div>
@@ -267,15 +267,15 @@ export default function DashboardPage() {
               
               <div className="relative flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Workouts</h4>
-                  <div className="flex items-baseline gap-3 mt-1">
-                    <p className="text-lg font-bold text-gray-900">6.8h</p>
-                    <p className="text-sm font-bold text-orange-600">58m daily</p>
+                  <h4 className="text-xs font-medium text-gray-600 uppercase tracking-wide">Workouts</h4>
+                  <div className="flex items-baseline gap-2 mt-0.5">
+                    <p className="text-base font-bold text-gray-900">6.8h</p>
+                    <p className="text-xs font-bold text-orange-600">58m daily</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-orange-600">97%</p>
-                  <p className="text-xs text-gray-500">of 7h goal</p>
+                  <p className="text-xl font-bold text-orange-600">97%</p>
+                  <p className="text-[10px] text-gray-500">of 7h goal</p>
                 </div>
               </div>
             </div>

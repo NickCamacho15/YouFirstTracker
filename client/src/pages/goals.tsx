@@ -83,16 +83,16 @@ export default function GoalsPage() {
 
   return (
     <div className="min-h-screen bg-background relative pb-20">
-      <div className="max-w-4xl mx-auto px-4 pt-8 pb-24">
+      <div className="max-w-4xl mx-auto px-4 pt-4 pb-24">
         {/* Active Goals Section */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              <Target className="w-6 h-6 text-blue-600" />
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Target className="w-5 h-5 text-blue-600" />
               Active Goals
             </h2>
-            <Button onClick={() => setShowNewGoalModal(true)} className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
+            <Button onClick={() => setShowNewGoalModal(true)} className="bg-blue-600 hover:bg-blue-700 h-8 text-sm">
+              <Plus className="w-3 h-3 mr-1" />
               Set a Clear Goal
             </Button>
           </div>
@@ -154,15 +154,15 @@ export default function GoalsPage() {
               const progress = Math.min(100, Math.round((goal.tasksCompleted / 500) * 100));
               const isExpanded = expandedGoals.has(goal.id);
               return (
-                <Card key={goal.id} className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-all">
-                  <CardContent className="p-6">
+                <Card key={goal.id} className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                  <CardContent className="p-4">
                     {/* Header with Accent Color */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex-1">
-                        <h3 className={`text-2xl font-bold bg-gradient-to-r ${goal.color} bg-clip-text text-transparent`}>
+                        <h3 className={`text-xl font-bold bg-gradient-to-r ${goal.color} bg-clip-text text-transparent`}>
                           {goal.title}
                         </h3>
-                        <p className="text-gray-600 mt-1">{goal.description}</p>
+                        <p className="text-gray-600 text-sm mt-0.5">{goal.description}</p>
                       </div>
                       <div className="flex gap-2">
                         <Button

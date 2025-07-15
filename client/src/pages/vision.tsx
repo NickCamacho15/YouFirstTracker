@@ -129,21 +129,20 @@ export default function VisionPage() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <Navigation />
-      <main className="container mx-auto px-4 py-8">
+      <main className="px-4 py-4">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Vision Board</h1>
-              <p className="text-muted-foreground mt-2">
+              <h1 className="text-xl font-bold tracking-tight">Vision Board</h1>
+              <p className="text-muted-foreground text-sm mt-1">
                 Create visual representations of your goals and aspirations
               </p>
             </div>
             
             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
               <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
+                <Button size="sm" className="h-8">
+                  <Plus className="h-3 w-3 mr-1" />
                   Add Vision Item
                 </Button>
               </DialogTrigger>
@@ -200,13 +199,13 @@ export default function VisionPage() {
                   <div className="mx-auto w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center">
                     <Move className="h-6 w-6 text-accent" />
                   </div>
-                  <h3 className="text-lg font-semibold">Start Your Vision Board</h3>
-                  <p className="text-muted-foreground max-w-sm">
+                  <h3 className="text-base font-semibold">Start Your Vision Board</h3>
+                  <p className="text-muted-foreground text-sm max-w-sm">
                     Add images that represent your goals, dreams, and aspirations. 
                     Visualize your future to make it reality.
                   </p>
-                  <Button onClick={() => setIsAddModalOpen(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
+                  <Button onClick={() => setIsAddModalOpen(true)} size="sm" className="h-8">
+                    <Plus className="h-3 w-3 mr-1" />
                     Add Your First Vision Item
                   </Button>
                 </div>
