@@ -123,6 +123,13 @@ Build scripts include:
 
 ## Changelog
 
+- July 16, 2025: Added Workout Day Navigation Arrows - Quick Jump to Next/Previous Workout Days
+  - **NEW**: Navigation arrows on either side of weekday selector in Workout tab
+  - **ENHANCED**: Arrows automatically skip Sunday rest days and jump to next available workout (Mon-Sat)
+  - **VISUAL**: Sunday now clearly marked as "Rest" day with gray styling
+  - **FUNCTIONAL**: Left arrow finds previous workout day, right arrow finds next workout day
+  - **MAINTAINED**: Clean integration with existing weekday selector interface
+  - Workout navigation now provides efficient day-to-day movement through training program
 - July 15, 2025: Body Page Complete Restructure - User-Friendly Workout Interface with Day Slider
   - **RESTRUCTURED**: Body page now features three distinct sub-pages: Profile, Workout, and Plan
   - **ENHANCED**: Profile page includes personal records, body metrics, training stats, and individual exercise progress analytics

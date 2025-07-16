@@ -8,6 +8,53 @@ import ProfileEditor from "@/components/profile/profile-editor";
 import ProgressAnalytics from "@/components/analytics/progress-analytics";
 import { WorkoutTimer } from "@/components/health/workout-timer";
 
+// Type definitions for workout program
+interface Exercise {
+  name: string;
+  sets: string;
+  reps: string;
+  intensity: string;
+  tempo?: string;
+  rest?: string;
+  notes?: string;
+  // Cardio-specific
+  time?: string;
+  distance?: string;
+  pace?: string;
+  // METCON-specific
+  timeCap?: string;
+  scoreType?: string;
+  target?: string;
+  // Plan builder fields
+  type?: 'lifting' | 'cardio' | 'metcon';
+}
+
+interface Block {
+  blockLetter: string;
+  name: string;
+  description?: string;
+  exercises: Exercise[];
+}
+
+interface Day {
+  dayNumber: number;
+  name: string;
+  blocks: Block[];
+}
+
+interface Week {
+  weekNumber: number;
+  phase: string;
+  phaseDescription?: string;
+  days: Day[];
+}
+
+interface BuildingPlan {
+  name: string;
+  description: string;
+  weeks: Week[];
+}
+
 export default function HealthPage() {
   const [expandedWeeks, setExpandedWeeks] = useState<Set<number>>(new Set());
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
@@ -20,7 +67,7 @@ export default function HealthPage() {
   const [expandedBlocks, setExpandedBlocks] = useState<Set<string>>(new Set());
   const [isBuilding, setIsBuilding] = useState(false);
   const [calculatedPercentages, setCalculatedPercentages] = useState<{ [key: string]: number }>({});
-  const [buildingPlan, setBuildingPlan] = useState({
+  const [buildingPlan, setBuildingPlan] = useState<BuildingPlan>({
     name: '',
     description: '',
     weeks: []
@@ -164,6 +211,31 @@ export default function HealthPage() {
     const dayInWeek = ((workoutDay - 1) % 6) + 1;
     
     return currentWeekData?.days.find(d => d.dayNumber === dayInWeek);
+  };
+
+  // Find next workout day (skip Sundays)
+  const findNextWorkoutDay = (currentDay: number): number => {
+    let nextDay = currentDay;
+    do {
+      nextDay = (nextDay + 1) % 7;
+      if (nextDay !== 0) { // Skip Sunday
+        return nextDay;
+      }
+    } while (nextDay !== currentDay);
+    return currentDay;
+  };
+
+  // Find previous workout day (skip Sundays)
+  const findPreviousWorkoutDay = (currentDay: number): number => {
+    let prevDay = currentDay;
+    do {
+      prevDay = prevDay - 1;
+      if (prevDay < 0) prevDay = 6;
+      if (prevDay !== 0) { // Skip Sunday
+        return prevDay;
+      }
+    } while (prevDay !== currentDay);
+    return currentDay;
   };
 
   const toggleBlock = (blockId: string) => {
@@ -543,31 +615,55 @@ export default function HealthPage() {
 
           {/* Workout Tab Content */}
           <TabsContent value="workout" className="mt-3 space-y-2">
-            {/* Weekday Track */}
+            {/* Weekday Track with Navigation */}
             <div className="bg-white rounded-lg shadow-md p-2 border border-blue-200">
-              <div className="grid grid-cols-7 gap-1">
-                {weekDays.map((day, index) => {
-                  const isToday = index === new Date().getDay();
-                  const isSelected = index === selectedDayOfWeek;
-                  
-                  return (
-                    <button
-                      key={day}
-                      onClick={() => setSelectedDayOfWeek(index)}
-                      className={`
-                        py-2 px-1 rounded text-center transition-all
-                        ${isSelected ? 'bg-blue-600 text-white' : 
-                          isToday ? 'bg-blue-100 text-blue-700' : 
-                          'bg-gray-50 hover:bg-gray-100 text-gray-700'}
-                      `}
-                    >
-                      <div className="text-xs font-medium">{day}</div>
-                      <div className="text-lg font-bold">
-                        {new Date(new Date().setDate(new Date().getDate() - new Date().getDay() + index)).getDate()}
-                      </div>
-                    </button>
-                  );
-                })}
+              <div className="flex items-center gap-2">
+                {/* Previous Workout Day Arrow */}
+                <button
+                  onClick={() => setSelectedDayOfWeek(findPreviousWorkoutDay(selectedDayOfWeek))}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  aria-label="Previous workout day"
+                >
+                  <ChevronLeft className="h-5 w-5 text-gray-600" />
+                </button>
+
+                {/* Weekday Grid */}
+                <div className="grid grid-cols-7 gap-1 flex-1">
+                  {weekDays.map((day, index) => {
+                    const isToday = index === new Date().getDay();
+                    const isSelected = index === selectedDayOfWeek;
+                    const isRestDay = index === 0; // Sunday
+                    
+                    return (
+                      <button
+                        key={day}
+                        onClick={() => setSelectedDayOfWeek(index)}
+                        className={`
+                          py-2 px-1 rounded text-center transition-all
+                          ${isSelected ? 'bg-blue-600 text-white' : 
+                            isToday ? 'bg-blue-100 text-blue-700' : 
+                            isRestDay ? 'bg-gray-100 text-gray-400' :
+                            'bg-gray-50 hover:bg-gray-100 text-gray-700'}
+                        `}
+                      >
+                        <div className="text-xs font-medium">{day}</div>
+                        <div className="text-lg font-bold">
+                          {new Date(new Date().setDate(new Date().getDate() - new Date().getDay() + index)).getDate()}
+                        </div>
+                        {isRestDay && <div className="text-xs">Rest</div>}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Next Workout Day Arrow */}
+                <button
+                  onClick={() => setSelectedDayOfWeek(findNextWorkoutDay(selectedDayOfWeek))}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  aria-label="Next workout day"
+                >
+                  <ChevronRight className="h-5 w-5 text-gray-600" />
+                </button>
               </div>
             </div>
 
