@@ -1023,6 +1023,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Workout session endpoints (for timer tracking)
+  app.post("/api/workout-sessions", requireAuth, async (req, res) => {
+    try {
+      const data = req.body;
+      const session = await storage.createWorkoutSession({ ...data, userId: req.session.userId });
+      res.json(session);
+    } catch (error: any) {
+      console.error("Create workout session error:", error);
+      res.status(500).json({ message: "Failed to create workout session" });
+    }
+  });
+
+  app.get("/api/workout-sessions", requireAuth, async (req, res) => {
+    try {
+      const sessions = await storage.getWorkoutSessionsByUserId(req.session.userId);
+      res.json(sessions);
+    } catch (error: any) {
+      console.error("Get workout sessions error:", error);
+      res.status(500).json({ message: "Failed to get workout sessions" });
+    }
+  });
+
   // Generate workout program using AI
   app.post("/api/workout-programs/generate", requireAuth, async (req, res) => {
     let timeoutHandle: NodeJS.Timeout | null = null;

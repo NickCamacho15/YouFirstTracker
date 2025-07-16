@@ -407,6 +407,19 @@ export const bodyWeightLogs = pgTable("body_weight_logs", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Workout sessions for time tracking
+export const workoutSessions = pgTable("workout_sessions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  duration: integer("duration").notNull(), // in seconds
+  workoutType: text("workout_type"), // e.g., "Upper Power", "Legs", etc.
+  notes: text("notes"),
+  blocksCompleted: text("blocks_completed").array(), // ["A", "B", "C"]
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const trainingTemplates = pgTable("training_templates", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
@@ -456,6 +469,12 @@ export const meals = pgTable("meals", {
   date: date("date").notNull(),
   isCompleted: boolean("is_completed").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Insert schemas for workout sessions
+export const insertWorkoutSessionSchema = createInsertSchema(workoutSessions).omit({
+  id: true,
+  createdAt: true,
 });
 
 // Insert schemas
@@ -725,6 +744,8 @@ export type TrainingTemplate = typeof trainingTemplates.$inferSelect;
 export type InsertTrainingTemplate = z.infer<typeof insertTrainingTemplateSchema>;
 export type ExerciseHistoryItem = typeof exerciseHistory.$inferSelect;
 export type InsertExerciseHistory = z.infer<typeof insertExerciseHistorySchema>;
+export type WorkoutSession = typeof workoutSessions.$inferSelect;
+export type InsertWorkoutSession = z.infer<typeof insertWorkoutSessionSchema>;
 
 // Screen time schemas
 export const insertScreenTimeEntrySchema = createInsertSchema(screenTimeEntries);

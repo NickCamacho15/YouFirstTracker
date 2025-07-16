@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import { 
   users, goals, microGoals, habits, habitLogs, readingSessions, readingList, meditationSessions, posts, visionBoard, tasks, wonDays, rules, challenges, challengeLogs,
   followers, postReactions, postComments, workouts, exercises, workoutExercises, bodyWeightLogs,
-  trainingTemplates, exerciseHistory, screenTimeEntries, workoutEntries,
+  trainingTemplates, exerciseHistory, screenTimeEntries, workoutEntries, workoutSessions,
   type User, type InsertUser, type Goal, type InsertGoal, type MicroGoal, type InsertMicroGoal,
   type Habit, type InsertHabit, type HabitLog, type InsertHabitLog,
   type ReadingSession, type InsertReadingSession, type ReadingListItem, type InsertReadingListItem,
@@ -1101,6 +1101,30 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return result[0];
     }
+  }
+
+  // Workout Sessions
+  async createWorkoutSession(data: any): Promise<any> {
+    const result = await db.insert(workoutSessions).values(data).returning();
+    return result[0];
+  }
+
+  async getWorkoutSessionsByUserId(userId: number): Promise<any[]> {
+    return await db.select().from(workoutSessions)
+      .where(eq(workoutSessions.userId, userId))
+      .orderBy(desc(workoutSessions.startTime));
+  }
+
+  async getWorkoutSessionsByDateRange(userId: number, startDate: Date, endDate: Date): Promise<any[]> {
+    return await db.select().from(workoutSessions)
+      .where(
+        and(
+          eq(workoutSessions.userId, userId),
+          sql`${workoutSessions.startTime} >= ${startDate}`,
+          sql`${workoutSessions.startTime} <= ${endDate}`
+        )
+      )
+      .orderBy(desc(workoutSessions.startTime));
   }
 }
 

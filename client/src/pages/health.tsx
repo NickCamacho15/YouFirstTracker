@@ -6,13 +6,13 @@ import { ChevronDown, Activity, Trophy, Play, User, Dumbbell, TrendingUp, Target
 import WorkoutLogger from "@/components/workout/workout-logger";
 import ProfileEditor from "@/components/profile/profile-editor";
 import ProgressAnalytics from "@/components/analytics/progress-analytics";
+import { WorkoutTimer } from "@/components/health/workout-timer";
 
 export default function HealthPage() {
   const [expandedWeeks, setExpandedWeeks] = useState<Set<number>>(new Set());
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState("profile");
-  const [workoutTimer, setWorkoutTimer] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
+
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(1);
   const [currentDay, setCurrentDay] = useState(1);
@@ -63,32 +63,7 @@ export default function HealthPage() {
     return percentages;
   };
 
-  // Timer effect
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isTimerRunning) {
-      interval = setInterval(() => {
-        setWorkoutTimer(prev => prev + 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isTimerRunning]);
 
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const startWorkout = () => {
-    setIsTimerRunning(true);
-    setWorkoutTimer(0);
-  };
-
-  const stopWorkout = () => {
-    setIsTimerRunning(false);
-  };
 
   const toggleWeek = (weekNumber: number) => {
     const newExpanded = new Set(expandedWeeks);
@@ -416,30 +391,6 @@ export default function HealthPage() {
                 <p className="text-xs text-gray-600">Elite Training Program</p>
               </div>
             </div>
-            {isTimerRunning ? (
-              <div className="flex items-center space-x-2">
-                <div className="flex items-center space-x-1 bg-red-100 px-2 py-1 rounded">
-                  <Timer className="h-3 w-3 text-red-600" />
-                  <span className="text-xs font-mono text-red-600">{formatTime(workoutTimer)}</span>
-                </div>
-                <Button 
-                  size="sm"
-                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 text-xs shadow-md"
-                  onClick={stopWorkout}
-                >
-                  Stop
-                </Button>
-              </div>
-            ) : (
-              <Button 
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-xs shadow-md"
-                onClick={startWorkout}
-              >
-                <Play className="h-3 w-3 mr-1" />
-                Start Workout
-              </Button>
-            )}
           </div>
         </div>
       </div>
@@ -612,26 +563,10 @@ export default function HealthPage() {
             </div>
 
             {/* Workout Timer */}
-            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-gray-900 flex items-center">
-                  <Timer className="h-4 w-4 mr-2 text-blue-600" />
-                  Workout Timer
-                </h4>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    {formatTime(workoutTimer)}
-                  </span>
-                  <Button
-                    size="sm"
-                    onClick={isTimerRunning ? stopWorkout : startWorkout}
-                    className="text-xs h-7"
-                  >
-                    {isTimerRunning ? 'Stop' : 'Start'}
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <WorkoutTimer 
+              currentWorkout={getWorkoutForDay(selectedDayOfWeek)?.name || `Day ${selectedDayOfWeek} Workout`}
+              currentBlocks={getWorkoutForDay(selectedDayOfWeek)?.blocks.map(b => `Block ${b.blockLetter}`) || []}
+            />
 
             {/* Workout Blocks */}
             <div className="space-y-2">
