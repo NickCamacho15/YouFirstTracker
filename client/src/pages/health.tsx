@@ -251,10 +251,19 @@ export default function HealthPage() {
     const newWeeks = [...buildingPlan.weeks];
     newWeeks[weekIndex].days[dayIndex].blocks[blockIndex].exercises.push({
       name: '',
+      type: 'lifting', // Default to lifting
       sets: '',
       reps: '',
       intensity: '',
-      rest: ''
+      rest: '',
+      // Cardio-specific fields
+      time: '',
+      distance: '',
+      pace: '',
+      // METCON-specific fields
+      timeCap: '',
+      scoreType: '',
+      target: ''
     });
     setBuildingPlan({ ...buildingPlan, weeks: newWeeks });
   };
@@ -767,51 +776,139 @@ export default function HealthPage() {
 
                                     {/* Exercises in Block */}
                                     {block.exercises.map((exercise, exerciseIndex) => (
-                                      <div key={exerciseIndex} className="bg-white rounded p-1.5 mt-1 text-xs">
+                                      <div key={exerciseIndex} className="bg-white rounded p-1.5 mt-1 text-xs space-y-1">
+                                        {/* Exercise Name and Type Row */}
                                         <div className="grid grid-cols-12 gap-1 items-center">
                                           <input
                                             type="text"
-                                            placeholder="Exercise"
-                                            className="col-span-4 bg-gray-100 rounded px-1 py-0.5"
+                                            placeholder="Exercise Name"
+                                            className="col-span-6 bg-gray-100 rounded px-1 py-0.5"
                                             value={exercise.name}
                                             onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'name', e.target.value)}
                                           />
-                                          <input
-                                            type="text"
-                                            placeholder="Sets"
-                                            className="col-span-1 bg-gray-100 rounded px-1 py-0.5 text-center"
-                                            value={exercise.sets}
-                                            onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'sets', e.target.value)}
-                                          />
-                                          <input
-                                            type="text"
-                                            placeholder="Reps"
-                                            className="col-span-2 bg-gray-100 rounded px-1 py-0.5 text-center"
-                                            value={exercise.reps}
-                                            onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'reps', e.target.value)}
-                                          />
-                                          <input
-                                            type="text"
-                                            placeholder="%/RPE"
-                                            className="col-span-2 bg-gray-100 rounded px-1 py-0.5 text-center"
-                                            value={exercise.intensity}
-                                            onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'intensity', e.target.value)}
-                                          />
-                                          <input
-                                            type="text"
-                                            placeholder="Rest"
-                                            className="col-span-2 bg-gray-100 rounded px-1 py-0.5 text-center"
-                                            value={exercise.rest}
-                                            onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'rest', e.target.value)}
-                                          />
+                                          <select
+                                            className="col-span-3 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                            value={exercise.type || 'lifting'}
+                                            onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'type', e.target.value)}
+                                          >
+                                            <option value="lifting">Lifting</option>
+                                            <option value="cardio">Cardio</option>
+                                            <option value="metcon">METCON</option>
+                                          </select>
                                           <Button
                                             size="sm"
                                             variant="ghost"
-                                            className="col-span-1 text-xs h-5 px-1"
+                                            className="col-span-1 text-xs h-5 px-1 ml-auto"
                                             onClick={() => removeExercise(weekIndex, dayIndex, blockIndex, exerciseIndex)}
                                           >
                                             ×
                                           </Button>
+                                        </div>
+                                        
+                                        {/* Dynamic Fields Based on Type */}
+                                        <div className="grid grid-cols-12 gap-1 items-center">
+                                          {exercise.type === 'cardio' ? (
+                                            <>
+                                              <input
+                                                type="text"
+                                                placeholder="Time"
+                                                className="col-span-3 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                                value={exercise.time || ''}
+                                                onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'time', e.target.value)}
+                                              />
+                                              <input
+                                                type="text"
+                                                placeholder="Distance"
+                                                className="col-span-3 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                                value={exercise.distance || ''}
+                                                onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'distance', e.target.value)}
+                                              />
+                                              <input
+                                                type="text"
+                                                placeholder="Pace"
+                                                className="col-span-3 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                                value={exercise.pace || ''}
+                                                onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'pace', e.target.value)}
+                                              />
+                                              <input
+                                                type="text"
+                                                placeholder="Rest"
+                                                className="col-span-3 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                                value={exercise.rest}
+                                                onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'rest', e.target.value)}
+                                              />
+                                            </>
+                                          ) : exercise.type === 'metcon' ? (
+                                            <>
+                                              <input
+                                                type="text"
+                                                placeholder="Time Cap"
+                                                className="col-span-2 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                                value={exercise.timeCap || ''}
+                                                onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'timeCap', e.target.value)}
+                                              />
+                                              <input
+                                                type="text"
+                                                placeholder="Sets"
+                                                className="col-span-2 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                                value={exercise.sets}
+                                                onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'sets', e.target.value)}
+                                              />
+                                              <input
+                                                type="text"
+                                                placeholder="Reps"
+                                                className="col-span-2 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                                value={exercise.reps}
+                                                onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'reps', e.target.value)}
+                                              />
+                                              <input
+                                                type="text"
+                                                placeholder="Score Type"
+                                                className="col-span-3 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                                value={exercise.scoreType || ''}
+                                                onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'scoreType', e.target.value)}
+                                              />
+                                              <input
+                                                type="text"
+                                                placeholder="Target"
+                                                className="col-span-3 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                                value={exercise.target || ''}
+                                                onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'target', e.target.value)}
+                                              />
+                                            </>
+                                          ) : (
+                                            // Default Lifting fields
+                                            <>
+                                              <input
+                                                type="text"
+                                                placeholder="Sets"
+                                                className="col-span-2 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                                value={exercise.sets}
+                                                onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'sets', e.target.value)}
+                                              />
+                                              <input
+                                                type="text"
+                                                placeholder="Reps"
+                                                className="col-span-3 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                                value={exercise.reps}
+                                                onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'reps', e.target.value)}
+                                              />
+                                              <input
+                                                type="text"
+                                                placeholder="Weight/%"
+                                                className="col-span-3 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                                value={exercise.intensity}
+                                                onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'intensity', e.target.value)}
+                                              />
+                                              <input
+                                                type="text"
+                                                placeholder="Rest"
+                                                className="col-span-3 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                                value={exercise.rest}
+                                                onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'rest', e.target.value)}
+                                              />
+                                            </>
+                                          )}
                                         </div>
                                       </div>
                                     ))}
