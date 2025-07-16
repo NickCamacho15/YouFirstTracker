@@ -1027,7 +1027,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/workout-sessions", requireAuth, async (req, res) => {
     try {
       const data = req.body;
-      const session = await storage.createWorkoutSession({ ...data, userId: req.session.userId });
+      // Convert string dates to Date objects
+      const sessionData = {
+        ...data,
+        userId: req.session.userId,
+        startTime: new Date(data.startTime),
+        endTime: new Date(data.endTime),
+        duration: data.duration
+      };
+      const session = await storage.createWorkoutSession(sessionData);
       res.json(session);
     } catch (error: any) {
       console.error("Create workout session error:", error);
