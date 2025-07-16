@@ -18,6 +18,13 @@ export default function HealthPage() {
   const [currentDay, setCurrentDay] = useState(1);
   const [selectedDayOfWeek, setSelectedDayOfWeek] = useState(new Date().getDay());
   const [expandedBlocks, setExpandedBlocks] = useState<Set<string>>(new Set());
+  const [isBuilding, setIsBuilding] = useState(false);
+  const [calculatedPercentages, setCalculatedPercentages] = useState<{ [key: string]: number }>({});
+  const [buildingPlan, setBuildingPlan] = useState({
+    name: '',
+    description: '',
+    weeks: []
+  });
   const [personalRecords, setPersonalRecords] = useState([
     { exercise: "Bench Press", weight: 225, percentages: {} },
     { exercise: "Squat", weight: 315, percentages: {} },
@@ -195,6 +202,107 @@ export default function HealthPage() {
   };
 
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  // Plan Builder Functions
+  const addWeek = () => {
+    setBuildingPlan({
+      ...buildingPlan,
+      weeks: [
+        ...buildingPlan.weeks,
+        {
+          weekNumber: buildingPlan.weeks.length + 1,
+          phase: '',
+          days: []
+        }
+      ]
+    });
+  };
+
+  const removeWeek = (weekIndex: number) => {
+    setBuildingPlan({
+      ...buildingPlan,
+      weeks: buildingPlan.weeks.filter((_, i) => i !== weekIndex)
+    });
+  };
+
+  const updateWeekPhase = (weekIndex: number, phase: string) => {
+    const newWeeks = [...buildingPlan.weeks];
+    newWeeks[weekIndex].phase = phase;
+    setBuildingPlan({ ...buildingPlan, weeks: newWeeks });
+  };
+
+  const addDay = (weekIndex: number) => {
+    const newWeeks = [...buildingPlan.weeks];
+    newWeeks[weekIndex].days.push({
+      dayNumber: newWeeks[weekIndex].days.length + 1,
+      name: '',
+      blocks: []
+    });
+    setBuildingPlan({ ...buildingPlan, weeks: newWeeks });
+  };
+
+  const removeDay = (weekIndex: number, dayIndex: number) => {
+    const newWeeks = [...buildingPlan.weeks];
+    newWeeks[weekIndex].days = newWeeks[weekIndex].days.filter((_, i) => i !== dayIndex);
+    setBuildingPlan({ ...buildingPlan, weeks: newWeeks });
+  };
+
+  const updateDayName = (weekIndex: number, dayIndex: number, name: string) => {
+    const newWeeks = [...buildingPlan.weeks];
+    newWeeks[weekIndex].days[dayIndex].name = name;
+    setBuildingPlan({ ...buildingPlan, weeks: newWeeks });
+  };
+
+  const addBlock = (weekIndex: number, dayIndex: number) => {
+    const newWeeks = [...buildingPlan.weeks];
+    const blockLetters = ['A', 'B', 'C', 'D', 'E', 'F'];
+    const nextLetter = blockLetters[newWeeks[weekIndex].days[dayIndex].blocks.length];
+    
+    newWeeks[weekIndex].days[dayIndex].blocks.push({
+      blockLetter: nextLetter || 'X',
+      name: '',
+      exercises: []
+    });
+    setBuildingPlan({ ...buildingPlan, weeks: newWeeks });
+  };
+
+  const updateBlockName = (weekIndex: number, dayIndex: number, blockIndex: number, name: string) => {
+    const newWeeks = [...buildingPlan.weeks];
+    newWeeks[weekIndex].days[dayIndex].blocks[blockIndex].name = name;
+    setBuildingPlan({ ...buildingPlan, weeks: newWeeks });
+  };
+
+  const addExercise = (weekIndex: number, dayIndex: number, blockIndex: number) => {
+    const newWeeks = [...buildingPlan.weeks];
+    newWeeks[weekIndex].days[dayIndex].blocks[blockIndex].exercises.push({
+      name: '',
+      sets: '',
+      reps: '',
+      intensity: '',
+      rest: ''
+    });
+    setBuildingPlan({ ...buildingPlan, weeks: newWeeks });
+  };
+
+  const removeExercise = (weekIndex: number, dayIndex: number, blockIndex: number, exerciseIndex: number) => {
+    const newWeeks = [...buildingPlan.weeks];
+    newWeeks[weekIndex].days[dayIndex].blocks[blockIndex].exercises = 
+      newWeeks[weekIndex].days[dayIndex].blocks[blockIndex].exercises.filter((_, i) => i !== exerciseIndex);
+    setBuildingPlan({ ...buildingPlan, weeks: newWeeks });
+  };
+
+  const updateExercise = (weekIndex: number, dayIndex: number, blockIndex: number, exerciseIndex: number, field: string, value: string) => {
+    const newWeeks = [...buildingPlan.weeks];
+    newWeeks[weekIndex].days[dayIndex].blocks[blockIndex].exercises[exerciseIndex][field] = value;
+    setBuildingPlan({ ...buildingPlan, weeks: newWeeks });
+  };
+
+  const savePlan = () => {
+    // TODO: Save plan to database
+    console.log('Saving plan:', buildingPlan);
+    setIsBuilding(false);
+    setBuildingPlan({ name: '', description: '', weeks: [] });
+  };
 
   // Generate weeks with 6 days each
   const generateWeeks = () => {
@@ -614,102 +722,269 @@ export default function HealthPage() {
                   <Target className="h-4 w-4 mr-2 text-blue-600" />
                   Training Plan Builder
                 </h3>
-                <Button size="sm" className="text-xs">
+                <Button 
+                  size="sm" 
+                  className="text-xs"
+                  onClick={() => setIsBuilding(true)}
+                >
                   <Plus className="h-3 w-3 mr-1" />
-                  New Plan
+                  Build Plan
                 </Button>
               </div>
-              <p className="text-xs text-gray-600">Design custom workout programs and launch them to your workout page</p>
+              <p className="text-xs text-gray-600">Create custom workout programs from scratch</p>
             </div>
 
-            {/* Current Plans */}
+            {/* Plan Builder Interface */}
+            {isBuilding ? (
+              <div className="space-y-2">
+                {/* Plan Name */}
+                <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+                  <input
+                    type="text"
+                    placeholder="Plan Name"
+                    className="w-full text-sm font-semibold bg-transparent border-b border-gray-300 pb-1 mb-2 focus:outline-none focus:border-blue-500"
+                    value={buildingPlan.name}
+                    onChange={(e) => setBuildingPlan({...buildingPlan, name: e.target.value})}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Plan Description"
+                    className="w-full text-xs bg-transparent border-b border-gray-300 pb-1 focus:outline-none focus:border-blue-500"
+                    value={buildingPlan.description}
+                    onChange={(e) => setBuildingPlan({...buildingPlan, description: e.target.value})}
+                  />
+                </div>
+
+                {/* Week Builder */}
+                <div className="space-y-2">
+                  {buildingPlan.weeks.map((week, weekIndex) => (
+                    <div key={weekIndex} className="bg-white rounded-lg shadow-md border border-blue-200">
+                      <div className="p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm font-semibold text-gray-900">Week {weekIndex + 1}</span>
+                            <input
+                              type="text"
+                              placeholder="Phase name"
+                              className="text-xs bg-gray-100 rounded px-2 py-1 w-24"
+                              value={week.phase}
+                              onChange={(e) => updateWeekPhase(weekIndex, e.target.value)}
+                            />
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-xs h-6"
+                            onClick={() => removeWeek(weekIndex)}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+
+                        {/* Days in Week */}
+                        <div className="space-y-1">
+                          {week.days.map((day, dayIndex) => (
+                            <div key={dayIndex} className="border border-gray-200 rounded p-2">
+                              <div className="flex items-center justify-between mb-1">
+                                <input
+                                  type="text"
+                                  placeholder={`Day ${dayIndex + 1} Name`}
+                                  className="text-xs font-medium bg-transparent w-32"
+                                  value={day.name}
+                                  onChange={(e) => updateDayName(weekIndex, dayIndex, e.target.value)}
+                                />
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="text-xs h-5 px-1"
+                                  onClick={() => removeDay(weekIndex, dayIndex)}
+                                >
+                                  ×
+                                </Button>
+                              </div>
+
+                              {/* Blocks in Day */}
+                              <div className="space-y-1 mt-2">
+                                {day.blocks.map((block, blockIndex) => (
+                                  <div key={blockIndex} className="bg-gray-50 rounded p-2">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <div className="flex items-center space-x-2">
+                                        <span className="text-xs font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">
+                                          Block {block.blockLetter}
+                                        </span>
+                                        <input
+                                          type="text"
+                                          placeholder="Block name"
+                                          className="text-xs bg-transparent w-24"
+                                          value={block.name}
+                                          onChange={(e) => updateBlockName(weekIndex, dayIndex, blockIndex, e.target.value)}
+                                        />
+                                      </div>
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="text-xs h-5 px-1"
+                                        onClick={() => addExercise(weekIndex, dayIndex, blockIndex)}
+                                      >
+                                        + Exercise
+                                      </Button>
+                                    </div>
+
+                                    {/* Exercises in Block */}
+                                    {block.exercises.map((exercise, exerciseIndex) => (
+                                      <div key={exerciseIndex} className="bg-white rounded p-1.5 mt-1 text-xs">
+                                        <div className="grid grid-cols-12 gap-1 items-center">
+                                          <input
+                                            type="text"
+                                            placeholder="Exercise"
+                                            className="col-span-4 bg-gray-100 rounded px-1 py-0.5"
+                                            value={exercise.name}
+                                            onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'name', e.target.value)}
+                                          />
+                                          <input
+                                            type="text"
+                                            placeholder="Sets"
+                                            className="col-span-1 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                            value={exercise.sets}
+                                            onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'sets', e.target.value)}
+                                          />
+                                          <input
+                                            type="text"
+                                            placeholder="Reps"
+                                            className="col-span-2 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                            value={exercise.reps}
+                                            onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'reps', e.target.value)}
+                                          />
+                                          <input
+                                            type="text"
+                                            placeholder="%/RPE"
+                                            className="col-span-2 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                            value={exercise.intensity}
+                                            onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'intensity', e.target.value)}
+                                          />
+                                          <input
+                                            type="text"
+                                            placeholder="Rest"
+                                            className="col-span-2 bg-gray-100 rounded px-1 py-0.5 text-center"
+                                            value={exercise.rest}
+                                            onChange={(e) => updateExercise(weekIndex, dayIndex, blockIndex, exerciseIndex, 'rest', e.target.value)}
+                                          />
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            className="col-span-1 text-xs h-5 px-1"
+                                            onClick={() => removeExercise(weekIndex, dayIndex, blockIndex, exerciseIndex)}
+                                          >
+                                            ×
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ))}
+
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="w-full text-xs h-6 mt-1"
+                                  onClick={() => addBlock(weekIndex, dayIndex)}
+                                >
+                                  + Add Block
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full text-xs h-7"
+                            onClick={() => addDay(weekIndex)}
+                          >
+                            + Add Day
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  <Button
+                    size="sm"
+                    className="w-full text-xs"
+                    onClick={addWeek}
+                  >
+                    + Add Week
+                  </Button>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1 text-xs"
+                    onClick={() => setIsBuilding(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="flex-1 text-xs bg-green-600 hover:bg-green-700"
+                    onClick={savePlan}
+                  >
+                    Save Plan
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              /* Saved Plans List */
+              <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+                <h4 className="text-sm font-medium text-gray-900 mb-2">My Plans</h4>
+                <div className="text-center py-8 text-gray-500">
+                  <Target className="h-8 w-8 mx-auto mb-2" />
+                  <p className="text-sm">No plans created yet</p>
+                  <p className="text-xs mt-1">Click "Build Plan" to create your first workout program</p>
+                </div>
+              </div>
+            )}
+
+            {/* Percentage Calculator Tool */}
             <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
               <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
-                <Activity className="h-4 w-4 mr-2 text-blue-600" />
-                My Training Plans
+                <Calculator className="h-4 w-4 mr-2 text-blue-600" />
+                1RM Percentage Calculator
               </h4>
-              
-              {/* Active Plan */}
-              <div className="border border-green-200 rounded-lg p-2 bg-green-50 mb-2">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-green-800">4-Week Elite Program</span>
-                  <div className="flex items-center space-x-1">
-                    <span className="text-xs bg-green-200 text-green-800 px-2 py-0.5 rounded">ACTIVE</span>
-                    <Button size="sm" variant="outline" className="text-xs h-6">
-                      Edit
-                    </Button>
-                  </div>
-                </div>
-                <p className="text-xs text-green-700 mb-1">Comprehensive strength and conditioning program</p>
-                <div className="text-xs text-green-600">
-                  Week 2 of 4 • 6 days/week • Currently running on Workout page
-                </div>
+              <div className="flex space-x-2">
+                <input
+                  type="number"
+                  placeholder="Max Weight"
+                  className="flex-1 text-sm bg-gray-100 rounded px-2 py-1"
+                  onChange={(e) => {
+                    const max = parseInt(e.target.value);
+                    if (!isNaN(max)) {
+                      setCalculatedPercentages({
+                        '60%': Math.round(max * 0.6),
+                        '65%': Math.round(max * 0.65),
+                        '70%': Math.round(max * 0.7),
+                        '75%': Math.round(max * 0.75),
+                        '80%': Math.round(max * 0.8),
+                        '85%': Math.round(max * 0.85),
+                        '90%': Math.round(max * 0.9),
+                      });
+                    }
+                  }}
+                />
               </div>
-
-              {/* Draft Plans */}
-              <div className="space-y-1">
-                <div className="border border-gray-200 rounded-lg p-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-900">Summer Cut Program</span>
-                    <div className="flex items-center space-x-1">
-                      <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded">DRAFT</span>
-                      <Button size="sm" variant="outline" className="text-xs h-6">
-                        Launch
-                      </Button>
+              {Object.keys(calculatedPercentages).length > 0 && (
+                <div className="grid grid-cols-4 gap-1 mt-2">
+                  {Object.entries(calculatedPercentages).map(([percent, weight]) => (
+                    <div key={percent} className="text-center bg-gray-100 rounded p-1">
+                      <div className="text-xs text-gray-600">{percent}</div>
+                      <div className="text-xs font-bold">{weight}lbs</div>
                     </div>
-                  </div>
-                  <p className="text-xs text-gray-600 mb-1">6-week fat loss and muscle definition plan</p>
-                  <div className="text-xs text-gray-500">
-                    6 weeks • 5 days/week • Ready to launch
-                  </div>
+                  ))}
                 </div>
-
-                <div className="border border-gray-200 rounded-lg p-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-900">Powerlifting Prep</span>
-                    <div className="flex items-center space-x-1">
-                      <span className="text-xs bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded">BUILDING</span>
-                      <Button size="sm" variant="outline" className="text-xs h-6">
-                        Continue
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-600 mb-1">12-week competition preparation program</p>
-                  <div className="text-xs text-gray-500">
-                    In progress • 4 of 12 weeks designed
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Plan Templates */}
-            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
-              <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
-                <Target className="h-4 w-4 mr-2 text-blue-600" />
-                Plan Templates
-              </h4>
-              
-              <div className="grid grid-cols-2 gap-2">
-                <div className="border border-blue-200 rounded-lg p-2 hover:bg-blue-50 cursor-pointer transition-colors">
-                  <div className="text-sm font-medium text-blue-900 mb-1">Strength Builder</div>
-                  <div className="text-xs text-blue-700">8-week progressive overload</div>
-                </div>
-                
-                <div className="border border-green-200 rounded-lg p-2 hover:bg-green-50 cursor-pointer transition-colors">
-                  <div className="text-sm font-medium text-green-900 mb-1">Fat Loss</div>
-                  <div className="text-xs text-green-700">6-week metabolic focus</div>
-                </div>
-                
-                <div className="border border-purple-200 rounded-lg p-2 hover:bg-purple-50 cursor-pointer transition-colors">
-                  <div className="text-sm font-medium text-purple-900 mb-1">Athlete Prep</div>
-                  <div className="text-xs text-purple-700">Sport-specific training</div>
-                </div>
-                
-                <div className="border border-orange-200 rounded-lg p-2 hover:bg-orange-50 cursor-pointer transition-colors">
-                  <div className="text-sm font-medium text-orange-900 mb-1">Beginner</div>
-                  <div className="text-xs text-orange-700">12-week foundation</div>
-                </div>
-              </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
