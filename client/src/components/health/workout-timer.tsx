@@ -146,15 +146,15 @@ export function WorkoutTimer({ currentWorkout = "Workout Session", currentBlocks
 
   return (
     <>
-      <Card className="p-8 text-center bg-background border shadow-md">
-        <h3 className="text-lg font-semibold text-foreground mb-6">Workout Timer</h3>
+      <Card className="p-4 text-center bg-background border shadow-md">
+        <h3 className="text-sm font-semibold text-foreground mb-3">Workout Timer</h3>
         
         {/* Timer Display */}
-        <div className="mb-8">
-          <div className="text-6xl font-bold text-foreground mb-2">
+        <div className="mb-4">
+          <div className="text-3xl font-bold text-foreground mb-1">
             {formatTime(elapsedTime)}
           </div>
-          <p className="text-muted-foreground font-medium">
+          <p className="text-sm text-muted-foreground font-medium">
             {currentWorkout}
           </p>
         </div>
@@ -164,20 +164,20 @@ export function WorkoutTimer({ currentWorkout = "Workout Session", currentBlocks
           <Button
             onClick={startWorkout}
             disabled={isRunning}
-            size="lg"
-            className="bg-gradient-to-r from-accent to-accent/90 hover:from-accent/90 hover:to-accent/80 text-white px-8 py-6 text-lg font-medium"
+            size="sm"
+            className="bg-gradient-to-r from-accent to-accent/90 hover:from-accent/90 hover:to-accent/80 text-white px-6 py-2 text-sm font-medium"
           >
-            <Play className="w-5 h-5 mr-2" />
+            <Play className="w-4 h-4 mr-1" />
             Start Workout
           </Button>
           <Button
             onClick={stopWorkout}
             disabled={!isRunning}
             variant="outline"
-            size="lg"
-            className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground px-8 py-6 text-lg"
+            size="sm"
+            className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground px-6 py-2 text-sm"
           >
-            <Square className="w-5 h-5 mr-2" />
+            <Square className="w-4 h-4 mr-1" />
             End Session
           </Button>
         </div>

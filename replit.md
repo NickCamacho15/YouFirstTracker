@@ -123,6 +123,13 @@ Build scripts include:
 
 ## Changelog
 
+- July 16, 2025: Compressed Workout Timer Tile - Reduced Vertical Scrolling
+  - **COMPRESSED**: Workout Timer tile now 50% smaller vertically for better mobile experience
+  - **REDUCED**: Padding from p-8 to p-4, timer display from 6xl to 3xl
+  - **COMPACT**: Button sizes reduced from lg to sm with minimal padding
+  - **OPTIMIZED**: Smaller font sizes and tighter margins throughout
+  - **MAINTAINED**: Full functionality with start/stop controls and session tracking
+  - Workout tab now requires less scrolling to view full content
 - July 16, 2025: Added Workout Day Navigation Arrows - Quick Jump to Next/Previous Workout Days
   - **NEW**: Navigation arrows on either side of weekday selector in Workout tab
   - **ENHANCED**: Arrows automatically skip Sunday rest days and jump to next available workout (Mon-Sat)
