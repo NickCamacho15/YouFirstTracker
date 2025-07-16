@@ -220,7 +220,7 @@ export default function HealthPage() {
       {/* Tabs Navigation */}
       <div className="px-2 pt-3">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 h-10 bg-white shadow-md">
+          <TabsList className="grid w-full grid-cols-3 h-10 bg-white shadow-md">
             <TabsTrigger value="profile" className="text-xs font-medium">
               <User className="h-3 w-3 mr-1" />
               Profile
@@ -228,6 +228,10 @@ export default function HealthPage() {
             <TabsTrigger value="workout" className="text-xs font-medium">
               <Dumbbell className="h-3 w-3 mr-1" />
               Workout
+            </TabsTrigger>
+            <TabsTrigger value="plan" className="text-xs font-medium">
+              <Target className="h-3 w-3 mr-1" />
+              Plan
             </TabsTrigger>
           </TabsList>
 
@@ -343,122 +347,140 @@ export default function HealthPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Progress Analytics moved from Workout tab */}
+                <ProgressAnalytics className="mt-4" />
               </>
             )}
           </TabsContent>
 
           {/* Workout Tab Content */}
           <TabsContent value="workout" className="mt-3 space-y-2">
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                <Dumbbell className="h-4 w-4 mr-2 text-blue-600" />
+                Workout Logger
+              </h3>
+              <p className="text-xs text-gray-600 mb-3">Log your workouts and track your progress in real-time</p>
+              
+              <div className="text-center py-8">
+                <div className="text-gray-500 mb-2">
+                  <Dumbbell className="h-8 w-8 mx-auto mb-2" />
+                </div>
+                <p className="text-sm text-gray-600">Workout logging interface coming soon</p>
+                <p className="text-xs text-gray-500 mt-1">Log exercises, sets, reps, and weights</p>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Plan Tab Content */}
+          <TabsContent value="plan" className="mt-3 space-y-2">
             {/* Program Overview */}
-          <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
-            <h3 className="text-sm font-semibold text-gray-900 mb-1 flex items-center">
-              <Trophy className="h-4 w-4 mr-2 text-blue-600" />
-              4-Week Elite Training Program
-            </h3>
-            <p className="text-xs text-gray-600 mb-2">Comprehensive strength and conditioning program designed for maximum results</p>
-            
-            {/* Compact Phase Overview */}
-            <div className="grid grid-cols-4 gap-1">
-              {[1, 2, 3, 4].map((week) => {
-                const phase = week <= 2 ? "Load" : week === 3 ? "Peak" : "Deload";
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+              <h3 className="text-sm font-semibold text-gray-900 mb-1 flex items-center">
+                <Trophy className="h-4 w-4 mr-2 text-blue-600" />
+                4-Week Elite Training Program
+              </h3>
+              <p className="text-xs text-gray-600 mb-2">Comprehensive strength and conditioning program designed for maximum results</p>
+              
+              {/* Compact Phase Overview */}
+              <div className="grid grid-cols-4 gap-1">
+                {[1, 2, 3, 4].map((week) => {
+                  const phase = week <= 2 ? "Load" : week === 3 ? "Peak" : "Deload";
+                  
+                  return (
+                    <div key={week} className={`rounded p-1.5 border text-center shadow-sm ${
+                      phase === "Load" ? "border-blue-300 bg-blue-50" :
+                      phase === "Peak" ? "border-red-300 bg-red-50" :
+                      "border-green-300 bg-green-50"
+                    }`}>
+                      <div className="text-xs font-medium text-gray-700">W{week}</div>
+                      <div className={`text-xs font-bold ${
+                        phase === "Load" ? "text-blue-600" :
+                        phase === "Peak" ? "text-red-600" :
+                        "text-green-600"
+                      }`}>{phase}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Compact Week Dropdowns */}
+            <div className="space-y-1">
+              {staticProgram.weeks.map((week) => {
+                const weekDates = getWeekDates(week.weekNumber);
+                const isExpanded = expandedWeeks.has(week.weekNumber);
                 
                 return (
-                  <div key={week} className={`rounded p-1.5 border text-center shadow-sm ${
-                    phase === "Load" ? "border-blue-300 bg-blue-50" :
-                    phase === "Peak" ? "border-red-300 bg-red-50" :
-                    "border-green-300 bg-green-50"
-                  }`}>
-                    <div className="text-xs font-medium text-gray-700">W{week}</div>
-                    <div className={`text-xs font-bold ${
-                      phase === "Load" ? "text-blue-600" :
-                      phase === "Peak" ? "text-red-600" :
-                      "text-green-600"
-                    }`}>{phase}</div>
+                  <div key={week.weekNumber} className="bg-white rounded-lg shadow-md border border-blue-200">
+                    {/* Week Header */}
+                    <button
+                      onClick={() => toggleWeek(week.weekNumber)}
+                      className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-blue-50 rounded-lg transition-colors"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <div className="text-sm font-semibold text-blue-600">
+                          Week {week.weekNumber}: {week.phase}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {weekDates.start} - {weekDates.end}
+                        </div>
+                      </div>
+                      <ChevronDown className={`h-4 w-4 text-blue-600 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {/* Week Content */}
+                    {isExpanded && (
+                      <div className="px-3 pb-3 space-y-1">
+                        <p className="text-xs text-gray-600 mb-2">{week.phaseDescription}</p>
+                        
+                        {/* Day Blocks */}
+                        <div className="space-y-1">
+                          {week.days.map((day) => {
+                            const dayKey = `${week.weekNumber}-${day.dayNumber}`;
+                            const isDayExpanded = expandedDays.has(dayKey);
+                            const dayDate = getDayDate(week.weekNumber, day.dayNumber);
+                            
+                            return (
+                              <div key={day.dayNumber} className="border border-gray-200 rounded shadow-sm">
+                                {/* Day Header */}
+                                <button
+                                  onClick={() => toggleDay(week.weekNumber, day.dayNumber)}
+                                  className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                                >
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-sm font-medium text-gray-900">
+                                      Day {day.dayNumber}: {day.name}
+                                    </span>
+                                    <span className="text-xs text-gray-500">{dayDate}</span>
+                                  </div>
+                                  <ChevronDown className={`h-3 w-3 text-gray-600 transform transition-transform ${isDayExpanded ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {/* Day Workout Blocks */}
+                                {isDayExpanded && (
+                                  <div className="px-3 pb-3 space-y-2 bg-gray-50">
+                                    {day.blocks.map((block) => (
+                                      <WorkoutLogger 
+                                        key={block.blockLetter}
+                                        weekNumber={week.weekNumber}
+                                        dayNumber={day.dayNumber}
+                                        blockLetter={block.blockLetter}
+                                      />
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
-          </div>
-
-          {/* Compact Week Dropdowns */}
-          <div className="space-y-1">
-            {staticProgram.weeks.map((week) => {
-              const weekDates = getWeekDates(week.weekNumber);
-              const isExpanded = expandedWeeks.has(week.weekNumber);
-              
-              return (
-                <div key={week.weekNumber} className="bg-white rounded-lg shadow-md border border-blue-200">
-                  {/* Week Header */}
-                  <button
-                    onClick={() => toggleWeek(week.weekNumber)}
-                    className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <div className="text-sm font-semibold text-blue-600">
-                        Week {week.weekNumber}: {week.phase}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {weekDates.start} - {weekDates.end}
-                      </div>
-                    </div>
-                    <ChevronDown className={`h-4 w-4 text-blue-600 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  {/* Week Content */}
-                  {isExpanded && (
-                    <div className="px-3 pb-3 space-y-1">
-                      <p className="text-xs text-gray-600 mb-2">{week.phaseDescription}</p>
-                      
-                      {/* Day Blocks */}
-                      <div className="space-y-1">
-                        {week.days.map((day) => {
-                          const dayKey = `${week.weekNumber}-${day.dayNumber}`;
-                          const isDayExpanded = expandedDays.has(dayKey);
-                          const dayDate = getDayDate(week.weekNumber, day.dayNumber);
-                          
-                          return (
-                            <div key={day.dayNumber} className="border border-gray-200 rounded shadow-sm">
-                              {/* Day Header */}
-                              <button
-                                onClick={() => toggleDay(week.weekNumber, day.dayNumber)}
-                                className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
-                              >
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-sm font-medium text-gray-900">
-                                    Day {day.dayNumber}: {day.name}
-                                  </span>
-                                  <span className="text-xs text-gray-500">{dayDate}</span>
-                                </div>
-                                <ChevronDown className={`h-3 w-3 text-gray-600 transform transition-transform ${isDayExpanded ? 'rotate-180' : ''}`} />
-                              </button>
-
-                              {/* Day Workout Blocks */}
-                              {isDayExpanded && (
-                                <div className="px-3 pb-3 space-y-2 bg-gray-50">
-                                  {day.blocks.map((block) => (
-                                    <WorkoutLogger 
-                                      key={block.blockLetter}
-                                      weekNumber={week.weekNumber}
-                                      dayNumber={day.dayNumber}
-                                      blockLetter={block.blockLetter}
-                                    />
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          
-          {/* Progress Analytics */}
-          <ProgressAnalytics />
-
           </TabsContent>
         </Tabs>
       </div>
