@@ -65,13 +65,64 @@ export default function ProgressAnalytics({ className }: ProgressAnalyticsProps)
 
   return (
     <div className={`space-y-4 ${className}`}>
-      {/* Weekly Volume Progress */}
+      {/* Individual Exercise Progress Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {exercises.map((exercise) => (
+          <Card key={exercise.key} className="border border-blue-200 shadow-md">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center">
+                <TrendingUp className="h-4 w-4 mr-2 text-blue-600" />
+                {exercise.name} Progress
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="h-32">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={data}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis 
+                      dataKey="date" 
+                      tick={{ fontSize: 10 }}
+                      interval="preserveStartEnd"
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 10 }}
+                      domain={['dataMin - 5', 'dataMax + 5']}
+                    />
+                    <Tooltip 
+                      labelStyle={{ fontSize: 12 }}
+                      contentStyle={{ fontSize: 12 }}
+                      formatter={(value, name) => [
+                        `${value} sets × reps`,
+                        'Progress'
+                      ]}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={exercise.key}
+                      stroke={exercise.color}
+                      strokeWidth={2}
+                      dot={{ fill: exercise.color, strokeWidth: 0, r: 3 }}
+                      activeDot={{ r: 4, stroke: exercise.color, strokeWidth: 2 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-2 text-xs text-gray-600 text-center">
+                Tracking sets × reps progression
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Weekly Volume Summary */}
       <Card className="border border-blue-200 shadow-md">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm flex items-center">
-              <TrendingUp className="h-4 w-4 mr-2 text-blue-600" />
-              Weekly Volume Progress
+              <BarChart3 className="h-4 w-4 mr-2 text-blue-600" />
+              Weekly Volume Summary
             </CardTitle>
             <div className="flex space-x-1">
               {timeframeOptions.map((option) => (
