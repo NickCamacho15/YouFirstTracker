@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDown, Activity, Trophy, Play, User, Dumbbell, TrendingUp, Target, Zap, Timer, Edit3, Calculator } from "lucide-react";
+import { ChevronDown, Activity, Trophy, Play, User, Dumbbell, TrendingUp, Target, Zap, Timer, Edit3, Calculator, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import WorkoutLogger from "@/components/workout/workout-logger";
 import ProfileEditor from "@/components/profile/profile-editor";
 import ProgressAnalytics from "@/components/analytics/progress-analytics";
@@ -14,6 +14,9 @@ export default function HealthPage() {
   const [workoutTimer, setWorkoutTimer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [currentWeek, setCurrentWeek] = useState(1);
+  const [currentDay, setCurrentDay] = useState(1);
+  const [isUserFriendlyMode, setIsUserFriendlyMode] = useState(false);
   const [personalRecords, setPersonalRecords] = useState([
     { exercise: "Bench Press", weight: 225, percentages: {} },
     { exercise: "Squat", weight: 315, percentages: {} },
@@ -130,6 +133,31 @@ export default function HealthPage() {
       month: 'short', 
       day: 'numeric' 
     });
+  };
+
+  // Navigation functions for user-friendly mode
+  const navigateDay = (direction: 'prev' | 'next') => {
+    if (direction === 'next') {
+      if (currentDay < 6) {
+        setCurrentDay(currentDay + 1);
+      } else if (currentWeek < 4) {
+        setCurrentWeek(currentWeek + 1);
+        setCurrentDay(1);
+      }
+    } else {
+      if (currentDay > 1) {
+        setCurrentDay(currentDay - 1);
+      } else if (currentWeek > 1) {
+        setCurrentWeek(currentWeek - 1);
+        setCurrentDay(6);
+      }
+    }
+  };
+
+  const getCurrentDayData = () => {
+    const week = staticProgram.weeks.find(w => w.weekNumber === currentWeek);
+    const day = week?.days.find(d => d.dayNumber === currentDay);
+    return { week, day };
   };
 
   // Generate weeks with 6 days each
@@ -356,38 +384,201 @@ export default function HealthPage() {
 
           {/* Workout Tab Content */}
           <TabsContent value="workout" className="mt-3 space-y-2">
+            {/* Day Navigation Slider */}
             <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
-              <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                <Dumbbell className="h-4 w-4 mr-2 text-blue-600" />
-                Workout Logger
-              </h3>
-              <p className="text-xs text-gray-600 mb-3">Log your workouts and track your progress in real-time</p>
-              
-              <div className="text-center py-8">
-                <div className="text-gray-500 mb-2">
-                  <Dumbbell className="h-8 w-8 mx-auto mb-2" />
+              <div className="flex items-center justify-between mb-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => navigateDay('prev')}
+                  disabled={currentWeek === 1 && currentDay === 1}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                
+                <div className="text-center">
+                  <div className="text-sm font-semibold text-gray-900">
+                    Week {currentWeek}, Day {currentDay}
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    {(() => {
+                      const { week, day } = getCurrentDayData();
+                      return day ? `${day.name} • ${getDayDate(currentWeek, currentDay)}` : '';
+                    })()}
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600">Workout logging interface coming soon</p>
-                <p className="text-xs text-gray-500 mt-1">Log exercises, sets, reps, and weights</p>
+                
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => navigateDay('next')}
+                  disabled={currentWeek === 4 && currentDay === 6}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
               </div>
+              
+              {/* Progress Bar */}
+              <div className="w-full bg-gray-200 rounded-full h-1.5">
+                <div 
+                  className="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
+                  style={{ 
+                    width: `${((currentWeek - 1) * 6 + currentDay) / 24 * 100}%` 
+                  }}
+                />
+              </div>
+              <div className="text-xs text-gray-500 text-center mt-1">
+                Day {(currentWeek - 1) * 6 + currentDay} of 24
+              </div>
+            </div>
+
+            {/* Current Day Workout */}
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-semibold text-gray-900 flex items-center">
+                  <Dumbbell className="h-4 w-4 mr-2 text-blue-600" />
+                  Today's Workout
+                </h4>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs text-gray-500">
+                    {formatTime(workoutTimer)}
+                  </span>
+                  <Button
+                    size="sm"
+                    onClick={isTimerRunning ? stopWorkout : startWorkout}
+                    className="text-xs h-7"
+                  >
+                    {isTimerRunning ? 'Stop' : 'Start'}
+                  </Button>
+                </div>
+              </div>
+              
+              {(() => {
+                const { week, day } = getCurrentDayData();
+                if (!day) return <div className="text-center text-gray-500 py-4">No workout data</div>;
+                
+                return (
+                  <div className="space-y-2">
+                    {day.blocks.map((block) => (
+                      <WorkoutLogger 
+                        key={block.blockLetter}
+                        weekNumber={currentWeek}
+                        dayNumber={currentDay}
+                        blockLetter={block.blockLetter}
+                      />
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           </TabsContent>
 
           {/* Plan Tab Content */}
           <TabsContent value="plan" className="mt-3 space-y-2">
+            {/* Plan Builder Header */}
             <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
-              <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                <Target className="h-4 w-4 mr-2 text-blue-600" />
-                Training Plans
-              </h3>
-              <p className="text-xs text-gray-600 mb-3">Create and manage your personalized training plans</p>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-semibold text-gray-900 flex items-center">
+                  <Target className="h-4 w-4 mr-2 text-blue-600" />
+                  Training Plan Builder
+                </h3>
+                <Button size="sm" className="text-xs">
+                  <Plus className="h-3 w-3 mr-1" />
+                  New Plan
+                </Button>
+              </div>
+              <p className="text-xs text-gray-600">Design custom workout programs and launch them to your workout page</p>
+            </div>
+
+            {/* Current Plans */}
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+              <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+                <Activity className="h-4 w-4 mr-2 text-blue-600" />
+                My Training Plans
+              </h4>
               
-              <div className="text-center py-8">
-                <div className="text-gray-500 mb-2">
-                  <Target className="h-8 w-8 mx-auto mb-2" />
+              {/* Active Plan */}
+              <div className="border border-green-200 rounded-lg p-2 bg-green-50 mb-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium text-green-800">4-Week Elite Program</span>
+                  <div className="flex items-center space-x-1">
+                    <span className="text-xs bg-green-200 text-green-800 px-2 py-0.5 rounded">ACTIVE</span>
+                    <Button size="sm" variant="outline" className="text-xs h-6">
+                      Edit
+                    </Button>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600">Plan creation interface coming soon</p>
-                <p className="text-xs text-gray-500 mt-1">Design custom workout programs and schedules</p>
+                <p className="text-xs text-green-700 mb-1">Comprehensive strength and conditioning program</p>
+                <div className="text-xs text-green-600">
+                  Week 2 of 4 • 6 days/week • Currently running on Workout page
+                </div>
+              </div>
+
+              {/* Draft Plans */}
+              <div className="space-y-1">
+                <div className="border border-gray-200 rounded-lg p-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-gray-900">Summer Cut Program</span>
+                    <div className="flex items-center space-x-1">
+                      <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded">DRAFT</span>
+                      <Button size="sm" variant="outline" className="text-xs h-6">
+                        Launch
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-600 mb-1">6-week fat loss and muscle definition plan</p>
+                  <div className="text-xs text-gray-500">
+                    6 weeks • 5 days/week • Ready to launch
+                  </div>
+                </div>
+
+                <div className="border border-gray-200 rounded-lg p-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-gray-900">Powerlifting Prep</span>
+                    <div className="flex items-center space-x-1">
+                      <span className="text-xs bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded">BUILDING</span>
+                      <Button size="sm" variant="outline" className="text-xs h-6">
+                        Continue
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-600 mb-1">12-week competition preparation program</p>
+                  <div className="text-xs text-gray-500">
+                    In progress • 4 of 12 weeks designed
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Plan Templates */}
+            <div className="bg-white rounded-lg shadow-md p-3 border border-blue-200">
+              <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+                <Target className="h-4 w-4 mr-2 text-blue-600" />
+                Plan Templates
+              </h4>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <div className="border border-blue-200 rounded-lg p-2 hover:bg-blue-50 cursor-pointer transition-colors">
+                  <div className="text-sm font-medium text-blue-900 mb-1">Strength Builder</div>
+                  <div className="text-xs text-blue-700">8-week progressive overload</div>
+                </div>
+                
+                <div className="border border-green-200 rounded-lg p-2 hover:bg-green-50 cursor-pointer transition-colors">
+                  <div className="text-sm font-medium text-green-900 mb-1">Fat Loss</div>
+                  <div className="text-xs text-green-700">6-week metabolic focus</div>
+                </div>
+                
+                <div className="border border-purple-200 rounded-lg p-2 hover:bg-purple-50 cursor-pointer transition-colors">
+                  <div className="text-sm font-medium text-purple-900 mb-1">Athlete Prep</div>
+                  <div className="text-xs text-purple-700">Sport-specific training</div>
+                </div>
+                
+                <div className="border border-orange-200 rounded-lg p-2 hover:bg-orange-50 cursor-pointer transition-colors">
+                  <div className="text-sm font-medium text-orange-900 mb-1">Beginner</div>
+                  <div className="text-xs text-orange-700">12-week foundation</div>
+                </div>
               </div>
             </div>
           </TabsContent>
