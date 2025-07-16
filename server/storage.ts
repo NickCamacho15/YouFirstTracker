@@ -1105,12 +1105,22 @@ export class DatabaseStorage implements IStorage {
 
   // Workout Sessions
   async createWorkoutSession(data: any): Promise<any> {
+    console.log('Raw data received:', data);
+    
     // Convert ISO strings to Date objects
     const sessionData = {
       ...data,
       startTime: new Date(data.startTime),
       endTime: new Date(data.endTime)
     };
+    
+    // Remove createdAt if it exists since it has defaultNow()
+    delete sessionData.createdAt;
+    
+    console.log('Processed sessionData:', sessionData);
+    console.log('startTime type:', typeof sessionData.startTime, sessionData.startTime);
+    console.log('endTime type:', typeof sessionData.endTime, sessionData.endTime);
+    
     const result = await db.insert(workoutSessions).values(sessionData).returning();
     return result[0];
   }
