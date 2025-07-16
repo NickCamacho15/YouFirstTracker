@@ -46,7 +46,10 @@ export function WorkoutTimer({ currentWorkout = "Workout Session", currentBlocks
       notes?: string;
       blocksCompleted?: string[];
     }) => {
-      const response = await apiRequest("POST", "/api/workout-sessions", data);
+      const response = await apiRequest("/api/workout-sessions", { 
+        method: "POST", 
+        body: data 
+      });
       return response.json();
     },
     onSuccess: () => {
