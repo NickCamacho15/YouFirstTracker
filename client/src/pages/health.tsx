@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDown, Activity, Trophy, Play, User, Dumbbell, TrendingUp, Target, Zap, Timer, Edit3, Calculator, Plus, ChevronLeft, ChevronRight, Calendar, Settings, BarChart2 } from "lucide-react";
+import { ChevronDown, Activity, Trophy, Play, User, Dumbbell, TrendingUp, Target, Zap, Timer, Edit3, Calculator, Plus, ChevronLeft, ChevronRight, Calendar, Settings, BarChart2, Check } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import WorkoutLogger from "@/components/workout/workout-logger";
 import ProfileEditor from "@/components/profile/profile-editor";
 import ProgressAnalytics from "@/components/analytics/progress-analytics";
@@ -49,7 +53,7 @@ interface Week {
   days: Day[];
 }
 
-interface BuildingPlan {
+interface WorkoutProgram {
   name: string;
   description: string;
   weeks: Week[];
@@ -65,9 +69,13 @@ export default function HealthPage() {
   const [currentDay, setCurrentDay] = useState(1);
   const [selectedDayOfWeek, setSelectedDayOfWeek] = useState(new Date().getDay());
   const [expandedBlocks, setExpandedBlocks] = useState<Set<string>>(new Set());
+  const [completedBlocks, setCompletedBlocks] = useState<Set<string>>(new Set());
+  const [showLogModal, setShowLogModal] = useState(false);
+  const [selectedBlock, setSelectedBlock] = useState<{blockId: string; block: Block} | null>(null);
+  const [workoutLogData, setWorkoutLogData] = useState<any>({});
   const [isBuilding, setIsBuilding] = useState(false);
   const [calculatedPercentages, setCalculatedPercentages] = useState<{ [key: string]: number }>({});
-  const [buildingPlan, setBuildingPlan] = useState<BuildingPlan>({
+  const [buildingPlan, setBuildingPlan] = useState<WorkoutProgram>({
     name: '',
     description: '',
     weeks: []
@@ -133,6 +141,18 @@ export default function HealthPage() {
     setExpandedDays(newExpanded);
   };
 
+  const toggleBlockCompletion = (blockId: string) => {
+    setCompletedBlocks(prev => {
+      const newCompleted = new Set(prev);
+      if (newCompleted.has(blockId)) {
+        newCompleted.delete(blockId);
+      } else {
+        newCompleted.add(blockId);
+      }
+      return newCompleted;
+    });
+  };
+
   const getWeekDates = (weekNumber: number) => {
     const today = new Date();
     const startOfProgram = new Date(today);
@@ -185,13 +205,13 @@ export default function HealthPage() {
   };
 
   const getCurrentDayData = () => {
-    const week = staticProgram.weeks.find(w => w.weekNumber === currentWeek);
-    const day = week?.days.find(d => d.dayNumber === currentDay);
+    const week = staticProgram.weeks.find((w: Week) => w.weekNumber === currentWeek);
+    const day = week?.days.find((d: Day) => d.dayNumber === currentDay);
     return { week, day };
   };
 
   // Get workout for selected day of week
-  const getWorkoutForDay = (dayOfWeek: number) => {
+  const getWorkoutForDay = (dayOfWeek: number): Day | null => {
     // Map day of week (0=Sunday) to workout day (1-6, with Sunday as rest)
     const workoutDayMap: { [key: number]: number } = {
       0: 0, // Sunday - Rest
@@ -210,7 +230,7 @@ export default function HealthPage() {
     const currentWeekData = staticProgram.weeks[Math.floor((workoutDay - 1) / 6)];
     const dayInWeek = ((workoutDay - 1) % 6) + 1;
     
-    return currentWeekData?.days.find(d => d.dayNumber === dayInWeek);
+    return currentWeekData?.days.find((d: Day) => d.dayNumber === dayInWeek) || null;
   };
 
   // Find next workout day (skip Sundays)
@@ -347,9 +367,10 @@ export default function HealthPage() {
     setBuildingPlan({ ...buildingPlan, weeks: newWeeks });
   };
 
-  const updateExercise = (weekIndex: number, dayIndex: number, blockIndex: number, exerciseIndex: number, field: string, value: string) => {
+  const updateExercise = (weekIndex: number, dayIndex: number, blockIndex: number, exerciseIndex: number, field: keyof Exercise, value: string) => {
     const newWeeks = [...buildingPlan.weeks];
-    newWeeks[weekIndex].days[dayIndex].blocks[blockIndex].exercises[exerciseIndex][field] = value;
+    const exercise = newWeeks[weekIndex].days[dayIndex].blocks[blockIndex].exercises[exerciseIndex];
+    (exercise as any)[field] = value;
     setBuildingPlan({ ...buildingPlan, weeks: newWeeks });
   };
 
@@ -366,11 +387,11 @@ export default function HealthPage() {
     const weeks = [];
     
     for (let weekNum = 1; weekNum <= totalWeeks; weekNum++) {
-      const week = {
+      const week: Week = {
         weekNumber: weekNum,
         phase: weekNum <= 2 ? "Load" : weekNum === 3 ? "Peak" : "Deload",
         phaseDescription: weekNum <= 2 ? "Building foundation" : weekNum === 3 ? "Maximum intensity" : "Active recovery",
-        days: []
+        days: [] as Day[]
       };
       
       // Generate 6 days for each week
@@ -699,6 +720,22 @@ export default function HealthPage() {
                         className="w-full p-3 flex items-center justify-between text-left hover:bg-blue-50 transition-colors rounded-lg"
                       >
                         <div className="flex items-center space-x-3">
+                          {/* Completion Checkbox */}
+                          <div
+                            className="relative"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleBlockCompletion(blockId);
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={completedBlocks.has(blockId)}
+                              onChange={() => {}}
+                              className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                          </div>
+                          
                           <div className="bg-blue-100 text-blue-700 font-bold rounded px-2 py-1 text-sm">
                             Block {block.blockLetter}
                           </div>
@@ -737,8 +774,8 @@ export default function HealthPage() {
                             <Button 
                               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                               onClick={() => {
-                                // TODO: Implement workout logging
-                                console.log('Log workout for block', blockId);
+                                setSelectedBlock({ blockId, block });
+                                setShowLogModal(true);
                               }}
                             >
                               Log Your Result
@@ -1117,6 +1154,90 @@ export default function HealthPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Workout Log Modal */}
+      <Dialog open={showLogModal} onOpenChange={setShowLogModal}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Log Workout Results</DialogTitle>
+            <DialogDescription>
+              {selectedBlock ? `Block ${selectedBlock.block.blockLetter}` : ''}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedBlock && (
+            <div className="space-y-4">
+              {selectedBlock.block.exercises.map((exercise, idx) => (
+                <div key={idx} className="space-y-2 border-b pb-4 last:border-0">
+                  <h4 className="font-semibold text-sm">{exercise.name}</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label htmlFor={`weight-${idx}`} className="text-xs">Weight (lbs)</Label>
+                      <Input
+                        id={`weight-${idx}`}
+                        type="number"
+                        placeholder="0"
+                        value={workoutLogData[`${selectedBlock.blockId}-${idx}-weight`] || ''}
+                        onChange={(e) => setWorkoutLogData({
+                          ...workoutLogData,
+                          [`${selectedBlock.blockId}-${idx}-weight`]: e.target.value
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor={`reps-${idx}`} className="text-xs">Reps Completed</Label>
+                      <Input
+                        id={`reps-${idx}`}
+                        type="number"
+                        placeholder="0"
+                        value={workoutLogData[`${selectedBlock.blockId}-${idx}-reps`] || ''}
+                        onChange={(e) => setWorkoutLogData({
+                          ...workoutLogData,
+                          [`${selectedBlock.blockId}-${idx}-reps`]: e.target.value
+                        })}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor={`notes-${idx}`} className="text-xs">Notes (optional)</Label>
+                    <Textarea
+                      id={`notes-${idx}`}
+                      placeholder="Any notes about this exercise..."
+                      className="h-16"
+                      value={workoutLogData[`${selectedBlock.blockId}-${idx}-notes`] || ''}
+                      onChange={(e) => setWorkoutLogData({
+                        ...workoutLogData,
+                        [`${selectedBlock.blockId}-${idx}-notes`]: e.target.value
+                      })}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowLogModal(false)}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={() => {
+                // Mark block as completed
+                if (selectedBlock) {
+                  toggleBlockCompletion(selectedBlock.blockId);
+                }
+                // TODO: Save workout data to database
+                console.log('Workout data:', workoutLogData);
+                setShowLogModal(false);
+                setWorkoutLogData({});
+              }}
+            >
+              Save Results
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
