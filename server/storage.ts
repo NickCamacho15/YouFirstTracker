@@ -836,25 +836,12 @@ export class DatabaseStorage implements IStorage {
       return { success: false, reason: "Rule not found or access denied" };
     }
 
-    const now = new Date();
-    const lastViolation = rule.lastViolationTime;
-    
-    // Check 24-hour cooldown
-    if (lastViolation) {
-      const timeDiff = now.getTime() - lastViolation.getTime();
-      const hoursDiff = timeDiff / (1000 * 60 * 60);
-      
-      if (hoursDiff < 24) {
-        const hoursLeft = Math.ceil(24 - hoursDiff);
-        return { 
-          success: false, 
-          reason: `Rule violation cooldown active. Try again in ${hoursLeft} hour${hoursLeft > 1 ? 's' : ''}.` 
-        };
-      }
-    }
-
+    // Reset completedToday and streak when rule is violated
     const updatedRule = await db.update(rules)
-      .set({ lastViolationTime: now })
+      .set({ 
+        completedToday: false,
+        streak: 0
+      })
       .where(eq(rules.id, ruleId))
       .returning();
 
@@ -966,30 +953,7 @@ export class DatabaseStorage implements IStorage {
     return result.length > 0;
   }
 
-  // Rules
-  async getRulesByUserId(userId: number): Promise<Rule[]> {
-    return await db.select().from(rules).where(eq(rules.userId, userId)).orderBy(desc(rules.createdAt));
-  }
 
-  async getRuleById(id: number): Promise<Rule | undefined> {
-    const result = await db.select().from(rules).where(eq(rules.id, id)).limit(1);
-    return result[0];
-  }
-
-  async createRule(rule: InsertRule): Promise<Rule> {
-    const result = await db.insert(rules).values(rule).returning();
-    return result[0];
-  }
-
-  async updateRule(id: number, updates: Partial<Rule>): Promise<Rule | undefined> {
-    const result = await db.update(rules).set(updates).where(eq(rules.id, id)).returning();
-    return result[0];
-  }
-
-  async deleteRule(id: number): Promise<boolean> {
-    const result = await db.delete(rules).where(eq(rules.id, id));
-    return result.rowCount > 0;
-  }
 
   // Challenges
   async getChallengesByUserId(userId: number): Promise<any[]> {
