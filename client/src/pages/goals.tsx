@@ -23,15 +23,8 @@ interface Goal {
   }>;
 }
 
-// Mock achievement data - replace with actual user data
-const achievements = [
-  { id: 1, title: "Completed Marathon", year: "2023", icon: Medal, color: "bg-gradient-to-r from-amber-500 to-orange-600" },
-  { id: 2, title: "Launched Business", year: "2022", icon: Trophy, color: "bg-gradient-to-r from-blue-500 to-indigo-600" },
-  { id: 3, title: "Published Book", year: "2022", icon: Award, color: "bg-gradient-to-r from-purple-500 to-pink-600" },
-  { id: 4, title: "10K Revenue", year: "2021", icon: Star, color: "bg-gradient-to-r from-green-500 to-emerald-600" },
-  { id: 5, title: "Built Mobile App", year: "2021", icon: Zap, color: "bg-gradient-to-r from-yellow-500 to-amber-600" },
-  { id: 6, title: "Team Leadership", year: "2020", icon: Crown, color: "bg-gradient-to-r from-red-500 to-rose-600" },
-];
+// Achievement data - will be populated from user's actual completed goals
+const achievements: any[] = [];
 
 export default function GoalsPage() {
   const [showNewGoalModal, setShowNewGoalModal] = useState(false);

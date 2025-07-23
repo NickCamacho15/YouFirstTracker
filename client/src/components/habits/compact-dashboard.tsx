@@ -157,11 +157,14 @@ export function CompactDashboard({ habits }: CompactDashboardProps) {
     const avgStreak = habits.reduce((sum, h) => sum + h.streak, 0) / habits.length;
     const foundationsStrength = Math.min((avgStreak / 21) * 100, 100); // 21 days = 100%
 
-    // Mock critical tasks for now (would come from tasks API)
-    const criticalTasks = 75; // Placeholder
+    // Critical tasks completion (calculated from actual data)
+    const criticalTasks = 0; // Will be populated from tasks API
 
-    // Calculate reading time (would come from reading sessions)
-    const readingTime = 60; // Placeholder
+    // Calculate reading time from actual sessions
+    const totalReadingMinutes = readingSessions.reduce((total: number, session: any) => {
+      return total + (session.durationMinutes || 0);
+    }, 0);
+    const readingTime = Math.min((totalReadingMinutes / 60) * 100, 100); // 60 minutes = 100%
 
     // Generate foundations trend data (last 7 days)
     const last7Days = Array.from({ length: 7 }, (_, i) => subDays(new Date(), 6 - i));
@@ -177,8 +180,16 @@ export function CompactDashboard({ habits }: CompactDashboardProps) {
       return habits.length > 0 ? (dayCompletions / habits.length) * 100 : 0;
     });
 
-    // Generate reading time data (mock for now)
-    const readingData = [45, 60, 30, 75, 90, 50, 65];
+    // Generate reading time data from actual sessions (last 7 days)
+    const readingData = last7Days.map(day => {
+      const dayReadingMinutes = readingSessions.reduce((minutes: number, session: any) => {
+        if (format(new Date(session.completedAt), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')) {
+          return minutes + (session.durationMinutes || 0);
+        }
+        return minutes;
+      }, 0);
+      return Math.min(dayReadingMinutes, 100); // Cap at 100 for chart display
+    });
 
     return {
       habitsCompletion,

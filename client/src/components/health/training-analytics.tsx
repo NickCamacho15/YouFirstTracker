@@ -8,50 +8,19 @@ import { TrendingUp, Clock, Target, Activity } from 'lucide-react';
 const TrainingAnalytics: React.FC = () => {
   const [timeView, setTimeView] = useState<'week' | 'month' | 'year'>('week');
 
-  // Mock data for demonstration - in real app, this would come from API
+  // Analytics data will be populated from actual workout data
   const overviewStats = [
-    { title: 'Completion Rate', value: '87%', change: '+5% from last period', icon: Target },
-    { title: 'Workouts Completed', value: '18', change: '+3 from last period', icon: Activity },
-    { title: 'Time Spent This Week', value: '7.5 hrs', change: '+15% from last week', icon: Clock },
-    { title: 'Avg. Volume Increase', value: '+8.2%', change: '+1.5% from last period', icon: TrendingUp }
+    { title: 'Completion Rate', value: '0%', change: 'No data yet', icon: Target },
+    { title: 'Workouts Completed', value: '0', change: 'Start tracking', icon: Activity },
+    { title: 'Time Spent This Week', value: '0 hrs', change: 'Begin your journey', icon: Clock },
+    { title: 'Avg. Volume Increase', value: '0%', change: 'Track progress', icon: TrendingUp }
   ];
 
-  const weeklyProgressData = [
-    { week: 'Week 1', score: 65 },
-    { week: 'Week 2', score: 72 },
-    { week: 'Week 3', score: 78 },
-    { week: 'Week 4', score: 85 }
-  ];
-
-  const muscleGroupData = [
-    { name: 'Chest', value: 25, color: '#ef4444' },
-    { name: 'Back', value: 20, color: '#22c55e' },
-    { name: 'Legs', value: 30, color: '#3b82f6' },
-    { name: 'Arms', value: 15, color: '#f59e0b' },
-    { name: 'Core', value: 10, color: '#8b5cf6' }
-  ];
-
-  const strengthProgressData = [
-    { period: 'Week 1', squat: 180, deadlift: 220, benchpress: 140, pullup: 8 },
-    { period: 'Week 2', squat: 185, deadlift: 225, benchpress: 145, pullup: 9 },
-    { period: 'Week 3', squat: 190, deadlift: 235, benchpress: 150, pullup: 10 },
-    { period: 'Week 4', squat: 195, deadlift: 240, benchpress: 155, pullup: 12 }
-  ];
-
-  const volumeData = [
-    { period: 'Week 1', volume: 12500 },
-    { period: 'Week 2', volume: 14200 },
-    { period: 'Week 3', volume: 16800 },
-    { period: 'Week 4', volume: 17200 }
-  ];
-
-  const workoutHistory = [
-    { name: 'Summer Strength Program', dateRange: 'May 1 - May 28, 2025' },
-    { name: 'Spring Hypertrophy Cycle', dateRange: 'April 1 - April 28, 2025' },
-    { name: 'Winter Power Building', dateRange: 'March 1 - March 28, 2025' },
-    { name: 'New Year Kickstart', dateRange: 'February 1 - February 28, 2025' },
-    { name: 'Holiday Maintenance', dateRange: 'January 1 - January 28, 2025' }
-  ];
+  const weeklyProgressData: any[] = [];
+  const muscleGroupData: any[] = [];
+  const strengthProgressData: any[] = [];
+  const volumeData: any[] = [];
+  const workoutHistory: any[] = [];
 
   return (
     <div className="w-full space-y-6">

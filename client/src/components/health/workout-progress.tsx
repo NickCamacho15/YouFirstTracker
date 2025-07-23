@@ -8,35 +8,18 @@ interface WorkoutProgressProps {
 
 export function WorkoutProgress({ workouts }: WorkoutProgressProps) {
   
-  // Mock data for progress charts (based on your screenshots)
-  const rdlProgress = [
-    { session: 'Session 1', weight: 210 },
-    { session: 'Session 2', weight: 195 },
-    { session: 'Session 3', weight: 225 },
-    { session: 'Session 4', weight: 210 },
-    { session: 'Session 5', weight: 230 },
-    { session: 'Session 6', weight: 230 },
-  ];
-
-  const pullUpProgress = [
-    { session: 'Session 1', reps: 16 },
-    { session: 'Session 2', reps: 15.5 },
-    { session: 'Session 3', reps: 15 },
-    { session: 'Session 4', reps: 18 },
-    { session: 'Session 5', reps: 20 },
-  ];
-
-  const nordicCurlsProgress = [
-    { session: 'Session 1', time: 10 },
-    { session: 'Session 2', time: 8.2 },
-    { session: 'Session 3', time: 10 },
-  ];
-
-  const splitSquatProgress = [
-    { session: 'Session 1', time: 72 },
-    { session: 'Session 2', time: 76 },
-    { session: 'Session 3', time: 90 },
-  ];
+  // Progress data will be calculated from actual workouts
+  const rdlProgress: any[] = [];
+  const pullUpProgress: any[] = [];
+  const nordicCurlsProgress: any[] = [];
+  const splitSquatProgress: any[] = [];
+  
+  // Calculate actual stats from workout data
+  const totalWorkouts = workouts?.length || 0;
+  const strengthGain = 0; // Will be calculated from actual progression
+  const prsThisMonth = 0; // Will be calculated from actual PRs
+  const avgPerWeek = totalWorkouts > 0 ? (totalWorkouts / 4).toFixed(1) : "0";
+  const consistency = totalWorkouts > 0 ? Math.min(Math.round((totalWorkouts / 16) * 100), 100) : 0;
 
   return (
     <div className="space-y-6">
@@ -46,7 +29,7 @@ export function WorkoutProgress({ workouts }: WorkoutProgressProps) {
         <Card>
           <CardContent className="p-4 text-center">
             <TrendingUp className="w-8 h-8 text-green-500 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-gray-900">+8%</div>
+            <div className="text-2xl font-bold text-gray-900">{strengthGain > 0 ? `+${strengthGain}` : strengthGain}%</div>
             <div className="text-sm text-gray-600">Strength Gain</div>
           </CardContent>
         </Card>
@@ -54,7 +37,7 @@ export function WorkoutProgress({ workouts }: WorkoutProgressProps) {
         <Card>
           <CardContent className="p-4 text-center">
             <Target className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-gray-900">12</div>
+            <div className="text-2xl font-bold text-gray-900">{prsThisMonth}</div>
             <div className="text-sm text-gray-600">PRs This Month</div>
           </CardContent>
         </Card>
@@ -62,7 +45,7 @@ export function WorkoutProgress({ workouts }: WorkoutProgressProps) {
         <Card>
           <CardContent className="p-4 text-center">
             <Calendar className="w-8 h-8 text-purple-500 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-gray-900">3.2</div>
+            <div className="text-2xl font-bold text-gray-900">{avgPerWeek}</div>
             <div className="text-sm text-gray-600">Avg/Week</div>
           </CardContent>
         </Card>
@@ -70,7 +53,7 @@ export function WorkoutProgress({ workouts }: WorkoutProgressProps) {
         <Card>
           <CardContent className="p-4 text-center">
             <Activity className="w-8 h-8 text-orange-500 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-gray-900">85%</div>
+            <div className="text-2xl font-bold text-gray-900">{consistency}%</div>
             <div className="text-sm text-gray-600">Consistency</div>
           </CardContent>
         </Card>

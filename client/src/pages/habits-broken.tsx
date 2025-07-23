@@ -515,7 +515,7 @@ export default function HabitsPage() {
                     <h4 className="font-medium text-gray-900 mb-3">Weekly Adherence Pattern</h4>
                     <div className="grid grid-cols-7 gap-2">
                       {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => {
-                        const completionRate = Math.floor(Math.random() * 100) + 1; // Mock data - replace with real calculation
+                        const completionRate = 0; // Will be calculated from actual habit completion data
                         return (
                           <div key={day} className="text-center">
                             <div className="text-xs text-gray-600 mb-1">{day}</div>
@@ -538,21 +538,22 @@ export default function HabitsPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="text-center">
-                          <div className="text-lg font-bold text-blue-600">89%</div>
+                          <div className="text-lg font-bold text-blue-600">0%</div>
                           <p className="text-xs text-gray-600">This Month</p>
                         </div>
                         <div className="text-center">
-                          <div className="text-lg font-bold text-green-600">+12%</div>
+                          <div className="text-lg font-bold text-gray-600">0%</div>
                           <p className="text-xs text-gray-600">vs Last Month</p>
                         </div>
                         <div className="text-center">
-                          <div className="text-lg font-bold text-purple-600">24</div>
+                          <div className="text-lg font-bold text-purple-600">
+                            {Math.max(...(habits as Habit[]).map(h => h.streak), 0)}
+                          </div>
                           <p className="text-xs text-gray-600">Best Streak</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <ChevronUp className="w-4 h-4 text-green-500" />
-                        <span className="text-sm text-green-600 font-medium">Improving</span>
+                        <span className="text-sm text-gray-600 font-medium">Start tracking</span>
                       </div>
                     </div>
                   </div>
