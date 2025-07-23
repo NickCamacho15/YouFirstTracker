@@ -1,8 +1,18 @@
 import { OpenAI } from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!, // Add exclamation mark if using TypeScript
-});
+let openai: OpenAI | null = null;
+
+function getOpenAIClient(): OpenAI {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY environment variable is not set");
+    }
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openai;
+}
 
 export async function generatePlan(goal: string) {
   const systemPrompt = `
@@ -35,7 +45,7 @@ Return it in this exact JSON format:
 }
   `;
 
-  const chat = await openai.chat.completions.create({
+  const chat = await getOpenAIClient().chat.completions.create({
     model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     temperature: 0.7,
     messages: [
@@ -181,7 +191,7 @@ Fitness Profile:
 Create a complete 4-week periodized program with proper phase progression. Each week should have ${fitnessProfile.workoutDaysPerWeek} unique workouts.
   `;
 
-  const chat = await openai.chat.completions.create({
+  const chat = await getOpenAIClient().chat.completions.create({
     model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     temperature: 0.7,
     max_tokens: 4000, // Increased to ensure complete generation
