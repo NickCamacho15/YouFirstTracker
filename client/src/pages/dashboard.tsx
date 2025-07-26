@@ -163,156 +163,169 @@ export default function DashboardPage() {
         </div>
 
         {/* Weekly Overview - Standalone Tiles */}
-        <div className="mb-6">
-          <div className="space-y-2">
-            {/* Reading Tile */}
-            <div className="relative bg-white rounded-lg shadow-sm p-3 border border-gray-200 overflow-hidden">
-              {/* Background Bar Chart */}
-              <div className="absolute inset-0 flex items-end justify-end gap-1 p-2 opacity-10">
-                <div className="w-2 bg-blue-500 rounded-t" style={{height: '75%'}}></div>
-                <div className="w-2 bg-blue-500 rounded-t" style={{height: '60%'}}></div>
-                <div className="w-2 bg-blue-500 rounded-t" style={{height: '90%'}}></div>
-                <div className="w-2 bg-blue-500 rounded-t" style={{height: '45%'}}></div>
-                <div className="w-2 bg-blue-500 rounded-t" style={{height: '85%'}}></div>
-                <div className="w-2 bg-blue-500 rounded-t" style={{height: '70%'}}></div>
-                <div className="w-2 bg-blue-500 rounded-t" style={{height: '55%'}}></div>
-              </div>
-              
-              <div className="relative flex items-center justify-between">
-                <div>
-                  <h4 className="text-xs font-medium text-gray-600 uppercase tracking-wide">Reading</h4>
-                  <div className="flex items-baseline gap-2 mt-0.5">
-                    <p className="text-base font-bold text-gray-900">12.5h</p>
-                    <p className="text-xs font-bold text-blue-600">1.8h daily</p>
+        <Card className="border-0 shadow-lg mb-6">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-blue-600" />
+              <CardTitle className="text-base sm:text-lg">Weekly Performance</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Reading Tile */}
+              <div className="relative bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100 overflow-hidden">
+                {/* Background Bar Chart */}
+                <div className="absolute inset-0 flex items-end justify-end gap-1 p-2 opacity-10">
+                  <div className="w-2 bg-blue-500 rounded-t" style={{height: '75%'}}></div>
+                  <div className="w-2 bg-blue-500 rounded-t" style={{height: '60%'}}></div>
+                  <div className="w-2 bg-blue-500 rounded-t" style={{height: '90%'}}></div>
+                  <div className="w-2 bg-blue-500 rounded-t" style={{height: '45%'}}></div>
+                  <div className="w-2 bg-blue-500 rounded-t" style={{height: '85%'}}></div>
+                  <div className="w-2 bg-blue-500 rounded-t" style={{height: '70%'}}></div>
+                  <div className="w-2 bg-blue-500 rounded-t" style={{height: '55%'}}></div>
+                </div>
+                
+                <div className="relative flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700">Reading</h4>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <p className="text-2xl font-bold text-gray-900">12.5h</p>
+                      <p className="text-sm font-medium text-blue-600">1.8h daily</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-blue-600">83%</p>
+                    <p className="text-xs text-gray-600">of 15h goal</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-xl font-bold text-blue-600">83%</p>
-                  <p className="text-[10px] text-gray-500">of 15h goal</p>
-                </div>
               </div>
-            </div>
 
             {/* Meditation Tile */}
-            <div className="relative bg-white rounded-lg shadow-sm p-3 border border-gray-200 overflow-hidden">
-              {/* Background Bar Chart */}
-              <div className="absolute inset-0 flex items-end justify-end gap-1 p-2 opacity-10">
-                <div className="w-2 bg-green-500 rounded-t" style={{height: '80%'}}></div>
-                <div className="w-2 bg-green-500 rounded-t" style={{height: '95%'}}></div>
-                <div className="w-2 bg-green-500 rounded-t" style={{height: '70%'}}></div>
-                <div className="w-2 bg-green-500 rounded-t" style={{height: '100%'}}></div>
-                <div className="w-2 bg-green-500 rounded-t" style={{height: '85%'}}></div>
-                <div className="w-2 bg-green-500 rounded-t" style={{height: '90%'}}></div>
-                <div className="w-2 bg-green-500 rounded-t" style={{height: '75%'}}></div>
-              </div>
-              
-              <div className="relative flex items-center justify-between">
-                <div>
-                  <h4 className="text-xs font-medium text-gray-600 uppercase tracking-wide">Meditation</h4>
-                  <div className="flex items-baseline gap-2 mt-0.5">
-                    <p className="text-base font-bold text-gray-900">3.2h</p>
-                    <p className="text-xs font-bold text-green-600">27m daily</p>
+              <div className="relative bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-100 overflow-hidden">
+                {/* Background Bar Chart */}
+                <div className="absolute inset-0 flex items-end justify-end gap-1 p-2 opacity-10">
+                  <div className="w-2 bg-green-500 rounded-t" style={{height: '80%'}}></div>
+                  <div className="w-2 bg-green-500 rounded-t" style={{height: '95%'}}></div>
+                  <div className="w-2 bg-green-500 rounded-t" style={{height: '70%'}}></div>
+                  <div className="w-2 bg-green-500 rounded-t" style={{height: '100%'}}></div>
+                  <div className="w-2 bg-green-500 rounded-t" style={{height: '85%'}}></div>
+                  <div className="w-2 bg-green-500 rounded-t" style={{height: '90%'}}></div>
+                  <div className="w-2 bg-green-500 rounded-t" style={{height: '75%'}}></div>
+                </div>
+                
+                <div className="relative flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700">Meditation</h4>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <p className="text-2xl font-bold text-gray-900">3.2h</p>
+                      <p className="text-sm font-medium text-green-600">27m daily</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-green-600">91%</p>
+                    <p className="text-xs text-gray-600">of 3.5h goal</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-xl font-bold text-green-600">91%</p>
-                  <p className="text-[10px] text-gray-500">of 3.5h goal</p>
-                </div>
               </div>
-            </div>
 
-            {/* Screen Time Tile */}
-            <div className="relative bg-white rounded-lg shadow-sm p-3 border border-gray-200 overflow-hidden">
-              {/* Background Bar Chart */}
-              <div className="absolute inset-0 flex items-end justify-end gap-1 p-2 opacity-10">
-                <div className="w-2 bg-red-500 rounded-t" style={{height: '90%'}}></div>
-                <div className="w-2 bg-red-500 rounded-t" style={{height: '100%'}}></div>
-                <div className="w-2 bg-red-500 rounded-t" style={{height: '85%'}}></div>
-                <div className="w-2 bg-red-500 rounded-t" style={{height: '95%'}}></div>
-                <div className="w-2 bg-red-500 rounded-t" style={{height: '100%'}}></div>
-                <div className="w-2 bg-red-500 rounded-t" style={{height: '90%'}}></div>
-                <div className="w-2 bg-red-500 rounded-t" style={{height: '80%'}}></div>
-              </div>
-              
-              <div className="relative flex items-center justify-between">
-                <div>
-                  <h4 className="text-xs font-medium text-gray-600 uppercase tracking-wide">Screen Time</h4>
-                  <div className="flex items-baseline gap-2 mt-0.5">
-                    <p className="text-base font-bold text-gray-900">28h</p>
-                    <p className="text-xs font-bold text-red-600">4h daily</p>
+              {/* Screen Time Tile */}
+              <div className="relative bg-gradient-to-r from-red-50 to-orange-50 rounded-lg p-4 border border-red-100 overflow-hidden">
+                {/* Background Bar Chart */}
+                <div className="absolute inset-0 flex items-end justify-end gap-1 p-2 opacity-10">
+                  <div className="w-2 bg-red-500 rounded-t" style={{height: '90%'}}></div>
+                  <div className="w-2 bg-red-500 rounded-t" style={{height: '100%'}}></div>
+                  <div className="w-2 bg-red-500 rounded-t" style={{height: '85%'}}></div>
+                  <div className="w-2 bg-red-500 rounded-t" style={{height: '95%'}}></div>
+                  <div className="w-2 bg-red-500 rounded-t" style={{height: '100%'}}></div>
+                  <div className="w-2 bg-red-500 rounded-t" style={{height: '90%'}}></div>
+                  <div className="w-2 bg-red-500 rounded-t" style={{height: '80%'}}></div>
+                </div>
+                
+                <div className="relative flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700">Screen Time</h4>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <p className="text-2xl font-bold text-gray-900">28h</p>
+                      <p className="text-sm font-medium text-red-600">4h daily</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center gap-1">
+                      <p className="text-2xl font-bold text-red-600">200%</p>
+                      <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                    </div>
+                    <p className="text-xs text-gray-600">limit exceeded</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-1">
-                    <p className="text-xl font-bold text-red-600">200%</p>
-                    <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-                  </div>
-                  <p className="text-[10px] text-gray-500">limit exceeded</p>
-                </div>
               </div>
-            </div>
 
-            {/* Workouts Tile */}
-            <div className="relative bg-white rounded-lg shadow-sm p-3 border border-gray-200 overflow-hidden">
-              {/* Background Bar Chart */}
-              <div className="absolute inset-0 flex items-end justify-end gap-1 p-2 opacity-10">
-                <div className="w-2 bg-orange-500 rounded-t" style={{height: '85%'}}></div>
-                <div className="w-2 bg-orange-500 rounded-t" style={{height: '70%'}}></div>
-                <div className="w-2 bg-orange-500 rounded-t" style={{height: '100%'}}></div>
-                <div className="w-2 bg-orange-500 rounded-t" style={{height: '80%'}}></div>
-                <div className="w-2 bg-orange-500 rounded-t" style={{height: '95%'}}></div>
-                <div className="w-2 bg-orange-500 rounded-t" style={{height: '90%'}}></div>
-                <div className="w-2 bg-orange-500 rounded-t" style={{height: '75%'}}></div>
-              </div>
-              
-              <div className="relative flex items-center justify-between">
-                <div>
-                  <h4 className="text-xs font-medium text-gray-600 uppercase tracking-wide">Workouts</h4>
-                  <div className="flex items-baseline gap-2 mt-0.5">
-                    <p className="text-base font-bold text-gray-900">6.8h</p>
-                    <p className="text-xs font-bold text-orange-600">58m daily</p>
-                  </div>
+              {/* Workouts Tile */}
+              <div className="relative bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-4 border border-orange-100 overflow-hidden">
+                {/* Background Bar Chart */}
+                <div className="absolute inset-0 flex items-end justify-end gap-1 p-2 opacity-10">
+                  <div className="w-2 bg-orange-500 rounded-t" style={{height: '85%'}}></div>
+                  <div className="w-2 bg-orange-500 rounded-t" style={{height: '70%'}}></div>
+                  <div className="w-2 bg-orange-500 rounded-t" style={{height: '100%'}}></div>
+                  <div className="w-2 bg-orange-500 rounded-t" style={{height: '80%'}}></div>
+                  <div className="w-2 bg-orange-500 rounded-t" style={{height: '95%'}}></div>
+                  <div className="w-2 bg-orange-500 rounded-t" style={{height: '90%'}}></div>
+                  <div className="w-2 bg-orange-500 rounded-t" style={{height: '75%'}}></div>
                 </div>
-                <div className="text-right">
-                  <p className="text-xl font-bold text-orange-600">97%</p>
-                  <p className="text-[10px] text-gray-500">of 7h goal</p>
+                
+                <div className="relative flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700">Workouts</h4>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <p className="text-2xl font-bold text-gray-900">6.8h</p>
+                      <p className="text-sm font-medium text-orange-600">58m daily</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-orange-600">97%</p>
+                    <p className="text-xs text-gray-600">of 7h goal</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Day of Week Selector */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between bg-gray-100 rounded-lg p-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedDay(selectedDay === 0 ? 6 : selectedDay - 1)}
-              className="h-8 w-8 p-0"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <div className="text-center">
-              <div className="text-sm font-semibold text-gray-900">{dayNames[selectedDay]}</div>
-              <div className="text-xs text-gray-500">Daily Routines</div>
+        <Card className="border-0 shadow-lg mb-6">
+          <CardContent className="p-2">
+            <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedDay(selectedDay === 0 ? 6 : selectedDay - 1)}
+                className="h-10 w-10 p-0 hover:bg-blue-100"
+              >
+                <ChevronLeft className="w-5 h-5 text-blue-600" />
+              </Button>
+              <div className="text-center">
+                <div className="text-lg font-semibold text-gray-900">{dayNames[selectedDay]}</div>
+                <div className="text-sm text-gray-600">Daily Routines</div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedDay((selectedDay + 1) % 7)}
+                className="h-10 w-10 p-0 hover:bg-blue-100"
+              >
+                <ChevronRight className="w-5 h-5 text-blue-600" />
+              </Button>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedDay((selectedDay + 1) % 7)}
-              className="h-8 w-8 p-0"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Morning Routine */}
-        <Card className="mb-6 shadow-md">
+        <Card className="border-0 shadow-lg mb-6">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-bold text-gray-900 flex items-center justify-between">
-              <span>Morning Priming</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                <CardTitle className="text-base sm:text-lg">Morning Priming</CardTitle>
+              </div>
               <Button
                 size="sm"
                 variant="ghost"
@@ -321,7 +334,7 @@ export default function DashboardPage() {
               >
                 <Plus className="w-4 h-4 text-blue-600" />
               </Button>
-            </CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-3">
@@ -434,10 +447,13 @@ export default function DashboardPage() {
         </Card>
 
         {/* Evening Routine */}
-        <Card className="mb-6 shadow-md">
+        <Card className="border-0 shadow-lg mb-6">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-bold text-gray-900 flex items-center justify-between">
-              <span>Evening Reflection</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-purple-600" />
+                <CardTitle className="text-base sm:text-lg">Evening Reflection</CardTitle>
+              </div>
               <Button
                 size="sm"
                 variant="ghost"
@@ -446,7 +462,7 @@ export default function DashboardPage() {
               >
                 <Plus className="w-4 h-4 text-purple-600" />
               </Button>
-            </CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-3">

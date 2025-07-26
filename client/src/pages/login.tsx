@@ -122,7 +122,12 @@ export default function LoginPage() {
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter your email" {...field} />
+                            <Input 
+                              placeholder="Enter your email" 
+                              autoCapitalize="none"
+                              autoCorrect="off"
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -175,7 +180,12 @@ export default function LoginPage() {
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter your email" {...field} />
+                            <Input 
+                              placeholder="Enter your email" 
+                              autoCapitalize="none"
+                              autoCorrect="off"
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

@@ -22,17 +22,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+    cookie: { 
+      secure: false, 
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days instead of 24 hours
+      httpOnly: true,
+      sameSite: 'none' // Important for cross-domain cookies in mobile apps
+    }
   }));
 
   // Auth middleware
   const requireAuth = (req: any, res: any, next: any) => {
+    // Support both session and token authentication
     if (!req.session.userId) {
-      return res.status(401).json({ message: "Authentication required" });
+      // Check for token-based auth in headers (mobile fallback)
+      const userId = getUserIdFromHeaders(req);
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      // Set session for compatibility
+      req.session.userId = userId;
     }
+    
     // Set user object for compatibility with social routes
     req.user = { id: req.session.userId };
     next();
+  };
+
+  // Helper to get user ID from headers (for mobile)
+  const getUserIdFromHeaders = (req: any): number | null => {
+    const userDataHeader = req.headers['x-user-data'];
+    if (userDataHeader) {
+      try {
+        const userData = JSON.parse(userDataHeader);
+        if (userData && userData.id) {
+          return userData.id;
+        }
+      } catch (e) {
+        console.error("Failed to parse user data header", e);
+      }
+    }
+    return null;
   };
 
   // Auth routes
@@ -47,6 +76,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const user = await storage.createUser(userData);
       req.session.userId = user.id;
+      
+      // Add a custom header with the user data for mobile apps
+      res.setHeader('X-User-Data', JSON.stringify({ 
+        id: user.id, 
+        email: user.email, 
+        displayName: user.displayName 
+      }));
       
       res.json({ user: { id: user.id, email: user.email, displayName: user.displayName } });
     } catch (error) {
@@ -65,6 +101,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       req.session.userId = user.id;
+      
+      // Add a custom header with the user data for mobile apps
+      res.setHeader('X-User-Data', JSON.stringify({ 
+        id: user.id, 
+        email: user.email, 
+        displayName: user.displayName 
+      }));
+      
       res.json({ user: { id: user.id, email: user.email, displayName: user.displayName } });
     } catch (error) {
       console.error("Login error:", error);

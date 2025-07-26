@@ -1,5 +1,6 @@
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
+import "dotenv/config";
+import { Client } from "pg";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, desc, and, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { 
@@ -25,8 +26,12 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is required");
 }
 
-const sql_client = neon(process.env.DATABASE_URL);
-const db = drizzle(sql_client);
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+});
+
+client.connect();
+const db = drizzle(client);
 
 export interface IStorage {
   // Users
