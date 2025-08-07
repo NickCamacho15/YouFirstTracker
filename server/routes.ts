@@ -17,6 +17,66 @@ const registerSchema = z.object({
   password: z.string().min(6),
 });
 
+// Function to initialize a new user with default empty values
+async function initializeUserData(userId: number): Promise<void> {
+  try {
+    // Initialize default empty body metrics
+    await storage.createBodyWeightLog({
+      userId,
+      weight: 0,
+      bodyFat: 0,
+      date: new Date(),
+      notes: 'Initial setup'
+    });
+    
+    // Initialize default screen time entry with zero values
+    await storage.upsertScreenTimeEntry({
+      userId,
+      platform: 'Total',
+      timeMinutes: 0,
+      date: new Date().toISOString().split('T')[0],
+    });
+    
+    // Initialize reading sessions with zero values
+    await storage.createReadingSession({
+      userId,
+      bookTitle: 'Getting Started',
+      durationMinutes: 0,
+      pagesRead: 0,
+      notes: 'Initial setup',
+      completedAt: new Date()
+    });
+    
+    // Initialize meditation session with zero values
+    await storage.createMeditationSession({
+      userId,
+      type: 'Initial',
+      durationMinutes: 0,
+      notes: 'Initial setup',
+      completedAt: new Date()
+    });
+    
+    // Initialize workout entry with zero values
+    await storage.createWorkoutEntry({
+      userId,
+      weekNumber: 1,
+      dayNumber: 1,
+      blockLetter: 'A',
+      exerciseName: 'Getting Started',
+      weight: 0,
+      reps: 0,
+      sets: 0,
+      notes: 'Initial setup'
+    });
+    
+    console.log(`User ${userId} data initialized successfully`);
+  } catch (error) {
+    console.error(`Error initializing data for user ${userId}:`, error);
+    // We don't throw the error here to prevent breaking the registration process
+    // Just log it and continue
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key',
@@ -76,6 +136,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const user = await storage.createUser(userData);
       req.session.userId = user.id;
+      
+      // Initialize user data with default empty values
+      await initializeUserData(user.id);
       
       // Add a custom header with the user data for mobile apps
       res.setHeader('X-User-Data', JSON.stringify({ 
@@ -316,6 +379,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Complete goal error:", error);
       res.status(400).json({ message: "Failed to complete goal" });
+    }
+  });
+
+  // Tasks routes
+  app.get("/api/tasks", requireAuth, async (req, res) => {
+    try {
+      const tasks = await storage.getTasksByUserId(req.session.userId);
+      res.json(tasks);
+    } catch (error) {
+      console.error("Get tasks error:", error);
+      res.status(500).json({ message: "Failed to get tasks" });
+    }
+  });
+
+  app.post("/api/tasks", requireAuth, async (req, res) => {
+    try {
+      const taskData = insertTaskSchema.parse({
+        ...req.body,
+        userId: req.session.userId,
+      });
+      const task = await storage.createTask(taskData);
+      res.status(201).json(task);
+    } catch (error) {
+      console.error("Create task error:", error);
+      res.status(400).json({ message: "Failed to create task" });
+    }
+  });
+
+  app.put("/api/tasks/:id", requireAuth, async (req, res) => {
+    try {
+      const taskId = parseInt(req.params.id);
+      const task = await storage.updateTask(taskId, req.body);
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      res.json(task);
+    } catch (error) {
+      console.error("Update task error:", error);
+      res.status(400).json({ message: "Failed to update task" });
+    }
+  });
+
+  app.delete("/api/tasks/:id", requireAuth, async (req, res) => {
+    try {
+      const taskId = parseInt(req.params.id);
+      const success = await storage.deleteTask(taskId);
+      if (!success) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      res.json({ message: "Task deleted successfully" });
+    } catch (error) {
+      console.error("Delete task error:", error);
+      res.status(500).json({ message: "Failed to delete task" });
+    }
+  });
+
+  // Morning routines routes
+  app.get("/api/morning-routines", requireAuth, async (req, res) => {
+    try {
+      const routines = await storage.getRoutinesByUserId(req.session.userId, "morning");
+      res.json(routines);
+    } catch (error) {
+      console.error("Get morning routines error:", error);
+      res.status(500).json({ message: "Failed to get morning routines" });
+    }
+  });
+
+  // Evening routines routes
+  app.get("/api/evening-routines", requireAuth, async (req, res) => {
+    try {
+      const routines = await storage.getRoutinesByUserId(req.session.userId, "evening");
+      res.json(routines);
+    } catch (error) {
+      console.error("Get evening routines error:", error);
+      res.status(500).json({ message: "Failed to get evening routines" });
+    }
+  });
+  
+  // Routine update endpoint
+  app.put("/api/routines/:id", requireAuth, async (req, res) => {
+    try {
+      const routineId = parseInt(req.params.id);
+      const routine = await storage.updateRoutine(routineId, req.body);
+      if (!routine) {
+        return res.status(404).json({ message: "Routine not found" });
+      }
+      res.json(routine);
+    } catch (error) {
+      console.error("Update routine error:", error);
+      res.status(400).json({ message: "Failed to update routine" });
     }
   });
 

@@ -209,6 +209,19 @@ export const userStats = pgTable("user_stats", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Routines for morning and evening
+export const routines = pgTable("routines", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  text: text("text").notNull(),
+  type: text("type", { enum: ["morning", "evening"] }).notNull(),
+  completed: boolean("completed").default(false).notNull(),
+  streak: integer("streak").default(0).notNull(),
+  weeklyTarget: integer("weekly_target").default(7).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Insights tracking table
 export const insights = pgTable("insights", {
   id: serial("id").primaryKey(),
@@ -584,6 +597,13 @@ export const insertUserStatsSchema = createInsertSchema(userStats).omit({
   updatedAt: true,
 });
 
+export const insertRoutineSchema = createInsertSchema(routines).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  streak: true,
+});
+
 export const insertInsightSchema = createInsertSchema(insights).omit({
   id: true,
   createdAt: true,
@@ -746,6 +766,9 @@ export type ExerciseHistoryItem = typeof exerciseHistory.$inferSelect;
 export type InsertExerciseHistory = z.infer<typeof insertExerciseHistorySchema>;
 export type WorkoutSession = typeof workoutSessions.$inferSelect;
 export type InsertWorkoutSession = z.infer<typeof insertWorkoutSessionSchema>;
+
+export type Routine = typeof routines.$inferSelect;
+export type InsertRoutine = z.infer<typeof insertRoutineSchema>;
 
 // Screen time schemas
 export const insertScreenTimeEntrySchema = createInsertSchema(screenTimeEntries);

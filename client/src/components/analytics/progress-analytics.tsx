@@ -23,13 +23,8 @@ export default function ProgressAnalytics({ className }: ProgressAnalyticsProps)
       date.setDate(now.getDate() - (dataPoints - 1 - i) * interval);
       
       const weekNumber = dataPoints - i;
-      const baseValues = {
-        benchPress: 225 + (i * 2) + Math.random() * 10,
-        squat: 315 + (i * 3) + Math.random() * 15,
-        clean: 185 + (i * 1.5) + Math.random() * 8,
-        overheadPress: 135 + (i * 1) + Math.random() * 5,
-      };
       
+      // For a new user, return zero values for all exercise data points
       return {
         date: date.toLocaleDateString('en-US', { 
           month: 'short', 
@@ -37,13 +32,11 @@ export default function ProgressAnalytics({ className }: ProgressAnalyticsProps)
           ...(timeframe === "1year" && { year: '2-digit' })
         }),
         weekNumber,
-        benchPress: Math.round(baseValues.benchPress),
-        squat: Math.round(baseValues.squat),
-        clean: Math.round(baseValues.clean),
-        overheadPress: Math.round(baseValues.overheadPress),
-        totalVolume: Math.round(
-          (baseValues.benchPress * 4 + baseValues.squat * 5 + baseValues.clean * 3 + baseValues.overheadPress * 4) * 3
-        ),
+        benchPress: 0,
+        squat: 0,
+        clean: 0,
+        overheadPress: 0,
+        totalVolume: 0,
       };
     });
   };

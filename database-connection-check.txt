@@ -1,0 +1,20 @@
+Please check the Supabase dashboard for the correct database connection information:
+
+1. Go to the Supabase dashboard
+2. Click on your project (YouFirst Tracker)
+3. Click on "Project Settings" (gear icon) in the left sidebar
+4. Click on "Database" in the left sidebar
+5. Look for the "Connection Info" section
+6. Check the "Host" value - it should match the hostname in your connection string
+
+Also, check if there's a "Connection String" section where you can directly copy the connection string format.
+
+The connection string should be in this format:
+postgres://postgres:[YOUR-PASSWORD]@[HOST]:[PORT]/postgres
+
+Where:
+- [YOUR-PASSWORD] is your database password
+- [HOST] is the database hostname (should be db.jevviwdsnyvvtpnqbecm.supabase.co)
+- [PORT] is the database port (should be 5432 for direct connection or 6543 for connection pooler)
+
+Additionally, check if there's a "Connection Pooling" section that provides a different hostname for connection pooling.

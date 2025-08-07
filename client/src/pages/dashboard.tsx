@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { CheckCircle2, ChevronLeft, ChevronRight, Plus, Target, Shield, Layers, Star, Flame } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { Routine } from '@shared/schema';
+import { apiRequest } from '@/lib/queryClient';
 import { NewGoalModal } from '@/components/goals/new-goal-modal';
 import { NewTaskModal } from '@/components/dashboard/new-task-modal';
 import { DayTrackerCalendar } from '@/components/dashboard/day-tracker-calendar';
@@ -52,104 +54,149 @@ export default function DashboardPage() {
   const [selectedDay, setSelectedDay] = useState(new Date().getDay());
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+  const queryClient = useQueryClient();
+
+  // Fetch data from API
   const { data: goals = [] } = useQuery<Goal[]>({
     queryKey: ['/api/goals'],
   });
 
-  const [morningRoutines, setMorningRoutines] = useState<RoutineTask[]>([
-    { id: 'morning-1', text: 'Morning Prayer & Meditation', completed: false, streak: 12, weeklyTarget: 7 },
-    { id: 'morning-2', text: 'Exercise & Movement', completed: false, streak: 8, weeklyTarget: 5 },
-    { id: 'morning-3', text: 'Healthy Breakfast', completed: false, streak: 15, weeklyTarget: 7 },
-    { id: 'morning-4', text: 'Review Daily Priorities', completed: false, streak: 6, weeklyTarget: 7 }
-  ]);
-
-  const [eveningRoutines, setEveningRoutines] = useState<RoutineTask[]>([
-    { id: 'evening-1', text: 'Daily Reflection Journal', completed: false, streak: 9, weeklyTarget: 7 },
-    { id: 'evening-2', text: 'Reading (30 min)', completed: false, streak: 11, weeklyTarget: 6 },
-    { id: 'evening-3', text: 'Prepare Tomorrow', completed: false, streak: 4, weeklyTarget: 7 },
-    { id: 'evening-4', text: 'Gratitude Practice', completed: false, streak: 14, weeklyTarget: 7 }
-  ]);
-
-  const [weeklyTasks, setWeeklyTasks] = useState<{ [key: number]: Task[] }>({
-    0: [ // Sunday
-      { id: 'sun-1', text: 'Weekly planning & reflection', completed: false, type: 'today', goalId: 1 },
-      { id: 'sun-2', text: 'Meal prep for the week', completed: false, type: 'today', goalId: 2 },
-      { id: 'sun-3', text: 'Review financial goals', completed: false, type: 'today', goalId: 3 },
-    ],
-    1: [ // Monday
-      { id: 'mon-1', text: 'Team meeting preparation', completed: false, type: 'today', goalId: 1 },
-      { id: 'mon-2', text: 'Work on strategic project', time: '10:00 AM', completed: false, type: 'today', goalId: 2 },
-      { id: 'mon-3', text: 'Gym - Upper body workout', time: '6:00 PM', completed: false, type: 'today', goalId: 3 },
-      { id: 'mon-4', text: 'Call Mom', time: '7:30 PM', completed: false, type: 'today', goalId: 4 },
-    ],
-    2: [ // Tuesday
-      { id: 'tue-1', text: 'Client presentation prep', completed: false, type: 'today', goalId: 1 },
-      { id: 'tue-2', text: 'Deep work block', time: '9:00 AM - 12:00 PM', completed: false, type: 'today', goalId: 2 },
-      { id: 'tue-3', text: 'Cardio & core workout', time: '5:30 PM', completed: false, type: 'today', goalId: 3 },
-    ],
-    3: [ // Wednesday
-      { id: 'wed-1', text: 'Mid-week review', completed: false, type: 'today', goalId: 1 },
-      { id: 'wed-2', text: 'Professional development', time: '2:00 PM', completed: false, type: 'today', goalId: 2 },
-      { id: 'wed-3', text: 'Yoga & meditation', time: '6:00 PM', completed: false, type: 'today', goalId: 3 },
-    ],
-    4: [ // Thursday
-      { id: 'thu-1', text: 'Project milestone check', completed: false, type: 'today', goalId: 1 },
-      { id: 'thu-2', text: 'Networking event', time: '5:00 PM', completed: false, type: 'today', goalId: 2 },
-      { id: 'thu-3', text: 'Lower body workout', time: '6:30 AM', completed: false, type: 'today', goalId: 3 },
-    ],
-    5: [ // Friday
-      { id: 'fri-1', text: 'Weekly report completion', completed: false, type: 'today', goalId: 1 },
-      { id: 'fri-2', text: 'Team retrospective', time: '3:00 PM', completed: false, type: 'today', goalId: 2 },
-      { id: 'fri-3', text: 'Plan weekend activities', completed: false, type: 'today', goalId: 4 },
-    ],
-    6: [ // Saturday
-      { id: 'sat-1', text: 'Long run or hike', time: '7:00 AM', completed: false, type: 'today', goalId: 3 },
-      { id: 'sat-2', text: 'Personal project time', completed: false, type: 'today', goalId: 2 },
-      { id: 'sat-3', text: 'Social activity', time: 'Evening', completed: false, type: 'today', goalId: 4 },
-    ]
+  const { data: tasks = [], isLoading: tasksLoading } = useQuery<Task[]>({
+    queryKey: ['/api/tasks'],
   });
+
+  const { data: morningRoutinesData = [], isLoading: morningLoading } = useQuery<Routine[]>({
+    queryKey: ['/api/morning-routines'],
+  });
+
+  const { data: eveningRoutinesData = [], isLoading: eveningLoading } = useQuery<Routine[]>({
+    queryKey: ['/api/evening-routines'],
+  });
+
+  // Convert database routines to RoutineTask format
+  const morningRoutines: RoutineTask[] = morningRoutinesData.map(routine => ({
+    id: routine.id.toString(),
+    text: routine.text,
+    completed: routine.completed,
+    streak: routine.streak,
+    weeklyTarget: routine.weeklyTarget
+  }));
+
+  const eveningRoutines: RoutineTask[] = eveningRoutinesData.map(routine => ({
+    id: routine.id.toString(),
+    text: routine.text,
+    completed: routine.completed,
+    streak: routine.streak,
+    weeklyTarget: routine.weeklyTarget
+  }));
+
+  // Organize tasks by day of week
+  const weeklyTasks = useMemo(() => {
+    const tasksByDay: { [key: number]: Task[] } = {
+      0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: []
+    };
+    
+    // Assign tasks to days based on timeframe property
+    tasks.forEach(task => {
+      // For now, assign all tasks to current day
+      // In a real implementation, you'd use the task's due date or day property
+      const dayNumber = selectedDay;
+      if (!tasksByDay[dayNumber]) {
+        tasksByDay[dayNumber] = [];
+      }
+      tasksByDay[dayNumber].push(task);
+    });
+    
+    return tasksByDay;
+  }, [tasks, selectedDay]);
 
   // Get tasks for the selected day
   const currentDayTasks = weeklyTasks[selectedDay] || [];
 
-  // Calculate total completed tasks (cumulative counter)
-  const criticalTasksCompleted = Object.values(weeklyTasks).flat().filter(t => t.completed).length + 147; // Adding base amount for long-term tracking
+  // Calculate total completed tasks
+  const criticalTasksCompleted = Object.values(weeklyTasks).flat().filter(t => t.completed).length;
+
+  const toggleTaskMutation = useMutation({
+    mutationFn: async ({ taskId, completed }: { taskId: number, completed: boolean }) => {
+      const response = await apiRequest(`/api/tasks/${taskId}`, { 
+        method: 'PUT', 
+        body: { completed } 
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+    }
+  });
 
   const handleWeeklyTaskToggle = (taskId: string) => {
-    setWeeklyTasks(prev => ({
-      ...prev,
-      [selectedDay]: prev[selectedDay].map(task => 
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
-    }));
+    const id = parseInt(taskId);
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+      toggleTaskMutation.mutate({ 
+        taskId: id, 
+        completed: !task.completed 
+      });
+    }
   };
+
+  const createTaskMutation = useMutation({
+    mutationFn: async (data: { title: string; goalId: number; timeframe: string; dueDate?: string }) => {
+      const response = await apiRequest('/api/tasks', { 
+        method: 'POST', 
+        body: data 
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      setShowNewTaskModal(false);
+    }
+  });
 
   const handleNewTask = (taskData: { text: string; goalId: number; time?: string }) => {
-    const newTask: Task = {
-      id: `task-${Date.now()}`,
-      text: taskData.text,
-      time: taskData.time,
-      completed: false,
-      type: 'today',
-      goalId: taskData.goalId
-    };
-
-    setWeeklyTasks(prev => ({
-      ...prev,
-      [selectedDay]: [...(prev[selectedDay] || []), newTask]
-    }));
+    createTaskMutation.mutate({
+      title: taskData.text,
+      goalId: taskData.goalId,
+      timeframe: 'today',
+      dueDate: taskData.time
+    });
   };
 
+  const toggleRoutineMutation = useMutation({
+    mutationFn: async ({ routineId, completed }: { routineId: number, completed: boolean }) => {
+      const response = await apiRequest(`/api/routines/${routineId}`, { 
+        method: 'PUT', 
+        body: { completed } 
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/morning-routines'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/evening-routines'] });
+    }
+  });
+
   const handleMorningRoutineToggle = (taskId: string) => {
-    setMorningRoutines(prev => prev.map(task => 
-      task.id === taskId ? { ...task, completed: !task.completed } : task
-    ));
+    const id = parseInt(taskId);
+    const routine = morningRoutinesData.find(r => r.id === id);
+    if (routine) {
+      toggleRoutineMutation.mutate({
+        routineId: id,
+        completed: !routine.completed
+      });
+    }
   };
 
   const handleEveningRoutineToggle = (taskId: string) => {
-    setEveningRoutines(prev => prev.map(task => 
-      task.id === taskId ? { ...task, completed: !task.completed } : task
-    ));
+    const id = parseInt(taskId);
+    const routine = eveningRoutinesData.find(r => r.id === id);
+    if (routine) {
+      toggleRoutineMutation.mutate({
+        routineId: id,
+        completed: !routine.completed
+      });
+    }
   };
 
   const getGoalById = (goalId: number) => goals.find(g => g.id === goalId);
@@ -189,12 +236,12 @@ export default function DashboardPage() {
                   <div>
                     <h4 className="text-sm font-medium text-gray-700">Reading</h4>
                     <div className="flex items-baseline gap-2 mt-1">
-                      <p className="text-2xl font-bold text-gray-900">12.5h</p>
-                      <p className="text-sm font-medium text-blue-600">1.8h daily</p>
+                      <p className="text-2xl font-bold text-gray-900">0h</p>
+                      <p className="text-sm font-medium text-blue-600">0h daily</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-blue-600">83%</p>
+                    <p className="text-2xl font-bold text-blue-600">0%</p>
                     <p className="text-xs text-gray-600">of 15h goal</p>
                   </div>
                 </div>
@@ -217,12 +264,12 @@ export default function DashboardPage() {
                   <div>
                     <h4 className="text-sm font-medium text-gray-700">Meditation</h4>
                     <div className="flex items-baseline gap-2 mt-1">
-                      <p className="text-2xl font-bold text-gray-900">3.2h</p>
-                      <p className="text-sm font-medium text-green-600">27m daily</p>
+                      <p className="text-2xl font-bold text-gray-900">0h</p>
+                      <p className="text-sm font-medium text-green-600">0m daily</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-green-600">91%</p>
+                    <p className="text-2xl font-bold text-green-600">0%</p>
                     <p className="text-xs text-gray-600">of 3.5h goal</p>
                   </div>
                 </div>
@@ -245,16 +292,15 @@ export default function DashboardPage() {
                   <div>
                     <h4 className="text-sm font-medium text-gray-700">Screen Time</h4>
                     <div className="flex items-baseline gap-2 mt-1">
-                      <p className="text-2xl font-bold text-gray-900">28h</p>
-                      <p className="text-sm font-medium text-red-600">4h daily</p>
+                      <p className="text-2xl font-bold text-gray-900">0h</p>
+                      <p className="text-sm font-medium text-red-600">0h daily</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-1">
-                      <p className="text-2xl font-bold text-red-600">200%</p>
-                      <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                      <p className="text-2xl font-bold text-red-600">0%</p>
                     </div>
-                    <p className="text-xs text-gray-600">limit exceeded</p>
+                    <p className="text-xs text-gray-600">of limit</p>
                   </div>
                 </div>
               </div>
@@ -276,12 +322,12 @@ export default function DashboardPage() {
                   <div>
                     <h4 className="text-sm font-medium text-gray-700">Workouts</h4>
                     <div className="flex items-baseline gap-2 mt-1">
-                      <p className="text-2xl font-bold text-gray-900">6.8h</p>
-                      <p className="text-sm font-medium text-orange-600">58m daily</p>
+                      <p className="text-2xl font-bold text-gray-900">0h</p>
+                      <p className="text-sm font-medium text-orange-600">0m daily</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-orange-600">97%</p>
+                    <p className="text-2xl font-bold text-orange-600">0%</p>
                     <p className="text-xs text-gray-600">of 7h goal</p>
                   </div>
                 </div>
@@ -557,7 +603,7 @@ export default function DashboardPage() {
 
               {/* Consistency Score */}
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-purple-600">89%</div>
+                <div className="text-2xl font-bold text-purple-600">0%</div>
                 <p className="text-sm text-gray-600 mt-1">Consistency</p>
                 <div className="flex items-center justify-center gap-1 mt-2">
                   <Star className="w-4 h-4 text-purple-500" />

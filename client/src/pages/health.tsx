@@ -81,14 +81,14 @@ export default function HealthPage() {
     weeks: []
   });
   const [personalRecords, setPersonalRecords] = useState([
-    { exercise: "Bench Press", weight: 225, percentages: {} },
-    { exercise: "Squat", weight: 315, percentages: {} },
-    { exercise: "Deadlift", weight: 405, percentages: {} },
-    { exercise: "Overhead Press", weight: 135, percentages: {} },
+    { exercise: "Bench Press", weight: 0, percentages: {} },
+    { exercise: "Squat", weight: 0, percentages: {} },
+    { exercise: "Deadlift", weight: 0, percentages: {} },
+    { exercise: "Overhead Press", weight: 0, percentages: {} },
   ]);
   const [bodyMetrics, setBodyMetrics] = useState({
-    weight: 185,
-    bodyFat: 12.5,
+    weight: 0,
+    bodyFat: 0,
   });
   const [showPercentages, setShowPercentages] = useState<{ [key: string]: boolean }>({});
 
@@ -592,19 +592,19 @@ export default function HealthPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center py-1 border-b border-gray-100">
                       <span className="text-xs text-gray-600">Total Workouts</span>
-                      <span className="text-sm font-medium text-gray-900">247</span>
+                      <span className="text-sm font-medium text-gray-900">0</span>
                     </div>
                     <div className="flex justify-between items-center py-1 border-b border-gray-100">
                       <span className="text-xs text-gray-600">Avg. Workout Duration</span>
-                      <span className="text-sm font-medium text-gray-900">52 mins</span>
+                      <span className="text-sm font-medium text-gray-900">0 mins</span>
                     </div>
                     <div className="flex justify-between items-center py-1 border-b border-gray-100">
                       <span className="text-xs text-gray-600">Current Streak</span>
-                      <span className="text-sm font-medium text-green-600">12 days</span>
+                      <span className="text-sm font-medium text-green-600">0 days</span>
                     </div>
                     <div className="flex justify-between items-center py-1">
                       <span className="text-xs text-gray-600">Total Volume This Week</span>
-                      <span className="text-sm font-medium text-gray-900">42,350 lbs</span>
+                      <span className="text-sm font-medium text-gray-900">0 lbs</span>
                     </div>
                   </div>
                 </div>

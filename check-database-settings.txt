@@ -1,0 +1,10 @@
+Please check the Supabase dashboard for the database connection settings:
+
+1. Go to the Supabase dashboard
+2. Click on your project (YouFirst Tracker)
+3. Click on "Project Settings" (gear icon) in the left sidebar
+4. Click on "Database" in the left sidebar
+5. Look for the "Connection Info" or "Connection Pooling" section
+6. Check if there's a "Connection String" that you can copy
+
+Also, since you're on a Pro plan, check if your database might be paused. Free tier databases are paused after 1 week of inactivity, but Pro tier databases should remain active.

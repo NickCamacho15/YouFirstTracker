@@ -1,0 +1,8 @@
+// Try this direct connection string format
+DATABASE_URL=postgres://postgres:ckEmWntBVBvrAmpi@db.jevviwdsnyvvtpnqbecm.supabase.co:5432/postgres
+
+// Or try this format for the pooler connection
+DATABASE_URL=postgres://postgres:ckEmWntBVBvrAmpi@aws-0-us-east-1.pooler.supabase.com:6543/postgres?options=project%3Djevviwdsnyvvtpnqbecm
+
+// Or try this format
+DATABASE_URL=postgres://postgres.jevviwdsnyvvtpnqbecm:ckEmWntBVBvrAmpi@aws-0-us-east-1.pooler.supabase.com:6543/postgres?options=project%3Djevviwdsnyvvtpnqbecm

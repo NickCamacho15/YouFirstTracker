@@ -22,17 +22,22 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- Production configuration with enhanced security -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
+		<!-- In production, we should restrict arbitrary loads -->
 		<key>NSAllowsArbitraryLoads</key>
-		<true/>
+		<false/>
+		<!-- Add specific domains your app needs to communicate with -->
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>192.168.1.190</key>
+			<key>supabase.co</key>
 			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
 				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<false/>
+				<key>NSExceptionRequiresForwardSecrecy</key>
 				<true/>
 			</dict>
 		</dict>

@@ -1,0 +1,2 @@
+# Try this direct connection string instead of the pooler
+DATABASE_URL=postgres://postgres:ckEmWntBVBvrAmpi@db.jevviwdsnyvvtpnqbecm.supabase.co:5432/postgres

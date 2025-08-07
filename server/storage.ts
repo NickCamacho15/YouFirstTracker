@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 import { 
   users, goals, microGoals, habits, habitLogs, readingSessions, readingList, meditationSessions, posts, visionBoard, tasks, wonDays, rules, challenges, challengeLogs,
   followers, postReactions, postComments, workouts, exercises, workoutExercises, bodyWeightLogs,
-  trainingTemplates, exerciseHistory, screenTimeEntries, workoutEntries, workoutSessions,
+  trainingTemplates, exerciseHistory, screenTimeEntries, workoutEntries, workoutSessions, routines,
   type User, type InsertUser, type Goal, type InsertGoal, type MicroGoal, type InsertMicroGoal,
   type Habit, type InsertHabit, type HabitLog, type InsertHabitLog,
   type ReadingSession, type InsertReadingSession, type ReadingListItem, type InsertReadingListItem,
@@ -19,7 +19,7 @@ import {
   type Exercise, type InsertExercise, type WorkoutExercise, type InsertWorkoutExercise,
   type BodyWeightLog, type InsertBodyWeightLog, type TrainingTemplate, type InsertTrainingTemplate,
   type ExerciseHistoryItem, type InsertExerciseHistory, type ScreenTimeEntry, type InsertScreenTimeEntry,
-  type WorkoutEntry, type InsertWorkoutEntry
+  type WorkoutEntry, type InsertWorkoutEntry, type Routine, type InsertRoutine
 } from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -40,6 +40,12 @@ export interface IStorage {
   createUser(user: InsertUser & { password: string }): Promise<User>;
   updateUser(id: number, updates: Partial<Omit<User, 'id' | 'createdAt' | 'passwordHash'>>): Promise<User | undefined>;
   validatePassword(email: string, password: string): Promise<User | null>;
+  
+  // Routines
+  getRoutinesByUserId(userId: number, type: string): Promise<Routine[]>;
+  createRoutine(routine: InsertRoutine): Promise<Routine>;
+  updateRoutine(id: number, updates: Partial<Routine>): Promise<Routine | undefined>;
+  deleteRoutine(id: number): Promise<boolean>;
 
   // Goals
   getGoalsByUserId(userId: number): Promise<Goal[]>;
@@ -425,6 +431,30 @@ export class DatabaseStorage implements IStorage {
 
   async deleteTask(id: number): Promise<boolean> {
     const result = await db.delete(tasks).where(eq(tasks.id, id));
+    return result.rowCount > 0;
+  }
+  
+  // Routines
+  async getRoutinesByUserId(userId: number, type: string): Promise<Routine[]> {
+    return await db.select().from(routines)
+      .where(and(
+        eq(routines.userId, userId),
+        eq(routines.type, type)
+      ));
+  }
+
+  async createRoutine(routine: InsertRoutine): Promise<Routine> {
+    const result = await db.insert(routines).values(routine).returning();
+    return result[0];
+  }
+
+  async updateRoutine(id: number, updates: Partial<Routine>): Promise<Routine | undefined> {
+    const result = await db.update(routines).set(updates).where(eq(routines.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteRoutine(id: number): Promise<boolean> {
+    const result = await db.delete(routines).where(eq(routines.id, id));
     return result.rowCount > 0;
   }
 
